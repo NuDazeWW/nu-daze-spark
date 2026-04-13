@@ -26,7 +26,7 @@ export function useStrategyTable<T extends Record<string, unknown>>(table: Table
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as T[];
+      return data as unknown as T[];
     },
     enabled: !!user,
   });
