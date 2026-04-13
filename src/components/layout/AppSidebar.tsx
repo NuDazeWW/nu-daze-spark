@@ -1,0 +1,118 @@
+import { useLocation, Link } from "react-router-dom";
+import {
+  LayoutDashboard,
+  FolderOpen,
+  Link2,
+  Settings2,
+  Sparkles,
+  CalendarDays,
+  MessageSquare,
+  CheckCircle2,
+  Repeat2,
+  LogOut,
+} from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarSeparator,
+} from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/useAuth";
+
+const mainNav = [
+  { title: "Dashboard", icon: LayoutDashboard, href: "/" },
+  { title: "Asset Library", icon: FolderOpen, href: "/assets" },
+  { title: "Connected Sources", icon: Link2, href: "/sources" },
+  { title: "Strategy & Rules", icon: Settings2, href: "/strategy" },
+];
+
+const contentNav = [
+  { title: "AI Post Generator", icon: Sparkles, href: "/generator" },
+  { title: "Daily Queue", icon: CalendarDays, href: "/queue" },
+  { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
+  { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
+  { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
+];
+
+export function AppSidebar() {
+  const location = useLocation();
+  const { user, signOut } = useAuth();
+
+  return (
+    <Sidebar>
+      <SidebarHeader className="px-4 py-5">
+        <Link to="/" className="flex items-center gap-2">
+          <span className="text-xl font-bold tracking-tight text-sidebar-foreground">
+            Nu<span className="text-primary">Daze</span>
+          </span>
+          <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
+            Copilot
+          </span>
+        </Link>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Overview</SidebarGroupLabel>
+          <SidebarMenu>
+            {mainNav.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname === item.href}
+                  tooltip={item.title}
+                >
+                  <Link to={item.href}>
+                    <item.icon className="size-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Content</SidebarGroupLabel>
+          <SidebarMenu>
+            {contentNav.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname === item.href}
+                  tooltip={item.title}
+                >
+                  <Link to={item.href}>
+                    <item.icon className="size-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="px-3 py-3">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={signOut} tooltip="Sign out">
+              <LogOut className="size-4" />
+              <span className="truncate text-sm">
+                {user?.email ?? "Sign out"}
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
