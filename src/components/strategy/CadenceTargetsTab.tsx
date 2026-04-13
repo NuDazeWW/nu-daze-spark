@@ -79,13 +79,13 @@ export function CadenceTargetsTab() {
       <StrategyFormDialog open={formOpen} onOpenChange={setFormOpen} title={editing ? "Edit Cadence Target" : "Add Cadence Target"}>
         <div className="space-y-4">
           <div><Label>Platform</Label>
-            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v }))}>
+            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{PLATFORMS.map((p) => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div><Label>Content Type</Label>
-            <Select value={form.content_type} onValueChange={(v) => setForm((f) => ({ ...f, content_type: v }))}>
+            <Select value={form.content_type} onValueChange={(v) => setForm((f) => ({ ...f, content_type: v as typeof form.content_type }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{CONTENT_TYPES.map((c) => <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>)}</SelectContent>
             </Select>

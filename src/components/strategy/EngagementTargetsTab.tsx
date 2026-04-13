@@ -78,7 +78,7 @@ export function EngagementTargetsTab() {
       <StrategyFormDialog open={formOpen} onOpenChange={setFormOpen} title={editing ? "Edit Engagement Target" : "Add Engagement Target"}>
         <div className="space-y-4">
           <div><Label>Platform</Label>
-            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v }))}>
+            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{PLATFORMS.map((p) => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent>
             </Select>
