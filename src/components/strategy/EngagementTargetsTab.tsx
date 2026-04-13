@@ -23,7 +23,7 @@ export function EngagementTargetsTab() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<EngagementTarget | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState({ platform: "linkedin" as string, daily_target: "5", min_relevance_threshold: "0.7", risk_tolerance: "safe_only", topic_category: "", is_active: true });
+  const [form, setForm] = useState({ platform: "linkedin" as "linkedin" | "instagram", daily_target: "5", min_relevance_threshold: "0.7", risk_tolerance: "safe_only", topic_category: "", is_active: true });
 
   const openCreate = () => { setEditing(null); setForm({ platform: "linkedin", daily_target: "5", min_relevance_threshold: "0.7", risk_tolerance: "safe_only", topic_category: "", is_active: true }); setFormOpen(true); };
   const openEdit = (r: EngagementTarget) => {

@@ -24,7 +24,7 @@ export function CadenceTargetsTab() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<CadenceTarget | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState({ platform: "linkedin" as string, content_type: "post" as string, daily_target: "1", weekly_target: "5", is_active: true });
+  const [form, setForm] = useState({ platform: "linkedin" as "linkedin" | "instagram", content_type: "post" as "post" | "story" | "reel" | "article" | "carousel" | "comment", daily_target: "1", weekly_target: "5", is_active: true });
 
   const openCreate = () => { setEditing(null); setForm({ platform: "linkedin", content_type: "post", daily_target: "1", weekly_target: "5", is_active: true }); setFormOpen(true); };
   const openEdit = (r: CadenceTarget) => {
