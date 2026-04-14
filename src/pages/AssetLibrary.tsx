@@ -330,11 +330,18 @@ export default function AssetLibrary() {
               const perm = PERMISSION_BADGE[asset.permission_state];
               const summary = summaryMap.get(asset.id);
               const expired = isExpired(asset);
+              const usageCount = usageMap.get(asset.id) ?? 0;
 
               return (
-                <Card key={asset.id} className={expired ? "border-destructive/40 opacity-75" : ""}>
+                <Card key={asset.id} className={`${expired ? "border-destructive/40 opacity-75" : ""} ${bulkMode && bulkSelected.has(asset.id) ? "ring-2 ring-primary" : ""}`}>
                   <CardHeader className="py-3 px-4 flex-row items-start justify-between space-y-0 gap-2">
                     <div className="flex items-center gap-2 min-w-0">
+                      {bulkMode && (
+                        <Checkbox
+                          checked={bulkSelected.has(asset.id)}
+                          onCheckedChange={() => toggleBulkSelect(asset.id)}
+                        />
+                      )}
                       <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
                       <CardTitle className="text-sm font-semibold truncate">{asset.title}</CardTitle>
                     </div>
