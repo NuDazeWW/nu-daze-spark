@@ -8,6 +8,11 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/microsoft_onedrive";
 
+function appendQueryParam(path: string, key: string, value: string) {
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -82,6 +87,10 @@ Deno.serve(async (req) => {
         break;
       default:
         throw new Error(`Unknown action: ${action}`);
+    }
+
+    if (["list_root", "list_folder", "list_site_drive"].includes(action)) {
+      graphPath = appendQueryParam(graphPath, "includeHiddenFolders", "true");
     }
 
     // Fetch with automatic pagination for list actions
