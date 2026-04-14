@@ -65,6 +65,66 @@ export function ReelCreatorDialog({ open, onOpenChange }: ReelCreatorDialogProps
     a.click();
   };
 
+  const handleSaveToLibrary = async () => {
+    if (!resultUrl || !user) return;
+    setIsSaving(true);
+    try {
+      // Fetch the blob from the object URL
+      const response = await fetch(resultUrl);
+      const blob = await response.blob();
+      const ext = blob.type.includes("mp4") ? "mp4" : "webm";
+      const fileName = `nudaze-reel-${Date.now()}.${ext}`;
+      const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from("source-assets")
+        .upload(storagePath, blob, { contentType: blob.type });
+
+      if (uploadError) throw uploadError;
+
+      // Create source_asset record
+      const { data: asset, error: assetError } = await supabase
+        .from("source_assets")
+        .insert({
+          title: fileName.replace(/\.[^/.]+$/, ""),
+          description: `Video reel created from ${files.length} images`,
+          asset_type: "video" as const,
+          permission_state: "generation_allowed" as const,
+          is_nudaze_origin: true,
+          file_path: storagePath,
+          created_by: user.id,
+          updated_by: user.id,
+        })
+        .select()
+        .single();
+
+      if (assetError) throw assetError;
+
+      queryClient.invalidateQueries({ queryKey: ["source_assets"] });
+
+      toast({
+        title: "Reel saved to Asset Library",
+        description: "Redirecting to Post Generator…",
+      });
+
+      onOpenChange(false);
+      clearResult();
+      setFiles([]);
+
+      // Navigate to Post Generator with the new asset pre-selected
+      navigate(`/generator?asset=${asset.id}`);
+    } catch (err) {
+      toast({
+        title: "Failed to save reel",
+        description: err instanceof Error ? err.message : "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const totalDuration = files.length * config.slideDuration;
 
   return (
