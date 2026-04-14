@@ -71,24 +71,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let ignore = false;
     setRoleLoading(true);
 
-    supabase
-      .rpc("has_role", {
-        _user_id: user.id,
-        _role: "admin",
-      })
-      .then(({ data, error }) => {
+    async function loadRole() {
+      try {
+        const { data, error } = await supabase.rpc("has_role", {
+          _user_id: user.id,
+          _role: "admin",
+        });
+
         if (ignore) return;
         if (error) throw error;
         setIsAdmin(Boolean(data));
-      })
-      .catch(() => {
+      } catch {
         if (ignore) return;
         setIsAdmin(false);
-      })
-      .finally(() => {
+      } finally {
         if (ignore) return;
         setRoleLoading(false);
-      });
+      }
+    }
+
+    void loadRole();
 
     return () => {
       ignore = true;
