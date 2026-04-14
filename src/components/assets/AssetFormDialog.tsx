@@ -6,17 +6,17 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMemo, useRef, useState, useEffect } from "react";
-import { Upload, FileType, Info, X, Plus, Check } from "lucide-react";
+import { Upload, FileType, Info, X, Plus, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useAccountTags } from "@/hooks/useAccountTags";
+import { Link } from "react-router-dom";
 import type { Database } from "@/integrations/supabase/types";
 
 type AssetType = Database["public"]["Enums"]["asset_type"];
 type PermissionState = Database["public"]["Enums"]["permission_state"];
 
-/** Maps file MIME prefixes / extensions to an asset_type, or null if ambiguous */
 function detectAssetType(file: File): AssetType | null {
   const mime = file.type.toLowerCase();
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
@@ -90,7 +90,7 @@ export function AssetFormDialog({
   const fileRef = useRef<HTMLInputElement>(null);
   const [contributorInput, setContributorInput] = useState("");
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
-  const { tags: accountTags, defaultTags } = useAccountTags();
+  const { activeTags, defaultTags } = useAccountTags();
 
   // Auto-populate defaults on new asset (when form has empty contributors)
   useEffect(() => {
@@ -98,6 +98,7 @@ export function AssetFormDialog({
       setForm((f) => ({ ...f, contributors: defaultTags.map((t) => t.handle) }));
     }
   }, [open, defaultTags]);
+
   const mode: UploadMode = form.asset_type === "link" ? "link" : form.asset_type === "text_snippet" ? "text" : "file";
 
   const isAmbiguousFile = useMemo(() => {
@@ -130,7 +131,7 @@ export function AssetFormDialog({
     const missing: string[] = [];
     if (!form.title.trim()) missing.push("Title");
     if (!form.content_date) missing.push("Date Created/Taken");
-    if (form.contributors.length === 0) missing.push("Contributors");
+    if (form.contributors.length === 0) missing.push("Account Tags");
     if (form.is_event && !form.event_name.trim()) missing.push("Event Name");
     if (mode === "file" && showFileUpload && !form.file) missing.push("File");
     if (mode === "link" && !form.external_url.trim()) missing.push("URL");
@@ -156,8 +157,12 @@ export function AssetFormDialog({
   };
 
   const addContributor = () => {
-    const name = contributorInput.trim();
-    if (name && !form.contributors.includes(name)) {
+    let name = contributorInput.trim();
+    if (!name) return;
+    // Auto-prefix @ and lowercase for consistency
+    if (!name.startsWith("@")) name = `@${name}`;
+    name = name.toLowerCase();
+    if (!form.contributors.includes(name)) {
       setForm((f) => ({ ...f, contributors: [...f.contributors, name] }));
     }
     setContributorInput("");
@@ -166,6 +171,9 @@ export function AssetFormDialog({
   const removeContributor = (name: string) => {
     setForm((f) => ({ ...f, contributors: f.contributors.filter((c) => c !== name) }));
   };
+
+  // Filter to only active tags not already selected
+  const availableTags = activeTags.filter((t) => !form.contributors.includes(t.handle));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -259,9 +267,10 @@ export function AssetFormDialog({
             <Input type="date" value={form.content_date} onChange={(e) => setForm((f) => ({ ...f, content_date: e.target.value }))} />
           </div>
 
-          {/* Contributors / Who's in it */}
+          {/* Account Tags */}
           <div>
-            <Label>Who's in it, wrote it, or created it? <span className="text-destructive">*</span></Label>
+            <Label>Account Tags <span className="text-destructive">*</span></Label>
+            <p className="text-[10px] text-muted-foreground mb-1.5">Tag the brands, creators, or accounts associated with this content.</p>
             <div className="flex gap-2">
               <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
                 <PopoverTrigger asChild>
@@ -275,7 +284,7 @@ export function AssetFormDialog({
                     <CommandList>
                       <CommandEmpty>No tags found.</CommandEmpty>
                       <CommandGroup>
-                        {accountTags.filter((t) => !form.contributors.includes(t.handle)).map((t) => (
+                        {availableTags.map((t) => (
                           <CommandItem key={t.id} value={t.handle} onSelect={() => {
                             setForm((f) => ({ ...f, contributors: [...f.contributors, t.handle] }));
                             setTagPopoverOpen(false);
@@ -292,7 +301,7 @@ export function AssetFormDialog({
               <Input
                 value={contributorInput}
                 onChange={(e) => setContributorInput(e.target.value)}
-                placeholder="Custom name…"
+                placeholder="Custom @handle…"
                 className="w-32"
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addContributor(); } }}
               />
@@ -310,6 +319,14 @@ export function AssetFormDialog({
                 ))}
               </div>
             )}
+            {/* Reminder helper */}
+            <p className="text-[10px] text-muted-foreground mt-1.5 flex items-center gap-1">
+              <Info className="h-3 w-3 shrink-0" />
+              Don't see the right account?{" "}
+              <Link to="/settings/tags" className="underline inline-flex items-center gap-0.5 hover:text-primary" onClick={() => onOpenChange(false)}>
+                Update Account Tags <ExternalLink className="h-2.5 w-2.5" />
+              </Link>
+            </p>
           </div>
 
           <div>

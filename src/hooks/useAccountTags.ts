@@ -8,6 +8,8 @@ export interface AccountTag {
   handle: string;
   display_name: string | null;
   is_default: boolean;
+  is_active: boolean;
+  is_system: boolean;
   created_at: string;
   updated_at: string;
   created_by: string | null;
@@ -33,7 +35,8 @@ export function useAccountTags() {
     enabled: !!user,
   });
 
-  const defaultTags = tags.filter((t) => t.is_default);
+  const activeTags = tags.filter((t) => t.is_active);
+  const defaultTags = tags.filter((t) => t.is_default && t.is_active);
 
   const insertTag = useMutation({
     mutationFn: async (tag: { handle: string; display_name?: string; is_default?: boolean }) => {
@@ -51,7 +54,7 @@ export function useAccountTags() {
   });
 
   const updateTag = useMutation({
-    mutationFn: async ({ id, ...fields }: { id: string; handle?: string; display_name?: string; is_default?: boolean }) => {
+    mutationFn: async ({ id, ...fields }: { id: string; handle?: string; display_name?: string; is_default?: boolean; is_active?: boolean }) => {
       const { error } = await supabase.from("account_tags").update({ ...fields, updated_by: user!.id } as any).eq("id", id);
       if (error) throw error;
     },
@@ -68,5 +71,5 @@ export function useAccountTags() {
     onError: (e) => toast({ title: "Failed to remove tag", description: e.message, variant: "destructive" }),
   });
 
-  return { tags, defaultTags, isLoading, isAdmin, insertTag, updateTag, deleteTag };
+  return { tags, activeTags, defaultTags, isLoading, isAdmin, insertTag, updateTag, deleteTag };
 }
