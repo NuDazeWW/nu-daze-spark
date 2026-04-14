@@ -76,7 +76,7 @@ export function AssetFormDialog({
   showFileUpload = true,
 }: AssetFormDialogProps) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const needsFile = ["image", "video", "pdf", "deck"].includes(form.asset_type);
+  const needsFile = ["image", "video", "pdf", "deck", "case_study", "testimonial"].includes(form.asset_type);
   const needsUrl = form.asset_type === "link";
   const needsText = ["text_snippet", "testimonial", "case_study"].includes(form.asset_type);
 
@@ -118,10 +118,12 @@ export function AssetFormDialog({
                 type="file"
                 className="hidden"
                 accept={
-                  form.asset_type === "image" ? "image/*" :
+                  form.asset_type === "image" ? "image/*,.jpg,.jpeg,.png,.gif,.webp,.svg,.heic,.heif,.tiff,.bmp" :
                   form.asset_type === "video" ? "video/*,.mp4,.mov,.avi,.wmv,.webm,.mkv,.m4v,.flv,.3gp,.mpg,.mpeg,.ts" :
-                  form.asset_type === "pdf" ? ".pdf" :
-                  form.asset_type === "deck" ? ".pptx,.ppt,.key,.pdf" :
+                  form.asset_type === "pdf" ? ".pdf,application/pdf" :
+                  form.asset_type === "deck" ? ".pptx,.ppt,.key,.pdf,.odp,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" :
+                  form.asset_type === "case_study" ? ".pdf,.docx,.doc,.txt,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" :
+                  form.asset_type === "testimonial" ? ".pdf,.docx,.doc,.txt,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" :
                   "*"
                 }
                 onChange={(e) => setForm((f) => ({ ...f, file: e.target.files?.[0] ?? null }))}
