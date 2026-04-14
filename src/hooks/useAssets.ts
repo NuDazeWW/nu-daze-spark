@@ -126,6 +126,7 @@ export function useAssets() {
     update: updateMutation.mutateAsync,
     remove: deleteMutation.mutateAsync,
     uploadFile,
+    downloadAsset,
     isInserting: insertMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
