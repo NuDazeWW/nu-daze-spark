@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -16,8 +17,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   MessageSquare, Plus, Sparkles, Search, AlertCircle, ExternalLink,
-  Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar,
+  Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar, Copy, Check,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const RISK_ICON = {
   safe: Shield,
@@ -37,8 +39,63 @@ const RISK_LABEL = {
   blocked: "Blocked",
 };
 
+function InlineComment({ comment, onSave, isSaving }: {
+  comment: { id: string; draft_copy: string; tone: string | null };
+  onSave: (id: string, text: string) => void;
+  isSaving: boolean;
+}) {
+  const [text, setText] = useState(comment.draft_copy);
+  const [copied, setCopied] = useState(false);
+  const dirty = text !== comment.draft_copy;
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    toast.success("Comment copied to clipboard");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSave(comment.id, text);
+  };
+
+  return (
+    <div className="mt-3 space-y-1.5 border-t border-border/40 pt-3" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-medium text-primary/70 flex items-center gap-1">
+          <Sparkles className="h-3 w-3" /> Auto-generated comment
+          {comment.tone && <Badge variant="secondary" className="text-[9px] h-4 ml-1">{comment.tone}</Badge>}
+        </span>
+        <div className="flex items-center gap-1">
+          {dirty && (
+            <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? "Saving…" : "Save"}
+            </Button>
+          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopy}>
+                {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Copy comment</TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+      <Textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={3}
+        className="text-xs resize-none bg-muted/20 border-muted"
+      />
+    </div>
+  );
+}
+
 export default function CommentGenerator() {
-  const { posts, isLoading, error, addPost, generateComments, scrapePosts } = useExternalPosts();
+  const { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment } = useExternalPosts();
 
   const [formOpen, setFormOpen] = useState(false);
   const [scrapeOpen, setScrapeOpen] = useState(false);
@@ -76,6 +133,10 @@ export default function CommentGenerator() {
     generateComments.mutate(selectedIds, {
       onSuccess: () => setSelectedIds([]),
     });
+  };
+
+  const handleCommentSave = (commentId: string, draft_copy: string) => {
+    updateComment.mutate({ id: commentId, draft_copy });
   };
 
   if (isLoading) {
@@ -184,6 +245,7 @@ export default function CommentGenerator() {
             const isBlocked = post.risk_flag === "blocked";
             const isSelected = selectedIds.includes(post.id);
             const RiskIcon = RISK_ICON[post.risk_flag];
+            const comment = commentsMap[post.id];
 
             return (
               <Card
@@ -248,6 +310,15 @@ export default function CommentGenerator() {
                   )}
                   {post.risk_notes && (
                     <p className="text-[10px] text-amber-400/70">⚠️ {post.risk_notes}</p>
+                  )}
+
+                  {/* Inline editable auto-generated comment */}
+                  {comment && (
+                    <InlineComment
+                      comment={comment}
+                      onSave={handleCommentSave}
+                      isSaving={updateComment.isPending}
+                    />
                   )}
                 </CardContent>
               </Card>
