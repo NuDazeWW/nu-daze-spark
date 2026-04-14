@@ -332,6 +332,8 @@ export default function ConnectedSources() {
 
       <BulkUrlImportDialog open={bulkOpen} onOpenChange={setBulkOpen} />
 
+      <OneDriveBrowserDialog open={oneDriveOpen} onOpenChange={setOneDriveOpen} />
+
       <DeleteConfirmDialog
         open={!!deleteId}
         onOpenChange={() => setDeleteId(null)}
