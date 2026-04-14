@@ -43,7 +43,7 @@ export function useDashboardStats() {
       if (tErr) throw tErr;
 
       // Fetch post cards this week with status >= approved
-      const approvedStatuses = ["approved", "exported", "posted"];
+      const approvedStatuses: ApprovalStatus[] = ["approved", "exported", "posted"];
       const { data: cards, error: cErr } = await supabase
         .from("post_cards")
         .select("platform, content_type")
@@ -71,7 +71,7 @@ export function useDashboardStats() {
   const pipelineQuery = useQuery({
     queryKey: ["dashboard_pipeline"],
     queryFn: async (): Promise<PipelineCount[]> => {
-      const statuses = [
+      const statuses: ApprovalStatus[] = [
         "draft",
         "in_review",
         "needs_revision",
