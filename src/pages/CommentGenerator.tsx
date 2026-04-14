@@ -13,12 +13,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   MessageSquare, Plus, Sparkles, Search, AlertCircle, ExternalLink,
   Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar, Copy, Check,
-  Eye, EyeOff, CheckCircle2,
+  CheckCircle2, Trash2, RefreshCw, Flame, TrendingUp, ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
@@ -41,11 +42,34 @@ const RISK_LABEL = {
   blocked: "Blocked",
 };
 
-function InlineComment({ comment, onSave, isSaving, onCopied }: {
+function EngagementBadge({ engagement }: { engagement: number }) {
+  if (!engagement || engagement === 0) return null;
+  let tier: string;
+  let color: string;
+  if (engagement >= 100) {
+    tier = "🔥 Hot";
+    color = "bg-orange-500/15 text-orange-400 border-orange-500/30";
+  } else if (engagement >= 30) {
+    tier = "📈 Rising";
+    color = "bg-amber-500/15 text-amber-400 border-amber-500/30";
+  } else {
+    tier = "💬 Active";
+    color = "bg-sky-500/15 text-sky-400 border-sky-500/30";
+  }
+  return (
+    <Badge variant="outline" className={`text-[9px] ${color}`}>
+      {tier}
+    </Badge>
+  );
+}
+
+function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRegenerating }: {
   comment: { id: string; draft_copy: string; tone: string | null };
   onSave: (id: string, text: string) => void;
   isSaving: boolean;
   onCopied?: () => void;
+  onRegenerate?: () => void;
+  isRegenerating?: boolean;
 }) {
   const [text, setText] = useState(comment.draft_copy);
   const [copied, setCopied] = useState(false);
@@ -78,6 +102,16 @@ function InlineComment({ comment, onSave, isSaving, onCopied }: {
               {isSaving ? "Saving…" : "Save"}
             </Button>
           )}
+          {onRegenerate && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); onRegenerate(); }} disabled={isRegenerating}>
+                  <RefreshCw className={`h-3 w-3 ${isRegenerating ? "animate-spin" : ""}`} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Regenerate comment</TooltipContent>
+            </Tooltip>
+          )}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopy}>
@@ -98,8 +132,17 @@ function InlineComment({ comment, onSave, isSaving, onCopied }: {
   );
 }
 
+type SortKey = "recent" | "relevance" | "engagement";
+
 export default function CommentGenerator() {
-  const { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented, unmarkCommented } = useExternalPosts();
+  const {
+    posts, isLoading, error,
+    addPost, generateComments, scrapePosts,
+    commentsMap, updateComment,
+    markCommented, unmarkCommented,
+    deletePost, bulkDelete, bulkMarkCommented,
+    dailyTarget,
+  } = useExternalPosts();
 
   const [formOpen, setFormOpen] = useState(false);
   const [scrapeOpen, setScrapeOpen] = useState(false);
@@ -107,10 +150,11 @@ export default function CommentGenerator() {
   const [platformFilter, setPlatformFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showCommented, setShowCommented] = useState(false);
+  const [sortBy, setSortBy] = useState<SortKey>("recent");
 
   const filtered = useMemo(() => {
-    return posts.filter((p) => {
-      if (!showCommented && (p as any).is_commented) return false;
+    let result = posts.filter((p) => {
+      if (!showCommented && p.is_commented) return false;
       if (platformFilter !== "all" && p.platform !== platformFilter) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -120,10 +164,19 @@ export default function CommentGenerator() {
       }
       return true;
     });
-  }, [posts, search, platformFilter, showCommented]);
 
-  const commentedCount = posts.filter((p) => (p as any).is_commented).length;
+    // Sort
+    if (sortBy === "relevance") {
+      result = [...result].sort((a, b) => (Number(b.relevance_score) || 0) - (Number(a.relevance_score) || 0));
+    } else if (sortBy === "engagement") {
+      result = [...result].sort((a, b) => (b.estimated_engagement || 0) - (a.estimated_engagement || 0));
+    }
+    // "recent" uses default order from query (created_at desc)
 
+    return result;
+  }, [posts, search, platformFilter, showCommented, sortBy]);
+
+  const commentedCount = posts.filter((p) => p.is_commented).length;
   const eligibleForGeneration = filtered.filter((p) => p.risk_flag !== "blocked");
 
   const toggleSelect = (id: string) => {
@@ -139,6 +192,24 @@ export default function CommentGenerator() {
   const handleGenerate = () => {
     if (selectedIds.length === 0) return;
     generateComments.mutate(selectedIds, {
+      onSuccess: () => setSelectedIds([]),
+    });
+  };
+
+  const handleRegenerate = (postId: string) => {
+    generateComments.mutate([postId]);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    bulkDelete.mutate(selectedIds, {
+      onSuccess: () => setSelectedIds([]),
+    });
+  };
+
+  const handleBulkMarkCommented = () => {
+    if (selectedIds.length === 0) return;
+    bulkMarkCommented.mutate(selectedIds, {
       onSuccess: () => setSelectedIds([]),
     });
   };
@@ -165,12 +236,34 @@ export default function CommentGenerator() {
     );
   }
 
+  const targetData = dailyTarget;
+  const targetProgress = targetData ? Math.min((targetData.completed / Math.max(targetData.target, 1)) * 100, 100) : 0;
+
   return (
     <div className="animate-fade-in">
       <PageHeader
         title="Comment Generator"
         description={`${posts.length} external post${posts.length !== 1 ? "s" : ""} curated · Select posts and generate AI comments.`}
       />
+
+      {/* Daily target tracker */}
+      {targetData && targetData.target > 0 && (
+        <div className="mb-6 p-4 rounded-lg border bg-card">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Daily Comment Target</span>
+            </div>
+            <span className="text-sm font-semibold text-primary">
+              {targetData.completed}/{targetData.target}
+            </span>
+          </div>
+          <Progress value={targetProgress} className="h-2" />
+          {targetData.completed >= targetData.target && (
+            <p className="text-[10px] text-emerald-400 mt-1.5">🎉 Daily target reached!</p>
+          )}
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -184,6 +277,17 @@ export default function CommentGenerator() {
             <SelectItem value="all">All Platforms</SelectItem>
             <SelectItem value="instagram">Instagram</SelectItem>
             <SelectItem value="linkedin">LinkedIn</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortKey)}>
+          <SelectTrigger className="w-[150px]">
+            <ArrowUpDown className="h-3.5 w-3.5 mr-1.5" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recent">Most Recent</SelectItem>
+            <SelectItem value="relevance">Relevance</SelectItem>
+            <SelectItem value="engagement">Engagement</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline" onClick={() => setScrapeOpen(true)}>
@@ -202,7 +306,7 @@ export default function CommentGenerator() {
 
       {/* Selection bar */}
       {posts.length > 0 && (
-        <div className="flex items-center gap-3 mb-4 p-3 rounded-lg border bg-card">
+        <div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-lg border bg-card">
           <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs">
             {eligibleForGeneration.length > 0 && eligibleForGeneration.every((p) => selectedIds.includes(p.id))
               ? "Deselect All"
@@ -211,6 +315,30 @@ export default function CommentGenerator() {
           </Button>
           <span className="text-xs text-muted-foreground">{selectedIds.length} selected</span>
           <div className="flex-1" />
+          {selectedIds.length > 0 && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkMarkCommented}
+                disabled={bulkMarkCommented.isPending}
+                className="text-xs"
+              >
+                <CheckCircle2 className="mr-1.5 h-3 w-3" />
+                Mark Done
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkDelete}
+                disabled={bulkDelete.isPending}
+                className="text-xs text-destructive hover:text-destructive"
+              >
+                <Trash2 className="mr-1.5 h-3 w-3" />
+                Delete
+              </Button>
+            </>
+          )}
           <Button
             onClick={handleGenerate}
             disabled={selectedIds.length === 0 || generateComments.isPending}
@@ -257,7 +385,7 @@ export default function CommentGenerator() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((post) => {
             const isBlocked = post.risk_flag === "blocked";
-            const isCommented = (post as any).is_commented;
+            const isCommented = post.is_commented;
             const isSelected = selectedIds.includes(post.id);
             const RiskIcon = RISK_ICON[post.risk_flag];
             const comment = commentsMap[post.id];
@@ -312,6 +440,7 @@ export default function CommentGenerator() {
                       {post.topic && (
                         <Badge variant="secondary" className="text-[10px] shrink-0">{post.topic}</Badge>
                       )}
+                      <EngagementBadge engagement={post.estimated_engagement} />
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <Tooltip>
@@ -339,6 +468,19 @@ export default function CommentGenerator() {
                         </TooltipTrigger>
                         <TooltipContent>Open original post</TooltipContent>
                       </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => { e.stopPropagation(); deletePost.mutate(post.id); }}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Delete post</TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                 </CardHeader>
@@ -356,13 +498,14 @@ export default function CommentGenerator() {
                     <p className="text-[10px] text-amber-400/70">⚠️ {post.risk_notes}</p>
                   )}
 
-                  {/* Inline editable auto-generated comment */}
                   {comment && (
                     <InlineComment
                       comment={comment}
                       onSave={handleCommentSave}
                       isSaving={updateComment.isPending}
                       onCopied={() => !isCommented && markCommented.mutate(post.id)}
+                      onRegenerate={() => handleRegenerate(post.id)}
+                      isRegenerating={generateComments.isPending}
                     />
                   )}
                 </CardContent>
@@ -372,7 +515,6 @@ export default function CommentGenerator() {
         </div>
       )}
 
-      {/* Add post dialog */}
       <ExternalPostFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
@@ -382,7 +524,6 @@ export default function CommentGenerator() {
         isPending={addPost.isPending}
       />
 
-      {/* Scrape posts dialog */}
       <ScrapePostsDialog
         open={scrapeOpen}
         onOpenChange={setScrapeOpen}
