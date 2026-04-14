@@ -47,6 +47,8 @@ export default function ConnectedSources() {
   const [form, setForm] = useState<SourceFormData>(defaultSourceForm);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [scrapingId, setScrapingId] = useState<string | null>(null);
+  const [quickUrl, setQuickUrl] = useState("");
+  const [quickScraping, setQuickScraping] = useState(false);
 
   if (!isAdmin) {
     return (
