@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import nudazeLogo from "@/assets/nudaze-logo.png";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -45,20 +46,20 @@ export default function Auth() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-sm space-y-8 px-6">
-        {/* Logo / Brand */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Nu<span className="text-primary">Daze</span>
-          </h1>
+        <div className="space-y-3 text-center">
+          <img
+            src={nudazeLogo}
+            alt="NuDaze"
+            className="mx-auto h-20 w-auto"
+          />
           <p className="text-sm text-muted-foreground">Social Copilot</p>
         </div>
 
-        {/* Form Card */}
-        <div className="rounded-lg border border-border bg-card p-6 shadow-card space-y-6">
+        <div className="space-y-6 rounded-lg border border-border bg-card p-6 shadow-card">
           <div className="text-center">
-            <h2 className="text-lg font-semibold text-card-foreground">
+            <h1 className="text-lg font-semibold text-card-foreground">
               {isLogin ? "Sign in" : "Create account"}
-            </h2>
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {isLogin
                 ? "Enter your credentials to continue"
