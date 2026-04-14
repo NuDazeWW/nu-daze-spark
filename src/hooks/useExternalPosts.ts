@@ -27,7 +27,6 @@ export function useExternalPosts() {
     enabled: !!user,
   });
 
-  // Fetch comments keyed by external_post_id
   const { data: commentsMap = {} } = useQuery({
     queryKey: ["external_post_comments"],
     queryFn: async () => {
@@ -38,12 +37,35 @@ export function useExternalPosts() {
       if (error) throw error;
       const map: Record<string, Comment> = {};
       for (const c of data as Comment[]) {
-        // Keep only the latest comment per external post
         if (!map[c.external_post_id]) {
           map[c.external_post_id] = c;
         }
       }
       return map;
+    },
+    enabled: !!user,
+  });
+
+  // Daily target progress
+  const { data: dailyTarget } = useQuery({
+    queryKey: ["engagement_daily_target"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("engagement_targets")
+        .select("daily_target, platform")
+        .eq("is_active", true);
+      const total = (data || []).reduce((sum: number, t: any) => sum + (t.daily_target || 0), 0);
+
+      // Count posts commented today
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const { count } = await supabase
+        .from("external_posts")
+        .select("id", { count: "exact", head: true })
+        .eq("is_commented", true)
+        .gte("updated_at", todayStart.toISOString());
+
+      return { target: total, completed: count || 0 };
     },
     enabled: !!user,
   });
@@ -74,6 +96,7 @@ export function useExternalPosts() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["engagement_daily_target"] });
     },
     onError: (e) => toast({ title: "Failed to mark as commented", description: e.message, variant: "destructive" }),
   });
@@ -88,9 +111,58 @@ export function useExternalPosts() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["engagement_daily_target"] });
       toast({ title: "Post returned to active queue" });
     },
     onError: (e) => toast({ title: "Failed to unmark", description: e.message, variant: "destructive" }),
+  });
+
+  const deletePost = useMutation({
+    mutationFn: async (postId: string) => {
+      const { error } = await supabase
+        .from("external_posts")
+        .delete()
+        .eq("id", postId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
+      toast({ title: "Post deleted" });
+    },
+    onError: (e) => toast({ title: "Delete failed", description: e.message, variant: "destructive" }),
+  });
+
+  const bulkDelete = useMutation({
+    mutationFn: async (postIds: string[]) => {
+      const { error } = await supabase
+        .from("external_posts")
+        .delete()
+        .in("id", postIds);
+      if (error) throw error;
+    },
+    onSuccess: (_d, postIds) => {
+      qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
+      toast({ title: `${postIds.length} post(s) deleted` });
+    },
+    onError: (e) => toast({ title: "Bulk delete failed", description: e.message, variant: "destructive" }),
+  });
+
+  const bulkMarkCommented = useMutation({
+    mutationFn: async (postIds: string[]) => {
+      const { error } = await supabase
+        .from("external_posts")
+        .update({ is_commented: true } as never)
+        .in("id", postIds);
+      if (error) throw error;
+    },
+    onSuccess: (_d, postIds) => {
+      qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["engagement_daily_target"] });
+      toast({ title: `${postIds.length} post(s) marked as commented` });
+    },
+    onError: (e) => toast({ title: "Bulk action failed", description: e.message, variant: "destructive" }),
   });
 
   const addPost = useMutation({
@@ -131,10 +203,11 @@ export function useExternalPosts() {
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
       qc.invalidateQueries({ queryKey: ["comments_queue"] });
       toast({
         title: `${data.count} comment${data.count !== 1 ? "s" : ""} generated`,
-        description: "Draft comments are ready for review in the Daily Queue.",
+        description: "Draft comments are ready for review.",
       });
     },
     onError: (e) => toast({ title: "Generation failed", description: e.message, variant: "destructive" }),
@@ -151,18 +224,26 @@ export function useExternalPosts() {
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
       qc.invalidateQueries({ queryKey: ["comments_queue"] });
       toast({
         title: data.count > 0
           ? `${data.count} post${data.count !== 1 ? "s" : ""} discovered`
           : "No new posts found",
         description: data.count > 0
-          ? `${data.comments_created || 0} comment draft${(data.comments_created || 0) !== 1 ? "s" : ""} auto-generated. Review and edit below.`
+          ? `${data.comments_created || 0} comment draft${(data.comments_created || 0) !== 1 ? "s" : ""} auto-generated.`
           : data.message || "Try a different search query.",
       });
     },
     onError: (e) => toast({ title: "Scrape failed", description: e.message, variant: "destructive" }),
   });
 
-  return { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented, unmarkCommented };
+  return {
+    posts, isLoading, error,
+    addPost, generateComments, scrapePosts,
+    commentsMap, updateComment,
+    markCommented, unmarkCommented,
+    deletePost, bulkDelete, bulkMarkCommented,
+    dailyTarget,
+  };
 }
