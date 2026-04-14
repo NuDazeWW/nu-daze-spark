@@ -52,7 +52,7 @@ export function AppSidebar() {
           <img
             src={nudazeLogo}
             alt="NuDaze"
-            className="h-7 w-auto"
+            className="h-[140px] w-auto"
           />
           <span className="text-[11px] font-medium text-muted-foreground tracking-wide uppercase">
             Copilot
