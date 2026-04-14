@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { useAssets, type SourceAsset } from "@/hooks/useAssets";
 import { AssetFormDialog, defaultAssetForm, type AssetFormData } from "@/components/assets/AssetFormDialog";
 import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
+import { ReelCreatorDialog } from "@/components/assets/ReelCreatorDialog";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { useBulkReelUpload } from "@/hooks/useBulkReelUpload";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ export default function AssetLibrary() {
 
   const { uploadAndCreateReels, isPending: isBulkPending, progress: bulkProgress } = useBulkReelUpload();
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [reelCreatorOpen, setReelCreatorOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<SourceAsset | null>(null);
@@ -168,7 +170,8 @@ export default function AssetLibrary() {
         </Select>
         {isAdmin && (
           <>
-            <Button variant="outline" onClick={() => setBulkOpen(true)}><Film className="mr-2 h-4 w-4" />Create Reels</Button>
+            <Button variant="outline" onClick={() => setReelCreatorOpen(true)}><Film className="mr-2 h-4 w-4" />Create Video Reel</Button>
+            <Button variant="outline" onClick={() => setBulkOpen(true)}><Sparkles className="mr-2 h-4 w-4" />AI Reel Cards</Button>
             <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
           </>
         )}
@@ -274,6 +277,11 @@ export default function AssetLibrary() {
         }}
         isPending={isBulkPending}
         progress={bulkProgress}
+      />
+
+      <ReelCreatorDialog
+        open={reelCreatorOpen}
+        onOpenChange={setReelCreatorOpen}
       />
     </div>
   );
