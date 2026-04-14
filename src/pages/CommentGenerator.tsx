@@ -38,9 +38,10 @@ const RISK_LABEL = {
 };
 
 export default function CommentGenerator() {
-  const { posts, isLoading, error, addPost, generateComments } = useExternalPosts();
+  const { posts, isLoading, error, addPost, generateComments, scrapePosts } = useExternalPosts();
 
   const [formOpen, setFormOpen] = useState(false);
+  const [scrapeOpen, setScrapeOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
