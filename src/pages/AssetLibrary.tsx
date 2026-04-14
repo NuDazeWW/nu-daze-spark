@@ -49,6 +49,8 @@ export default function AssetLibrary() {
   } = useAssets();
 
   const { uploadAndCreateReels, isPending: isBulkPending, progress: bulkProgress } = useBulkReelUpload();
+  const { warnIfDuplicate } = useDuplicateDetection(assets);
+  const { usageMap } = useAssetUsage();
   const [bulkOpen, setBulkOpen] = useState(false);
   const [reelCreatorOpen, setReelCreatorOpen] = useState(false);
 
@@ -62,6 +64,8 @@ export default function AssetLibrary() {
   const [filterType, setFilterType] = useState("all");
   const [filterPermission, setFilterPermission] = useState("all");
   const [showTrash, setShowTrash] = useState(false);
+  const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
+  const [bulkMode, setBulkMode] = useState(false);
 
   const filtered = useMemo(() => {
     return assets.filter((a) => {
