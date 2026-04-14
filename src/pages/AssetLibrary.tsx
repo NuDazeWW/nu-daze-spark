@@ -18,7 +18,6 @@ import {
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
   Shield, ShieldAlert, ShieldOff, Archive, CalendarClock, Sparkles, Film,
 } from "lucide-react";
-} from "lucide-react";
 import { format } from "date-fns";
 
 const ASSET_TYPE_ICON: Record<string, React.ElementType> = {
