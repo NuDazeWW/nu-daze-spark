@@ -186,6 +186,7 @@ export default function AssetLibrary() {
   return (
     <div className="animate-fade-in">
       <PageHeader title="Asset Library" description="Manage uploaded source assets, permissions, and summaries." />
+      <ExpirationAlerts />
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
