@@ -99,7 +99,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied }: {
 }
 
 export default function CommentGenerator() {
-  const { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented } = useExternalPosts();
+  const { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented, unmarkCommented } = useExternalPosts();
 
   const [formOpen, setFormOpen] = useState(false);
   const [scrapeOpen, setScrapeOpen] = useState(false);
