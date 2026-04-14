@@ -135,5 +135,5 @@ export function useExternalPosts() {
     onError: (e) => toast({ title: "Scrape failed", description: e.message, variant: "destructive" }),
   });
 
-  return { posts, isLoading, error, addPost, generateComments, scrapePosts };
+  return { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment };
 }
