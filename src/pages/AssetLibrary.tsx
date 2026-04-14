@@ -253,7 +253,7 @@ export default function AssetLibrary() {
         form={form}
         setForm={setForm}
         onSubmit={handleSubmit}
-        isPending={isInserting || isUpdating}
+        isPending={submitting || isInserting || isUpdating}
         showFileUpload={!editing}
       />
 
