@@ -113,10 +113,17 @@ export function AssetFormDialog({
             <div>
               <Label>File</Label>
               <input
+                key={form.asset_type}
                 ref={fileRef}
                 type="file"
                 className="hidden"
-                accept={form.asset_type === "image" ? "image/*" : form.asset_type === "video" ? "video/*,.mp4,.mov,.avi,.wmv,.webm,.mkv,.m4v,.flv,.3gp" : form.asset_type === "pdf" ? ".pdf" : "*"}
+                accept={
+                  form.asset_type === "image" ? "image/*" :
+                  form.asset_type === "video" ? "video/*,.mp4,.mov,.avi,.wmv,.webm,.mkv,.m4v,.flv,.3gp,.mpg,.mpeg,.ts" :
+                  form.asset_type === "pdf" ? ".pdf" :
+                  form.asset_type === "deck" ? ".pptx,.ppt,.key,.pdf" :
+                  "*"
+                }
                 onChange={(e) => setForm((f) => ({ ...f, file: e.target.files?.[0] ?? null }))}
               />
               <Button type="button" variant="outline" className="w-full justify-start gap-2" onClick={() => fileRef.current?.click()}>
