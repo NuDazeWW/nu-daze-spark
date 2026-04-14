@@ -117,6 +117,9 @@ export default function CommentGenerator() {
             <SelectItem value="linkedin">LinkedIn</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant="outline" onClick={() => setScrapeOpen(true)}>
+          <Radar className="mr-2 h-4 w-4" />Find Posts
+        </Button>
         <Button variant="outline" onClick={() => setFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />Add Post
         </Button>
