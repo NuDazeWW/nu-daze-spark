@@ -283,6 +283,7 @@ Return ONLY actual social media posts worth engaging with (relevance >= 0.5). If
         risk_flag: eval_.risk_flag || "safe",
         risk_notes: eval_.risk_notes || null,
         recommended_comment_angle: eval_.recommended_comment_angle || null,
+        estimated_engagement: eval_.estimated_engagement || 0,
       });
 
       if (eval_.draft_comment) {
