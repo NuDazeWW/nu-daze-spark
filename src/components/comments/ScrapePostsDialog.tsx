@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Search, Radar, X, Sparkles } from "lucide-react";
 
@@ -86,19 +86,19 @@ export function ScrapePostsDialog({ open, onOpenChange, onScrape, isPending }: S
               {SUGGESTED_QUERIES.map((s) => {
                 const active = selectedQueries.includes(s.query);
                 return (
-                  <Badge
+                  <button
                     key={s.query}
-                    variant={active ? "default" : "outline"}
-                    className={`cursor-pointer text-xs transition-colors select-none ${
-                      active
-                        ? "bg-primary text-primary-foreground hover:bg-primary/80"
-                        : "hover:bg-accent"
-                    }`}
+                    type="button"
                     onClick={() => toggleSuggestion(s.query)}
+                    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors cursor-pointer select-none ${
+                      active
+                        ? "bg-primary text-primary-foreground border-primary hover:bg-primary/80"
+                        : "border-border text-foreground hover:bg-accent"
+                    }`}
                   >
                     {s.label}
                     {active && <X className="ml-1 h-3 w-3" />}
-                  </Badge>
+                  </button>
                 );
               })}
             </div>
