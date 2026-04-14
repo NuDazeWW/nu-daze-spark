@@ -112,6 +112,10 @@ export default function AssetLibrary() {
 
   const handleSubmit = async () => {
     if (submitting) return;
+    // Duplicate check on create
+    if (!editing) {
+      warnIfDuplicate(form.title, form.file?.name);
+    }
     setSubmitting(true);
     try {
       let file_path = editing?.file_path ?? null;
@@ -131,6 +135,32 @@ export default function AssetLibrary() {
       else await insert(payload as never);
       setFormOpen(false);
     } finally { setSubmitting(false); }
+  };
+
+  const toggleBulkSelect = (id: string) => {
+    setBulkSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    for (const id of bulkSelected) {
+      await softDelete(id);
+    }
+    toast(`${bulkSelected.size} assets moved to trash`);
+    setBulkSelected(new Set());
+    setBulkMode(false);
+  };
+
+  const handleBulkPermission = async (permission: string) => {
+    for (const id of bulkSelected) {
+      await update({ id, permission_state: permission } as never);
+    }
+    toast(`Updated permission for ${bulkSelected.size} assets`);
+    setBulkSelected(new Set());
+    setBulkMode(false);
   };
 
   if (isLoading) {
