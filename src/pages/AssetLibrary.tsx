@@ -204,7 +204,10 @@ export default function AssetLibrary() {
                   </div>
                    <div className="flex gap-1 shrink-0">
                       {asset.file_path && (
-                        <Button variant="ghost" size="icon" onClick={() => downloadAsset(asset.file_path!, asset.title)}><Download className="h-3.5 w-3.5" /></Button>
+                        <>
+                          <Button variant="ghost" size="icon" onClick={() => setViewingAsset(asset)} title="Preview"><Eye className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => downloadAsset(asset.file_path!, asset.title)} title="Download"><Download className="h-3.5 w-3.5" /></Button>
+                        </>
                       )}
                       {isAdmin && (
                         <>
