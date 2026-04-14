@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { ExpirationAlerts } from "@/components/assets/ExpirationAlerts";
@@ -7,9 +8,12 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sparkles, MessageSquare, Upload, CalendarDays,
-  TrendingUp, ArrowRight, Linkedin, Instagram,
+  TrendingUp, TrendingDown, Minus, ArrowRight,
+  Linkedin, Instagram, FileText, Image, FolderOpen,
+  ShieldCheck, Eye, ShieldX, Archive,
 } from "lucide-react";
 
 const PLATFORM_ICON: Record<string, React.ElementType> = {
@@ -20,11 +24,28 @@ const PLATFORM_ICON: Record<string, React.ElementType> = {
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   draft: { label: "Drafts", color: "bg-muted text-muted-foreground" },
   in_review: { label: "In Review", color: "bg-primary/20 text-primary" },
-  needs_revision: { label: "Needs Revision", color: "bg-accent/20 text-accent" },
+  needs_revision: { label: "Revision", color: "bg-accent/20 text-accent" },
   approved: { label: "Approved", color: "bg-emerald-500/20 text-emerald-400" },
   exported: { label: "Exported", color: "bg-blue-500/20 text-blue-400" },
   posted: { label: "Posted", color: "bg-violet-500/20 text-violet-400" },
   archived: { label: "Archived", color: "bg-muted text-muted-foreground" },
+};
+
+const PIPELINE_COLORS: Record<string, string> = {
+  draft: "bg-muted-foreground/60",
+  in_review: "bg-primary",
+  needs_revision: "bg-accent",
+  approved: "bg-emerald-500",
+  exported: "bg-blue-500",
+  posted: "bg-violet-500",
+  archived: "bg-muted-foreground/30",
+};
+
+const ASSET_HEALTH_META: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+  generation_allowed: { label: "Usable", icon: ShieldCheck, color: "text-emerald-400" },
+  summarization_only: { label: "Summary Only", icon: Eye, color: "text-accent" },
+  blocked: { label: "Blocked", icon: ShieldX, color: "text-destructive" },
+  archived: { label: "Archived", icon: Archive, color: "text-muted-foreground" },
 };
 
 function cadenceColor(current: number, target: number) {
@@ -35,9 +56,41 @@ function cadenceColor(current: number, target: number) {
   return "text-destructive";
 }
 
+function WowIndicator({ current, previous }: { current: number; previous: number }) {
+  const diff = current - previous;
+  if (diff === 0) return <Minus className="h-3 w-3 text-muted-foreground" />;
+  if (diff > 0) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex items-center gap-0.5 text-emerald-400 text-[10px] font-medium">
+            <TrendingUp className="h-3 w-3" />+{diff}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="text-xs">vs last week ({previous})</TooltipContent>
+      </Tooltip>
+    );
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="inline-flex items-center gap-0.5 text-destructive text-[10px] font-medium">
+          <TrendingDown className="h-3 w-3" />{diff}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="text-xs">vs last week ({previous})</TooltipContent>
+    </Tooltip>
+  );
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { cadence, pipeline, comments, recentCards, isLoading } = useDashboardStats();
+  const { cadence, pipeline, comments, recentCards, assetHealth, totalStats, isLoading } = useDashboardStats();
+
+  const pipelineTotal = useMemo(
+    () => pipeline.reduce((sum, p) => sum + p.count, 0),
+    [pipeline]
+  );
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -45,6 +98,27 @@ export default function Dashboard() {
         title="Dashboard"
         description="Your content operations at a glance."
       />
+
+      {/* Total Stats Header */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Posts This Week", value: totalStats.postsThisWeek, icon: FileText, color: "text-primary" },
+          { label: "Comments Today", value: totalStats.commentsToday, icon: MessageSquare, color: "text-accent" },
+          { label: "Total Assets", value: totalStats.totalAssets, icon: Image, color: "text-emerald-400" },
+        ].map((s) => (
+          <Card key={s.label} className="border-border/40">
+            <CardContent className="flex items-center gap-3 py-4 px-5">
+              <div className={`rounded-lg bg-secondary p-2.5 ${s.color}`}>
+                <s.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{isLoading ? "–" : s.value}</div>
+                <div className="text-xs text-muted-foreground">{s.label}</div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -70,13 +144,13 @@ export default function Dashboard() {
 
       {isLoading ? (
         <div className="grid md:grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map((i) => (
+          {[1, 2, 3, 4, 5].map((i) => (
             <Skeleton key={i} className="h-48 rounded-lg" />
           ))}
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {/* Weekly Cadence Tracker */}
+          {/* Weekly Cadence Tracker with WoW */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
@@ -104,8 +178,11 @@ export default function Dashboard() {
                           <span className="capitalize">{c.platform}</span>
                           <span className="text-muted-foreground capitalize">· {c.content_type}s</span>
                         </span>
-                        <span className={cadenceColor(c.current_count, c.weekly_target)}>
-                          {c.current_count}/{c.weekly_target}
+                        <span className="flex items-center gap-2">
+                          <WowIndicator current={c.current_count} previous={c.last_week_count} />
+                          <span className={cadenceColor(c.current_count, c.weekly_target)}>
+                            {c.current_count}/{c.weekly_target}
+                          </span>
                         </span>
                       </div>
                       <Progress value={pct} className="h-2" />
@@ -155,7 +232,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Content Pipeline */}
+          {/* Content Pipeline Chart */}
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
@@ -165,31 +242,90 @@ export default function Dashboard() {
                 </Button>
               </div>
             </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Stacked bar */}
+              {pipelineTotal > 0 ? (
+                <>
+                  <div className="flex h-5 rounded-full overflow-hidden bg-secondary">
+                    {pipeline
+                      .filter((p) => p.count > 0)
+                      .map((p) => (
+                        <Tooltip key={p.status}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={`${PIPELINE_COLORS[p.status] ?? "bg-muted"} transition-all cursor-pointer hover:opacity-80`}
+                              style={{ width: `${(p.count / pipelineTotal) * 100}%` }}
+                              onClick={() => navigate(`/queue?status=${p.status}`)}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent className="text-xs">
+                            {STATUS_LABELS[p.status]?.label}: {p.count}
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                  </div>
+                  {/* Legend */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                    {pipeline
+                      .filter((p) => p.count > 0)
+                      .map((p) => {
+                        const meta = STATUS_LABELS[p.status];
+                        return (
+                          <button
+                            key={p.status}
+                            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            onClick={() => navigate(`/queue?status=${p.status}`)}
+                          >
+                            <span className={`inline-block w-2.5 h-2.5 rounded-full ${PIPELINE_COLORS[p.status]}`} />
+                            {meta?.label} ({p.count})
+                          </button>
+                        );
+                      })}
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No post cards yet. Generate your first batch!</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Asset Library Health */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FolderOpen className="h-4 w-4 text-primary" />
+                  Asset Health
+                </CardTitle>
+                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/assets")}>
+                  Library <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
+            </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {pipeline
-                  .filter((p) => p.status !== "archived")
-                  .map((p) => {
-                    const meta = STATUS_LABELS[p.status] ?? { label: p.status, color: "" };
-                    return (
-                      <button
-                        key={p.status}
-                        className="rounded-lg border border-border/50 p-3 text-center hover:border-primary/30 transition-colors"
-                        onClick={() => navigate(`/queue?status=${p.status}`)}
-                      >
-                        <div className="text-2xl font-bold">{p.count}</div>
-                        <Badge variant="outline" className={`text-[10px] mt-1 ${meta.color}`}>
-                          {meta.label}
-                        </Badge>
-                      </button>
-                    );
-                  })}
+              <div className="grid grid-cols-2 gap-3">
+                {assetHealth.map((a) => {
+                  const meta = ASSET_HEALTH_META[a.permission_state];
+                  if (!meta) return null;
+                  return (
+                    <div
+                      key={a.permission_state}
+                      className="flex items-center gap-3 rounded-lg border border-border/40 p-3"
+                    >
+                      <meta.icon className={`h-4 w-4 ${meta.color}`} />
+                      <div>
+                        <div className="text-lg font-bold">{a.count}</div>
+                        <div className="text-[11px] text-muted-foreground">{meta.label}</div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
 
           {/* Recent Activity */}
-          <Card>
+          <Card className="md:col-span-2">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Recent Activity</CardTitle>
@@ -202,7 +338,7 @@ export default function Dashboard() {
               {recentCards.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No post cards yet. Generate your first batch!</p>
               ) : (
-                <div className="space-y-3">
+                <div className="grid md:grid-cols-2 gap-2">
                   {recentCards.map((card) => {
                     const Icon = PLATFORM_ICON[card.platform];
                     const meta = STATUS_LABELS[card.approval_status] ?? { label: card.approval_status, color: "" };
