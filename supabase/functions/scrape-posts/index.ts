@@ -145,6 +145,13 @@ Topics of interest: ${topics.join(", ") || "AI, digital marketing, branding, soc
 Brand categories: ${brandCategories.join(", ") || "general"}
 Platform focus: ${platform}
 
+ENGAGEMENT PRIORITY — CRITICAL:
+- PRIORITIZE posts that show HIGH ENGAGEMENT: many comments, likes, reactions, reposts, or shares.
+- Look for engagement signals in the scraped content: comment counts, like counts, reaction counts, "X comments", "X likes", viewer/impression numbers.
+- Posts with active comment threads are MORE VALUABLE because NuDaze's comment will get more visibility.
+- Boost relevance_score significantly for posts with high engagement (e.g. 50+ comments = major boost, 10+ = moderate boost).
+- Include an estimated_engagement field with your best estimate of total engagement (likes + comments + shares) from what you can see, or 0 if unclear.
+
 CRITICAL FILTERING RULES — STRICTLY EXCLUDE:
 - Blog posts, articles, newsletters, or editorial content (e.g. medium.com articles, substack posts, news sites)
 - Shopping pages, product listings, or e-commerce content
@@ -158,11 +165,12 @@ ONLY include results that are:
 - Content where leaving a comment would be visible and valuable on a social platform
 
 For each qualifying result, evaluate:
-1. Relevance to NuDaze's positioning (0.0 to 1.0)
+1. Relevance to NuDaze's positioning (0.0 to 1.0) — BOOSTED by engagement level
 2. Risk assessment (safe / review_needed / blocked)
 3. A recommended comment angle
 4. A DRAFT COMMENT that NuDaze could post — 2-4 sentences, genuinely human, adds value, never generic or spammy
 
+Return results SORTED by relevance_score descending (highest engagement + relevance first).
 Return ONLY actual social media posts worth engaging with (relevance >= 0.5). If none qualify, return an empty array.`;
 
     const resultsForAI = searchResults.slice(0, 8).map((r: any, i: number) => ({
