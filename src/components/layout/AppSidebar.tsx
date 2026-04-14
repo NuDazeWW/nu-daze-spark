@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Repeat2,
   LogOut,
+  AtSign,
 } from "lucide-react";
 import {
   Sidebar,
@@ -39,6 +40,10 @@ const contentNav = [
   { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
   { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
   { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
+];
+
+const settingsNav = [
+  { title: "Account Tags", icon: AtSign, href: "/settings/tags" },
 ];
 
 export function AppSidebar() {
@@ -87,6 +92,27 @@ export function AppSidebar() {
           <SidebarGroupLabel>Content</SidebarGroupLabel>
           <SidebarMenu>
             {contentNav.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname === item.href}
+                  tooltip={item.title}
+                >
+                  <Link to={item.href}>
+                    <item.icon className="size-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+          <SidebarMenu>
+            {settingsNav.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   asChild

@@ -17,6 +17,7 @@ import DailyQueue from "./pages/DailyQueue";
 import CommentGenerator from "./pages/CommentGenerator";
 import ApprovedContent from "./pages/ApprovedContent";
 import RepurposeCenter from "./pages/RepurposeCenter";
+import AccountTags from "./pages/AccountTags";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/comments" element={<CommentGenerator />} />
               <Route path="/approved" element={<ApprovedContent />} />
               <Route path="/repurpose" element={<RepurposeCenter />} />
+              <Route path="/settings/tags" element={<AccountTags />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
