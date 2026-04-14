@@ -46,6 +46,7 @@ export default function AssetLibrary() {
   const [editing, setEditing] = useState<SourceAsset | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState<AssetFormData>(defaultAssetForm);
+  const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterPermission, setFilterPermission] = useState("all");
