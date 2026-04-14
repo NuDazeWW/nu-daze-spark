@@ -126,7 +126,14 @@ export function AssetFormDialog({
                   form.asset_type === "testimonial" ? ".pdf,.docx,.doc,.txt,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" :
                   "*"
                 }
-                onChange={(e) => setForm((f) => ({ ...f, file: e.target.files?.[0] ?? null }))}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setForm((f) => ({
+                    ...f,
+                    file,
+                    title: file && !f.title ? file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ") : f.title,
+                  }));
+                }}
               />
               <Button type="button" variant="outline" className="w-full justify-start gap-2" onClick={() => fileRef.current?.click()}>
                 <Upload className="h-4 w-4" />
