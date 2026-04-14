@@ -21,60 +21,96 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
+  const [roleLoading, setRoleLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkRole(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    }).catch(() => {
-      setLoading(false);
+    let ignore = false;
+
+    const applySession = (nextSession: Session | null) => {
+      if (ignore) return;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      setAuthReady(true);
+    };
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      applySession(nextSession);
     });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await checkRole(session.user.id);
-        } else {
-          setIsAdmin(false);
-          setLoading(false);
-        }
-      }
-    );
+    supabase.auth
+      .getSession()
+      .then(({ data: { session: initialSession } }) => {
+        applySession(initialSession);
+      })
+      .catch(() => {
+        if (ignore) return;
+        setSession(null);
+        setUser(null);
+        setAuthReady(true);
+      });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      ignore = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  async function checkRole(userId: string) {
-    try {
-      const { data } = await supabase.rpc("has_role", {
-        _user_id: userId,
-        _role: "admin",
-      });
-      setIsAdmin(!!data);
-    } catch {
+  useEffect(() => {
+    if (!authReady) return;
+
+    if (!user) {
       setIsAdmin(false);
-    } finally {
-      setLoading(false);
+      setRoleLoading(false);
+      return;
     }
-  }
+
+    let ignore = false;
+    setRoleLoading(true);
+
+    async function loadRole() {
+      try {
+        const { data, error } = await supabase.rpc("has_role", {
+          _user_id: user.id,
+          _role: "admin",
+        });
+
+        if (ignore) return;
+        if (error) throw error;
+        setIsAdmin(Boolean(data));
+      } catch {
+        if (ignore) return;
+        setIsAdmin(false);
+      } finally {
+        if (ignore) return;
+        setRoleLoading(false);
+      }
+    }
+
+    void loadRole();
+
+    return () => {
+      ignore = true;
+    };
+  }, [authReady, user]);
 
   async function signOut() {
     await supabase.auth.signOut();
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading: !authReady || roleLoading,
+        isAdmin,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
