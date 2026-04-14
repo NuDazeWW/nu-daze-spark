@@ -25,6 +25,11 @@ export function ReelCreatorDialog({ open, onOpenChange }: ReelCreatorDialogProps
   const [config, setConfig] = useState<ReelConfig>(DEFAULT_REEL_CONFIG);
   const inputRef = useRef<HTMLInputElement>(null);
   const { createReel, isCreating, progress, resultUrl, cancel, clearResult } = useReelCreator();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const addFiles = useCallback((newFiles: FileList | File[]) => {
     const arr = Array.from(newFiles).filter((f) => f.type.startsWith("image/"));
