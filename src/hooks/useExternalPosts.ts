@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Tables, Database } from "@/integrations/supabase/types";
 
 export type ExternalPost = Tables<"external_posts">;
+export type Comment = Tables<"comments">;
 type PlatformType = Database["public"]["Enums"]["platform_type"];
 type RiskFlag = Database["public"]["Enums"]["risk_flag"];
 
@@ -24,6 +25,43 @@ export function useExternalPosts() {
       return data as ExternalPost[];
     },
     enabled: !!user,
+  });
+
+  // Fetch comments keyed by external_post_id
+  const { data: commentsMap = {} } = useQuery({
+    queryKey: ["external_post_comments"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("comments")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const map: Record<string, Comment> = {};
+      for (const c of data as Comment[]) {
+        // Keep only the latest comment per external post
+        if (!map[c.external_post_id]) {
+          map[c.external_post_id] = c;
+        }
+      }
+      return map;
+    },
+    enabled: !!user,
+  });
+
+  const updateComment = useMutation({
+    mutationFn: async ({ id, draft_copy }: { id: string; draft_copy: string }) => {
+      const { error } = await supabase
+        .from("comments")
+        .update({ draft_copy, updated_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
+      qc.invalidateQueries({ queryKey: ["comments_queue"] });
+      toast({ title: "Comment updated" });
+    },
+    onError: (e) => toast({ title: "Update failed", description: e.message, variant: "destructive" }),
   });
 
   const addPost = useMutation({
