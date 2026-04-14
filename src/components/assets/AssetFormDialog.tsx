@@ -5,9 +5,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useMemo, useRef, useState } from "react";
-import { Upload, FileType, Info, X, Plus } from "lucide-react";
+import { useMemo, useRef, useState, useEffect } from "react";
+import { Upload, FileType, Info, X, Plus, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { useAccountTags } from "@/hooks/useAccountTags";
 import type { Database } from "@/integrations/supabase/types";
 
 type AssetType = Database["public"]["Enums"]["asset_type"];
