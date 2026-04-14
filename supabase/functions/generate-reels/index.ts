@@ -167,6 +167,10 @@ Generate a JSON response with exactly these fields:
         continue;
       }
 
+      // Merge asset contributors into people_tags (ensure they're always included)
+      const aiPeopleTags: string[] = reelData.people_tags || [];
+      const mergedPeopleTags = [...new Set([...assetContributors, ...aiPeopleTags])];
+
       // Create the post card
       const { data: postCard, error: pcError } = await supabaseAdmin
         .from("post_cards")
@@ -178,7 +182,7 @@ Generate a JSON response with exactly these fields:
           audience: reelData.audience || null,
           campaign_pillar: reelData.campaign_pillar || null,
           hashtags: (reelData.hashtags || []).map((h: string) => h.replace(/^#/, "")),
-          people_tags: reelData.people_tags || [],
+          people_tags: mergedPeopleTags,
           org_tags: reelData.org_tags || [],
           rationale: reelData.rationale || null,
           suggested_asset_description: reelData.suggested_asset_description || null,
