@@ -887,6 +887,7 @@ export type Database = {
           asset_type: Database["public"]["Enums"]["asset_type"]
           created_at: string
           created_by: string
+          deleted_at: string | null
           description: string | null
           expires_at: string | null
           external_url: string | null
@@ -904,6 +905,7 @@ export type Database = {
           asset_type: Database["public"]["Enums"]["asset_type"]
           created_at?: string
           created_by: string
+          deleted_at?: string | null
           description?: string | null
           expires_at?: string | null
           external_url?: string | null
@@ -921,6 +923,7 @@ export type Database = {
           asset_type?: Database["public"]["Enums"]["asset_type"]
           created_at?: string
           created_by?: string
+          deleted_at?: string | null
           description?: string | null
           expires_at?: string | null
           external_url?: string | null
