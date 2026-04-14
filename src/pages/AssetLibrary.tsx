@@ -278,6 +278,11 @@ export default function AssetLibrary() {
         isPending={isBulkPending}
         progress={bulkProgress}
       />
+
+      <ReelCreatorDialog
+        open={reelCreatorOpen}
+        onOpenChange={setReelCreatorOpen}
+      />
     </div>
   );
 }
