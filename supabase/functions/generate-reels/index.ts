@@ -204,7 +204,7 @@ Generate a JSON response with exactly these fields:
         version_number: 1,
         draft_copy: reelData.draft_copy,
         hashtags: (reelData.hashtags || []).map((h: string) => h.replace(/^#/, "")),
-        people_tags: reelData.people_tags || [],
+        people_tags: mergedPeopleTags,
         org_tags: reelData.org_tags || [],
         edit_source: "ai",
         created_by: user.id,
