@@ -1,0 +1,1 @@
+ALTER TABLE public.external_posts ADD COLUMN estimated_engagement integer NOT NULL DEFAULT 0;

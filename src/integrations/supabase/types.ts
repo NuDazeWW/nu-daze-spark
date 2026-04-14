@@ -516,6 +516,7 @@ export type Database = {
         Row: {
           author_name: string | null
           created_at: string
+          estimated_engagement: number
           external_url: string
           id: string
           is_commented: boolean
@@ -531,6 +532,7 @@ export type Database = {
         Insert: {
           author_name?: string | null
           created_at?: string
+          estimated_engagement?: number
           external_url: string
           id?: string
           is_commented?: boolean
@@ -546,6 +548,7 @@ export type Database = {
         Update: {
           author_name?: string | null
           created_at?: string
+          estimated_engagement?: number
           external_url?: string
           id?: string
           is_commented?: boolean
