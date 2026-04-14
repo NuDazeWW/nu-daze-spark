@@ -1,7 +1,8 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, ExternalLink, FileText } from "lucide-react";
 
 interface AssetLightboxProps {
   open: boolean;
@@ -38,13 +39,33 @@ export function AssetLightbox({ open, onOpenChange, filePath, title, assetType }
 
   const isImage = assetType === "image";
   const isVideo = assetType === "video";
-  const isPdf = assetType === "pdf";
+  const isDocument = ["pdf", "deck", "testimonial", "case_study", "text_snippet"].includes(assetType);
+
+  // Detect actual file extension for rendering hints
+  const ext = filePath?.split(".").pop()?.toLowerCase() ?? "";
+  const isPdfFile = ext === "pdf";
+  const isDocFile = ["docx", "doc", "pptx", "ppt", "key", "odp", "odt", "rtf", "txt"].includes(ext);
+
+  const openInNewTab = async () => {
+    if (!url) return;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Fetch failed");
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, "_blank");
+    } catch {
+      window.open(url, "_blank");
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] p-2 overflow-hidden">
-        <div className="pt-6">
-          <p className="text-sm font-medium px-2 mb-2 truncate">{title}</p>
+        <DialogHeader className="px-2 pt-4">
+          <DialogTitle className="text-sm font-medium truncate">{title}</DialogTitle>
+        </DialogHeader>
+        <div>
           {loading && (
             <div className="flex items-center justify-center h-64">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -72,19 +93,41 @@ export function AssetLightbox({ open, onOpenChange, filePath, title, assetType }
                   className="w-full max-h-[75vh] rounded-md"
                 />
               )}
-              {isPdf && (
+              {isDocument && isPdfFile && (
                 <iframe
                   src={url}
                   title={title}
                   className="w-full h-[75vh] rounded-md border-0"
                 />
               )}
-              {!isImage && !isVideo && !isPdf && (
-                <div className="flex items-center justify-center h-64 text-sm text-muted-foreground">
-                  Preview not available for this file type.{" "}
-                  <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary underline ml-1">
-                    Open file
-                  </a>
+              {isDocument && !isPdfFile && (
+                <div className="flex flex-col items-center justify-center h-64 gap-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <FileText className="h-10 w-10" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{title}</p>
+                      <p className="text-xs text-muted-foreground uppercase">{ext} document</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="gap-2" onClick={openInNewTab}>
+                    <ExternalLink className="h-4 w-4" />
+                    Open in New Tab
+                  </Button>
+                </div>
+              )}
+              {!isImage && !isVideo && !isDocument && (
+                <div className="flex flex-col items-center justify-center h-64 gap-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <FileText className="h-10 w-10" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{title}</p>
+                      <p className="text-xs text-muted-foreground uppercase">{ext} file</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="gap-2" onClick={openInNewTab}>
+                    <ExternalLink className="h-4 w-4" />
+                    Open in New Tab
+                  </Button>
                 </div>
               )}
             </>
