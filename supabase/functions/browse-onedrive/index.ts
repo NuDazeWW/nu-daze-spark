@@ -47,38 +47,38 @@ Deno.serve(async (req) => {
 
     switch (action) {
       case "list_root":
-        graphPath = "/v1.0/me/drive/root/children";
+        graphPath = "/me/drive/root/children";
         break;
       case "list_folder":
         if (!itemId) throw new Error("itemId required for list_folder");
-        graphPath = `/v1.0/me/drive/items/${itemId}/children`;
+        graphPath = `/me/drive/items/${itemId}/children`;
         break;
       case "get_item":
         if (!itemId) throw new Error("itemId required for get_item");
-        graphPath = `/v1.0/me/drive/items/${itemId}`;
+        graphPath = `/me/drive/items/${itemId}`;
         break;
       case "download_content":
         if (!itemId) throw new Error("itemId required for download_content");
-        graphPath = `/v1.0/me/drive/items/${itemId}/content`;
+        graphPath = `/me/drive/items/${itemId}/content`;
         break;
       case "search":
         if (!searchQuery) throw new Error("searchQuery required for search");
-        graphPath = `/v1.0/me/drive/root/search(q='${encodeURIComponent(searchQuery)}')`;
+        graphPath = `/me/drive/root/search(q='${encodeURIComponent(searchQuery)}')`;
         break;
       case "list_sharepoint_sites":
         graphPath = searchQuery
-          ? `/v1.0/sites?search=${encodeURIComponent(searchQuery)}`
-          : `/v1.0/sites?search=*`;
+          ? `/sites?search=${encodeURIComponent(searchQuery)}`
+          : `/sites?search=*`;
         break;
       case "list_site_drive":
         if (!siteId) throw new Error("siteId required for list_site_drive");
         graphPath = itemId
-          ? `/v1.0/sites/${siteId}/drive/items/${itemId}/children`
-          : `/v1.0/sites/${siteId}/drive/root/children`;
+          ? `/sites/${siteId}/drive/items/${itemId}/children`
+          : `/sites/${siteId}/drive/root/children`;
         break;
       case "list_site_drives":
         if (!siteId) throw new Error("siteId required for list_site_drives");
-        graphPath = `/v1.0/sites/${siteId}/drives`;
+        graphPath = `/sites/${siteId}/drives`;
         break;
       default:
         throw new Error(`Unknown action: ${action}`);
