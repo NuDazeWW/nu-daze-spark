@@ -98,6 +98,21 @@ export function useAssets() {
     return path;
   };
 
+  const downloadAsset = async (filePath: string, fileName: string) => {
+    const { data, error } = await supabase.storage
+      .from("source-assets")
+      .createSignedUrl(filePath, 60);
+    if (error) {
+      toast({ title: "Download failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = data.signedUrl;
+    a.download = fileName;
+    a.target = "_blank";
+    a.click();
+  };
+
   const summaryMap = new Map<string, AssetSummary>();
   (summariesQuery.data ?? []).forEach((s) => summaryMap.set(s.asset_id, s));
 
@@ -111,6 +126,7 @@ export function useAssets() {
     update: updateMutation.mutateAsync,
     remove: deleteMutation.mutateAsync,
     uploadFile,
+    downloadAsset,
     isInserting: insertMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
