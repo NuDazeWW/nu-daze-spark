@@ -18,8 +18,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import {
   MessageSquare, Plus, Sparkles, Search, AlertCircle, ExternalLink,
   Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar, Copy, Check,
+  Eye, EyeOff, CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 
 const RISK_ICON = {
   safe: Shield,
@@ -39,10 +41,11 @@ const RISK_LABEL = {
   blocked: "Blocked",
 };
 
-function InlineComment({ comment, onSave, isSaving }: {
+function InlineComment({ comment, onSave, isSaving, onCopied }: {
   comment: { id: string; draft_copy: string; tone: string | null };
   onSave: (id: string, text: string) => void;
   isSaving: boolean;
+  onCopied?: () => void;
 }) {
   const [text, setText] = useState(comment.draft_copy);
   const [copied, setCopied] = useState(false);
@@ -53,6 +56,7 @@ function InlineComment({ comment, onSave, isSaving }: {
     await navigator.clipboard.writeText(text);
     setCopied(true);
     toast.success("Comment copied to clipboard");
+    onCopied?.();
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -95,16 +99,18 @@ function InlineComment({ comment, onSave, isSaving }: {
 }
 
 export default function CommentGenerator() {
-  const { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment } = useExternalPosts();
+  const { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented } = useExternalPosts();
 
   const [formOpen, setFormOpen] = useState(false);
   const [scrapeOpen, setScrapeOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showCommented, setShowCommented] = useState(false);
 
   const filtered = useMemo(() => {
     return posts.filter((p) => {
+      if (!showCommented && (p as any).is_commented) return false;
       if (platformFilter !== "all" && p.platform !== platformFilter) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -114,7 +120,9 @@ export default function CommentGenerator() {
       }
       return true;
     });
-  }, [posts, search, platformFilter]);
+  }, [posts, search, platformFilter, showCommented]);
+
+  const commentedCount = posts.filter((p) => (p as any).is_commented).length;
 
   const eligibleForGeneration = filtered.filter((p) => p.risk_flag !== "blocked");
 
@@ -184,6 +192,12 @@ export default function CommentGenerator() {
         <Button variant="outline" onClick={() => setFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />Add Post
         </Button>
+        <div className="flex items-center gap-2 ml-auto">
+          <Switch checked={showCommented} onCheckedChange={setShowCommented} id="show-commented" />
+          <label htmlFor="show-commented" className="text-xs text-muted-foreground cursor-pointer">
+            Show commented ({commentedCount})
+          </label>
+        </div>
       </div>
 
       {/* Selection bar */}
@@ -243,6 +257,7 @@ export default function CommentGenerator() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((post) => {
             const isBlocked = post.risk_flag === "blocked";
+            const isCommented = (post as any).is_commented;
             const isSelected = selectedIds.includes(post.id);
             const RiskIcon = RISK_ICON[post.risk_flag];
             const comment = commentsMap[post.id];
@@ -250,19 +265,22 @@ export default function CommentGenerator() {
             return (
               <Card
                 key={post.id}
-                className={`transition-colors ${isSelected ? "ring-1 ring-primary/40 bg-primary/5" : ""} ${isBlocked ? "opacity-50" : "cursor-pointer"}`}
-                onClick={() => !isBlocked && toggleSelect(post.id)}
+                className={`transition-colors ${isSelected ? "ring-1 ring-primary/40 bg-primary/5" : ""} ${isBlocked ? "opacity-50" : "cursor-pointer"} ${isCommented ? "opacity-60 border-emerald-500/30" : ""}`}
+                onClick={() => !isBlocked && !isCommented && toggleSelect(post.id)}
               >
                 <CardHeader className="py-3 px-4 space-y-0">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2 min-w-0">
-                      {!isBlocked && (
+                      {!isBlocked && !isCommented && (
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => toggleSelect(post.id)}
                           onClick={(e) => e.stopPropagation()}
                           className="shrink-0"
                         />
+                      )}
+                      {isCommented && (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                       )}
                       <Badge variant="outline" className="text-[10px] capitalize shrink-0">{post.platform}</Badge>
                       {post.topic && (
@@ -318,6 +336,7 @@ export default function CommentGenerator() {
                       comment={comment}
                       onSave={handleCommentSave}
                       isSaving={updateComment.isPending}
+                      onCopied={() => !isCommented && markCommented.mutate(post.id)}
                     />
                   )}
                 </CardContent>

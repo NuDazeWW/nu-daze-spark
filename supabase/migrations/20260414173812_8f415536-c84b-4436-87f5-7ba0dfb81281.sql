@@ -1,0 +1,1 @@
+ALTER TABLE public.external_posts ADD COLUMN is_commented boolean NOT NULL DEFAULT false;

@@ -518,6 +518,7 @@ export type Database = {
           created_at: string
           external_url: string
           id: string
+          is_commented: boolean
           platform: Database["public"]["Enums"]["platform_type"]
           post_content: string | null
           recommended_comment_angle: string | null
@@ -532,6 +533,7 @@ export type Database = {
           created_at?: string
           external_url: string
           id?: string
+          is_commented?: boolean
           platform: Database["public"]["Enums"]["platform_type"]
           post_content?: string | null
           recommended_comment_angle?: string | null
@@ -546,6 +548,7 @@ export type Database = {
           created_at?: string
           external_url?: string
           id?: string
+          is_commented?: boolean
           platform?: Database["public"]["Enums"]["platform_type"]
           post_content?: string | null
           recommended_comment_angle?: string | null
