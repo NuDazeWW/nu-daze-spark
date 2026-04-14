@@ -5,6 +5,7 @@ import { useAssets, type SourceAsset } from "@/hooks/useAssets";
 import { AssetFormDialog, defaultAssetForm, type AssetFormData } from "@/components/assets/AssetFormDialog";
 import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
 import { ReelCreatorDialog } from "@/components/assets/ReelCreatorDialog";
+import { AssetLightbox } from "@/components/assets/AssetLightbox";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { useBulkReelUpload } from "@/hooks/useBulkReelUpload";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download,
+  FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download, Eye,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
   Shield, ShieldAlert, ShieldOff, Archive, CalendarClock, Sparkles, Film,
 } from "lucide-react";
