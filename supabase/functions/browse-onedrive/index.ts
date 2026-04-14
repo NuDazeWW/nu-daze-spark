@@ -84,36 +84,61 @@ Deno.serve(async (req) => {
         throw new Error(`Unknown action: ${action}`);
     }
 
-    const url = `${GATEWAY_URL}${graphPath}`;
-    const response = await fetch(url, { method: "GET", headers });
+    // Fetch with automatic pagination for list actions
+    const isListAction = ["list_root", "list_folder", "list_site_drive", "list_site_drives", "list_sharepoint_sites", "search"].includes(action);
 
-    if (!response.ok) {
-      const errBody = await response.text();
-      console.error(`Graph API error [${response.status}]:`, errBody);
+    const firstUrl = `${GATEWAY_URL}${graphPath}`;
+    const firstResponse = await fetch(firstUrl, { method: "GET", headers });
+
+    if (!firstResponse.ok) {
+      const errBody = await firstResponse.text();
+      console.error(`Graph API error [${firstResponse.status}]:`, errBody);
       return new Response(
-        JSON.stringify({ error: `Microsoft Graph API error: ${response.status}`, details: errBody }),
-        { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: `Microsoft Graph API error: ${firstResponse.status}`, details: errBody }),
+        { status: firstResponse.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     // For download_content, return the redirected URL or content
     if (action === "download_content") {
-      // The gateway may return a redirect or the content directly
-      const contentType = response.headers.get("content-type") ?? "application/octet-stream";
+      const contentType = firstResponse.headers.get("content-type") ?? "application/octet-stream";
       if (contentType.includes("application/json")) {
-        const data = await response.json();
+        const data = await firstResponse.json();
         return new Response(JSON.stringify(data), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      // Return text content for text-based files
-      const text = await response.text();
+      const text = await firstResponse.text();
       return new Response(JSON.stringify({ content: text, contentType }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const data = await response.json();
+    let data = await firstResponse.json();
+
+    // Follow @odata.nextLink for paginated results (up to 10 pages to avoid runaway)
+    if (isListAction && data["@odata.nextLink"]) {
+      const allValues = [...(data.value ?? [])];
+      let nextLink: string | undefined = data["@odata.nextLink"];
+      let pages = 0;
+      const MAX_PAGES = 10;
+
+      while (nextLink && pages < MAX_PAGES) {
+        pages++;
+        // The nextLink from Graph is a full URL; route it through the gateway
+        const nextPath = nextLink.replace(/^https:\/\/graph\.microsoft\.com\/v1\.0/, "");
+        const nextUrl = `${GATEWAY_URL}${nextPath}`;
+        const nextResp = await fetch(nextUrl, { method: "GET", headers });
+        if (!nextResp.ok) break;
+        const nextData = await nextResp.json();
+        allValues.push(...(nextData.value ?? []));
+        nextLink = nextData["@odata.nextLink"];
+      }
+
+      data = { ...data, value: allValues };
+      delete data["@odata.nextLink"];
+    }
+
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
