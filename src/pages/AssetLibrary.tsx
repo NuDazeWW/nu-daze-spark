@@ -42,6 +42,7 @@ export default function AssetLibrary() {
 
   const { uploadAndCreateReels, isPending: isBulkPending, progress: bulkProgress } = useBulkReelUpload();
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [reelCreatorOpen, setReelCreatorOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<SourceAsset | null>(null);
