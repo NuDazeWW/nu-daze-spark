@@ -220,109 +220,146 @@ export default function ConnectedSources() {
         <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Source</Button>
       </div>
 
-      {data.length === 0 ? (
-        <EmptyState
-          icon={Link2}
-          title="No sources connected"
-          description="Connect Google Drive, SharePoint, or add webpage links for content sourcing."
-          action={<Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Source</Button>}
-        />
-      ) : (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {data.map((source) => {
-            const meta = SOURCE_TYPE_META[source.source_type] ?? { icon: Globe, label: source.source_type };
-            const Icon = meta.icon;
-            const isWebpage = source.source_type === "webpage";
-            const isScraping = scrapingId === source.id;
-            const config = source.connection_config as Record<string, unknown> | null;
-            const hasUrl = !!(config?.url);
+      {(() => {
+        const cloudTypes = ["onedrive", "sharepoint"];
+        const cloudSources = data.filter((s) => cloudTypes.includes(s.source_type));
+        const otherSources = data.filter((s) => !cloudTypes.includes(s.source_type));
 
-            return (
-              <Card key={source.id} className="group">
-                <CardHeader className="py-3 px-4 flex-row items-center justify-between space-y-0">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <CardTitle className="text-sm font-semibold truncate">{source.source_name}</CardTitle>
-                  </div>
-                  <div className="flex gap-1 shrink-0">
-                    {isWebpage && hasUrl && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleScrapeSource(source)}
-                            disabled={isScraping}
-                          >
-                            {isScraping ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <Download className="h-3.5 w-3.5 text-primary" />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="text-xs">Scrape & import to Asset Library</TooltipContent>
-                      </Tooltip>
-                    )}
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(source)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(source.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="px-4 pb-3 pt-0 space-y-2">
-                  <div className="flex gap-1.5 flex-wrap">
-                    <Badge variant="outline" className="text-xs">{meta.label}</Badge>
-                    <Badge variant={source.is_connected ? "default" : "secondary"} className="text-xs">
-                      {source.is_connected ? "Connected" : "Disconnected"}
-                    </Badge>
-                    {isWebpage && !hasUrl && (
-                      <Badge variant="outline" className="text-xs text-muted-foreground">No URL set</Badge>
-                    )}
-                  </div>
-                  {hasUrl && (
-                    <p className="text-[10px] text-muted-foreground/60 truncate">
-                      {config?.url as string}
-                    </p>
-                  )}
-                  {source.last_synced_at && (
-                    <p className="text-[10px] text-muted-foreground/60 flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-                      Last synced {format(new Date(source.last_synced_at), "MMM d, yyyy 'at' h:mm a")}
-                    </p>
-                  )}
-                  <p className="text-[10px] text-muted-foreground/60">
-                    Created {format(new Date(source.created_at), "MMM d, yyyy")}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+        return otherSources.length === 0 && cloudSources.length === 0 ? (
+          <EmptyState
+            icon={Link2}
+            title="No sources connected"
+            description="Connect Google Drive, SharePoint, or add webpage links for content sourcing."
+            action={<Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Source</Button>}
+          />
+        ) : otherSources.length === 0 ? null : (
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {otherSources.map((source) => {
+              const meta = SOURCE_TYPE_META[source.source_type] ?? { icon: Globe, label: source.source_type };
+              const Icon = meta.icon;
+              const isWebpage = source.source_type === "webpage";
+              const isScraping = scrapingId === source.id;
+              const config = source.connection_config as Record<string, unknown> | null;
+              const hasUrl = !!(config?.url);
 
+              return (
+                <Card key={source.id} className="group">
+                  <CardHeader className="py-3 px-4 flex-row items-center justify-between space-y-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <CardTitle className="text-sm font-semibold truncate">{source.source_name}</CardTitle>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      {isWebpage && hasUrl && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleScrapeSource(source)}
+                              disabled={isScraping}
+                            >
+                              {isScraping ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <Download className="h-3.5 w-3.5 text-primary" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-xs">Scrape & import to Asset Library</TooltipContent>
+                        </Tooltip>
+                      )}
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(source)}><Pencil className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(source.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-3 pt-0 space-y-2">
+                    <div className="flex gap-1.5 flex-wrap">
+                      <Badge variant="outline" className="text-xs">{meta.label}</Badge>
+                      <Badge variant={source.is_connected ? "default" : "secondary"} className="text-xs">
+                        {source.is_connected ? "Connected" : "Disconnected"}
+                      </Badge>
+                      {isWebpage && !hasUrl && (
+                        <Badge variant="outline" className="text-xs text-muted-foreground">No URL set</Badge>
+                      )}
+                    </div>
+                    {hasUrl && (
+                      <p className="text-[10px] text-muted-foreground/60 truncate">
+                        {config?.url as string}
+                      </p>
+                    )}
+                    {source.last_synced_at && (
+                      <p className="text-[10px] text-muted-foreground/60 flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                        Last synced {format(new Date(source.last_synced_at), "MMM d, yyyy 'at' h:mm a")}
+                      </p>
+                    )}
+                    <p className="text-[10px] text-muted-foreground/60">
+                      Created {format(new Date(source.created_at), "MMM d, yyyy")}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        );
+      })()}
       {/* Cloud Storage Integrations */}
       <div className="mt-8">
         <h3 className="text-sm font-medium text-muted-foreground mb-3">Cloud Storage Integrations</h3>
         <div className="grid gap-3 md:grid-cols-3">
-          <Card className="border-primary/20 cursor-pointer hover:border-primary/40 transition-colors" onClick={() => setOneDriveOpen(true)}>
-            <CardContent className="py-6 px-4 text-center space-y-2">
-              <FolderSync className="h-8 w-8 mx-auto text-primary" />
-              <p className="text-sm font-medium">OneDrive / SharePoint</p>
-              <p className="text-xs text-muted-foreground">Browse and import files from OneDrive & SharePoint</p>
-              <Badge variant="default" className="text-[10px]">Connected</Badge>
-            </CardContent>
-          </Card>
-          {[
-            { label: "Google Drive", icon: HardDrive, desc: "Browse and import files from Google Drive" },
-          ].map((item) => (
-            <Card key={item.label} className="border-dashed border-border/50 opacity-60">
+          {/* Dynamic OneDrive / SharePoint sources */}
+          {data
+            .filter((s) => s.source_type === "onedrive" || s.source_type === "sharepoint")
+            .map((source) => {
+              const meta = SOURCE_TYPE_META[source.source_type] ?? { icon: FolderSync, label: source.source_type };
+              const Icon = meta.icon;
+              return (
+                <Card
+                  key={source.id}
+                  className="border-primary/20 cursor-pointer hover:border-primary/40 transition-colors group"
+                  onClick={() => setOneDriveOpen(true)}
+                >
+                  <CardContent className="py-6 px-4 text-center space-y-2 relative">
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEdit(source); }}><Pencil className="h-3 w-3" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); setDeleteId(source.id); }}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                    </div>
+                    <Icon className="h-8 w-8 mx-auto text-primary" />
+                    <p className="text-sm font-medium">{source.source_name}</p>
+                    <p className="text-xs text-muted-foreground">Browse and import files from {meta.label}</p>
+                    <Badge variant={source.is_connected ? "default" : "secondary"} className="text-[10px]">
+                      {source.is_connected ? "Connected" : "Disconnected"}
+                    </Badge>
+                    {source.last_synced_at && (
+                      <p className="text-[10px] text-muted-foreground/60">
+                        Last synced {format(new Date(source.last_synced_at), "MMM d, yyyy 'at' h:mm a")}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          {/* Fallback if no OneDrive sources exist yet */}
+          {!data.some((s) => s.source_type === "onedrive" || s.source_type === "sharepoint") && (
+            <Card className="border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors" onClick={() => setOneDriveOpen(true)}>
               <CardContent className="py-6 px-4 text-center space-y-2">
-                <item.icon className="h-8 w-8 mx-auto text-muted-foreground" />
-                <p className="text-sm font-medium">{item.label}</p>
-                <p className="text-xs text-muted-foreground">{item.desc}</p>
-                <Badge variant="outline" className="text-[10px]">Coming Soon</Badge>
+                <FolderSync className="h-8 w-8 mx-auto text-primary" />
+                <p className="text-sm font-medium">OneDrive / SharePoint</p>
+                <p className="text-xs text-muted-foreground">Browse and import files from OneDrive & SharePoint</p>
+                <Badge variant="outline" className="text-[10px]">Click to browse</Badge>
               </CardContent>
             </Card>
-          ))}
+          )}
+          {/* Google Drive — coming soon */}
+          <Card className="border-dashed border-border/50 opacity-60">
+            <CardContent className="py-6 px-4 text-center space-y-2">
+              <HardDrive className="h-8 w-8 mx-auto text-muted-foreground" />
+              <p className="text-sm font-medium">Google Drive</p>
+              <p className="text-xs text-muted-foreground">Browse and import files from Google Drive</p>
+              <Badge variant="outline" className="text-[10px]">Coming Soon</Badge>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
