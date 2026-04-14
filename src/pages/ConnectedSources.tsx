@@ -50,6 +50,7 @@ export default function ConnectedSources() {
   const [scrapingId, setScrapingId] = useState<string | null>(null);
   const [quickUrl, setQuickUrl] = useState("");
   const [quickScraping, setQuickScraping] = useState(false);
+  const [oneDriveOpen, setOneDriveOpen] = useState(false);
 
   if (!isAdmin) {
     return (
