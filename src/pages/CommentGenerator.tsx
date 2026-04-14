@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ExternalPostFormDialog } from "@/components/comments/ExternalPostFormDialog";
+import { ScrapePostsDialog } from "@/components/comments/ScrapePostsDialog";
 import { useExternalPosts } from "@/hooks/useExternalPosts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   MessageSquare, Plus, Sparkles, Search, AlertCircle, ExternalLink,
-  Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight,
+  Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar,
 } from "lucide-react";
 
 const RISK_ICON = {
@@ -37,9 +38,10 @@ const RISK_LABEL = {
 };
 
 export default function CommentGenerator() {
-  const { posts, isLoading, error, addPost, generateComments } = useExternalPosts();
+  const { posts, isLoading, error, addPost, generateComments, scrapePosts } = useExternalPosts();
 
   const [formOpen, setFormOpen] = useState(false);
+  const [scrapeOpen, setScrapeOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -115,6 +117,9 @@ export default function CommentGenerator() {
             <SelectItem value="linkedin">LinkedIn</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant="outline" onClick={() => setScrapeOpen(true)}>
+          <Radar className="mr-2 h-4 w-4" />Find Posts
+        </Button>
         <Button variant="outline" onClick={() => setFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />Add Post
         </Button>
@@ -157,14 +162,19 @@ export default function CommentGenerator() {
           title={posts.length === 0 ? "No external posts yet" : "No matching posts"}
           description={
             posts.length === 0
-              ? "Add relevant industry posts to generate AI-powered engagement comments."
+              ? "Find relevant industry posts or add them manually to generate AI-powered engagement comments."
               : "Try adjusting your search or filter."
           }
           action={
             posts.length === 0 ? (
-              <Button onClick={() => setFormOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />Add First Post
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setScrapeOpen(true)}>
+                  <Radar className="mr-2 h-4 w-4" />Find Posts
+                </Button>
+                <Button variant="outline" onClick={() => setFormOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />Add Manually
+                </Button>
+              </div>
             ) : undefined
           }
         />
@@ -254,6 +264,16 @@ export default function CommentGenerator() {
           addPost.mutate(post, { onSuccess: () => setFormOpen(false) });
         }}
         isPending={addPost.isPending}
+      />
+
+      {/* Scrape posts dialog */}
+      <ScrapePostsDialog
+        open={scrapeOpen}
+        onOpenChange={setScrapeOpen}
+        onScrape={(params) => {
+          scrapePosts.mutate(params, { onSuccess: () => setScrapeOpen(false) });
+        }}
+        isPending={scrapePosts.isPending}
       />
     </div>
   );

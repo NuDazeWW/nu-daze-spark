@@ -73,5 +73,28 @@ export function useExternalPosts() {
     onError: (e) => toast({ title: "Generation failed", description: e.message, variant: "destructive" }),
   });
 
-  return { posts, isLoading, error, addPost, generateComments };
+  const scrapePosts = useMutation({
+    mutationFn: async (params: { platform?: string; query?: string }) => {
+      const { data, error } = await supabase.functions.invoke("scrape-posts", {
+        body: params,
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ["external_posts"] });
+      toast({
+        title: data.count > 0
+          ? `${data.count} relevant post${data.count !== 1 ? "s" : ""} discovered`
+          : "No new posts found",
+        description: data.count > 0
+          ? "Review and select posts to generate comments."
+          : data.message || "Try a different search query.",
+      });
+    },
+    onError: (e) => toast({ title: "Scrape failed", description: e.message, variant: "destructive" }),
+  });
+
+  return { posts, isLoading, error, addPost, generateComments, scrapePosts };
 }
