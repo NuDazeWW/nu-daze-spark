@@ -254,28 +254,21 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <HardDrive className="h-5 w-5 text-primary" />
-            Browse OneDrive & SharePoint
+            Browse OneDrive Files
           </DialogTitle>
         </DialogHeader>
 
         {/* Mode Toggle */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <Button
-            variant={mode !== "sharepoint_sites" ? "default" : "outline"}
+            variant="default"
             size="sm"
             onClick={loadRoot}
           >
             <HardDrive className="h-3.5 w-3.5 mr-1.5" />
             My Files
           </Button>
-          <Button
-            variant={mode === "sharepoint_sites" || mode === "sharepoint_drive" ? "default" : "outline"}
-            size="sm"
-            onClick={() => loadSharePointSites()}
-          >
-            <Globe className="h-3.5 w-3.5 mr-1.5" />
-            SharePoint Sites
-          </Button>
+          <span className="text-[10px] text-muted-foreground">SharePoint Sites require additional permissions — coming soon</span>
         </div>
 
         {/* Search */}
