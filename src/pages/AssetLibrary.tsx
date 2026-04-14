@@ -160,7 +160,10 @@ export default function AssetLibrary() {
           </SelectContent>
         </Select>
         {isAdmin && (
-          <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
+          <>
+            <Button variant="outline" onClick={() => setBulkOpen(true)}><Film className="mr-2 h-4 w-4" />Create Reels</Button>
+            <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
+          </>
         )}
       </div>
 
