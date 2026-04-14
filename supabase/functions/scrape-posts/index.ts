@@ -220,6 +220,7 @@ Return ONLY actual social media posts worth engaging with (relevance >= 0.5). If
                         post_summary: { type: "string", description: "Brief summary of the post content" },
                         draft_comment: { type: "string", description: "A ready-to-post comment (2-4 sentences, human, insightful)" },
                         comment_tone: { type: "string", description: "Tone of the draft comment (e.g. supportive, insightful, curious)" },
+                        estimated_engagement: { type: "number", description: "Estimated total engagement (likes+comments+shares) from visible signals, 0 if unknown" },
                       },
                       required: ["index", "topic", "relevance_score", "risk_flag", "recommended_comment_angle", "draft_comment"],
                     },
