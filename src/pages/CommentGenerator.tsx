@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ExternalPostFormDialog } from "@/components/comments/ExternalPostFormDialog";
+import { ScrapePostsDialog } from "@/components/comments/ScrapePostsDialog";
 import { useExternalPosts } from "@/hooks/useExternalPosts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   MessageSquare, Plus, Sparkles, Search, AlertCircle, ExternalLink,
-  Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight,
+  Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar,
 } from "lucide-react";
 
 const RISK_ICON = {
