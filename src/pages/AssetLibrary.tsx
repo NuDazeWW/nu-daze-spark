@@ -7,12 +7,16 @@ import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
 import { ReelCreatorDialog } from "@/components/assets/ReelCreatorDialog";
 import { AssetLightbox } from "@/components/assets/AssetLightbox";
 import { AssetThumbnail } from "@/components/assets/AssetThumbnail";
+import { ExpirationAlerts } from "@/components/assets/ExpirationAlerts";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { useBulkReelUpload } from "@/hooks/useBulkReelUpload";
+import { useDuplicateDetection } from "@/hooks/useDuplicateDetection";
+import { useAssetUsage } from "@/hooks/useAssetUsage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,6 +25,7 @@ import {
   FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download, Eye,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
   CalendarClock, Sparkles, Film, Undo2, Archive, Trash, Calendar, Users, PartyPopper,
+  Tags, BarChart3,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
