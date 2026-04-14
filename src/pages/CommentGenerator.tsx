@@ -162,14 +162,19 @@ export default function CommentGenerator() {
           title={posts.length === 0 ? "No external posts yet" : "No matching posts"}
           description={
             posts.length === 0
-              ? "Add relevant industry posts to generate AI-powered engagement comments."
+              ? "Find relevant industry posts or add them manually to generate AI-powered engagement comments."
               : "Try adjusting your search or filter."
           }
           action={
             posts.length === 0 ? (
-              <Button onClick={() => setFormOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />Add First Post
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setScrapeOpen(true)}>
+                  <Radar className="mr-2 h-4 w-4" />Find Posts
+                </Button>
+                <Button variant="outline" onClick={() => setFormOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />Add Manually
+                </Button>
+              </div>
             ) : undefined
           }
         />
