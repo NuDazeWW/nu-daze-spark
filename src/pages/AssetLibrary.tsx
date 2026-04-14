@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import {
   FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download, Eye,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
-  CalendarClock, Sparkles, Film, Undo2, Archive, Trash,
+  CalendarClock, Sparkles, Film, Undo2, Archive, Trash, Calendar, Users, PartyPopper,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
@@ -298,6 +298,27 @@ export default function AssetLibrary() {
                       <Badge variant={perm.variant} className="text-xs">{perm.label}</Badge>
                       {asset.is_nudaze_origin && <Badge variant="outline" className="text-xs border-primary/30 text-primary">NuDaze</Badge>}
                       {expired && <Badge variant="destructive" className="text-xs">Expired</Badge>}
+                    </div>
+                    {/* Metadata: date, event, contributors */}
+                    <div className="space-y-1">
+                      {(asset as any).content_date && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Calendar className="h-3 w-3 shrink-0" />
+                          {format(new Date((asset as any).content_date), "MMM d, yyyy")}
+                        </div>
+                      )}
+                      {(asset as any).is_event && (asset as any).event_name && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <PartyPopper className="h-3 w-3 shrink-0" />
+                          {(asset as any).event_name}
+                        </div>
+                      )}
+                      {(asset as any).contributors?.length > 0 && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Users className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{(asset as any).contributors.join(", ")}</span>
+                        </div>
+                      )}
                     </div>
                     {asset.expires_at && !expired && (
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
