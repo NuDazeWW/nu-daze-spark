@@ -150,10 +150,17 @@ export function ReelCreatorDialog({ open, onOpenChange }: ReelCreatorDialogProps
               className="w-full rounded-lg border max-h-[40vh] mx-auto"
               style={{ aspectRatio: "9/16", objectFit: "contain" }}
             />
+            <Button onClick={handleSaveToLibrary} disabled={isSaving} className="w-full">
+              {isSaving ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving…</>
+              ) : (
+                <><Save className="mr-2 h-4 w-4" />Save to Library & Generate Post Card</>
+              )}
+            </Button>
             <div className="flex gap-2">
-              <Button onClick={handleDownload} className="flex-1">
+              <Button variant="outline" onClick={handleDownload} className="flex-1">
                 <Download className="mr-2 h-4 w-4" />
-                Download Reel
+                Download Only
               </Button>
               <Button variant="outline" onClick={handleReset}>
                 <RotateCcw className="mr-2 h-4 w-4" />
