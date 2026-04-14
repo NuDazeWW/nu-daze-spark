@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { useAssets, type SourceAsset } from "@/hooks/useAssets";
 import { AssetFormDialog, defaultAssetForm, type AssetFormData } from "@/components/assets/AssetFormDialog";
 import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
+import { ReelCreatorDialog } from "@/components/assets/ReelCreatorDialog";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { useBulkReelUpload } from "@/hooks/useBulkReelUpload";
 import { Button } from "@/components/ui/button";
