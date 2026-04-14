@@ -6,6 +6,7 @@ import { AssetFormDialog, defaultAssetForm, type AssetFormData } from "@/compone
 import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
 import { ReelCreatorDialog } from "@/components/assets/ReelCreatorDialog";
 import { AssetLightbox } from "@/components/assets/AssetLightbox";
+import { AssetThumbnail } from "@/components/assets/AssetThumbnail";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { useBulkReelUpload } from "@/hooks/useBulkReelUpload";
 import { Button } from "@/components/ui/button";
