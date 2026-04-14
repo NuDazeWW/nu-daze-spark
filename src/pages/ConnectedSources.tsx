@@ -125,8 +125,6 @@ export default function ConnectedSources() {
   };
 
   // Quick import: scrape a URL directly without creating a source first
-  const [quickUrl, setQuickUrl] = useState("");
-  const [quickScraping, setQuickScraping] = useState(false);
 
   const handleQuickImport = async () => {
     if (!quickUrl.trim()) return;
