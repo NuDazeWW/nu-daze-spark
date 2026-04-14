@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { action, itemId, siteId, searchQuery } = await req.json();
+    const { action, itemId, siteId, searchQuery, driveId } = await req.json();
 
     const headers = {
       Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -58,13 +58,30 @@ Deno.serve(async (req) => {
         if (!itemId) throw new Error("itemId required for list_folder");
         graphPath = `/me/drive/items/${itemId}/children`;
         break;
+      case "list_remote_folder":
+        // Browse into a remote/shared folder using its driveId and itemId
+        if (!driveId) throw new Error("driveId required for list_remote_folder");
+        if (itemId) {
+          graphPath = `/drives/${driveId}/items/${itemId}/children`;
+        } else {
+          graphPath = `/drives/${driveId}/root/children`;
+        }
+        break;
       case "get_item":
         if (!itemId) throw new Error("itemId required for get_item");
-        graphPath = `/me/drive/items/${itemId}`;
+        if (driveId) {
+          graphPath = `/drives/${driveId}/items/${itemId}`;
+        } else {
+          graphPath = `/me/drive/items/${itemId}`;
+        }
         break;
       case "download_content":
         if (!itemId) throw new Error("itemId required for download_content");
-        graphPath = `/me/drive/items/${itemId}/content`;
+        if (driveId) {
+          graphPath = `/drives/${driveId}/items/${itemId}/content`;
+        } else {
+          graphPath = `/me/drive/items/${itemId}/content`;
+        }
         break;
       case "search":
         if (!searchQuery) throw new Error("searchQuery required for search");
@@ -89,12 +106,17 @@ Deno.serve(async (req) => {
         throw new Error(`Unknown action: ${action}`);
     }
 
-    if (["list_root", "list_folder", "list_site_drive"].includes(action)) {
+    if (["list_root", "list_folder", "list_remote_folder", "list_site_drive"].includes(action)) {
       graphPath = appendQueryParam(graphPath, "includeHiddenFolders", "true");
     }
 
+    // For remote folder listings, expand remoteItem so we can detect shortcuts
+    if (["list_root", "list_folder"].includes(action)) {
+      graphPath = appendQueryParam(graphPath, "$expand", "children");
+    }
+
     // Fetch with automatic pagination for list actions
-    const isListAction = ["list_root", "list_folder", "list_site_drive", "list_site_drives", "list_sharepoint_sites", "search"].includes(action);
+    const isListAction = ["list_root", "list_folder", "list_remote_folder", "list_site_drive", "list_site_drives", "list_sharepoint_sites", "search"].includes(action);
 
     const firstUrl = `${GATEWAY_URL}${graphPath}`;
     const firstResponse = await fetch(firstUrl, { method: "GET", headers });
@@ -134,7 +156,6 @@ Deno.serve(async (req) => {
 
       while (nextLink && pages < MAX_PAGES) {
         pages++;
-        // The nextLink from Graph is a full URL; route it through the gateway
         const nextPath = nextLink.replace(/^https:\/\/graph\.microsoft\.com\/v1\.0/, "");
         const nextUrl = `${GATEWAY_URL}${nextPath}`;
         const nextResp = await fetch(nextUrl, { method: "GET", headers });

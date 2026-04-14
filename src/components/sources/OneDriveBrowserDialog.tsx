@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Folder, FileText, Image, Film, File, ArrowLeft,
-  Download, Search, Loader2, HardDrive, Globe, CheckCircle2,
+  Download, Search, Loader2, HardDrive, Globe, CheckCircle2, Link2,
 } from "lucide-react";
 
 interface DriveItem {
@@ -22,15 +21,27 @@ interface DriveItem {
   webUrl?: string;
   lastModifiedDateTime?: string;
   "@microsoft.graph.downloadUrl"?: string;
+  remoteItem?: {
+    id: string;
+    folder?: { childCount: number };
+    file?: { mimeType: string };
+    parentReference?: {
+      driveId: string;
+      driveType?: string;
+    };
+    size?: number;
+  };
 }
 
 interface BreadcrumbItem {
   id: string | null;
   name: string;
   siteId?: string;
+  driveId?: string;
+  action?: string;
 }
 
-type BrowseMode = "onedrive" | "sharepoint_sites" | "sharepoint_drive";
+type BrowseMode = "onedrive" | "sharepoint_sites" | "sharepoint_drive" | "remote_drive";
 
 interface OneDriveBrowserDialogProps {
   open: boolean;
@@ -57,6 +68,10 @@ function formatSize(bytes?: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function isShortcut(item: DriveItem): boolean {
+  return !!item.remoteItem?.parentReference?.driveId;
+}
+
 export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDialogProps) {
   const { toast } = useToast();
   const qc = useQueryClient();
@@ -69,6 +84,7 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([{ id: null, name: "Root" }]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentSiteId, setCurrentSiteId] = useState<string | null>(null);
+  const [currentDriveId, setCurrentDriveId] = useState<string | null>(null);
   const [imported, setImported] = useState<Set<string>>(new Set());
 
   const callBrowse = useCallback(async (body: Record<string, unknown>) => {
@@ -86,6 +102,7 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
       setBreadcrumbs([{ id: null, name: "My Files" }]);
       setMode("onedrive");
       setCurrentSiteId(null);
+      setCurrentDriveId(null);
     } catch (e) {
       toast({ title: "Failed to load files", description: e instanceof Error ? e.message : "Unknown error", variant: "destructive" });
     } finally {
@@ -93,22 +110,44 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
     }
   }, [callBrowse, toast]);
 
-  const loadFolder = useCallback(async (itemId: string, name: string) => {
+  const loadFolder = useCallback(async (itemId: string, name: string, item?: DriveItem) => {
     setLoading(true);
     try {
+      // Check if this is a shortcut to a remote/shared folder
+      if (item && isShortcut(item)) {
+        const remote = item.remoteItem!;
+        const remoteDriveId = remote.parentReference!.driveId;
+        const remoteItemId = remote.id;
+        
+        const data = await callBrowse({ action: "list_remote_folder", driveId: remoteDriveId, itemId: remoteItemId });
+        setItems(data.value ?? []);
+        setMode("remote_drive");
+        setCurrentDriveId(remoteDriveId);
+        setBreadcrumbs((prev) => [...prev, { id: remoteItemId, name, driveId: remoteDriveId, action: "list_remote_folder" }]);
+        return;
+      }
+
+      // If we're already browsing a remote drive, keep using that driveId
+      if (mode === "remote_drive" && currentDriveId) {
+        const data = await callBrowse({ action: "list_remote_folder", driveId: currentDriveId, itemId });
+        setItems(data.value ?? []);
+        setBreadcrumbs((prev) => [...prev, { id: itemId, name, driveId: currentDriveId, action: "list_remote_folder" }]);
+        return;
+      }
+
       const action = mode === "sharepoint_drive" ? "list_site_drive" : "list_folder";
       const body: Record<string, unknown> = { action, itemId };
       if (currentSiteId) body.siteId = currentSiteId;
 
       const data = await callBrowse(body);
       setItems(data.value ?? []);
-      setBreadcrumbs((prev) => [...prev, { id: itemId, name, siteId: currentSiteId ?? undefined }]);
+      setBreadcrumbs((prev) => [...prev, { id: itemId, name, siteId: currentSiteId ?? undefined, action }]);
     } catch (e) {
       toast({ title: "Failed to load folder", description: e instanceof Error ? e.message : "Unknown error", variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  }, [callBrowse, toast, mode, currentSiteId]);
+  }, [callBrowse, toast, mode, currentSiteId, currentDriveId]);
 
   const loadSharePointSites = useCallback(async (query?: string) => {
     setLoading(true);
@@ -146,31 +185,26 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
       await loadSharePointSites();
       return;
     }
-    if (index === 0 && mode !== "sharepoint_sites") {
+    if (index === 0) {
       await loadRoot();
-      return;
-    }
-    if (crumb.siteId && !crumb.id?.includes("-")) {
-      // It's a site root
-      await openSiteDrive(crumb.id!, crumb.name);
       return;
     }
 
     setLoading(true);
     try {
-      const action = crumb.siteId ? "list_site_drive" : "list_folder";
-      const body: Record<string, unknown> = { action };
-      if (crumb.id) body.itemId = crumb.id;
-      if (crumb.siteId) body.siteId = crumb.siteId;
+      let body: Record<string, unknown>;
 
-      if (!crumb.id) {
-        if (crumb.siteId) {
-          body.action = "list_site_drive";
-          body.siteId = crumb.siteId;
-          delete body.itemId;
-        } else {
-          body.action = "list_root";
-        }
+      if (crumb.action === "list_remote_folder" && crumb.driveId) {
+        body = { action: "list_remote_folder", driveId: crumb.driveId, itemId: crumb.id };
+        setMode("remote_drive");
+        setCurrentDriveId(crumb.driveId);
+      } else if (crumb.siteId && !crumb.id?.includes("-")) {
+        await openSiteDrive(crumb.id!, crumb.name);
+        return;
+      } else if (crumb.siteId) {
+        body = { action: "list_site_drive", siteId: crumb.siteId, itemId: crumb.id };
+      } else {
+        body = crumb.id ? { action: "list_folder", itemId: crumb.id } : { action: "list_root" };
       }
 
       const data = await callBrowse(body);
@@ -200,12 +234,18 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
   const importFile = useCallback(async (item: DriveItem) => {
     setImporting(item.id);
     try {
-      // Get download URL
-      const detail = await callBrowse({ action: "get_item", itemId: item.id });
+      const isRemote = isShortcut(item);
+      const getBody: Record<string, unknown> = { action: "get_item", itemId: isRemote ? item.remoteItem!.id : item.id };
+      if (isRemote && item.remoteItem?.parentReference?.driveId) {
+        getBody.driveId = item.remoteItem.parentReference.driveId;
+      } else if (currentDriveId && mode === "remote_drive") {
+        getBody.driveId = currentDriveId;
+      }
+
+      const detail = await callBrowse(getBody);
       const downloadUrl = detail["@microsoft.graph.downloadUrl"] ?? detail.webUrl;
 
-      // Determine asset type from mime
-      const mime = item.file?.mimeType ?? "";
+      const mime = item.file?.mimeType ?? item.remoteItem?.file?.mimeType ?? "";
       let assetType: string = "link";
       if (mime.startsWith("image/")) assetType = "image";
       else if (mime.startsWith("video/")) assetType = "video";
@@ -213,12 +253,11 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
       else if (mime.includes("text") || mime.includes("document") || mime.includes("word")) assetType = "text_snippet";
       else if (mime.includes("presentation") || mime.includes("powerpoint")) assetType = "deck";
 
-      // Insert into source_assets
       const { error: insertErr } = await supabase.from("source_assets").insert({
         title: item.name,
         asset_type: assetType as any,
         external_url: downloadUrl || item.webUrl || "",
-        description: `Imported from ${mode === "sharepoint_drive" ? "SharePoint" : "OneDrive"} — ${formatSize(item.size)}`,
+        description: `Imported from ${mode === "sharepoint_drive" ? "SharePoint" : mode === "remote_drive" ? "Shared Drive" : "OneDrive"} — ${formatSize(item.size ?? item.remoteItem?.size)}`,
         permission_state: "generation_allowed" as any,
         is_nudaze_origin: false,
         created_by: (await supabase.auth.getUser()).data.user!.id,
@@ -234,7 +273,7 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
     } finally {
       setImporting(null);
     }
-  }, [callBrowse, mode, toast, qc]);
+  }, [callBrowse, mode, currentDriveId, toast, qc]);
 
   const handleOpen = useCallback(() => {
     if (items.length === 0 && sites.length === 0) {
@@ -260,11 +299,7 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
 
         {/* Mode Toggle */}
         <div className="flex gap-2 items-center">
-          <Button
-            variant="default"
-            size="sm"
-            onClick={loadRoot}
-          >
+          <Button variant="default" size="sm" onClick={loadRoot}>
             <HardDrive className="h-3.5 w-3.5 mr-1.5" />
             My Files
           </Button>
@@ -337,8 +372,10 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
               <p className="text-sm text-muted-foreground text-center py-8">No files or folders found.</p>
             ) : (
               items.map((item) => {
-                const isFolder = !!item.folder;
-                const IconComp = isFolder ? Folder : getFileIcon(item.file?.mimeType);
+                const shortcut = isShortcut(item);
+                const isFolder = !!item.folder || !!item.remoteItem?.folder;
+                const mime = item.file?.mimeType ?? item.remoteItem?.file?.mimeType;
+                const IconComp = isFolder ? Folder : getFileIcon(mime);
                 const isImported = imported.has(item.id);
                 const isImporting = importing === item.id;
 
@@ -349,15 +386,25 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
                   >
                     <button
                       className="flex items-center gap-3 flex-1 min-w-0 text-left"
-                      onClick={() => isFolder && loadFolder(item.id, item.name)}
+                      onClick={() => isFolder && loadFolder(item.id, item.name, item)}
                       disabled={!isFolder}
                     >
-                      <IconComp className={`h-4 w-4 shrink-0 ${isFolder ? "text-primary" : "text-muted-foreground"}`} />
+                      <div className="relative shrink-0">
+                        <IconComp className={`h-4 w-4 ${isFolder ? "text-primary" : "text-muted-foreground"}`} />
+                        {shortcut && (
+                          <Link2 className="h-2.5 w-2.5 text-primary absolute -bottom-1 -right-1" />
+                        )}
+                      </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm truncate">{item.name}</p>
                         <div className="flex gap-2 text-[10px] text-muted-foreground">
-                          {item.size != null && !isFolder && <span>{formatSize(item.size)}</span>}
-                          {isFolder && item.folder && <span>{item.folder.childCount} items</span>}
+                          {(item.size != null || item.remoteItem?.size != null) && !isFolder && (
+                            <span>{formatSize(item.size ?? item.remoteItem?.size)}</span>
+                          )}
+                          {isFolder && (item.folder || item.remoteItem?.folder) && (
+                            <span>{(item.folder?.childCount ?? item.remoteItem?.folder?.childCount)} items</span>
+                          )}
+                          {shortcut && <span className="text-primary/70">Shortcut</span>}
                         </div>
                       </div>
                     </button>
