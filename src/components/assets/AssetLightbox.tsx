@@ -46,15 +46,13 @@ export function AssetLightbox({ open, onOpenChange, filePath, title, assetType }
   const isPdfFile = ext === "pdf";
   const isDocFile = ["docx", "doc", "pptx", "ppt", "key", "odp", "odt", "rtf", "txt"].includes(ext);
 
-  const openInNewTab = async () => {
+  const openInNewTab = () => {
     if (!url) return;
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Fetch failed");
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, "_blank");
-    } catch {
+    // Use Google Docs Viewer for office documents to render them inline instead of downloading
+    const officeExts = ["docx", "doc", "pptx", "ppt", "xlsx", "xls", "odt", "odp", "rtf"];
+    if (officeExts.includes(ext)) {
+      window.open(`https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`, "_blank");
+    } else {
       window.open(url, "_blank");
     }
   };
