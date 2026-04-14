@@ -18,7 +18,22 @@ export function useAssets() {
       const { data, error } = await supabase
         .from("source_assets")
         .select("*")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const trashedQuery = useQuery({
+    queryKey: ["source_assets_trashed"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("source_assets")
+        .select("*")
+        .not("deleted_at", "is", null)
+        .order("deleted_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -76,14 +91,49 @@ export function useAssets() {
     },
   });
 
-  const deleteMutation = useMutation({
+  const softDeleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("source_assets")
+        .update({ deleted_at: new Date().toISOString(), updated_by: user!.id } as never)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["source_assets"] });
+      queryClient.invalidateQueries({ queryKey: ["source_assets_trashed"] });
+    },
+    onError: (e: Error) => {
+      toast({ title: "Error deleting asset", description: e.message, variant: "destructive" });
+    },
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("source_assets")
+        .update({ deleted_at: null, updated_by: user!.id } as never)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["source_assets"] });
+      queryClient.invalidateQueries({ queryKey: ["source_assets_trashed"] });
+      toast({ title: "Asset restored" });
+    },
+    onError: (e: Error) => {
+      toast({ title: "Error restoring asset", description: e.message, variant: "destructive" });
+    },
+  });
+
+  const permanentDeleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("source_assets").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["source_assets"] });
-      toast({ title: "Asset deleted" });
+      queryClient.invalidateQueries({ queryKey: ["source_assets_trashed"] });
+      toast({ title: "Asset permanently deleted" });
     },
     onError: (e: Error) => {
       toast({ title: "Error deleting asset", description: e.message, variant: "destructive" });
@@ -118,17 +168,22 @@ export function useAssets() {
 
   return {
     assets: assetsQuery.data ?? [],
+    trashedAssets: trashedQuery.data ?? [],
     summaryMap,
     isLoading: assetsQuery.isLoading,
     error: assetsQuery.error,
     isAdmin,
     insert: insertMutation.mutateAsync,
     update: updateMutation.mutateAsync,
-    remove: deleteMutation.mutateAsync,
+    softDelete: softDeleteMutation.mutateAsync,
+    restore: restoreMutation.mutateAsync,
+    permanentDelete: permanentDeleteMutation.mutateAsync,
     uploadFile,
     downloadAsset,
     isInserting: insertMutation.isPending,
     isUpdating: updateMutation.isPending,
-    isDeleting: deleteMutation.isPending,
+    isDeleting: softDeleteMutation.isPending,
+    isRestoring: restoreMutation.isPending,
+    isPermanentDeleting: permanentDeleteMutation.isPending,
   };
 }
