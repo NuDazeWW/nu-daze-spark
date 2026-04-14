@@ -71,19 +71,24 @@ serve(async (req) => {
     const results = [];
 
     for (const asset of assets) {
+      const assetContributors: string[] = asset.contributors || [];
+      const contributorsLine = assetContributors.length > 0
+        ? `\nContributors/People: ${assetContributors.join(", ")}`
+        : "";
+
       const prompt = `You are a social media strategist for NuDaze, a premium content operations agency. Create an Instagram Reel post card for the following asset:
 
 Title: ${asset.title}
 Description: ${asset.description || "No description provided"}
-Type: ${asset.asset_type}
+Type: ${asset.asset_type}${contributorsLine}${asset.event_name ? `\nEvent: ${asset.event_name}` : ""}
 
 Generate a JSON response with exactly these fields:
-- draft_copy: Instagram Reel caption (engaging, with line breaks, emojis, and a hook in the first line). Max 2200 chars.
+- draft_copy: Instagram Reel caption (engaging, with line breaks, emojis, and a hook in the first line). Max 2200 chars.${assetContributors.length > 0 ? ` Naturally mention or tag the contributors: ${assetContributors.join(", ")}.` : ""}
 - objective: The strategic objective of this reel (1 sentence)
 - audience: Target audience segment (1-2 words)
 - campaign_pillar: Relevant content pillar (1-2 words)
 - hashtags: Array of 10-15 relevant hashtags (without the # symbol)
-- people_tags: Array of 1-3 relevant people to tag (use placeholder handles)
+- people_tags: Array of people/accounts to tag. MUST include these contributors: ${assetContributors.length > 0 ? assetContributors.join(", ") : "use placeholder handles"}. Add 1-2 more relevant handles if appropriate.
 - org_tags: Array of 1-2 relevant organizations to tag
 - rationale: Brief rationale for why this reel works (1-2 sentences)
 - suggested_asset_description: Description of the ideal visual treatment for this reel (1 sentence)`;
@@ -162,6 +167,10 @@ Generate a JSON response with exactly these fields:
         continue;
       }
 
+      // Merge asset contributors into people_tags (ensure they're always included)
+      const aiPeopleTags: string[] = reelData.people_tags || [];
+      const mergedPeopleTags = [...new Set([...assetContributors, ...aiPeopleTags])];
+
       // Create the post card
       const { data: postCard, error: pcError } = await supabaseAdmin
         .from("post_cards")
@@ -173,7 +182,7 @@ Generate a JSON response with exactly these fields:
           audience: reelData.audience || null,
           campaign_pillar: reelData.campaign_pillar || null,
           hashtags: (reelData.hashtags || []).map((h: string) => h.replace(/^#/, "")),
-          people_tags: reelData.people_tags || [],
+          people_tags: mergedPeopleTags,
           org_tags: reelData.org_tags || [],
           rationale: reelData.rationale || null,
           suggested_asset_description: reelData.suggested_asset_description || null,
@@ -195,7 +204,7 @@ Generate a JSON response with exactly these fields:
         version_number: 1,
         draft_copy: reelData.draft_copy,
         hashtags: (reelData.hashtags || []).map((h: string) => h.replace(/^#/, "")),
-        people_tags: reelData.people_tags || [],
+        people_tags: mergedPeopleTags,
         org_tags: reelData.org_tags || [],
         edit_source: "ai",
         created_by: user.id,
