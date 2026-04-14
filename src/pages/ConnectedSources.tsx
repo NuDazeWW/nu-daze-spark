@@ -211,6 +211,12 @@ export default function ConnectedSources() {
 
       {/* Source Actions */}
       <div className="flex justify-end gap-2 mb-4">
+        <Button variant="outline" size="sm" asChild>
+          <a href="/settings/connectors" target="_blank" rel="noopener noreferrer">
+            <Link2 className="mr-2 h-4 w-4" />
+            Manage Connectors
+          </a>
+        </Button>
         <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Source</Button>
       </div>
 
