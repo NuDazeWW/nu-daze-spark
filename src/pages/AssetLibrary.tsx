@@ -46,6 +46,7 @@ export default function AssetLibrary() {
   const [editing, setEditing] = useState<SourceAsset | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState<AssetFormData>(defaultAssetForm);
+  const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterPermission, setFilterPermission] = useState("all");
@@ -82,27 +83,33 @@ export default function AssetLibrary() {
   };
 
   const handleSubmit = async () => {
-    let file_path = editing?.file_path ?? null;
-    if (form.file) {
-      file_path = await uploadFile(form.file);
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      let file_path = editing?.file_path ?? null;
+      if (form.file) {
+        file_path = await uploadFile(form.file);
+      }
+      const payload: Record<string, unknown> = {
+        title: form.title,
+        description: form.description || null,
+        asset_type: form.asset_type,
+        permission_state: form.permission_state,
+        is_nudaze_origin: form.is_nudaze_origin,
+        external_url: form.external_url || null,
+        text_content: form.text_content || null,
+        expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null,
+        file_path,
+      };
+      if (editing) {
+        await update({ id: editing.id, ...payload } as never);
+      } else {
+        await insert(payload as never);
+      }
+      setFormOpen(false);
+    } finally {
+      setSubmitting(false);
     }
-    const payload: Record<string, unknown> = {
-      title: form.title,
-      description: form.description || null,
-      asset_type: form.asset_type,
-      permission_state: form.permission_state,
-      is_nudaze_origin: form.is_nudaze_origin,
-      external_url: form.external_url || null,
-      text_content: form.text_content || null,
-      expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null,
-      file_path,
-    };
-    if (editing) {
-      await update({ id: editing.id, ...payload } as never);
-    } else {
-      await insert(payload as never);
-    }
-    setFormOpen(false);
   };
 
   if (isLoading) {
@@ -246,7 +253,7 @@ export default function AssetLibrary() {
         form={form}
         setForm={setForm}
         onSubmit={handleSubmit}
-        isPending={isInserting || isUpdating}
+        isPending={submitting || isInserting || isUpdating}
         showFileUpload={!editing}
       />
 
