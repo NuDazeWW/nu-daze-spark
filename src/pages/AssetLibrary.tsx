@@ -16,7 +16,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
-  Shield, ShieldAlert, ShieldOff, Archive, CalendarClock, Sparkles,
+  Shield, ShieldAlert, ShieldOff, Archive, CalendarClock, Sparkles, Film,
+} from "lucide-react";
 } from "lucide-react";
 import { format } from "date-fns";
 
