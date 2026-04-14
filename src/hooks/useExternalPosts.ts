@@ -84,12 +84,13 @@ export function useExternalPosts() {
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["comments_queue"] });
       toast({
         title: data.count > 0
-          ? `${data.count} relevant post${data.count !== 1 ? "s" : ""} discovered`
+          ? `${data.count} post${data.count !== 1 ? "s" : ""} discovered`
           : "No new posts found",
         description: data.count > 0
-          ? "Review and select posts to generate comments."
+          ? `${data.comments_created || 0} comment draft${(data.comments_created || 0) !== 1 ? "s" : ""} auto-generated. Review and edit below.`
           : data.message || "Try a different search query.",
       });
     },
