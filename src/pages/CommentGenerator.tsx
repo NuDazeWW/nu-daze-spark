@@ -260,6 +260,16 @@ export default function CommentGenerator() {
         }}
         isPending={addPost.isPending}
       />
+
+      {/* Scrape posts dialog */}
+      <ScrapePostsDialog
+        open={scrapeOpen}
+        onOpenChange={setScrapeOpen}
+        onScrape={(params) => {
+          scrapePosts.mutate(params, { onSuccess: () => setScrapeOpen(false) });
+        }}
+        isPending={scrapePosts.isPending}
+      />
     </div>
   );
 }
