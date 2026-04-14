@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { useConnectedSources, type ConnectedSource } from "@/hooks/useConnectedSources";
 import { SourceFormDialog, defaultSourceForm, type SourceFormData } from "@/components/sources/SourceFormDialog";
 import { BulkUrlImportDialog } from "@/components/sources/BulkUrlImportDialog";
+import { OneDriveBrowserDialog } from "@/components/sources/OneDriveBrowserDialog";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
