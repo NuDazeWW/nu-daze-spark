@@ -257,6 +257,17 @@ export default function AssetLibrary() {
         title="this asset"
         isPending={isDeleting}
       />
+
+      <BulkUploadDialog
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        onSubmit={async (files) => {
+          await uploadAndCreateReels(files);
+          setBulkOpen(false);
+        }}
+        isPending={isBulkPending}
+        progress={bulkProgress}
+      />
     </div>
   );
 }
