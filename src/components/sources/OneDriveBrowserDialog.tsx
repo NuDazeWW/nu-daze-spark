@@ -82,7 +82,7 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState<string | null>(null);
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([{ id: null, name: "Root" }]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("NuDaze Brand");
   const [currentSiteId, setCurrentSiteId] = useState<string | null>(null);
   const [currentDriveId, setCurrentDriveId] = useState<string | null>(null);
   const [imported, setImported] = useState<Set<string>>(new Set());
