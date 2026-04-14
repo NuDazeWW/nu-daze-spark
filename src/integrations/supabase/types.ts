@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_tags: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          display_name: string | null
+          handle: string
+          id: string
+          is_default: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          display_name?: string | null
+          handle: string
+          id?: string
+          is_default?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          display_name?: string | null
+          handle?: string
+          id?: string
+          is_default?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       approval_log: {
         Row: {
           action: Database["public"]["Enums"]["approval_status"]

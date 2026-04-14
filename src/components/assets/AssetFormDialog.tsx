@@ -5,9 +5,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useMemo, useRef, useState } from "react";
-import { Upload, FileType, Info, X, Plus } from "lucide-react";
+import { useMemo, useRef, useState, useEffect } from "react";
+import { Upload, FileType, Info, X, Plus, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { useAccountTags } from "@/hooks/useAccountTags";
 import type { Database } from "@/integrations/supabase/types";
 
 type AssetType = Database["public"]["Enums"]["asset_type"];
@@ -86,7 +89,15 @@ export function AssetFormDialog({
 }: AssetFormDialogProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [contributorInput, setContributorInput] = useState("");
+  const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
+  const { tags: accountTags, defaultTags } = useAccountTags();
 
+  // Auto-populate defaults on new asset (when form has empty contributors)
+  useEffect(() => {
+    if (open && form.contributors.length === 0 && defaultTags.length > 0) {
+      setForm((f) => ({ ...f, contributors: defaultTags.map((t) => t.handle) }));
+    }
+  }, [open, defaultTags]);
   const mode: UploadMode = form.asset_type === "link" ? "link" : form.asset_type === "text_snippet" ? "text" : "file";
 
   const isAmbiguousFile = useMemo(() => {
@@ -252,10 +263,37 @@ export function AssetFormDialog({
           <div>
             <Label>Who's in it, wrote it, or created it? <span className="text-destructive">*</span></Label>
             <div className="flex gap-2">
+              <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="outline" className="flex-1 justify-start text-sm font-normal text-muted-foreground">
+                    Select account tag…
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0 w-[260px]" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search tags…" />
+                    <CommandList>
+                      <CommandEmpty>No tags found.</CommandEmpty>
+                      <CommandGroup>
+                        {accountTags.filter((t) => !form.contributors.includes(t.handle)).map((t) => (
+                          <CommandItem key={t.id} value={t.handle} onSelect={() => {
+                            setForm((f) => ({ ...f, contributors: [...f.contributors, t.handle] }));
+                            setTagPopoverOpen(false);
+                          }}>
+                            <span>{t.handle}</span>
+                            {t.display_name && <span className="ml-1 text-muted-foreground text-xs">({t.display_name})</span>}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               <Input
                 value={contributorInput}
                 onChange={(e) => setContributorInput(e.target.value)}
-                placeholder="Add a name…"
+                placeholder="Custom name…"
+                className="w-32"
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addContributor(); } }}
               />
               <Button type="button" variant="outline" size="icon" onClick={addContributor} disabled={!contributorInput.trim()}>
