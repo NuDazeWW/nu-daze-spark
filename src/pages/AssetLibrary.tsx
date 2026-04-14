@@ -3,7 +3,9 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAssets, type SourceAsset } from "@/hooks/useAssets";
 import { AssetFormDialog, defaultAssetForm, type AssetFormData } from "@/components/assets/AssetFormDialog";
+import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
+import { useBulkReelUpload } from "@/hooks/useBulkReelUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +16,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
-  Shield, ShieldAlert, ShieldOff, Archive, CalendarClock, Sparkles,
+  Shield, ShieldAlert, ShieldOff, Archive, CalendarClock, Sparkles, Film,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -36,6 +38,9 @@ export default function AssetLibrary() {
     insert, update, remove, uploadFile,
     isInserting, isUpdating, isDeleting,
   } = useAssets();
+
+  const { uploadAndCreateReels, isPending: isBulkPending, progress: bulkProgress } = useBulkReelUpload();
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<SourceAsset | null>(null);
@@ -155,7 +160,10 @@ export default function AssetLibrary() {
           </SelectContent>
         </Select>
         {isAdmin && (
-          <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
+          <>
+            <Button variant="outline" onClick={() => setBulkOpen(true)}><Film className="mr-2 h-4 w-4" />Create Reels</Button>
+            <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
+          </>
         )}
       </div>
 
@@ -248,6 +256,17 @@ export default function AssetLibrary() {
         onConfirm={async () => { if (deleteId) { await remove(deleteId); setDeleteId(null); } }}
         title="this asset"
         isPending={isDeleting}
+      />
+
+      <BulkUploadDialog
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        onSubmit={async (files) => {
+          await uploadAndCreateReels(files);
+          setBulkOpen(false);
+        }}
+        isPending={isBulkPending}
+        progress={bulkProgress}
       />
     </div>
   );
