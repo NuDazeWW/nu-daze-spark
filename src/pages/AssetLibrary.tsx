@@ -39,6 +39,9 @@ export default function AssetLibrary() {
     isInserting, isUpdating, isDeleting,
   } = useAssets();
 
+  const { uploadAndCreateReels, isPending: isBulkPending, progress: bulkProgress } = useBulkReelUpload();
+  const [bulkOpen, setBulkOpen] = useState(false);
+
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<SourceAsset | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
