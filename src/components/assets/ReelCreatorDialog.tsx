@@ -6,8 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { useState, useRef, useCallback } from "react";
-import { Upload, X, ImageIcon, Film, Download, RotateCcw } from "lucide-react";
+import { Upload, X, ImageIcon, Film, Download, RotateCcw, Save, Sparkles, Loader2 } from "lucide-react";
 import { useReelCreator, DEFAULT_REEL_CONFIG, type ReelConfig } from "@/hooks/useReelCreator";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ReelCreatorDialogProps {
   open: boolean;
@@ -20,6 +25,11 @@ export function ReelCreatorDialog({ open, onOpenChange }: ReelCreatorDialogProps
   const [config, setConfig] = useState<ReelConfig>(DEFAULT_REEL_CONFIG);
   const inputRef = useRef<HTMLInputElement>(null);
   const { createReel, isCreating, progress, resultUrl, cancel, clearResult } = useReelCreator();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const addFiles = useCallback((newFiles: FileList | File[]) => {
     const arr = Array.from(newFiles).filter((f) => f.type.startsWith("image/"));
@@ -55,6 +65,66 @@ export function ReelCreatorDialog({ open, onOpenChange }: ReelCreatorDialogProps
     a.click();
   };
 
+  const handleSaveToLibrary = async () => {
+    if (!resultUrl || !user) return;
+    setIsSaving(true);
+    try {
+      // Fetch the blob from the object URL
+      const response = await fetch(resultUrl);
+      const blob = await response.blob();
+      const ext = blob.type.includes("mp4") ? "mp4" : "webm";
+      const fileName = `nudaze-reel-${Date.now()}.${ext}`;
+      const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from("source-assets")
+        .upload(storagePath, blob, { contentType: blob.type });
+
+      if (uploadError) throw uploadError;
+
+      // Create source_asset record
+      const { data: asset, error: assetError } = await supabase
+        .from("source_assets")
+        .insert({
+          title: fileName.replace(/\.[^/.]+$/, ""),
+          description: `Video reel created from ${files.length} images`,
+          asset_type: "video" as const,
+          permission_state: "generation_allowed" as const,
+          is_nudaze_origin: true,
+          file_path: storagePath,
+          created_by: user.id,
+          updated_by: user.id,
+        })
+        .select()
+        .single();
+
+      if (assetError) throw assetError;
+
+      queryClient.invalidateQueries({ queryKey: ["source_assets"] });
+
+      toast({
+        title: "Reel saved to Asset Library",
+        description: "Redirecting to Post Generator…",
+      });
+
+      onOpenChange(false);
+      clearResult();
+      setFiles([]);
+
+      // Navigate to Post Generator with the new asset pre-selected
+      navigate(`/generator?asset=${asset.id}`);
+    } catch (err) {
+      toast({
+        title: "Failed to save reel",
+        description: err instanceof Error ? err.message : "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const totalDuration = files.length * config.slideDuration;
 
   return (
@@ -80,10 +150,17 @@ export function ReelCreatorDialog({ open, onOpenChange }: ReelCreatorDialogProps
               className="w-full rounded-lg border max-h-[40vh] mx-auto"
               style={{ aspectRatio: "9/16", objectFit: "contain" }}
             />
+            <Button onClick={handleSaveToLibrary} disabled={isSaving} className="w-full">
+              {isSaving ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving…</>
+              ) : (
+                <><Save className="mr-2 h-4 w-4" />Save to Library & Generate Post Card</>
+              )}
+            </Button>
             <div className="flex gap-2">
-              <Button onClick={handleDownload} className="flex-1">
+              <Button variant="outline" onClick={handleDownload} className="flex-1">
                 <Download className="mr-2 h-4 w-4" />
-                Download Reel
+                Download Only
               </Button>
               <Button variant="outline" onClick={handleReset}>
                 <RotateCcw className="mr-2 h-4 w-4" />
