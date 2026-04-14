@@ -93,6 +93,10 @@ export default function AssetLibrary() {
       text_content: a.text_content ?? "",
       expires_at: a.expires_at ? a.expires_at.split("T")[0] : "",
       file: null,
+      content_date: (a as any).content_date ?? "",
+      is_event: (a as any).is_event ?? false,
+      event_name: (a as any).event_name ?? "",
+      contributors: (a as any).contributors ?? [],
     });
     setFormOpen(true);
   };
@@ -109,6 +113,10 @@ export default function AssetLibrary() {
         is_nudaze_origin: form.is_nudaze_origin, external_url: form.external_url || null,
         text_content: form.text_content || null,
         expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null, file_path,
+        content_date: form.content_date || null,
+        is_event: form.is_event,
+        event_name: form.is_event ? form.event_name || null : null,
+        contributors: form.contributors,
       };
       if (editing) await update({ id: editing.id, ...payload } as never);
       else await insert(payload as never);
@@ -278,14 +286,12 @@ export default function AssetLibrary() {
                     </div>
                   </CardHeader>
                   <CardContent className="px-4 pb-3 pt-0 space-y-2">
-                    {asset.file_path && (asset.asset_type === "image" || asset.asset_type === "video") && (
-                      <AssetThumbnail
-                        filePath={asset.file_path}
-                        assetType={asset.asset_type}
-                        title={asset.title}
-                        onClick={() => setViewingAsset(asset)}
-                      />
-                    )}
+                    <AssetThumbnail
+                      filePath={asset.file_path}
+                      assetType={asset.asset_type}
+                      title={asset.title}
+                      onClick={() => setViewingAsset(asset)}
+                    />
                     {asset.description && <p className="text-xs text-muted-foreground line-clamp-2">{asset.description}</p>}
                     <div className="flex flex-wrap gap-1.5">
                       <Badge variant="outline" className="text-xs capitalize">{asset.asset_type.replace("_", " ")}</Badge>
