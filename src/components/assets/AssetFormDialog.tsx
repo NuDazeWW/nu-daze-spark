@@ -6,21 +6,34 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMemo, useRef } from "react";
-import { Upload } from "lucide-react";
+import { Upload, FileType, Info } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import type { Database } from "@/integrations/supabase/types";
 
 type AssetType = Database["public"]["Enums"]["asset_type"];
 type PermissionState = Database["public"]["Enums"]["permission_state"];
 
-const ASSET_TYPES: { value: AssetType; label: string }[] = [
-  { value: "image", label: "Image" },
-  { value: "video", label: "Video" },
+/** Maps file MIME prefixes / extensions to an asset_type, or null if ambiguous */
+function detectAssetType(file: File): AssetType | null {
+  const mime = file.type.toLowerCase();
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+
+  if (mime.startsWith("image/") || ["jpg", "jpeg", "png", "gif", "webp", "svg", "heic", "heif", "tiff", "bmp"].includes(ext)) return "image";
+  if (mime.startsWith("video/") || ["mp4", "mov", "avi", "wmv", "webm", "mkv", "m4v", "flv", "3gp", "mpg", "mpeg", "ts"].includes(ext)) return "video";
+  // PDFs and documents are ambiguous — could be pdf, deck, testimonial, case_study
+  return null;
+}
+
+const AMBIGUOUS_TYPES: { value: AssetType; label: string }[] = [
   { value: "pdf", label: "PDF" },
-  { value: "link", label: "Link" },
-  { value: "text_snippet", label: "Text Snippet" },
-  { value: "deck", label: "Deck" },
+  { value: "deck", label: "Deck / Presentation" },
   { value: "testimonial", label: "Testimonial" },
   { value: "case_study", label: "Case Study" },
+];
+
+const NON_FILE_TYPES: { value: AssetType; label: string }[] = [
+  { value: "link", label: "Link" },
+  { value: "text_snippet", label: "Text Snippet" },
 ];
 
 const PERMISSION_STATES: { value: PermissionState; label: string }[] = [
@@ -65,6 +78,8 @@ export const defaultAssetForm: AssetFormData = {
   file: null,
 };
 
+type UploadMode = "file" | "link" | "text";
+
 export function AssetFormDialog({
   open,
   onOpenChange,
@@ -76,26 +91,68 @@ export function AssetFormDialog({
   showFileUpload = true,
 }: AssetFormDialogProps) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const needsFile = ["image", "video", "pdf", "deck", "case_study", "testimonial"].includes(form.asset_type);
-  const needsUrl = form.asset_type === "link";
+
+  // Determine the current mode
+  const mode: UploadMode = form.asset_type === "link" ? "link" : form.asset_type === "text_snippet" ? "text" : "file";
+
+  // Whether the file produced an ambiguous type (user needs to pick)
+  const isAmbiguousFile = useMemo(() => {
+    if (!form.file) return false;
+    return detectAssetType(form.file) === null;
+  }, [form.file]);
+
+  // Auto-detected label for display
+  const detectedLabel = useMemo(() => {
+    if (!form.file) return null;
+    const detected = detectAssetType(form.file);
+    if (detected === "image") return "Image";
+    if (detected === "video") return "Video";
+    return null; // ambiguous
+  }, [form.file]);
+
   const needsText = ["text_snippet", "testimonial", "case_study"].includes(form.asset_type);
 
   const isValid = useMemo(() => {
     if (!form.title.trim()) return false;
-    if (needsFile && showFileUpload && !form.file) return false;
-    if (needsUrl && !form.external_url.trim()) return false;
+    if (mode === "file" && showFileUpload && !form.file) return false;
+    if (mode === "link" && !form.external_url.trim()) return false;
     if (form.asset_type === "text_snippet" && !form.text_content.trim()) return false;
     return true;
-  }, [form, needsFile, needsUrl, showFileUpload]);
+  }, [form, mode, showFileUpload]);
 
   const missingFields = useMemo(() => {
     const missing: string[] = [];
     if (!form.title.trim()) missing.push("Title");
-    if (needsFile && showFileUpload && !form.file) missing.push("File");
-    if (needsUrl && !form.external_url.trim()) missing.push("URL");
+    if (mode === "file" && showFileUpload && !form.file) missing.push("File");
+    if (mode === "link" && !form.external_url.trim()) missing.push("URL");
     if (form.asset_type === "text_snippet" && !form.text_content.trim()) missing.push("Content");
     return missing;
-  }, [form, needsFile, needsUrl, showFileUpload]);
+  }, [form, mode, showFileUpload]);
+
+  const handleFileChange = (file: File | null) => {
+    if (!file) {
+      setForm((f) => ({ ...f, file: null }));
+      return;
+    }
+    const detected = detectAssetType(file);
+    setForm((f) => ({
+      ...f,
+      file,
+      asset_type: detected ?? "pdf", // default ambiguous to pdf
+      title: !f.title ? file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ") : f.title,
+    }));
+  };
+
+  const handleModeSwitch = (newMode: UploadMode) => {
+    if (newMode === "link") {
+      setForm((f) => ({ ...f, asset_type: "link", file: null }));
+    } else if (newMode === "text") {
+      setForm((f) => ({ ...f, asset_type: "text_snippet", file: null }));
+    } else {
+      setForm((f) => ({ ...f, asset_type: "image", file: null }));
+    }
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -104,19 +161,90 @@ export function AssetFormDialog({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Type selector FIRST */}
+          {/* Mode selector: File / Link / Text */}
           <div>
-            <Label>Type</Label>
-            <Select value={form.asset_type} onValueChange={(v) => setForm((f) => ({ ...f, asset_type: v as AssetType, file: null }))}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {ASSET_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="text-xs text-muted-foreground mb-1.5 block">What are you adding?</Label>
+            <div className="flex gap-2">
+              {([
+                { value: "file" as UploadMode, label: "File Upload" },
+                { value: "link" as UploadMode, label: "Link / URL" },
+                { value: "text" as UploadMode, label: "Text Snippet" },
+              ]).map((opt) => (
+                <Button
+                  key={opt.value}
+                  type="button"
+                  size="sm"
+                  variant={mode === opt.value ? "default" : "outline"}
+                  onClick={() => handleModeSwitch(opt.value)}
+                  className="flex-1"
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
           </div>
 
+          {/* File upload area */}
+          {mode === "file" && showFileUpload && (
+            <div>
+              <Label>File <span className="text-destructive">*</span></Label>
+              <input
+                ref={fileRef}
+                type="file"
+                className="hidden"
+                accept="image/*,video/*,.pdf,.pptx,.ppt,.key,.odp,.docx,.doc,.txt,.rtf,.odt,.jpg,.jpeg,.png,.gif,.webp,.svg,.heic,.heif,.tiff,.bmp,.mp4,.mov,.avi,.wmv,.webm,.mkv,.m4v,.flv,.3gp,.mpg,.mpeg,.ts"
+                onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
+              />
+              <Button type="button" variant="outline" className="w-full justify-start gap-2" onClick={() => fileRef.current?.click()}>
+                <Upload className="h-4 w-4" />
+                {form.file ? form.file.name : "Choose file…"}
+              </Button>
+              {form.file && (
+                <div className="flex items-center gap-2 mt-1.5">
+                  <p className="text-[10px] text-muted-foreground">
+                    {form.file.type || "Unknown type"} · {(form.file.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                  {detectedLabel && (
+                    <Badge variant="secondary" className="text-[10px] h-4">
+                      Auto-detected: {detectedLabel}
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Ambiguous file type selector — only when file is PDF/doc */}
+          {mode === "file" && isAmbiguousFile && (
+            <div>
+              <Label className="flex items-center gap-1.5">
+                <FileType className="h-3.5 w-3.5 text-muted-foreground" />
+                What kind of document is this?
+              </Label>
+              <Select value={form.asset_type} onValueChange={(v) => setForm((f) => ({ ...f, asset_type: v as AssetType }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {AMBIGUOUS_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
+                <Info className="h-3 w-3" />
+                We couldn't tell from the file — please choose the right type
+              </p>
+            </div>
+          )}
+
+          {/* URL field for links */}
+          {mode === "link" && (
+            <div>
+              <Label>URL <span className="text-destructive">*</span></Label>
+              <Input value={form.external_url} onChange={(e) => setForm((f) => ({ ...f, external_url: e.target.value }))} placeholder="https://…" />
+            </div>
+          )}
+
+          {/* Title */}
           <div>
             <Label>Title <span className="text-destructive">*</span></Label>
             <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="Asset title" />
@@ -127,51 +255,7 @@ export function AssetFormDialog({
             <Textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} rows={2} placeholder="Brief description…" />
           </div>
 
-          {needsFile && showFileUpload && (
-            <div>
-              <Label>File <span className="text-destructive">*</span></Label>
-              <input
-                key={form.asset_type}
-                ref={fileRef}
-                type="file"
-                className="hidden"
-                accept={
-                  form.asset_type === "image" ? "image/*,.jpg,.jpeg,.png,.gif,.webp,.svg,.heic,.heif,.tiff,.bmp" :
-                  form.asset_type === "video" ? "video/*,.mp4,.mov,.avi,.wmv,.webm,.mkv,.m4v,.flv,.3gp,.mpg,.mpeg,.ts" :
-                  form.asset_type === "pdf" ? ".pdf,application/pdf" :
-                  form.asset_type === "deck" ? ".pptx,.ppt,.key,.pdf,.odp,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" :
-                  form.asset_type === "case_study" ? ".pdf,.docx,.doc,.txt,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" :
-                  form.asset_type === "testimonial" ? ".pdf,.docx,.doc,.txt,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" :
-                  "*"
-                }
-                onChange={(e) => {
-                  const file = e.target.files?.[0] ?? null;
-                  setForm((f) => ({
-                    ...f,
-                    file,
-                    title: file && !f.title ? file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ") : f.title,
-                  }));
-                }}
-              />
-              <Button type="button" variant="outline" className="w-full justify-start gap-2" onClick={() => fileRef.current?.click()}>
-                <Upload className="h-4 w-4" />
-                {form.file ? form.file.name : "Choose file…"}
-              </Button>
-              {form.file && (
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  {form.file.type || "Unknown type"} · {(form.file.size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              )}
-            </div>
-          )}
-
-          {needsUrl && (
-            <div>
-              <Label>URL <span className="text-destructive">*</span></Label>
-              <Input value={form.external_url} onChange={(e) => setForm((f) => ({ ...f, external_url: e.target.value }))} placeholder="https://…" />
-            </div>
-          )}
-
+          {/* Text content for text_snippet, testimonial, case_study */}
           {needsText && (
             <div>
               <Label>Content {form.asset_type === "text_snippet" && <span className="text-destructive">*</span>}</Label>
