@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Upload } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -80,6 +80,23 @@ export function AssetFormDialog({
   const needsUrl = form.asset_type === "link";
   const needsText = ["text_snippet", "testimonial", "case_study"].includes(form.asset_type);
 
+  const isValid = useMemo(() => {
+    if (!form.title.trim()) return false;
+    if (needsFile && showFileUpload && !form.file) return false;
+    if (needsUrl && !form.external_url.trim()) return false;
+    if (form.asset_type === "text_snippet" && !form.text_content.trim()) return false;
+    return true;
+  }, [form, needsFile, needsUrl, showFileUpload]);
+
+  const missingFields = useMemo(() => {
+    const missing: string[] = [];
+    if (!form.title.trim()) missing.push("Title");
+    if (needsFile && showFileUpload && !form.file) missing.push("File");
+    if (needsUrl && !form.external_url.trim()) missing.push("URL");
+    if (form.asset_type === "text_snippet" && !form.text_content.trim()) missing.push("Content");
+    return missing;
+  }, [form, needsFile, needsUrl, showFileUpload]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
@@ -87,14 +104,10 @@ export function AssetFormDialog({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div>
-            <Label>Title</Label>
-            <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="Asset title" />
-          </div>
-
+          {/* Type selector FIRST */}
           <div>
             <Label>Type</Label>
-            <Select value={form.asset_type} onValueChange={(v) => setForm((f) => ({ ...f, asset_type: v as AssetType }))}>
+            <Select value={form.asset_type} onValueChange={(v) => setForm((f) => ({ ...f, asset_type: v as AssetType, file: null }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {ASSET_TYPES.map((t) => (
@@ -105,13 +118,18 @@ export function AssetFormDialog({
           </div>
 
           <div>
+            <Label>Title <span className="text-destructive">*</span></Label>
+            <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="Asset title" />
+          </div>
+
+          <div>
             <Label>Description</Label>
             <Textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} rows={2} placeholder="Brief description…" />
           </div>
 
           {needsFile && showFileUpload && (
             <div>
-              <Label>File</Label>
+              <Label>File <span className="text-destructive">*</span></Label>
               <input
                 key={form.asset_type}
                 ref={fileRef}
@@ -139,19 +157,24 @@ export function AssetFormDialog({
                 <Upload className="h-4 w-4" />
                 {form.file ? form.file.name : "Choose file…"}
               </Button>
+              {form.file && (
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {form.file.type || "Unknown type"} · {(form.file.size / 1024 / 1024).toFixed(2)} MB
+                </p>
+              )}
             </div>
           )}
 
           {needsUrl && (
             <div>
-              <Label>URL</Label>
+              <Label>URL <span className="text-destructive">*</span></Label>
               <Input value={form.external_url} onChange={(e) => setForm((f) => ({ ...f, external_url: e.target.value }))} placeholder="https://…" />
             </div>
           )}
 
           {needsText && (
             <div>
-              <Label>Content</Label>
+              <Label>Content {form.asset_type === "text_snippet" && <span className="text-destructive">*</span>}</Label>
               <Textarea value={form.text_content} onChange={(e) => setForm((f) => ({ ...f, text_content: e.target.value }))} rows={4} placeholder="Paste text content…" />
             </div>
           )}
@@ -178,7 +201,13 @@ export function AssetFormDialog({
             <Label>NuDaze Origin</Label>
           </div>
 
-          <Button onClick={onSubmit} disabled={!form.title || isPending} className="w-full">
+          {!isValid && missingFields.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Required: {missingFields.join(", ")}
+            </p>
+          )}
+
+          <Button onClick={onSubmit} disabled={!isValid || isPending} className="w-full">
             {isPending ? "Saving…" : "Save Asset"}
           </Button>
         </div>

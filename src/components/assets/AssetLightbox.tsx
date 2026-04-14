@@ -1,5 +1,5 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
@@ -16,37 +16,32 @@ export function AssetLightbox({ open, onOpenChange, filePath, title, assetType }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadUrl = async () => {
-    if (!filePath) return;
-    setLoading(true);
-    setError(null);
-    const { data, error: err } = await supabase.storage
-      .from("source-assets")
-      .createSignedUrl(filePath, 300);
-    if (err) {
-      setError(err.message);
-    } else {
-      setUrl(data.signedUrl);
+  useEffect(() => {
+    if (open && filePath) {
+      setLoading(true);
+      setError(null);
+      setUrl(null);
+      supabase.storage
+        .from("source-assets")
+        .createSignedUrl(filePath, 300)
+        .then(({ data, error: err }) => {
+          if (err) setError(err.message);
+          else setUrl(data.signedUrl);
+          setLoading(false);
+        });
     }
-    setLoading(false);
-  };
-
-  const handleOpenChange = (o: boolean) => {
-    if (o) {
-      loadUrl();
-    } else {
+    if (!open) {
       setUrl(null);
       setError(null);
     }
-    onOpenChange(o);
-  };
+  }, [open, filePath]);
 
   const isImage = assetType === "image";
   const isVideo = assetType === "video";
   const isPdf = assetType === "pdf";
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] p-2 overflow-hidden">
         <div className="pt-6">
           <p className="text-sm font-medium px-2 mb-2 truncate">{title}</p>
@@ -73,6 +68,7 @@ export function AssetLightbox({ open, onOpenChange, filePath, title, assetType }
                 <video
                   src={url}
                   controls
+                  autoPlay
                   className="w-full max-h-[75vh] rounded-md"
                 />
               )}
