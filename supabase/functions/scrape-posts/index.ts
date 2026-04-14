@@ -86,11 +86,14 @@ serve(async (req) => {
       ?.map((r: any) => r.category)
       .filter((v: string, i: number, a: string[]) => a.indexOf(v) === i) || [];
 
-    // Construct search query
+    // Construct search query — bias toward actual social posts, not articles/blogs
     let searchQuery = customQuery;
     if (!searchQuery) {
       const topicParts = topics.length > 0 ? topics.slice(0, 3).join(" OR ") : "digital marketing AI branding";
-      searchQuery = `${platform} ${topicParts} industry insights 2026`;
+      searchQuery = `site:linkedin.com/posts OR site:linkedin.com/feed ${topicParts} 2026`;
+    } else {
+      // Append social post site filters to custom queries too
+      searchQuery = `${searchQuery} site:linkedin.com/posts OR site:linkedin.com/feed`;
     }
 
     console.log("Searching Firecrawl with query:", searchQuery);
@@ -251,12 +254,16 @@ Return ONLY actual social media posts worth engaging with (relevance >= 0.5). If
       );
     }
 
+    // Build post+comment pairs
     const postsToInsert = [];
+    const commentDrafts: { postIndex: number; draft_comment: string; comment_tone: string }[] = [];
+
     for (const eval_ of evaluations.posts || []) {
       const source = resultsForAI[eval_.index];
       if (!source) continue;
       if (existingUrls.has(source.url)) continue;
 
+      const idx = postsToInsert.length;
       postsToInsert.push({
         external_url: source.url,
         platform: platform as "linkedin" | "instagram",
@@ -268,11 +275,19 @@ Return ONLY actual social media posts worth engaging with (relevance >= 0.5). If
         risk_notes: eval_.risk_notes || null,
         recommended_comment_angle: eval_.recommended_comment_angle || null,
       });
+
+      if (eval_.draft_comment) {
+        commentDrafts.push({
+          postIndex: idx,
+          draft_comment: eval_.draft_comment,
+          comment_tone: eval_.comment_tone || "insightful",
+        });
+      }
     }
 
     if (postsToInsert.length === 0) {
       return new Response(
-        JSON.stringify({ success: true, count: 0, message: "No new relevant posts found (duplicates filtered)." }),
+        JSON.stringify({ success: true, count: 0, message: "No new relevant social posts found (articles/blogs filtered out)." }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -290,10 +305,39 @@ Return ONLY actual social media posts worth engaging with (relevance >= 0.5). If
       );
     }
 
+    // Auto-create comment drafts for each discovered post
+    let commentsCreated = 0;
+    if (inserted && commentDrafts.length > 0) {
+      const commentsToInsert = commentDrafts
+        .filter((cd) => inserted[cd.postIndex])
+        .map((cd) => ({
+          external_post_id: inserted[cd.postIndex].id,
+          draft_copy: cd.draft_comment,
+          tone: cd.comment_tone,
+          rationale: "Auto-generated during post discovery",
+          approval_status: "draft" as const,
+          created_by: user.id,
+        }));
+
+      if (commentsToInsert.length > 0) {
+        const { data: createdComments, error: commentsError } = await supabaseAdmin
+          .from("comments")
+          .insert(commentsToInsert)
+          .select();
+
+        if (commentsError) {
+          console.error("Error creating auto-comments:", commentsError.message);
+        } else {
+          commentsCreated = createdComments?.length || 0;
+        }
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         count: inserted?.length || 0,
+        comments_created: commentsCreated,
         posts: inserted,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
