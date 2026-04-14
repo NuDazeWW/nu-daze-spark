@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type ApprovalStatus = Database["public"]["Enums"]["approval_status"];
 import { useAuth } from "@/hooks/useAuth";
 import { startOfWeek, endOfWeek, startOfDay, endOfDay } from "date-fns";
 
