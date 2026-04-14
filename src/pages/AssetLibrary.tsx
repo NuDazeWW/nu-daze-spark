@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle,
+  FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
   Shield, ShieldAlert, ShieldOff, Archive, CalendarClock, Sparkles, Film,
 } from "lucide-react";
@@ -36,7 +36,7 @@ const PERMISSION_BADGE: Record<string, { label: string; variant: "default" | "se
 export default function AssetLibrary() {
   const {
     assets, summaryMap, isLoading, error, isAdmin,
-    insert, update, remove, uploadFile,
+    insert, update, remove, uploadFile, downloadAsset,
     isInserting, isUpdating, isDeleting,
   } = useAssets();
 
@@ -200,12 +200,17 @@ export default function AssetLibrary() {
                     <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
                     <CardTitle className="text-sm font-semibold truncate">{asset.title}</CardTitle>
                   </div>
-                  {isAdmin && (
-                    <div className="flex gap-1 shrink-0">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(asset)}><Pencil className="h-3.5 w-3.5" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(asset.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+                   <div className="flex gap-1 shrink-0">
+                      {asset.file_path && (
+                        <Button variant="ghost" size="icon" onClick={() => downloadAsset(asset.file_path!, asset.title)}><Download className="h-3.5 w-3.5" /></Button>
+                      )}
+                      {isAdmin && (
+                        <>
+                          <Button variant="ghost" size="icon" onClick={() => openEdit(asset)}><Pencil className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(asset.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+                        </>
+                      )}
                     </div>
-                  )}
                 </CardHeader>
                 <CardContent className="px-4 pb-3 pt-0 space-y-2">
                   {asset.description && (
