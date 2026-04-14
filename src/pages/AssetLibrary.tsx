@@ -278,6 +278,14 @@ export default function AssetLibrary() {
                     </div>
                   </CardHeader>
                   <CardContent className="px-4 pb-3 pt-0 space-y-2">
+                    {asset.file_path && (asset.asset_type === "image" || asset.asset_type === "video") && (
+                      <AssetThumbnail
+                        filePath={asset.file_path}
+                        assetType={asset.asset_type}
+                        title={asset.title}
+                        onClick={() => setViewingAsset(asset)}
+                      />
+                    )}
                     {asset.description && <p className="text-xs text-muted-foreground line-clamp-2">{asset.description}</p>}
                     <div className="flex flex-wrap gap-1.5">
                       <Badge variant="outline" className="text-xs capitalize">{asset.asset_type.replace("_", " ")}</Badge>
