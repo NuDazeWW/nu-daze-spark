@@ -885,14 +885,18 @@ export type Database = {
       source_assets: {
         Row: {
           asset_type: Database["public"]["Enums"]["asset_type"]
+          content_date: string | null
+          contributors: string[]
           created_at: string
           created_by: string
           deleted_at: string | null
           description: string | null
+          event_name: string | null
           expires_at: string | null
           external_url: string | null
           file_path: string | null
           id: string
+          is_event: boolean
           is_nudaze_origin: boolean
           last_used_at: string | null
           permission_state: Database["public"]["Enums"]["permission_state"]
@@ -903,14 +907,18 @@ export type Database = {
         }
         Insert: {
           asset_type: Database["public"]["Enums"]["asset_type"]
+          content_date?: string | null
+          contributors?: string[]
           created_at?: string
           created_by: string
           deleted_at?: string | null
           description?: string | null
+          event_name?: string | null
           expires_at?: string | null
           external_url?: string | null
           file_path?: string | null
           id?: string
+          is_event?: boolean
           is_nudaze_origin?: boolean
           last_used_at?: string | null
           permission_state?: Database["public"]["Enums"]["permission_state"]
@@ -921,14 +929,18 @@ export type Database = {
         }
         Update: {
           asset_type?: Database["public"]["Enums"]["asset_type"]
+          content_date?: string | null
+          contributors?: string[]
           created_at?: string
           created_by?: string
           deleted_at?: string | null
           description?: string | null
+          event_name?: string | null
           expires_at?: string | null
           external_url?: string | null
           file_path?: string | null
           id?: string
+          is_event?: boolean
           is_nudaze_origin?: boolean
           last_used_at?: string | null
           permission_state?: Database["public"]["Enums"]["permission_state"]
