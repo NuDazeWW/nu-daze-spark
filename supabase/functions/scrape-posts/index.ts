@@ -136,19 +136,31 @@ serve(async (req) => {
 
     // Use AI to evaluate each result for relevance and risk
     const evaluationPrompt = `You are evaluating web search results for NuDaze's social media engagement strategy.
-NuDaze is a digital-first brand consultancy. We want to find posts worth commenting on to build thought leadership.
+NuDaze is a digital-first brand consultancy. We want to find SOCIAL MEDIA POSTS worth commenting on to build thought leadership.
 
 Topics of interest: ${topics.join(", ") || "AI, digital marketing, branding, social media strategy"}
 Brand categories: ${brandCategories.join(", ") || "general"}
 Platform focus: ${platform}
 
-For each search result, evaluate:
-1. Is this a real social media post or article worth engaging with? (not a generic directory/tool page)
-2. Relevance to NuDaze's positioning (0.0 to 1.0)
-3. Risk assessment (safe / review_needed / blocked)
-4. A recommended comment angle
+CRITICAL FILTERING RULES — STRICTLY EXCLUDE:
+- Blog posts, articles, newsletters, or editorial content (e.g. medium.com articles, substack posts, news sites)
+- Shopping pages, product listings, or e-commerce content
+- Documentation, how-to guides, tutorials, or wiki pages
+- Directory listings, tool comparison pages, or aggregator sites
+- Any content that is NOT an actual social media post embedded on or from a social platform (LinkedIn, Instagram, X/Twitter, etc.)
 
-Return ONLY results worth engaging with (relevance >= 0.5).`;
+ONLY include results that are:
+- Actual social media posts (LinkedIn posts, Instagram posts, tweets, etc.)
+- Posts from real people or brands discussing topics relevant to NuDaze
+- Content where leaving a comment would be visible and valuable on a social platform
+
+For each qualifying result, evaluate:
+1. Relevance to NuDaze's positioning (0.0 to 1.0)
+2. Risk assessment (safe / review_needed / blocked)
+3. A recommended comment angle
+4. A DRAFT COMMENT that NuDaze could post — 2-4 sentences, genuinely human, adds value, never generic or spammy
+
+Return ONLY actual social media posts worth engaging with (relevance >= 0.5). If none qualify, return an empty array.`;
 
     const resultsForAI = searchResults.slice(0, 8).map((r: any, i: number) => ({
       index: i,
@@ -195,8 +207,10 @@ Return ONLY results worth engaging with (relevance >= 0.5).`;
                         risk_notes: { type: "string", description: "Risk context if review_needed" },
                         recommended_comment_angle: { type: "string", description: "How NuDaze should engage" },
                         post_summary: { type: "string", description: "Brief summary of the post content" },
+                        draft_comment: { type: "string", description: "A ready-to-post comment (2-4 sentences, human, insightful)" },
+                        comment_tone: { type: "string", description: "Tone of the draft comment (e.g. supportive, insightful, curious)" },
                       },
-                      required: ["index", "topic", "relevance_score", "risk_flag", "recommended_comment_angle"],
+                      required: ["index", "topic", "relevance_score", "risk_flag", "recommended_comment_angle", "draft_comment"],
                     },
                   },
                 },
