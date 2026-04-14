@@ -5,6 +5,7 @@ import { useAssets, type SourceAsset } from "@/hooks/useAssets";
 import { AssetFormDialog, defaultAssetForm, type AssetFormData } from "@/components/assets/AssetFormDialog";
 import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
 import { ReelCreatorDialog } from "@/components/assets/ReelCreatorDialog";
+import { AssetLightbox } from "@/components/assets/AssetLightbox";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { useBulkReelUpload } from "@/hooks/useBulkReelUpload";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download,
+  FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download, Eye,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
   Shield, ShieldAlert, ShieldOff, Archive, CalendarClock, Sparkles, Film,
 } from "lucide-react";
@@ -47,6 +48,7 @@ export default function AssetLibrary() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<SourceAsset | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewingAsset, setViewingAsset] = useState<SourceAsset | null>(null);
   const [form, setForm] = useState<AssetFormData>(defaultAssetForm);
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
@@ -202,7 +204,10 @@ export default function AssetLibrary() {
                   </div>
                    <div className="flex gap-1 shrink-0">
                       {asset.file_path && (
-                        <Button variant="ghost" size="icon" onClick={() => downloadAsset(asset.file_path!, asset.title)}><Download className="h-3.5 w-3.5" /></Button>
+                        <>
+                          <Button variant="ghost" size="icon" onClick={() => setViewingAsset(asset)} title="Preview"><Eye className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => downloadAsset(asset.file_path!, asset.title)} title="Download"><Download className="h-3.5 w-3.5" /></Button>
+                        </>
                       )}
                       {isAdmin && (
                         <>
@@ -287,6 +292,14 @@ export default function AssetLibrary() {
       <ReelCreatorDialog
         open={reelCreatorOpen}
         onOpenChange={setReelCreatorOpen}
+      />
+
+      <AssetLightbox
+        open={!!viewingAsset}
+        onOpenChange={(o) => { if (!o) setViewingAsset(null); }}
+        filePath={viewingAsset?.file_path ?? null}
+        title={viewingAsset?.title ?? ""}
+        assetType={viewingAsset?.asset_type ?? ""}
       />
     </div>
   );
