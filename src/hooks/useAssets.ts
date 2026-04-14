@@ -148,7 +148,15 @@ export function useAssets() {
     return path;
   };
 
-  const downloadAsset = async (filePath: string, fileName: string) => {
+  const buildDownloadName = (filePath: string, assetType: string) => {
+    const ext = filePath.split(".").pop()?.toLowerCase() ?? "file";
+    const now = new Date();
+    const date = now.toISOString().slice(0, 10).replace(/-/g, "");
+    const time = now.toTimeString().slice(0, 8).replace(/:/g, "");
+    return `NuDazeCopilot.social-upload.${date}_${time}.${assetType}.${ext}`;
+  };
+
+  const downloadAsset = async (filePath: string, assetType: string) => {
     const { data, error } = await supabase.storage
       .from("source-assets")
       .createSignedUrl(filePath, 60);
@@ -156,11 +164,23 @@ export function useAssets() {
       toast({ title: "Download failed", description: error.message, variant: "destructive" });
       return;
     }
-    const a = document.createElement("a");
-    a.href = data.signedUrl;
-    a.download = fileName;
-    a.target = "_blank";
-    a.click();
+    try {
+      const response = await fetch(data.signedUrl);
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = buildDownloadName(filePath, assetType);
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    } catch {
+      const a = document.createElement("a");
+      a.href = data.signedUrl;
+      a.download = buildDownloadName(filePath, assetType);
+      a.target = "_blank";
+      a.click();
+    }
   };
 
   const summaryMap = new Map<string, AssetSummary>();

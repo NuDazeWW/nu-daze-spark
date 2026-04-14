@@ -266,7 +266,7 @@ export default function AssetLibrary() {
                       {asset.file_path && (
                         <>
                           <Button variant="ghost" size="icon" onClick={() => setViewingAsset(asset)} title="Preview"><Eye className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => downloadAsset(asset.file_path!, asset.title)} title="Download"><Download className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => downloadAsset(asset.file_path!, asset.asset_type)} title="Download"><Download className="h-3.5 w-3.5" /></Button>
                         </>
                       )}
                       {isAdmin && (
