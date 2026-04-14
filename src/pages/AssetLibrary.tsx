@@ -373,6 +373,11 @@ export default function AssetLibrary() {
                       <Badge variant={perm.variant} className="text-xs">{perm.label}</Badge>
                       {asset.is_nudaze_origin && <Badge variant="outline" className="text-xs border-primary/30 text-primary">NuDaze</Badge>}
                       {expired && <Badge variant="destructive" className="text-xs">Expired</Badge>}
+                      {usageCount > 0 && (
+                        <Badge variant="outline" className="text-[10px] gap-0.5">
+                          <BarChart3 className="h-2.5 w-2.5" />{usageCount} use{usageCount !== 1 ? "s" : ""}
+                        </Badge>
+                      )}
                     </div>
                     {/* Metadata: date, event, contributors */}
                     <div className="space-y-1">
