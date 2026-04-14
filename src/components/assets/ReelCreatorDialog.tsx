@@ -6,8 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { useState, useRef, useCallback } from "react";
-import { Upload, X, ImageIcon, Film, Download, RotateCcw } from "lucide-react";
+import { Upload, X, ImageIcon, Film, Download, RotateCcw, Save, Sparkles, Loader2 } from "lucide-react";
 import { useReelCreator, DEFAULT_REEL_CONFIG, type ReelConfig } from "@/hooks/useReelCreator";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ReelCreatorDialogProps {
   open: boolean;
