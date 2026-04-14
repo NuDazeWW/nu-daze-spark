@@ -237,12 +237,40 @@ export default function AssetLibrary() {
         </Button>
         {!showTrash && isAdmin && (
           <>
+            <Button
+              variant={bulkMode ? "default" : "outline"}
+              onClick={() => { setBulkMode(!bulkMode); setBulkSelected(new Set()); }}
+            >
+              <Tags className="mr-2 h-4 w-4" />{bulkMode ? "Exit Bulk" : "Bulk Actions"}
+            </Button>
             <Button variant="outline" onClick={() => setReelCreatorOpen(true)}><Film className="mr-2 h-4 w-4" />Create Video Reel</Button>
             <Button variant="outline" onClick={() => setBulkOpen(true)}><Sparkles className="mr-2 h-4 w-4" />AI Reel Cards</Button>
             <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
           </>
         )}
       </div>
+
+      {/* Bulk actions bar */}
+      {bulkMode && bulkSelected.size > 0 && (
+        <div className="flex items-center gap-3 mb-4 p-3 rounded-lg border bg-muted/30">
+          <span className="text-sm font-medium">{bulkSelected.size} selected</span>
+          <Select onValueChange={handleBulkPermission}>
+            <SelectTrigger className="w-[170px] h-8 text-xs">
+              <SelectValue placeholder="Set permission…" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="generation_allowed">Gen Allowed</SelectItem>
+              <SelectItem value="summarization_only">Summary Only</SelectItem>
+              <SelectItem value="blocked">Blocked</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+            <Trash2 className="mr-1 h-3.5 w-3.5" />Delete Selected
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => { setBulkSelected(new Set()); setBulkMode(false); }}>Cancel</Button>
+        </div>
+      )}
 
       {/* Trash View */}
       {showTrash ? (
