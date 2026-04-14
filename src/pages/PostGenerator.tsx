@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { AssetPickerDialog } from "@/components/assets/AssetPickerDialog";
 import { useAssets } from "@/hooks/useAssets";
@@ -26,12 +27,22 @@ export default function PostGenerator() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [platform, setPlatform] = useState<"instagram" | "linkedin">("instagram");
   const [contentType, setContentType] = useState<string>("reel");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCount, setGeneratedCount] = useState<number | null>(null);
+
+  // Pre-select asset from URL param (e.g. after saving a reel)
+  useEffect(() => {
+    const assetId = searchParams.get("asset");
+    if (assetId && assets.length > 0) {
+      setSelectedAssetIds((prev) => prev.includes(assetId) ? prev : [...prev, assetId]);
+      setSearchParams({}, { replace: true }); // clean up URL
+    }
+  }, [searchParams, assets]);
 
   const selectedAssets = assets.filter((a) => selectedAssetIds.includes(a.id));
 
