@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { useConnectedSources, type ConnectedSource } from "@/hooks/useConnectedSources";
 import { SourceFormDialog, defaultSourceForm, type SourceFormData } from "@/components/sources/SourceFormDialog";
 import { BulkUrlImportDialog } from "@/components/sources/BulkUrlImportDialog";
+import { OneDriveBrowserDialog } from "@/components/sources/OneDriveBrowserDialog";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,6 +50,7 @@ export default function ConnectedSources() {
   const [scrapingId, setScrapingId] = useState<string | null>(null);
   const [quickUrl, setQuickUrl] = useState("");
   const [quickScraping, setQuickScraping] = useState(false);
+  const [oneDriveOpen, setOneDriveOpen] = useState(false);
 
   if (!isAdmin) {
     return (
@@ -291,14 +293,20 @@ export default function ConnectedSources() {
         </div>
       )}
 
-      {/* Cloud storage coming soon */}
+      {/* Cloud Storage Integrations */}
       <div className="mt-8">
         <h3 className="text-sm font-medium text-muted-foreground mb-3">Cloud Storage Integrations</h3>
         <div className="grid gap-3 md:grid-cols-3">
+          <Card className="border-primary/20 cursor-pointer hover:border-primary/40 transition-colors" onClick={() => setOneDriveOpen(true)}>
+            <CardContent className="py-6 px-4 text-center space-y-2">
+              <FolderSync className="h-8 w-8 mx-auto text-primary" />
+              <p className="text-sm font-medium">OneDrive / SharePoint</p>
+              <p className="text-xs text-muted-foreground">Browse and import files from OneDrive & SharePoint</p>
+              <Badge variant="default" className="text-[10px]">Connected</Badge>
+            </CardContent>
+          </Card>
           {[
             { label: "Google Drive", icon: HardDrive, desc: "Browse and import files from Google Drive" },
-            { label: "OneDrive", icon: FolderSync, desc: "Browse and import files from OneDrive" },
-            { label: "SharePoint", icon: Cloud, desc: "Browse and import files from SharePoint" },
           ].map((item) => (
             <Card key={item.label} className="border-dashed border-border/50 opacity-60">
               <CardContent className="py-6 px-4 text-center space-y-2">
@@ -323,6 +331,8 @@ export default function ConnectedSources() {
       />
 
       <BulkUrlImportDialog open={bulkOpen} onOpenChange={setBulkOpen} />
+
+      <OneDriveBrowserDialog open={oneDriveOpen} onOpenChange={setOneDriveOpen} />
 
       <DeleteConfirmDialog
         open={!!deleteId}
