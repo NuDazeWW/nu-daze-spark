@@ -293,6 +293,14 @@ export default function AssetLibrary() {
         open={reelCreatorOpen}
         onOpenChange={setReelCreatorOpen}
       />
+
+      <AssetLightbox
+        open={!!viewingAsset}
+        onOpenChange={(o) => { if (!o) setViewingAsset(null); }}
+        filePath={viewingAsset?.file_path ?? null}
+        title={viewingAsset?.title ?? ""}
+        assetType={viewingAsset?.asset_type ?? ""}
+      />
     </div>
   );
 }
