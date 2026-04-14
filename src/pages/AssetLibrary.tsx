@@ -93,6 +93,10 @@ export default function AssetLibrary() {
       text_content: a.text_content ?? "",
       expires_at: a.expires_at ? a.expires_at.split("T")[0] : "",
       file: null,
+      content_date: (a as any).content_date ?? "",
+      is_event: (a as any).is_event ?? false,
+      event_name: (a as any).event_name ?? "",
+      contributors: (a as any).contributors ?? [],
     });
     setFormOpen(true);
   };
