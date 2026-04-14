@@ -99,7 +99,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied }: {
 }
 
 export default function CommentGenerator() {
-  const { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented } = useExternalPosts();
+  const { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented, unmarkCommented } = useExternalPosts();
 
   const [formOpen, setFormOpen] = useState(false);
   const [scrapeOpen, setScrapeOpen] = useState(false);
@@ -279,10 +279,21 @@ export default function CommentGenerator() {
                           className="shrink-0"
                         />
                       )}
-                      {isCommented && (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                      )}
-                      {!isCommented && !isBlocked && !comment && (
+                      {isCommented ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 shrink-0"
+                              onClick={(e) => { e.stopPropagation(); unmarkCommented.mutate(post.id); }}
+                            >
+                              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Unmark — return to active queue</TooltipContent>
+                        </Tooltip>
+                      ) : !isBlocked && !comment ? (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -296,7 +307,7 @@ export default function CommentGenerator() {
                           </TooltipTrigger>
                           <TooltipContent>Mark as commented</TooltipContent>
                         </Tooltip>
-                      )}
+                      ) : null}
                       <Badge variant="outline" className="text-[10px] capitalize shrink-0">{post.platform}</Badge>
                       {post.topic && (
                         <Badge variant="secondary" className="text-[10px] shrink-0">{post.topic}</Badge>

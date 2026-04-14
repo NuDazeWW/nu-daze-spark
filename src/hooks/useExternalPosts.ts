@@ -78,6 +78,21 @@ export function useExternalPosts() {
     onError: (e) => toast({ title: "Failed to mark as commented", description: e.message, variant: "destructive" }),
   });
 
+  const unmarkCommented = useMutation({
+    mutationFn: async (postId: string) => {
+      const { error } = await supabase
+        .from("external_posts")
+        .update({ is_commented: false } as never)
+        .eq("id", postId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["external_posts"] });
+      toast({ title: "Post returned to active queue" });
+    },
+    onError: (e) => toast({ title: "Failed to unmark", description: e.message, variant: "destructive" }),
+  });
+
   const addPost = useMutation({
     mutationFn: async (post: {
       external_url: string;
@@ -149,5 +164,5 @@ export function useExternalPosts() {
     onError: (e) => toast({ title: "Scrape failed", description: e.message, variant: "destructive" }),
   });
 
-  return { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented };
+  return { posts, isLoading, error, addPost, generateComments, scrapePosts, commentsMap, updateComment, markCommented, unmarkCommented };
 }
