@@ -21,7 +21,9 @@ export type Database = {
           display_name: string | null
           handle: string
           id: string
+          is_active: boolean
           is_default: boolean
+          is_system: boolean
           updated_at: string
           updated_by: string | null
         }
@@ -31,7 +33,9 @@ export type Database = {
           display_name?: string | null
           handle: string
           id?: string
+          is_active?: boolean
           is_default?: boolean
+          is_system?: boolean
           updated_at?: string
           updated_by?: string | null
         }
@@ -41,7 +45,9 @@ export type Database = {
           display_name?: string | null
           handle?: string
           id?: string
+          is_active?: boolean
           is_default?: boolean
+          is_system?: boolean
           updated_at?: string
           updated_by?: string | null
         }

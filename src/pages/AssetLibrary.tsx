@@ -7,12 +7,16 @@ import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
 import { ReelCreatorDialog } from "@/components/assets/ReelCreatorDialog";
 import { AssetLightbox } from "@/components/assets/AssetLightbox";
 import { AssetThumbnail } from "@/components/assets/AssetThumbnail";
+import { ExpirationAlerts } from "@/components/assets/ExpirationAlerts";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { useBulkReelUpload } from "@/hooks/useBulkReelUpload";
+import { useDuplicateDetection } from "@/hooks/useDuplicateDetection";
+import { useAssetUsage } from "@/hooks/useAssetUsage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,6 +25,7 @@ import {
   FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download, Eye,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
   CalendarClock, Sparkles, Film, Undo2, Archive, Trash, Calendar, Users, PartyPopper,
+  Tags, BarChart3,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
@@ -44,6 +49,8 @@ export default function AssetLibrary() {
   } = useAssets();
 
   const { uploadAndCreateReels, isPending: isBulkPending, progress: bulkProgress } = useBulkReelUpload();
+  const { warnIfDuplicate } = useDuplicateDetection(assets);
+  const { usageMap } = useAssetUsage();
   const [bulkOpen, setBulkOpen] = useState(false);
   const [reelCreatorOpen, setReelCreatorOpen] = useState(false);
 
@@ -57,6 +64,8 @@ export default function AssetLibrary() {
   const [filterType, setFilterType] = useState("all");
   const [filterPermission, setFilterPermission] = useState("all");
   const [showTrash, setShowTrash] = useState(false);
+  const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
+  const [bulkMode, setBulkMode] = useState(false);
 
   const filtered = useMemo(() => {
     return assets.filter((a) => {
@@ -103,6 +112,10 @@ export default function AssetLibrary() {
 
   const handleSubmit = async () => {
     if (submitting) return;
+    // Duplicate check on create
+    if (!editing) {
+      warnIfDuplicate(form.title, form.file?.name);
+    }
     setSubmitting(true);
     try {
       let file_path = editing?.file_path ?? null;
@@ -122,6 +135,32 @@ export default function AssetLibrary() {
       else await insert(payload as never);
       setFormOpen(false);
     } finally { setSubmitting(false); }
+  };
+
+  const toggleBulkSelect = (id: string) => {
+    setBulkSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    for (const id of bulkSelected) {
+      await softDelete(id);
+    }
+    toast(`${bulkSelected.size} assets moved to trash`);
+    setBulkSelected(new Set());
+    setBulkMode(false);
+  };
+
+  const handleBulkPermission = async (permission: string) => {
+    for (const id of bulkSelected) {
+      await update({ id, permission_state: permission } as never);
+    }
+    toast(`Updated permission for ${bulkSelected.size} assets`);
+    setBulkSelected(new Set());
+    setBulkMode(false);
   };
 
   if (isLoading) {
@@ -147,6 +186,7 @@ export default function AssetLibrary() {
   return (
     <div className="animate-fade-in">
       <PageHeader title="Asset Library" description="Manage uploaded source assets, permissions, and summaries." />
+      <ExpirationAlerts />
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -197,12 +237,40 @@ export default function AssetLibrary() {
         </Button>
         {!showTrash && isAdmin && (
           <>
+            <Button
+              variant={bulkMode ? "default" : "outline"}
+              onClick={() => { setBulkMode(!bulkMode); setBulkSelected(new Set()); }}
+            >
+              <Tags className="mr-2 h-4 w-4" />{bulkMode ? "Exit Bulk" : "Bulk Actions"}
+            </Button>
             <Button variant="outline" onClick={() => setReelCreatorOpen(true)}><Film className="mr-2 h-4 w-4" />Create Video Reel</Button>
             <Button variant="outline" onClick={() => setBulkOpen(true)}><Sparkles className="mr-2 h-4 w-4" />AI Reel Cards</Button>
             <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
           </>
         )}
       </div>
+
+      {/* Bulk actions bar */}
+      {bulkMode && bulkSelected.size > 0 && (
+        <div className="flex items-center gap-3 mb-4 p-3 rounded-lg border bg-muted/30">
+          <span className="text-sm font-medium">{bulkSelected.size} selected</span>
+          <Select onValueChange={handleBulkPermission}>
+            <SelectTrigger className="w-[170px] h-8 text-xs">
+              <SelectValue placeholder="Set permission…" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="generation_allowed">Gen Allowed</SelectItem>
+              <SelectItem value="summarization_only">Summary Only</SelectItem>
+              <SelectItem value="blocked">Blocked</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+            <Trash2 className="mr-1 h-3.5 w-3.5" />Delete Selected
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => { setBulkSelected(new Set()); setBulkMode(false); }}>Cancel</Button>
+        </div>
+      )}
 
       {/* Trash View */}
       {showTrash ? (
@@ -262,11 +330,18 @@ export default function AssetLibrary() {
               const perm = PERMISSION_BADGE[asset.permission_state];
               const summary = summaryMap.get(asset.id);
               const expired = isExpired(asset);
+              const usageCount = usageMap.get(asset.id) ?? 0;
 
               return (
-                <Card key={asset.id} className={expired ? "border-destructive/40 opacity-75" : ""}>
+                <Card key={asset.id} className={`${expired ? "border-destructive/40 opacity-75" : ""} ${bulkMode && bulkSelected.has(asset.id) ? "ring-2 ring-primary" : ""}`}>
                   <CardHeader className="py-3 px-4 flex-row items-start justify-between space-y-0 gap-2">
                     <div className="flex items-center gap-2 min-w-0">
+                      {bulkMode && (
+                        <Checkbox
+                          checked={bulkSelected.has(asset.id)}
+                          onCheckedChange={() => toggleBulkSelect(asset.id)}
+                        />
+                      )}
                       <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
                       <CardTitle className="text-sm font-semibold truncate">{asset.title}</CardTitle>
                     </div>
@@ -298,6 +373,11 @@ export default function AssetLibrary() {
                       <Badge variant={perm.variant} className="text-xs">{perm.label}</Badge>
                       {asset.is_nudaze_origin && <Badge variant="outline" className="text-xs border-primary/30 text-primary">NuDaze</Badge>}
                       {expired && <Badge variant="destructive" className="text-xs">Expired</Badge>}
+                      {usageCount > 0 && (
+                        <Badge variant="outline" className="text-[10px] gap-0.5">
+                          <BarChart3 className="h-2.5 w-2.5" />{usageCount} use{usageCount !== 1 ? "s" : ""}
+                        </Badge>
+                      )}
                     </div>
                     {/* Metadata: date, event, contributors */}
                     <div className="space-y-1">
