@@ -110,10 +110,6 @@ Deno.serve(async (req) => {
       graphPath = appendQueryParam(graphPath, "includeHiddenFolders", "true");
     }
 
-    // For remote folder listings, expand remoteItem so we can detect shortcuts
-    if (["list_root", "list_folder"].includes(action)) {
-      graphPath = appendQueryParam(graphPath, "$expand", "children");
-    }
 
     // Fetch with automatic pagination for list actions
     const isListAction = ["list_root", "list_folder", "list_remote_folder", "list_site_drive", "list_site_drives", "list_sharepoint_sites", "search"].includes(action);
