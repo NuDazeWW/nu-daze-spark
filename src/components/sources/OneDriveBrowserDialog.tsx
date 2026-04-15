@@ -7,69 +7,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Folder, FileText, Image, Film, File, ArrowLeft,
-  Download, Search, Loader2, HardDrive, Globe, CheckCircle2, Link2, Eye, X,
-} from "lucide-react";
-
-interface DriveItem {
-  id: string;
-  name: string;
-  size?: number;
-  folder?: { childCount: number };
-  file?: { mimeType: string };
-  webUrl?: string;
-  lastModifiedDateTime?: string;
-  "@microsoft.graph.downloadUrl"?: string;
-  remoteItem?: {
-    id: string;
-    folder?: { childCount: number };
-    file?: { mimeType: string };
-    parentReference?: {
-      driveId: string;
-      driveType?: string;
-    };
-    size?: number;
-  };
-}
-
-interface BreadcrumbItem {
-  id: string | null;
-  name: string;
-  siteId?: string;
-  driveId?: string;
-  action?: string;
-}
-
-type BrowseMode = "onedrive" | "sharepoint_sites" | "sharepoint_drive" | "remote_drive";
+import { HardDrive, Search, Globe } from "lucide-react";
+import type { DriveItem, BreadcrumbItem, BrowseMode, SharePointSite } from "./onedrive/types";
+import { formatSize, isShortcut } from "./onedrive/utils";
+import { OneDriveFileList } from "./onedrive/OneDriveFileList";
+import { OneDrivePreview } from "./onedrive/OneDrivePreview";
 
 interface OneDriveBrowserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-const FILE_ICON_MAP: Record<string, React.ElementType> = {
-  image: Image,
-  video: Film,
-  text: FileText,
-  application: File,
-};
-
-function getFileIcon(mimeType?: string) {
-  if (!mimeType) return File;
-  const prefix = mimeType.split("/")[0];
-  return FILE_ICON_MAP[prefix] ?? File;
-}
-
-function formatSize(bytes?: number) {
-  if (!bytes) return "";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function isShortcut(item: DriveItem): boolean {
-  return !!item.remoteItem?.parentReference?.driveId;
 }
 
 export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDialogProps) {
@@ -78,7 +24,7 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
 
   const [mode, setMode] = useState<BrowseMode>("onedrive");
   const [items, setItems] = useState<DriveItem[]>([]);
-  const [sites, setSites] = useState<Array<{ id: string; displayName: string; webUrl: string }>>([]);
+  const [sites, setSites] = useState<SharePointSite[]>([]);
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState<string | null>(null);
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([{ id: null, name: "Root" }]);
@@ -116,12 +62,10 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
   const loadFolder = useCallback(async (itemId: string, name: string, item?: DriveItem) => {
     setLoading(true);
     try {
-      // Check if this is a shortcut to a remote/shared folder
       if (item && isShortcut(item)) {
         const remote = item.remoteItem!;
         const remoteDriveId = remote.parentReference!.driveId;
         const remoteItemId = remote.id;
-        
         const data = await callBrowse({ action: "list_remote_folder", driveId: remoteDriveId, itemId: remoteItemId });
         setItems(data.value ?? []);
         setMode("remote_drive");
@@ -130,7 +74,6 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
         return;
       }
 
-      // If we're already browsing a remote drive, keep using that driveId
       if (mode === "remote_drive" && currentDriveId) {
         const data = await callBrowse({ action: "list_remote_folder", driveId: currentDriveId, itemId });
         setItems(data.value ?? []);
@@ -141,7 +84,6 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
       const action = mode === "sharepoint_drive" ? "list_site_drive" : "list_folder";
       const body: Record<string, unknown> = { action, itemId };
       if (currentSiteId) body.siteId = currentSiteId;
-
       const data = await callBrowse(body);
       setItems(data.value ?? []);
       setBreadcrumbs((prev) => [...prev, { id: itemId, name, siteId: currentSiteId ?? undefined, action }]);
@@ -184,19 +126,12 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
 
   const navigateToBreadcrumb = useCallback(async (index: number) => {
     const crumb = breadcrumbs[index];
-    if (index === 0 && mode === "sharepoint_sites") {
-      await loadSharePointSites();
-      return;
-    }
-    if (index === 0) {
-      await loadRoot();
-      return;
-    }
+    if (index === 0 && mode === "sharepoint_sites") { await loadSharePointSites(); return; }
+    if (index === 0) { await loadRoot(); return; }
 
     setLoading(true);
     try {
       let body: Record<string, unknown>;
-
       if (crumb.action === "list_remote_folder" && crumb.driveId) {
         body = { action: "list_remote_folder", driveId: crumb.driveId, itemId: crumb.id };
         setMode("remote_drive");
@@ -209,7 +144,6 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
       } else {
         body = crumb.id ? { action: "list_folder", itemId: crumb.id } : { action: "list_root" };
       }
-
       const data = await callBrowse(body);
       setItems(data.value ?? []);
       setBreadcrumbs(breadcrumbs.slice(0, index + 1));
@@ -237,14 +171,13 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
   const importFile = useCallback(async (item: DriveItem) => {
     setImporting(item.id);
     try {
-      const isRemote = isShortcut(item);
-      const getBody: Record<string, unknown> = { action: "get_item", itemId: isRemote ? item.remoteItem!.id : item.id };
-      if (isRemote && item.remoteItem?.parentReference?.driveId) {
+      const remote = isShortcut(item);
+      const getBody: Record<string, unknown> = { action: "get_item", itemId: remote ? item.remoteItem!.id : item.id };
+      if (remote && item.remoteItem?.parentReference?.driveId) {
         getBody.driveId = item.remoteItem.parentReference.driveId;
       } else if (currentDriveId && mode === "remote_drive") {
         getBody.driveId = currentDriveId;
       }
-
       const detail = await callBrowse(getBody);
       const downloadUrl = detail["@microsoft.graph.downloadUrl"] ?? detail.webUrl;
 
@@ -265,7 +198,6 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
         is_nudaze_origin: false,
         created_by: (await supabase.auth.getUser()).data.user!.id,
       });
-
       if (insertErr) throw insertErr;
 
       setImported((prev) => new Set([...prev, item.id]));
@@ -286,9 +218,9 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
     setPreviewItem(item);
     setPreviewUrl(null);
     try {
-      const isRemote = isShortcut(item);
-      const getBody: Record<string, unknown> = { action: "get_item", itemId: isRemote ? item.remoteItem!.id : item.id };
-      if (isRemote && item.remoteItem?.parentReference?.driveId) {
+      const remote = isShortcut(item);
+      const getBody: Record<string, unknown> = { action: "get_item", itemId: remote ? item.remoteItem!.id : item.id };
+      if (remote && item.remoteItem?.parentReference?.driveId) {
         getBody.driveId = item.remoteItem.parentReference.driveId;
       } else if (currentDriveId && mode === "remote_drive") {
         getBody.driveId = currentDriveId;
@@ -304,19 +236,15 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
   }, [callBrowse, currentDriveId, mode, toast]);
 
   const handleOpen = useCallback(() => {
-    if (items.length === 0 && sites.length === 0) {
-      loadRoot();
-    }
+    if (items.length === 0 && sites.length === 0) loadRoot();
   }, [items.length, sites.length, loadRoot]);
 
+  const handleFolderClick = useCallback((item: DriveItem) => {
+    loadFolder(item.id, item.name, item);
+  }, [loadFolder]);
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        if (o) handleOpen();
-        onOpenChange(o);
-      }}
-    >
+    <Dialog open={open} onOpenChange={(o) => { if (o) handleOpen(); onOpenChange(o); }}>
       <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -396,138 +324,32 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
                   </button>
                 ))
               )
-            ) : items.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No files or folders found.</p>
             ) : (
-              items.map((item) => {
-                const shortcut = isShortcut(item);
-                const isFolder = !!item.folder || !!item.remoteItem?.folder;
-                const mime = item.file?.mimeType ?? item.remoteItem?.file?.mimeType;
-                const IconComp = isFolder ? Folder : getFileIcon(mime);
-                const isImported = imported.has(item.id);
-                const isImporting = importing === item.id;
-
-                return (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent/50 transition-colors group"
-                  >
-                    <button
-                      className="flex items-center gap-3 flex-1 min-w-0 text-left"
-                      onClick={() => isFolder && loadFolder(item.id, item.name, item)}
-                      disabled={!isFolder}
-                    >
-                      <div className="relative shrink-0">
-                        <IconComp className={`h-4 w-4 ${isFolder ? "text-primary" : "text-muted-foreground"}`} />
-                        {shortcut && (
-                          <Link2 className="h-2.5 w-2.5 text-primary absolute -bottom-1 -right-1" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm truncate">{item.name}</p>
-                        <div className="flex gap-2 text-[10px] text-muted-foreground">
-                          {(item.size != null || item.remoteItem?.size != null) && !isFolder && (
-                            <span>{formatSize(item.size ?? item.remoteItem?.size)}</span>
-                          )}
-                          {isFolder && (item.folder || item.remoteItem?.folder) && (
-                            <span>{(item.folder?.childCount ?? item.remoteItem?.folder?.childCount)} items</span>
-                          )}
-                          {shortcut && <span className="text-primary/70">Shortcut</span>}
-                        </div>
-                      </div>
-                    </button>
-
-                    {!isFolder && (
-                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {(mime?.startsWith("image/") || mime?.startsWith("video/")) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => previewFile(item)}
-                            disabled={previewLoading && previewItem?.id === item.id}
-                          >
-                            {previewLoading && previewItem?.id === item.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <Eye className="h-3.5 w-3.5" />
-                            )}
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => importFile(item)}
-                          disabled={isImporting || isImported}
-                        >
-                          {isImported ? (
-                            <>
-                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
-                              <span className="text-xs">Imported</span>
-                            </>
-                          ) : isImporting ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <>
-                              <Download className="h-3.5 w-3.5 mr-1" />
-                              <span className="text-xs">Import</span>
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
+              <OneDriveFileList
+                items={items}
+                importing={importing}
+                imported={imported}
+                previewLoading={previewLoading}
+                previewItemId={previewItem?.id ?? null}
+                onFolderClick={handleFolderClick}
+                onImport={importFile}
+                onPreview={previewFile}
+              />
             )}
           </div>
         </ScrollArea>
-        {/* Preview Lightbox Overlay */}
+
+        {/* Preview Lightbox */}
         {previewItem && (
-          <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col rounded-lg overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <p className="text-sm font-medium truncate flex-1">{previewItem.name}</p>
-              <div className="flex items-center gap-2 shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    importFile(previewItem);
-                  }}
-                  disabled={importing === previewItem.id || imported.has(previewItem.id)}
-                >
-                  {imported.has(previewItem.id) ? (
-                    <>
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
-                      Imported
-                    </>
-                  ) : importing === previewItem.id ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <>
-                      <Download className="h-3.5 w-3.5 mr-1" />
-                      Import
-                    </>
-                  )}
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => { setPreviewItem(null); setPreviewUrl(null); }}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="flex-1 flex items-center justify-center p-4 min-h-0">
-              {previewLoading ? (
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              ) : previewUrl ? (
-                (previewItem.file?.mimeType ?? previewItem.remoteItem?.file?.mimeType ?? "").startsWith("video/") ? (
-                  <video src={previewUrl} controls autoPlay className="max-w-full max-h-[60vh] rounded-md" />
-                ) : (
-                  <img src={previewUrl} alt={previewItem.name} className="max-w-full max-h-[60vh] object-contain rounded-md" />
-                )
-              ) : (
-                <p className="text-sm text-muted-foreground">Preview unavailable</p>
-              )}
-            </div>
-          </div>
+          <OneDrivePreview
+            item={previewItem}
+            url={previewUrl}
+            loading={previewLoading}
+            importing={importing}
+            imported={imported}
+            onImport={importFile}
+            onClose={() => { setPreviewItem(null); setPreviewUrl(null); }}
+          />
         )}
       </DialogContent>
     </Dialog>
