@@ -86,6 +86,9 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
   const [currentSiteId, setCurrentSiteId] = useState<string | null>(null);
   const [currentDriveId, setCurrentDriveId] = useState<string | null>(null);
   const [imported, setImported] = useState<Set<string>>(new Set());
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewItem, setPreviewItem] = useState<DriveItem | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const callBrowse = useCallback(async (body: Record<string, unknown>) => {
     const { data, error } = await supabase.functions.invoke("browse-onedrive", { body });
