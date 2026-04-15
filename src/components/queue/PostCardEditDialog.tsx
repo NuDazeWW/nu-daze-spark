@@ -5,7 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { X, Plus, Hash } from "lucide-react";
+import { useActiveHashtagBanks } from "@/hooks/useHashtagBanks";
 import type { PostCard } from "@/hooks/usePostCards";
 
 interface PostCardEditDialogProps {
@@ -25,6 +27,12 @@ export function PostCardEditDialog({ open, onOpenChange, card, onSave, isPending
   const [peopleInput, setPeopleInput] = useState("");
   const [orgInput, setOrgInput] = useState("");
   const [revisionNotes, setRevisionNotes] = useState(card.revision_notes ?? "");
+  const { data: hashtagBanks } = useActiveHashtagBanks();
+
+  const insertBank = (bankHashtags: string[]) => {
+    const merged = [...new Set([...hashtags, ...bankHashtags])];
+    setHashtags(merged);
+  };
 
   const addTag = (
     value: string,
