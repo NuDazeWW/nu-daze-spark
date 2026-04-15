@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Folder, FileText, Image, Film, File, ArrowLeft,
-  Download, Search, Loader2, HardDrive, Globe, CheckCircle2, Link2,
+  Download, Search, Loader2, HardDrive, Globe, CheckCircle2, Link2, Eye, X,
 } from "lucide-react";
 
 interface DriveItem {
@@ -86,6 +86,9 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
   const [currentSiteId, setCurrentSiteId] = useState<string | null>(null);
   const [currentDriveId, setCurrentDriveId] = useState<string | null>(null);
   const [imported, setImported] = useState<Set<string>>(new Set());
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewItem, setPreviewItem] = useState<DriveItem | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const callBrowse = useCallback(async (body: Record<string, unknown>) => {
     const { data, error } = await supabase.functions.invoke("browse-onedrive", { body });
@@ -275,6 +278,31 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
     }
   }, [callBrowse, mode, currentDriveId, toast, qc]);
 
+  const previewFile = useCallback(async (item: DriveItem) => {
+    const mime = item.file?.mimeType ?? item.remoteItem?.file?.mimeType ?? "";
+    if (!mime.startsWith("image/") && !mime.startsWith("video/")) return;
+
+    setPreviewLoading(true);
+    setPreviewItem(item);
+    setPreviewUrl(null);
+    try {
+      const isRemote = isShortcut(item);
+      const getBody: Record<string, unknown> = { action: "get_item", itemId: isRemote ? item.remoteItem!.id : item.id };
+      if (isRemote && item.remoteItem?.parentReference?.driveId) {
+        getBody.driveId = item.remoteItem.parentReference.driveId;
+      } else if (currentDriveId && mode === "remote_drive") {
+        getBody.driveId = currentDriveId;
+      }
+      const detail = await callBrowse(getBody);
+      setPreviewUrl(detail["@microsoft.graph.downloadUrl"] ?? detail.webUrl ?? null);
+    } catch (e) {
+      toast({ title: "Preview failed", description: e instanceof Error ? e.message : "Unknown error", variant: "destructive" });
+      setPreviewItem(null);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, [callBrowse, currentDriveId, mode, toast]);
+
   const handleOpen = useCallback(() => {
     if (items.length === 0 && sites.length === 0) {
       loadRoot();
@@ -410,27 +438,42 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
                     </button>
 
                     {!isFolder && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => importFile(item)}
-                        disabled={isImporting || isImported}
-                      >
-                        {isImported ? (
-                          <>
-                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
-                            <span className="text-xs">Imported</span>
-                          </>
-                        ) : isImporting ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <>
-                            <Download className="h-3.5 w-3.5 mr-1" />
-                            <span className="text-xs">Import</span>
-                          </>
+                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {(mime?.startsWith("image/") || mime?.startsWith("video/")) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => previewFile(item)}
+                            disabled={previewLoading && previewItem?.id === item.id}
+                          >
+                            {previewLoading && previewItem?.id === item.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <Eye className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
                         )}
-                      </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => importFile(item)}
+                          disabled={isImporting || isImported}
+                        >
+                          {isImported ? (
+                            <>
+                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
+                              <span className="text-xs">Imported</span>
+                            </>
+                          ) : isImporting ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <>
+                              <Download className="h-3.5 w-3.5 mr-1" />
+                              <span className="text-xs">Import</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     )}
                   </div>
                 );
@@ -438,6 +481,54 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
             )}
           </div>
         </ScrollArea>
+        {/* Preview Lightbox Overlay */}
+        {previewItem && (
+          <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <p className="text-sm font-medium truncate flex-1">{previewItem.name}</p>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    importFile(previewItem);
+                  }}
+                  disabled={importing === previewItem.id || imported.has(previewItem.id)}
+                >
+                  {imported.has(previewItem.id) ? (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
+                      Imported
+                    </>
+                  ) : importing === previewItem.id ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <Download className="h-3.5 w-3.5 mr-1" />
+                      Import
+                    </>
+                  )}
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => { setPreviewItem(null); setPreviewUrl(null); }}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+              {previewLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              ) : previewUrl ? (
+                (previewItem.file?.mimeType ?? previewItem.remoteItem?.file?.mimeType ?? "").startsWith("video/") ? (
+                  <video src={previewUrl} controls autoPlay className="max-w-full max-h-[60vh] rounded-md" />
+                ) : (
+                  <img src={previewUrl} alt={previewItem.name} className="max-w-full max-h-[60vh] object-contain rounded-md" />
+                )
+              ) : (
+                <p className="text-sm text-muted-foreground">Preview unavailable</p>
+              )}
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
