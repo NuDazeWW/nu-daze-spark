@@ -438,27 +438,42 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
                     </button>
 
                     {!isFolder && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => importFile(item)}
-                        disabled={isImporting || isImported}
-                      >
-                        {isImported ? (
-                          <>
-                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
-                            <span className="text-xs">Imported</span>
-                          </>
-                        ) : isImporting ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <>
-                            <Download className="h-3.5 w-3.5 mr-1" />
-                            <span className="text-xs">Import</span>
-                          </>
+                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {(mime?.startsWith("image/") || mime?.startsWith("video/")) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => previewFile(item)}
+                            disabled={previewLoading && previewItem?.id === item.id}
+                          >
+                            {previewLoading && previewItem?.id === item.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <Eye className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
                         )}
-                      </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => importFile(item)}
+                          disabled={isImporting || isImported}
+                        >
+                          {isImported ? (
+                            <>
+                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
+                              <span className="text-xs">Imported</span>
+                            </>
+                          ) : isImporting ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <>
+                              <Download className="h-3.5 w-3.5 mr-1" />
+                              <span className="text-xs">Import</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     )}
                   </div>
                 );
