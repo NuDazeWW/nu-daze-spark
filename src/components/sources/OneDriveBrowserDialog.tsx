@@ -481,6 +481,54 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
             )}
           </div>
         </ScrollArea>
+        {/* Preview Lightbox Overlay */}
+        {previewItem && (
+          <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <p className="text-sm font-medium truncate flex-1">{previewItem.name}</p>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    importFile(previewItem);
+                  }}
+                  disabled={importing === previewItem.id || imported.has(previewItem.id)}
+                >
+                  {imported.has(previewItem.id) ? (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
+                      Imported
+                    </>
+                  ) : importing === previewItem.id ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <Download className="h-3.5 w-3.5 mr-1" />
+                      Import
+                    </>
+                  )}
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => { setPreviewItem(null); setPreviewUrl(null); }}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+              {previewLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              ) : previewUrl ? (
+                (previewItem.file?.mimeType ?? previewItem.remoteItem?.file?.mimeType ?? "").startsWith("video/") ? (
+                  <video src={previewUrl} controls autoPlay className="max-w-full max-h-[60vh] rounded-md" />
+                ) : (
+                  <img src={previewUrl} alt={previewItem.name} className="max-w-full max-h-[60vh] object-contain rounded-md" />
+                )
+              ) : (
+                <p className="text-sm text-muted-foreground">Preview unavailable</p>
+              )}
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
