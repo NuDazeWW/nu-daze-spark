@@ -52,7 +52,7 @@ export default function Auth() {
             alt="NuDaze"
             className="mx-auto h-20 w-auto"
           />
-          <p className="text-sm text-muted-foreground">Social Copilot</p>
+          <p className="text-sm text-muted-foreground">Social Engine</p>
         </div>
 
         <div className="space-y-6 rounded-lg border border-border bg-card p-6 shadow-card">

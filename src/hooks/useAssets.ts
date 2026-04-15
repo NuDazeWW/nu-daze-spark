@@ -153,7 +153,7 @@ export function useAssets() {
     const now = new Date();
     const date = now.toISOString().slice(0, 10).replace(/-/g, "");
     const time = now.toTimeString().slice(0, 8).replace(/:/g, "");
-    return `NuDazeCopilot.social-upload.${date}_${time}.${assetType}.${ext}`;
+    return `NuDazeSocialEngine.upload.${date}_${time}.${assetType}.${ext}`;
   };
 
   const downloadAsset = async (filePath: string, assetType: string) => {
