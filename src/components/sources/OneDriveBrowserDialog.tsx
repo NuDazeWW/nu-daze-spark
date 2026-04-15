@@ -278,6 +278,31 @@ export function OneDriveBrowserDialog({ open, onOpenChange }: OneDriveBrowserDia
     }
   }, [callBrowse, mode, currentDriveId, toast, qc]);
 
+  const previewFile = useCallback(async (item: DriveItem) => {
+    const mime = item.file?.mimeType ?? item.remoteItem?.file?.mimeType ?? "";
+    if (!mime.startsWith("image/") && !mime.startsWith("video/")) return;
+
+    setPreviewLoading(true);
+    setPreviewItem(item);
+    setPreviewUrl(null);
+    try {
+      const isRemote = isShortcut(item);
+      const getBody: Record<string, unknown> = { action: "get_item", itemId: isRemote ? item.remoteItem!.id : item.id };
+      if (isRemote && item.remoteItem?.parentReference?.driveId) {
+        getBody.driveId = item.remoteItem.parentReference.driveId;
+      } else if (currentDriveId && mode === "remote_drive") {
+        getBody.driveId = currentDriveId;
+      }
+      const detail = await callBrowse(getBody);
+      setPreviewUrl(detail["@microsoft.graph.downloadUrl"] ?? detail.webUrl ?? null);
+    } catch (e) {
+      toast({ title: "Preview failed", description: e instanceof Error ? e.message : "Unknown error", variant: "destructive" });
+      setPreviewItem(null);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, [callBrowse, currentDriveId, mode, toast]);
+
   const handleOpen = useCallback(() => {
     if (items.length === 0 && sites.length === 0) {
       loadRoot();
