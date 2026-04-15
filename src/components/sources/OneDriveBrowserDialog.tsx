@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Folder, FileText, Image, Film, File, ArrowLeft,
-  Download, Search, Loader2, HardDrive, Globe, CheckCircle2, Link2,
+  Download, Search, Loader2, HardDrive, Globe, CheckCircle2, Link2, Eye, X,
 } from "lucide-react";
 
 interface DriveItem {
