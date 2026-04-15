@@ -67,6 +67,16 @@ serve(async (req) => {
       });
     }
 
+    // Fetch active hashtag banks for context
+    const { data: hashtagBanks } = await supabaseAdmin
+      .from("hashtag_banks")
+      .select("bank_name, category, hashtags")
+      .eq("is_active", true);
+
+    const hashtagBankContext = (hashtagBanks && hashtagBanks.length > 0)
+      ? `\n\nAvailable Hashtag Banks (use relevant ones):\n${hashtagBanks.map((b: { bank_name: string; category: string; hashtags: string[] }) => `- ${b.bank_name} (${b.category}): ${b.hashtags.join(", ")}`).join("\n")}`
+      : "";
+
     // Generate reel content for each asset using AI
     const results = [];
 
@@ -87,7 +97,7 @@ Generate a JSON response with exactly these fields:
 - objective: The strategic objective of this reel (1 sentence)
 - audience: Target audience segment (1-2 words)
 - campaign_pillar: Relevant content pillar (1-2 words)
-- hashtags: Array of 10-15 relevant hashtags (without the # symbol)
+- hashtags: Array of 10-15 relevant hashtags (without the # symbol). PRIORITIZE hashtags from the available hashtag banks below when they are relevant to the content.${hashtagBankContext}
 - people_tags: Array of people/accounts to tag. MUST include these contributors: ${assetContributors.length > 0 ? assetContributors.join(", ") : "use placeholder handles"}. Add 1-2 more relevant handles if appropriate.
 - org_tags: Array of 1-2 relevant organizations to tag
 - rationale: Brief rationale for why this reel works (1-2 sentences)
