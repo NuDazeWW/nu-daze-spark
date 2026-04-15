@@ -77,7 +77,34 @@ export function PostCardEditDialog({ open, onOpenChange, card, onSave, isPending
 
           {/* Hashtags */}
           <div>
-            <Label>Hashtags</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label>Hashtags</Label>
+              {hashtagBanks && hashtagBanks.length > 0 && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button type="button" variant="outline" size="sm" className="h-7 text-xs gap-1">
+                      <Hash className="h-3 w-3" /> Insert Bank
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-2" align="end">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">Click a bank to insert all its hashtags</p>
+                    <div className="space-y-1 max-h-48 overflow-y-auto">
+                      {hashtagBanks.map((bank) => (
+                        <button
+                          key={bank.id}
+                          type="button"
+                          className="w-full text-left px-2 py-1.5 rounded-md hover:bg-accent text-sm flex items-center justify-between"
+                          onClick={() => insertBank(bank.hashtags)}
+                        >
+                          <span className="font-medium">{bank.bank_name}</span>
+                          <Badge variant="secondary" className="text-[10px] ml-2">{bank.hashtags.length}</Badge>
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </div>
             <div className="flex gap-2 mb-1.5">
               <Input
                 value={hashtagInput}
