@@ -60,7 +60,7 @@ export function AppSidebar() {
             className="h-[140px] w-auto"
           />
           <span className="text-[11px] font-medium text-muted-foreground tracking-wide uppercase">
-            Social Engine
+            Content Copilot
           </span>
         </Link>
       </SidebarHeader>
