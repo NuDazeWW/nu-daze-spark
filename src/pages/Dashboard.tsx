@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useDdiHandoff } from "@/hooks/useDdiHandoff";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { ExpirationAlerts } from "@/components/assets/ExpirationAlerts";
@@ -86,6 +87,7 @@ function WowIndicator({ current, previous }: { current: number; previous: number
 export default function Dashboard() {
   const navigate = useNavigate();
   const { cadence, pipeline, comments, recentCards, assetHealth, totalStats, isLoading } = useDashboardStats();
+  const ddiContext = useDdiHandoff();
 
   const pipelineTotal = useMemo(
     () => pipeline.reduce((sum, p) => sum + p.count, 0),
@@ -94,6 +96,17 @@ export default function Dashboard() {
 
   return (
     <div className="animate-fade-in space-y-6">
+      {ddiContext && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="flex items-center gap-3 py-3">
+            <Badge variant="outline" className="border-primary text-primary">DDI Context</Badge>
+            <span className="text-sm text-muted-foreground">
+              Linked to entity <code className="text-primary font-mono text-xs">{ddiContext.entityId.slice(0, 12)}…</code>
+              {ddiContext.surface && <> from <strong>{ddiContext.surface}</strong></>}
+            </span>
+          </CardContent>
+        </Card>
+      )}
       <PageHeader
         title="Dashboard"
         description="Your content operations at a glance."
