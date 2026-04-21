@@ -11,6 +11,7 @@ import {
   Repeat2,
   LogOut,
   AtSign,
+  ExternalLink,
 } from "lucide-react";
 import {
   Sidebar,
