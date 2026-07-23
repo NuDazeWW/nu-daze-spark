@@ -179,7 +179,7 @@ export function useExternalPosts() {
     }) => {
       const { data, error } = await supabase
         .from("external_posts")
-        .insert(post as never)
+        .insert({ ...post, client_id: activeClientId } as never)
         .select()
         .single();
       if (error) throw error;
