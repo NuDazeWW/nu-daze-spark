@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useActiveClient } from "@/contexts/ClientContext";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type ConnectedSource = Tables<"connected_sources">;
@@ -10,25 +11,25 @@ export function useConnectedSources() {
   const queryClient = useQueryClient();
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
+  const { activeClientId } = useActiveClient();
 
   const query = useQuery({
-    queryKey: ["connected_sources"],
+    queryKey: ["connected_sources", activeClientId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("connected_sources")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = supabase.from("connected_sources").select("*").order("created_at", { ascending: false });
+      if (activeClientId) q = q.eq("client_id", activeClientId);
+      const { data, error } = await q;
       if (error) throw error;
       return data;
     },
-    enabled: !!user && isAdmin,
+    enabled: !!user && isAdmin && !!activeClientId,
   });
 
   const insertMutation = useMutation({
     mutationFn: async (row: Partial<ConnectedSource>) => {
       const { data, error } = await supabase
         .from("connected_sources")
-        .insert({ ...row, created_by: user!.id, updated_by: user!.id } as never)
+        .insert({ ...row, created_by: user!.id, updated_by: user!.id, client_id: activeClientId } as never)
         .select()
         .single();
       if (error) throw error;

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useActiveClient } from "@/contexts/ClientContext";
 
 type TableName =
   | "brand_voice_rules"
@@ -17,25 +18,25 @@ export function useStrategyTable<T extends Record<string, unknown>>(table: Table
   const queryClient = useQueryClient();
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
+  const { activeClientId } = useActiveClient();
 
   const query = useQuery({
-    queryKey: [table],
+    queryKey: [table, activeClientId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from(table)
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = supabase.from(table).select("*").order("created_at", { ascending: false });
+      if (activeClientId) q = q.eq("client_id", activeClientId);
+      const { data, error } = await q;
       if (error) throw error;
       return data as unknown as T[];
     },
-    enabled: !!user,
+    enabled: !!user && !!activeClientId,
   });
 
   const insertMutation = useMutation({
     mutationFn: async (row: Partial<T>) => {
       const { data, error } = await supabase
         .from(table)
-        .insert({ ...row, created_by: user?.id, updated_by: user?.id } as never)
+        .insert({ ...row, created_by: user?.id, updated_by: user?.id, client_id: activeClientId } as never)
         .select()
         .single();
       if (error) throw error;
