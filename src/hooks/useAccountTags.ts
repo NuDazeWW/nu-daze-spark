@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useActiveClient } from "@/contexts/ClientContext";
 
 export interface AccountTag {
   id: string;
@@ -14,25 +15,25 @@ export interface AccountTag {
   updated_at: string;
   created_by: string | null;
   updated_by: string | null;
+  client_id: string | null;
 }
 
 export function useAccountTags() {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
+  const { activeClientId } = useActiveClient();
 
   const { data: tags = [], isLoading } = useQuery({
-    queryKey: ["account_tags"],
+    queryKey: ["account_tags", activeClientId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("account_tags")
-        .select("*")
-        .order("is_default", { ascending: false })
-        .order("handle");
+      let q = supabase.from("account_tags").select("*").order("is_default", { ascending: false }).order("handle");
+      if (activeClientId) q = q.eq("client_id", activeClientId);
+      const { data, error } = await q;
       if (error) throw error;
-      return data as AccountTag[];
+      return data as unknown as AccountTag[];
     },
-    enabled: !!user,
+    enabled: !!user && !!activeClientId,
   });
 
   const activeTags = tags.filter((t) => t.is_active);
@@ -46,6 +47,7 @@ export function useAccountTags() {
         is_default: tag.is_default ?? false,
         created_by: user!.id,
         updated_by: user!.id,
+        client_id: activeClientId,
       } as any);
       if (error) throw error;
     },

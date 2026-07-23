@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       account_tags: {
         Row: {
+          client_id: string | null
           created_at: string
           created_by: string | null
           display_name: string | null
@@ -28,6 +29,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           display_name?: string | null
@@ -40,6 +42,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           display_name?: string | null
@@ -51,7 +54,15 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "account_tags_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       approval_log: {
         Row: {
@@ -91,6 +102,7 @@ export type Database = {
       asset_summaries: {
         Row: {
           asset_id: string
+          client_id: string | null
           content_type_detected: string | null
           created_at: string
           created_by: string | null
@@ -101,6 +113,7 @@ export type Database = {
         }
         Insert: {
           asset_id: string
+          client_id?: string | null
           content_type_detected?: string | null
           created_at?: string
           created_by?: string | null
@@ -111,6 +124,7 @@ export type Database = {
         }
         Update: {
           asset_id?: string
+          client_id?: string | null
           content_type_detected?: string | null
           created_at?: string
           created_by?: string | null
@@ -127,10 +141,18 @@ export type Database = {
             referencedRelation: "source_assets"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "asset_summaries_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
         ]
       }
       audience_definitions: {
         Row: {
+          client_id: string | null
           created_at: string
           created_by: string | null
           demographics: Json | null
@@ -144,6 +166,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           demographics?: Json | null
@@ -157,6 +180,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           demographics?: Json | null
@@ -169,7 +193,15 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "audience_definitions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       background_jobs: {
         Row: {
@@ -231,6 +263,7 @@ export type Database = {
       brand_voice_rules: {
         Row: {
           category: string
+          client_id: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -242,6 +275,7 @@ export type Database = {
         }
         Insert: {
           category?: string
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -253,6 +287,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -262,10 +297,19 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "brand_voice_rules_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cadence_targets: {
         Row: {
+          client_id: string | null
           content_type: Database["public"]["Enums"]["content_type"]
           created_at: string
           created_by: string | null
@@ -278,6 +322,7 @@ export type Database = {
           weekly_target: number
         }
         Insert: {
+          client_id?: string | null
           content_type: Database["public"]["Enums"]["content_type"]
           created_at?: string
           created_by?: string | null
@@ -290,6 +335,7 @@ export type Database = {
           weekly_target?: number
         }
         Update: {
+          client_id?: string | null
           content_type?: Database["public"]["Enums"]["content_type"]
           created_at?: string
           created_by?: string | null
@@ -301,11 +347,20 @@ export type Database = {
           updated_by?: string | null
           weekly_target?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cadence_targets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       campaign_rules: {
         Row: {
           campaign_name: string
+          client_id: string | null
           content_pillars: string[] | null
           created_at: string
           created_by: string | null
@@ -319,6 +374,7 @@ export type Database = {
         }
         Insert: {
           campaign_name: string
+          client_id?: string | null
           content_pillars?: string[] | null
           created_at?: string
           created_by?: string | null
@@ -332,6 +388,7 @@ export type Database = {
         }
         Update: {
           campaign_name?: string
+          client_id?: string | null
           content_pillars?: string[] | null
           created_at?: string
           created_by?: string | null
@@ -343,11 +400,76 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_rules_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_members: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_members_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
         Relationships: []
       }
       comments: {
         Row: {
           approval_status: Database["public"]["Enums"]["approval_status"]
+          client_id: string | null
           created_at: string
           created_by: string
           draft_copy: string
@@ -360,6 +482,7 @@ export type Database = {
         }
         Insert: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
+          client_id?: string | null
           created_at?: string
           created_by: string
           draft_copy: string
@@ -372,6 +495,7 @@ export type Database = {
         }
         Update: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
+          client_id?: string | null
           created_at?: string
           created_by?: string
           draft_copy?: string
@@ -384,6 +508,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "comments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "comments_external_post_id_fkey"
             columns: ["external_post_id"]
             isOneToOne: false
@@ -394,6 +525,7 @@ export type Database = {
       }
       connected_sources: {
         Row: {
+          client_id: string | null
           connection_config: Json | null
           created_at: string
           created_by: string | null
@@ -406,6 +538,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          client_id?: string | null
           connection_config?: Json | null
           created_at?: string
           created_by?: string | null
@@ -418,6 +551,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          client_id?: string | null
           connection_config?: Json | null
           created_at?: string
           created_by?: string | null
@@ -429,12 +563,21 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "connected_sources_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cta_banks: {
         Row: {
           bank_name: string
           category: string
+          client_id: string | null
           created_at: string
           created_by: string | null
           ctas: string[]
@@ -447,6 +590,7 @@ export type Database = {
         Insert: {
           bank_name: string
           category?: string
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           ctas?: string[]
@@ -459,6 +603,7 @@ export type Database = {
         Update: {
           bank_name?: string
           category?: string
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           ctas?: string[]
@@ -468,10 +613,19 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cta_banks_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       engagement_targets: {
         Row: {
+          client_id: string | null
           created_at: string
           created_by: string | null
           daily_target: number
@@ -485,6 +639,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           daily_target?: number
@@ -498,6 +653,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           daily_target?: number
@@ -510,11 +666,20 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "engagement_targets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       external_posts: {
         Row: {
           author_name: string | null
+          client_id: string | null
           created_at: string
           estimated_engagement: number
           external_url: string
@@ -531,6 +696,7 @@ export type Database = {
         }
         Insert: {
           author_name?: string | null
+          client_id?: string | null
           created_at?: string
           estimated_engagement?: number
           external_url: string
@@ -547,6 +713,7 @@ export type Database = {
         }
         Update: {
           author_name?: string | null
+          client_id?: string | null
           created_at?: string
           estimated_engagement?: number
           external_url?: string
@@ -561,12 +728,21 @@ export type Database = {
           topic?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "external_posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       generation_batches: {
         Row: {
           batch_name: string | null
           card_count: number
+          client_id: string | null
           content_type: Database["public"]["Enums"]["content_type"] | null
           created_at: string
           created_by: string
@@ -581,6 +757,7 @@ export type Database = {
         Insert: {
           batch_name?: string | null
           card_count?: number
+          client_id?: string | null
           content_type?: Database["public"]["Enums"]["content_type"] | null
           created_at?: string
           created_by: string
@@ -595,6 +772,7 @@ export type Database = {
         Update: {
           batch_name?: string | null
           card_count?: number
+          client_id?: string | null
           content_type?: Database["public"]["Enums"]["content_type"] | null
           created_at?: string
           created_by?: string
@@ -606,12 +784,21 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "generation_batches_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hashtag_banks: {
         Row: {
           bank_name: string
           category: string
+          client_id: string | null
           created_at: string
           created_by: string | null
           hashtags: string[]
@@ -624,6 +811,7 @@ export type Database = {
         Insert: {
           bank_name: string
           category?: string
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           hashtags?: string[]
@@ -636,6 +824,7 @@ export type Database = {
         Update: {
           bank_name?: string
           category?: string
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           hashtags?: string[]
@@ -645,11 +834,20 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "hashtag_banks_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       platform_rules: {
         Row: {
           char_limit: number | null
+          client_id: string | null
           created_at: string
           created_by: string | null
           format_preferences: Json | null
@@ -663,6 +861,7 @@ export type Database = {
         }
         Insert: {
           char_limit?: number | null
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           format_preferences?: Json | null
@@ -676,6 +875,7 @@ export type Database = {
         }
         Update: {
           char_limit?: number | null
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           format_preferences?: Json | null
@@ -687,7 +887,15 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "platform_rules_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       post_cards: {
         Row: {
@@ -696,6 +904,7 @@ export type Database = {
           audience: string | null
           batch_id: string | null
           campaign_pillar: string | null
+          client_id: string | null
           content_type: Database["public"]["Enums"]["content_type"]
           created_at: string
           created_by: string
@@ -719,6 +928,7 @@ export type Database = {
           audience?: string | null
           batch_id?: string | null
           campaign_pillar?: string | null
+          client_id?: string | null
           content_type: Database["public"]["Enums"]["content_type"]
           created_at?: string
           created_by: string
@@ -742,6 +952,7 @@ export type Database = {
           audience?: string | null
           batch_id?: string | null
           campaign_pillar?: string | null
+          client_id?: string | null
           content_type?: Database["public"]["Enums"]["content_type"]
           created_at?: string
           created_by?: string
@@ -767,10 +978,18 @@ export type Database = {
             referencedRelation: "generation_batches"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "post_cards_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
         ]
       }
       post_versions: {
         Row: {
+          client_id: string | null
           created_at: string
           created_by: string
           draft_copy: string
@@ -783,6 +1002,7 @@ export type Database = {
           version_number: number
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           created_by: string
           draft_copy: string
@@ -795,6 +1015,7 @@ export type Database = {
           version_number?: number
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           created_by?: string
           draft_copy?: string
@@ -807,6 +1028,13 @@ export type Database = {
           version_number?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "post_versions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "post_versions_post_card_id_fkey"
             columns: ["post_card_id"]
@@ -845,6 +1073,7 @@ export type Database = {
       }
       repurpose_suggestions: {
         Row: {
+          client_id: string | null
           created_at: string
           id: string
           is_actioned: boolean
@@ -856,6 +1085,7 @@ export type Database = {
           target_platform: Database["public"]["Enums"]["platform_type"]
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           id?: string
           is_actioned?: boolean
@@ -867,6 +1097,7 @@ export type Database = {
           target_platform: Database["public"]["Enums"]["platform_type"]
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           id?: string
           is_actioned?: boolean
@@ -878,6 +1109,13 @@ export type Database = {
           target_platform?: Database["public"]["Enums"]["platform_type"]
         }
         Relationships: [
+          {
+            foreignKeyName: "repurpose_suggestions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "repurpose_suggestions_source_asset_id_fkey"
             columns: ["source_asset_id"]
@@ -930,6 +1168,7 @@ export type Database = {
       source_assets: {
         Row: {
           asset_type: Database["public"]["Enums"]["asset_type"]
+          client_id: string | null
           content_date: string | null
           contributors: string[]
           created_at: string
@@ -952,6 +1191,7 @@ export type Database = {
         }
         Insert: {
           asset_type: Database["public"]["Enums"]["asset_type"]
+          client_id?: string | null
           content_date?: string | null
           contributors?: string[]
           created_at?: string
@@ -974,6 +1214,7 @@ export type Database = {
         }
         Update: {
           asset_type?: Database["public"]["Enums"]["asset_type"]
+          client_id?: string | null
           content_date?: string | null
           contributors?: string[]
           created_at?: string
@@ -994,7 +1235,15 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "source_assets_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -1027,6 +1276,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      user_can_access_client: {
+        Args: { _client_id: string; _user_id: string }
         Returns: boolean
       }
     }

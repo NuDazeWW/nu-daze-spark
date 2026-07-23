@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useActiveClient } from "@/contexts/ClientContext";
 import type { Tables, Database } from "@/integrations/supabase/types";
 
 export type ExternalPost = Tables<"external_posts">;
@@ -13,27 +14,26 @@ export function useExternalPosts() {
   const { user } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
+  const { activeClientId } = useActiveClient();
 
   const { data: posts = [], isLoading, error } = useQuery({
-    queryKey: ["external_posts"],
+    queryKey: ["external_posts", activeClientId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("external_posts")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = supabase.from("external_posts").select("*").order("created_at", { ascending: false });
+      if (activeClientId) q = q.eq("client_id", activeClientId);
+      const { data, error } = await q;
       if (error) throw error;
       return data as ExternalPost[];
     },
-    enabled: !!user,
+    enabled: !!user && !!activeClientId,
   });
 
   const { data: commentsMap = {} } = useQuery({
-    queryKey: ["external_post_comments"],
+    queryKey: ["external_post_comments", activeClientId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = supabase.from("comments").select("*").order("created_at", { ascending: false });
+      if (activeClientId) q = q.eq("client_id", activeClientId);
+      const { data, error } = await q;
       if (error) throw error;
       const map: Record<string, Comment> = {};
       for (const c of data as Comment[]) {
@@ -43,31 +43,31 @@ export function useExternalPosts() {
       }
       return map;
     },
-    enabled: !!user,
+    enabled: !!user && !!activeClientId,
   });
 
   // Daily target progress
   const { data: dailyTarget } = useQuery({
-    queryKey: ["engagement_daily_target"],
+    queryKey: ["engagement_daily_target", activeClientId],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("engagement_targets")
-        .select("daily_target, platform")
-        .eq("is_active", true);
+      let tq = supabase.from("engagement_targets").select("daily_target, platform").eq("is_active", true);
+      if (activeClientId) tq = tq.eq("client_id", activeClientId);
+      const { data } = await tq;
       const total = (data || []).reduce((sum: number, t: any) => sum + (t.daily_target || 0), 0);
 
-      // Count posts commented today
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-      const { count } = await supabase
+      let cq = supabase
         .from("external_posts")
         .select("id", { count: "exact", head: true })
         .eq("is_commented", true)
         .gte("updated_at", todayStart.toISOString());
+      if (activeClientId) cq = cq.eq("client_id", activeClientId);
+      const { count } = await cq;
 
       return { target: total, completed: count || 0 };
     },
-    enabled: !!user,
+    enabled: !!user && !!activeClientId,
   });
 
   const updateComment = useMutation({
@@ -179,7 +179,7 @@ export function useExternalPosts() {
     }) => {
       const { data, error } = await supabase
         .from("external_posts")
-        .insert(post as never)
+        .insert({ ...post, client_id: activeClientId } as never)
         .select()
         .single();
       if (error) throw error;

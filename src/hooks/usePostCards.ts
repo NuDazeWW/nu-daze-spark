@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useActiveClient } from "@/contexts/ClientContext";
 import type { Tables, Database } from "@/integrations/supabase/types";
 
 export type PostCard = Tables<"post_cards">;
@@ -23,9 +24,7 @@ export interface QueueItem {
   draft_copy: string;
   platform: string;
   created_at: string;
-  // Post-specific
   postCard?: PostCard;
-  // Comment-specific
   comment?: CommentWithPost;
 }
 
@@ -47,33 +46,30 @@ export function usePostCards() {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
+  const { activeClientId } = useActiveClient();
 
-  // Fetch post cards
   const { data: cards = [], isLoading: cardsLoading, error: cardsError } = useQuery({
-    queryKey: ["post_cards"],
+    queryKey: ["post_cards", activeClientId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("post_cards")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = supabase.from("post_cards").select("*").order("created_at", { ascending: false });
+      if (activeClientId) q = q.eq("client_id", activeClientId);
+      const { data, error } = await q;
       if (error) throw error;
       return data as PostCard[];
     },
-    enabled: !!user,
+    enabled: !!user && !!activeClientId,
   });
 
-  // Fetch comments with their external posts
   const { data: comments = [], isLoading: commentsLoading, error: commentsError } = useQuery({
-    queryKey: ["comments_queue"],
+    queryKey: ["comments_queue", activeClientId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*, external_posts(*)")
-        .order("created_at", { ascending: false });
+      let q = supabase.from("comments").select("*, external_posts(*)").order("created_at", { ascending: false });
+      if (activeClientId) q = q.eq("client_id", activeClientId);
+      const { data, error } = await q;
       if (error) throw error;
       return data as CommentWithPost[];
     },
-    enabled: !!user,
+    enabled: !!user && !!activeClientId,
   });
 
   // Build unified queue

@@ -11,6 +11,7 @@ import {
   Repeat2,
   LogOut,
   AtSign,
+  Building2,
   ExternalLink,
 } from "lucide-react";
 import {
@@ -44,6 +45,7 @@ const contentNav = [
 ];
 
 const settingsNav = [
+  { title: "Clients", icon: Building2, href: "/settings/clients" },
   { title: "Account Tags", icon: AtSign, href: "/settings/tags" },
 ];
 

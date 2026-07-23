@@ -18,6 +18,7 @@ import CommentGenerator from "./pages/CommentGenerator";
 import ApprovedContent from "./pages/ApprovedContent";
 import RepurposeCenter from "./pages/RepurposeCenter";
 import AccountTags from "./pages/AccountTags";
+import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="/approved" element={<ApprovedContent />} />
               <Route path="/repurpose" element={<RepurposeCenter />} />
               <Route path="/settings/tags" element={<AccountTags />} />
+              <Route path="/settings/clients" element={<Clients />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
