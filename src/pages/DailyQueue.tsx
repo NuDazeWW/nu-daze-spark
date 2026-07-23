@@ -46,6 +46,7 @@ export default function DailyQueue() {
   const [editingPostCard, setEditingPostCard] = useState<typeof queueItems[0] | null>(null);
   const [editingComment, setEditingComment] = useState<typeof queueItems[0] | null>(null);
   const [deletingItem, setDeletingItem] = useState<{ id: string; type: QueueItemType } | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return queueItems.filter((item) => {
