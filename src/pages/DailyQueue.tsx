@@ -6,7 +6,9 @@ import { PostCardItem } from "@/components/queue/PostCardItem";
 import { CommentCardItem } from "@/components/queue/CommentCardItem";
 import { PostCardEditDialog } from "@/components/queue/PostCardEditDialog";
 import { CommentEditDialog } from "@/components/queue/CommentEditDialog";
+import { ScheduleImportDialog } from "@/components/queue/ScheduleImportDialog";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid,
+  CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid, Upload,
 } from "lucide-react";
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
@@ -44,6 +46,7 @@ export default function DailyQueue() {
   const [editingPostCard, setEditingPostCard] = useState<typeof queueItems[0] | null>(null);
   const [editingComment, setEditingComment] = useState<typeof queueItems[0] | null>(null);
   const [deletingItem, setDeletingItem] = useState<{ id: string; type: QueueItemType } | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return queueItems.filter((item) => {
@@ -105,7 +108,13 @@ export default function DailyQueue() {
       <PageHeader
         title="Daily Content Queue"
         description={`${activeCount} active item${activeCount !== 1 ? "s" : ""} in the pipeline · ${typeCounts.post} post${typeCounts.post !== 1 ? "s" : ""} · ${typeCounts.comment} comment${typeCounts.comment !== 1 ? "s" : ""}`}
-      />
+      >
+        <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+          <Upload className="h-4 w-4 mr-1.5" />Import schedule
+        </Button>
+      </PageHeader>
+
+      <ScheduleImportDialog open={importOpen} onOpenChange={setImportOpen} />
 
       {/* Type filter pills */}
       <div className="flex items-center gap-2 mb-4">
