@@ -6,7 +6,9 @@ import { PostCardItem } from "@/components/queue/PostCardItem";
 import { CommentCardItem } from "@/components/queue/CommentCardItem";
 import { PostCardEditDialog } from "@/components/queue/PostCardEditDialog";
 import { CommentEditDialog } from "@/components/queue/CommentEditDialog";
+import { ScheduleImportDialog } from "@/components/queue/ScheduleImportDialog";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid,
+  CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid, Upload,
 } from "lucide-react";
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
