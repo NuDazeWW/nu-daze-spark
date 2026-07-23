@@ -911,12 +911,14 @@ export type Database = {
           draft_copy: string
           hashtags: string[] | null
           id: string
+          import_source: string | null
           objective: string | null
           org_tags: string[] | null
           people_tags: string[] | null
           platform: Database["public"]["Enums"]["platform_type"]
           rationale: string | null
           revision_notes: string | null
+          scheduled_for: string | null
           source_references: string[] | null
           suggested_asset_description: string | null
           updated_at: string
@@ -935,12 +937,14 @@ export type Database = {
           draft_copy: string
           hashtags?: string[] | null
           id?: string
+          import_source?: string | null
           objective?: string | null
           org_tags?: string[] | null
           people_tags?: string[] | null
           platform: Database["public"]["Enums"]["platform_type"]
           rationale?: string | null
           revision_notes?: string | null
+          scheduled_for?: string | null
           source_references?: string[] | null
           suggested_asset_description?: string | null
           updated_at?: string
@@ -959,12 +963,14 @@ export type Database = {
           draft_copy?: string
           hashtags?: string[] | null
           id?: string
+          import_source?: string | null
           objective?: string | null
           org_tags?: string[] | null
           people_tags?: string[] | null
           platform?: Database["public"]["Enums"]["platform_type"]
           rationale?: string | null
           revision_notes?: string | null
+          scheduled_for?: string | null
           source_references?: string[] | null
           suggested_asset_description?: string | null
           updated_at?: string
