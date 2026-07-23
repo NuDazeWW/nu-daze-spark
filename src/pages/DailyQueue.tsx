@@ -108,12 +108,11 @@ export default function DailyQueue() {
       <PageHeader
         title="Daily Content Queue"
         description={`${activeCount} active item${activeCount !== 1 ? "s" : ""} in the pipeline · ${typeCounts.post} post${typeCounts.post !== 1 ? "s" : ""} · ${typeCounts.comment} comment${typeCounts.comment !== 1 ? "s" : ""}`}
-        actions={
-          <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
-            <Upload className="h-4 w-4 mr-1.5" />Import schedule
-          </Button>
-        }
-      />
+      >
+        <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+          <Upload className="h-4 w-4 mr-1.5" />Import schedule
+        </Button>
+      </PageHeader>
 
       <ScheduleImportDialog open={importOpen} onOpenChange={setImportOpen} />
 
