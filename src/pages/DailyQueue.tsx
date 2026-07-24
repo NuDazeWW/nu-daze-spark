@@ -15,8 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WeeklyCalendarView } from "@/components/queue/WeeklyCalendarView";
 import {
-  CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid, Upload,
+  CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid, Upload, List,
 } from "lucide-react";
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
@@ -47,6 +48,7 @@ export default function DailyQueue() {
   const [editingComment, setEditingComment] = useState<typeof queueItems[0] | null>(null);
   const [deletingItem, setDeletingItem] = useState<{ id: string; type: QueueItemType } | null>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [view, setView] = useState<"list" | "calendar">("list");
 
   const filtered = useMemo(() => {
     return queueItems.filter((item) => {
@@ -109,6 +111,17 @@ export default function DailyQueue() {
         title="Daily Content Queue"
         description={`${activeCount} active item${activeCount !== 1 ? "s" : ""} in the pipeline · ${typeCounts.post} post${typeCounts.post !== 1 ? "s" : ""} · ${typeCounts.comment} comment${typeCounts.comment !== 1 ? "s" : ""}`}
       >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setView(view === "list" ? "calendar" : "list")}
+        >
+          {view === "list" ? (
+            <><CalendarDays className="h-4 w-4 mr-1.5" />Calendar view</>
+          ) : (
+            <><List className="h-4 w-4 mr-1.5" />List view</>
+          )}
+        </Button>
         <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
           <Upload className="h-4 w-4 mr-1.5" />Import schedule
         </Button>
@@ -189,6 +202,14 @@ export default function DailyQueue() {
               ? "Generate post cards or comments to populate the queue."
               : "Try adjusting your search or filters."
           }
+        />
+      ) : view === "calendar" ? (
+        <WeeklyCalendarView
+          items={filtered}
+          onItemClick={(item) => {
+            if (item.type === "comment") setEditingComment(item);
+            else setEditingPostCard(item);
+          }}
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
