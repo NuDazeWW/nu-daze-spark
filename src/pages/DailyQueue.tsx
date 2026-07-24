@@ -38,7 +38,7 @@ const TYPE_FILTERS: { value: string; label: string; icon: React.ElementType }[] 
 ];
 
 export default function DailyQueue() {
-  const { queueItems, isLoading, error, isAdmin, updateStatus, updateCard, updateComment, deleteCard, deleteComment } = usePostCards();
+  const { queueItems, cards, isLoading, error, isAdmin, updateStatus, updateCard, updateComment, deleteCard, deleteComment, reschedulePost } = usePostCards();
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
