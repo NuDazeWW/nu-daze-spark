@@ -111,6 +111,17 @@ export default function DailyQueue() {
         title="Daily Content Queue"
         description={`${activeCount} active item${activeCount !== 1 ? "s" : ""} in the pipeline · ${typeCounts.post} post${typeCounts.post !== 1 ? "s" : ""} · ${typeCounts.comment} comment${typeCounts.comment !== 1 ? "s" : ""}`}
       >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setView(view === "list" ? "calendar" : "list")}
+        >
+          {view === "list" ? (
+            <><CalendarDays className="h-4 w-4 mr-1.5" />Calendar view</>
+          ) : (
+            <><List className="h-4 w-4 mr-1.5" />List view</>
+          )}
+        </Button>
         <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
           <Upload className="h-4 w-4 mr-1.5" />Import schedule
         </Button>
