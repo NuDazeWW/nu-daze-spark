@@ -27,7 +27,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import nudazeLogo from "@/assets/nudaze-logo.png";
+import nudazeLogo from "@/assets/pimpsocial-logo.png";
 
 const mainNav = [
   { title: "Dashboard", icon: LayoutDashboard, href: "/" },
@@ -56,15 +56,12 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="px-4 py-5">
-        <Link to="/" className="flex items-center gap-2.5">
+        <Link to="/" className="block w-full">
           <img
             src={nudazeLogo}
-            alt="NuDaze"
-            className="h-[140px] w-auto"
+            alt="PimpSocial AI"
+            className="w-full h-auto object-contain"
           />
-          <span className="text-[11px] font-medium text-muted-foreground tracking-wide uppercase">
-            Content Copilot
-          </span>
         </Link>
       </SidebarHeader>
 
