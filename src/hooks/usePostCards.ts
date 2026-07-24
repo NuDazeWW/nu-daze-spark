@@ -221,5 +221,6 @@ export function usePostCards() {
     updateComment,
     deleteCard,
     deleteComment,
+    reschedulePost,
   };
 }
