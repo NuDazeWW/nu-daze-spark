@@ -210,6 +210,21 @@ export default function DailyQueue() {
             if (item.type === "comment") setEditingComment(item);
             else setEditingPostCard(item);
           }}
+          onReschedule={(id, date, platform) => {
+            const card = cards.find((c) => c.id === id);
+            const existing = card?.scheduled_for ? new Date(card.scheduled_for) : null;
+            const target = new Date(date);
+            if (existing) {
+              target.setHours(existing.getHours(), existing.getMinutes(), 0, 0);
+            } else {
+              target.setHours(12, 0, 0, 0);
+            }
+            reschedulePost.mutate({
+              id,
+              scheduled_for: target.toISOString(),
+              platform: card?.platform !== platform ? platform : undefined,
+            });
+          }}
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
