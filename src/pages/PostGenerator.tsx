@@ -13,8 +13,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { prepareAssetMedia } from "@/lib/prepareAssetMedia";
 import {
-  Sparkles, FolderOpen, Image, Video, FileText, X, Loader2, Info, ExternalLink, AtSign, Users,
+  Sparkles, FolderOpen, Image, Video, FileText, X, Loader2, Info, ExternalLink, AtSign, Users, Eye,
 } from "lucide-react";
 
 const ICON_MAP: Record<string, React.ElementType> = {
