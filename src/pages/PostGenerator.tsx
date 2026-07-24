@@ -71,10 +71,24 @@ export default function PostGenerator() {
     setIsGenerating(true);
     setGeneratedCount(null);
     setGeneratedCards([]);
+    setPrepStage("");
 
     try {
+      let media: { asset_id: string; images: string[] }[] = [];
+      if (analyzeVisually) {
+        setPrepStage("Preparing media for visual analysis…");
+        media = await prepareAssetMedia(selectedAssets, { videoFrames: 3 });
+      }
+
+      setPrepStage("Generating with AI…");
       const { data, error } = await supabase.functions.invoke("generate-reels", {
-        body: { asset_ids: selectedAssetIds },
+        body: {
+          asset_ids: selectedAssetIds,
+          platform,
+          content_type: contentType,
+          analyze_visually: analyzeVisually,
+          media,
+        },
       });
 
       if (error) throw error;
@@ -83,7 +97,6 @@ export default function PostGenerator() {
       const count = data.count ?? selectedAssetIds.length;
       setGeneratedCount(count);
 
-      // Extract generated card details if available
       if (data.results && Array.isArray(data.results)) {
         setGeneratedCards(data.results.map((r: any) => ({
           platform: r.platform || platform,
@@ -101,7 +114,9 @@ export default function PostGenerator() {
       queryClient.invalidateQueries({ queryKey: ["post_cards"] });
       toast({
         title: `${count} post card${count !== 1 ? "s" : ""} generated`,
-        description: "Draft post cards are ready for review in the Daily Queue.",
+        description: analyzeVisually
+          ? "AI analyzed the media visually. Review drafts in the Daily Queue."
+          : "Draft post cards are ready for review in the Daily Queue.",
       });
     } catch (err) {
       toast({
@@ -111,6 +126,7 @@ export default function PostGenerator() {
       });
     } finally {
       setIsGenerating(false);
+      setPrepStage("");
     }
   };
 
