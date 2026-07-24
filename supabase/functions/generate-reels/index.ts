@@ -7,6 +7,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+interface MediaRef {
+  asset_id: string;
+  // array of https or data:image/... URLs the model can "see"
+  images: string[];
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -32,7 +38,6 @@ serve(async (req) => {
       });
     }
 
-    // Validate user
     const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
     const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!, {
       global: { headers: { Authorization: authHeader } },
@@ -46,7 +51,14 @@ serve(async (req) => {
       });
     }
 
-    const { asset_ids } = await req.json();
+    const body = await req.json();
+    const asset_ids: string[] = body.asset_ids ?? [];
+    const platform: "instagram" | "linkedin" = body.platform ?? "instagram";
+    const content_type: string = body.content_type ?? "reel";
+    const analyze_visually: boolean = !!body.analyze_visually;
+    const mediaRefs: MediaRef[] = Array.isArray(body.media) ? body.media : [];
+    const mediaMap = new Map(mediaRefs.map((m) => [m.asset_id, m.images ?? []]));
+
     if (!Array.isArray(asset_ids) || asset_ids.length === 0) {
       return new Response(JSON.stringify({ error: "asset_ids is required" }), {
         status: 400,
@@ -54,7 +66,6 @@ serve(async (req) => {
       });
     }
 
-    // Fetch the uploaded assets
     const { data: assets, error: assetsError } = await supabaseAdmin
       .from("source_assets")
       .select("*")
@@ -67,17 +78,33 @@ serve(async (req) => {
       });
     }
 
-    // Fetch active hashtag banks for context
-    const { data: hashtagBanks } = await supabaseAdmin
-      .from("hashtag_banks")
-      .select("bank_name, category, hashtags")
-      .eq("is_active", true);
+    // Load strategy context scoped to the asset's client
+    const clientId = assets[0].client_id ?? null;
+    let hashtagBanks: { bank_name: string; category: string; hashtags: string[] }[] = [];
+    let brandVoice: { rule_name: string; description: string | null }[] = [];
+    let platformRules: { platform: string; rule_name: string; description: string | null }[] = [];
 
-    const hashtagBankContext = (hashtagBanks && hashtagBanks.length > 0)
-      ? `\n\nAvailable Hashtag Banks (use relevant ones):\n${hashtagBanks.map((b: { bank_name: string; category: string; hashtags: string[] }) => `- ${b.bank_name} (${b.category}): ${b.hashtags.join(", ")}`).join("\n")}`
+    if (clientId) {
+      const [hb, bv, pr] = await Promise.all([
+        supabaseAdmin.from("hashtag_banks").select("bank_name, category, hashtags").eq("is_active", true).eq("client_id", clientId),
+        supabaseAdmin.from("brand_voice_rules").select("rule_name, description").eq("client_id", clientId),
+        supabaseAdmin.from("platform_rules").select("platform, rule_name, description").eq("client_id", clientId).eq("platform", platform),
+      ]);
+      hashtagBanks = hb.data ?? [];
+      brandVoice = bv.data ?? [];
+      platformRules = pr.data ?? [];
+    }
+
+    const hashtagBankContext = hashtagBanks.length > 0
+      ? `\n\nAvailable Hashtag Banks (prioritize these when relevant):\n${hashtagBanks.map((b) => `- ${b.bank_name} (${b.category}): ${b.hashtags.join(", ")}`).join("\n")}`
+      : "";
+    const brandVoiceContext = brandVoice.length > 0
+      ? `\n\nBrand Voice Rules:\n${brandVoice.map((r) => `- ${r.rule_name}${r.description ? `: ${r.description}` : ""}`).join("\n")}`
+      : "";
+    const platformRulesContext = platformRules.length > 0
+      ? `\n\n${platform} Platform Rules:\n${platformRules.map((r) => `- ${r.rule_name}${r.description ? `: ${r.description}` : ""}`).join("\n")}`
       : "";
 
-    // Generate reel content for each asset using AI
     const results = [];
 
     for (const asset of assets) {
@@ -86,22 +113,32 @@ serve(async (req) => {
         ? `\nContributors/People: ${assetContributors.join(", ")}`
         : "";
 
-      const prompt = `You are a social media strategist for NuDaze, a premium content operations agency. Create an Instagram Reel post card for the following asset:
+      const visualImages = analyze_visually ? (mediaMap.get(asset.id) ?? []) : [];
+      const visualNote = visualImages.length > 0
+        ? `\n\nIMPORTANT: You have been given ${visualImages.length} image${visualImages.length !== 1 ? "s" : ""} showing the actual media${asset.asset_type === "video" ? " (sampled frames from the video)" : ""}. Base the draft copy on what is actually visible — describe scenes, subjects, mood, colors, setting, and any visible text. Do not invent details that are not present.`
+        : "";
+
+      const prompt = `You are a social media strategist for NuDaze. Create a ${platform} ${content_type} post card for the following asset.
 
 Title: ${asset.title}
 Description: ${asset.description || "No description provided"}
-Type: ${asset.asset_type}${contributorsLine}${asset.event_name ? `\nEvent: ${asset.event_name}` : ""}
+Type: ${asset.asset_type}${contributorsLine}${asset.event_name ? `\nEvent: ${asset.event_name}` : ""}${visualNote}${brandVoiceContext}${platformRulesContext}
 
 Generate a JSON response with exactly these fields:
-- draft_copy: Instagram Reel caption (engaging, with line breaks, emojis, and a hook in the first line). Max 2200 chars.${assetContributors.length > 0 ? ` Naturally mention or tag the contributors: ${assetContributors.join(", ")}.` : ""}
-- objective: The strategic objective of this reel (1 sentence)
+- draft_copy: ${platform} ${content_type} caption (engaging, platform-appropriate, with hook in first line). ${platform === "instagram" ? "Max 2200 chars, use line breaks and emojis." : "Max 3000 chars, professional tone, strategic hook."}${assetContributors.length > 0 ? ` Naturally mention or tag the contributors: ${assetContributors.join(", ")}.` : ""}
+- objective: Strategic objective (1 sentence)
 - audience: Target audience segment (1-2 words)
 - campaign_pillar: Relevant content pillar (1-2 words)
-- hashtags: Array of 10-15 relevant hashtags (without the # symbol). PRIORITIZE hashtags from the available hashtag banks below when they are relevant to the content.${hashtagBankContext}
-- people_tags: Array of people/accounts to tag. MUST include these contributors: ${assetContributors.length > 0 ? assetContributors.join(", ") : "use placeholder handles"}. Add 1-2 more relevant handles if appropriate.
-- org_tags: Array of 1-2 relevant organizations to tag
-- rationale: Brief rationale for why this reel works (1-2 sentences)
-- suggested_asset_description: Description of the ideal visual treatment for this reel (1 sentence)`;
+- hashtags: Array of ${platform === "instagram" ? "10-15" : "3-6"} relevant hashtags (without #). Prioritize hashtag bank entries when relevant.${hashtagBankContext}
+- people_tags: Array of handles. MUST include contributors: ${assetContributors.length > 0 ? assetContributors.join(", ") : "use placeholders if none"}. Add 1-2 more if appropriate.
+- org_tags: Array of 1-2 relevant organizations
+- rationale: Brief rationale (1-2 sentences)${visualImages.length > 0 ? ", referencing what's visible in the media" : ""}
+- suggested_asset_description: ${visualImages.length > 0 ? "Describe how the visible media should be treated/edited for this post" : "Describe the ideal visual treatment"} (1 sentence)`;
+
+      const userContent: unknown[] = [{ type: "text", text: prompt }];
+      for (const url of visualImages) {
+        userContent.push({ type: "image_url", image_url: { url } });
+      }
 
       const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -110,17 +147,17 @@ Generate a JSON response with exactly these fields:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: "google/gemini-3.6-flash",
           messages: [
-            { role: "system", content: "You are a social media strategist. Respond only with valid JSON, no markdown fences." },
-            { role: "user", content: prompt },
+            { role: "system", content: "You are a social media strategist. Respond only via the provided function." },
+            { role: "user", content: visualImages.length > 0 ? userContent : prompt },
           ],
           tools: [
             {
               type: "function",
               function: {
-                name: "create_reel_card",
-                description: "Create a reel post card with caption and metadata",
+                name: "create_post_card",
+                description: "Create a post card with caption and metadata",
                 parameters: {
                   type: "object",
                   properties: {
@@ -139,7 +176,7 @@ Generate a JSON response with exactly these fields:
               },
             },
           ],
-          tool_choice: { type: "function", function: { name: "create_reel_card" } },
+          tool_choice: { type: "function", function: { name: "create_post_card" } },
         }),
       });
 
@@ -158,7 +195,6 @@ Generate a JSON response with exactly these fields:
           });
         }
         console.error("AI error:", status, await aiResponse.text());
-        // Skip this asset but continue
         continue;
       }
 
@@ -169,37 +205,36 @@ Generate a JSON response with exactly these fields:
         continue;
       }
 
-      let reelData;
+      let cardData;
       try {
-        reelData = JSON.parse(toolCall.function.arguments);
+        cardData = JSON.parse(toolCall.function.arguments);
       } catch {
         console.error("Failed to parse AI response for asset:", asset.id);
         continue;
       }
 
-      // Merge asset contributors into people_tags (ensure they're always included)
-      const aiPeopleTags: string[] = reelData.people_tags || [];
+      const aiPeopleTags: string[] = cardData.people_tags || [];
       const mergedPeopleTags = [...new Set([...assetContributors, ...aiPeopleTags])];
 
-      // Create the post card
       const { data: postCard, error: pcError } = await supabaseAdmin
         .from("post_cards")
         .insert({
-          platform: "instagram",
-          content_type: "reel",
-          draft_copy: reelData.draft_copy,
-          objective: reelData.objective || null,
-          audience: reelData.audience || null,
-          campaign_pillar: reelData.campaign_pillar || null,
-          hashtags: (reelData.hashtags || []).map((h: string) => h.replace(/^#/, "")),
+          platform,
+          content_type,
+          client_id: asset.client_id,
+          draft_copy: cardData.draft_copy,
+          objective: cardData.objective || null,
+          audience: cardData.audience || null,
+          campaign_pillar: cardData.campaign_pillar || null,
+          hashtags: (cardData.hashtags || []).map((h: string) => h.replace(/^#/, "")),
           people_tags: mergedPeopleTags,
-          org_tags: reelData.org_tags || [],
-          rationale: reelData.rationale || null,
-          suggested_asset_description: reelData.suggested_asset_description || null,
+          org_tags: cardData.org_tags || [],
+          rationale: cardData.rationale || null,
+          suggested_asset_description: cardData.suggested_asset_description || null,
           source_references: [asset.id],
           approval_status: "draft",
           created_by: user.id,
-        })
+        } as never)
         .select()
         .single();
 
@@ -208,14 +243,13 @@ Generate a JSON response with exactly these fields:
         continue;
       }
 
-      // Create initial version
       await supabaseAdmin.from("post_versions").insert({
         post_card_id: postCard.id,
         version_number: 1,
-        draft_copy: reelData.draft_copy,
-        hashtags: (reelData.hashtags || []).map((h: string) => h.replace(/^#/, "")),
+        draft_copy: cardData.draft_copy,
+        hashtags: (cardData.hashtags || []).map((h: string) => h.replace(/^#/, "")),
         people_tags: mergedPeopleTags,
-        org_tags: reelData.org_tags || [],
+        org_tags: cardData.org_tags || [],
         edit_source: "ai",
         created_by: user.id,
       });
@@ -224,6 +258,17 @@ Generate a JSON response with exactly these fields:
         asset_id: asset.id,
         post_card_id: postCard.id,
         title: asset.title,
+        platform,
+        content_type,
+        draft_copy: cardData.draft_copy,
+        objective: cardData.objective,
+        audience: cardData.audience,
+        campaign_pillar: cardData.campaign_pillar,
+        hashtags: cardData.hashtags || [],
+        people_tags: mergedPeopleTags,
+        org_tags: cardData.org_tags || [],
+        rationale: cardData.rationale,
+        visually_analyzed: visualImages.length > 0,
       });
     }
 
