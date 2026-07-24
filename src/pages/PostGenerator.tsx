@@ -49,6 +49,8 @@ export default function PostGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCount, setGeneratedCount] = useState<number | null>(null);
   const [generatedCards, setGeneratedCards] = useState<GeneratedCard[]>([]);
+  const [analyzeVisually, setAnalyzeVisually] = useState(true);
+  const [prepStage, setPrepStage] = useState<string>("");
 
   // Pre-select asset from URL param
   useEffect(() => {
