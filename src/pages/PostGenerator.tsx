@@ -13,8 +13,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { prepareAssetMedia } from "@/lib/prepareAssetMedia";
 import {
-  Sparkles, FolderOpen, Image, Video, FileText, X, Loader2, Info, ExternalLink, AtSign, Users,
+  Sparkles, FolderOpen, Image, Video, FileText, X, Loader2, Info, ExternalLink, AtSign, Users, Eye,
 } from "lucide-react";
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -47,6 +49,8 @@ export default function PostGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCount, setGeneratedCount] = useState<number | null>(null);
   const [generatedCards, setGeneratedCards] = useState<GeneratedCard[]>([]);
+  const [analyzeVisually, setAnalyzeVisually] = useState(true);
+  const [prepStage, setPrepStage] = useState<string>("");
 
   // Pre-select asset from URL param
   useEffect(() => {
@@ -67,10 +71,24 @@ export default function PostGenerator() {
     setIsGenerating(true);
     setGeneratedCount(null);
     setGeneratedCards([]);
+    setPrepStage("");
 
     try {
+      let media: { asset_id: string; images: string[] }[] = [];
+      if (analyzeVisually) {
+        setPrepStage("Preparing media for visual analysis…");
+        media = await prepareAssetMedia(selectedAssets, { videoFrames: 3 });
+      }
+
+      setPrepStage("Generating with AI…");
       const { data, error } = await supabase.functions.invoke("generate-reels", {
-        body: { asset_ids: selectedAssetIds },
+        body: {
+          asset_ids: selectedAssetIds,
+          platform,
+          content_type: contentType,
+          analyze_visually: analyzeVisually,
+          media,
+        },
       });
 
       if (error) throw error;
@@ -79,7 +97,6 @@ export default function PostGenerator() {
       const count = data.count ?? selectedAssetIds.length;
       setGeneratedCount(count);
 
-      // Extract generated card details if available
       if (data.results && Array.isArray(data.results)) {
         setGeneratedCards(data.results.map((r: any) => ({
           platform: r.platform || platform,
@@ -97,7 +114,9 @@ export default function PostGenerator() {
       queryClient.invalidateQueries({ queryKey: ["post_cards"] });
       toast({
         title: `${count} post card${count !== 1 ? "s" : ""} generated`,
-        description: "Draft post cards are ready for review in the Daily Queue.",
+        description: analyzeVisually
+          ? "AI analyzed the media visually. Review drafts in the Daily Queue."
+          : "Draft post cards are ready for review in the Daily Queue.",
       });
     } catch (err) {
       toast({
@@ -107,6 +126,7 @@ export default function PostGenerator() {
       });
     } finally {
       setIsGenerating(false);
+      setPrepStage("");
     }
   };
 
@@ -285,6 +305,24 @@ export default function PostGenerator() {
                 </Select>
               </div>
 
+              <div className="rounded-md border p-3 space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="analyze-visually" className="text-xs flex items-center gap-1.5">
+                      <Eye className="h-3.5 w-3.5 text-primary" /> Analyze media visually
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground leading-snug">
+                      AI looks at the actual image{selectedAssets.some(a => a.asset_type === "video") ? " or samples 3 video frames" : ""} so copy references what's in it. Strategy rules still apply.
+                    </p>
+                  </div>
+                  <Switch
+                    id="analyze-visually"
+                    checked={analyzeVisually}
+                    onCheckedChange={setAnalyzeVisually}
+                  />
+                </div>
+              </div>
+
               {/* Reminder about account tags */}
               <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                 <Info className="h-3 w-3 shrink-0" />
@@ -296,8 +334,9 @@ export default function PostGenerator() {
 
               {isGenerating && (
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Generating with AI…</p>
+                  <p className="text-xs text-muted-foreground">{prepStage || "Generating with AI…"}</p>
                   <Progress value={undefined} className="animate-pulse" />
+
                 </div>
               )}
 
