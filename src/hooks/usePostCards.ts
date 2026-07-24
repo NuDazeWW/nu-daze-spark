@@ -145,6 +145,31 @@ export function usePostCards() {
     onError: (e) => toast({ title: "Update failed", description: e.message, variant: "destructive" }),
   });
 
+  const reschedulePost = useMutation({
+    mutationFn: async ({ id, scheduled_for, platform }: { id: string; scheduled_for: string; platform?: PostCard["platform"] }) => {
+      const updates: Record<string, unknown> = { scheduled_for, updated_by: user!.id };
+      if (platform) updates.platform = platform;
+      const { error } = await supabase.from("post_cards").update(updates as never).eq("id", id);
+      if (error) throw error;
+    },
+    onMutate: async ({ id, scheduled_for, platform }) => {
+      await qc.cancelQueries({ queryKey: ["post_cards", activeClientId] });
+      const prev = qc.getQueryData<PostCard[]>(["post_cards", activeClientId]);
+      if (prev) {
+        qc.setQueryData<PostCard[]>(
+          ["post_cards", activeClientId],
+          prev.map((c) => (c.id === id ? { ...c, scheduled_for, ...(platform ? { platform } : {}) } : c)),
+        );
+      }
+      return { prev };
+    },
+    onError: (e, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["post_cards", activeClientId], ctx.prev);
+      toast({ title: "Reschedule failed", description: e.message, variant: "destructive" });
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["post_cards"] }),
+  });
+
   const updateComment = useMutation({
     mutationFn: async ({ id, draft_copy }: { id: string; draft_copy: string }) => {
       const { error } = await supabase
@@ -196,5 +221,6 @@ export function usePostCards() {
     updateComment,
     deleteCard,
     deleteComment,
+    reschedulePost,
   };
 }

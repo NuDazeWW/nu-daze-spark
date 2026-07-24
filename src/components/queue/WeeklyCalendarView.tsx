@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 interface WeeklyCalendarViewProps {
   items: QueueItem[];
   onItemClick: (item: QueueItem) => void;
+  onReschedule?: (postCardId: string, date: Date, platform: "instagram" | "linkedin") => void;
 }
 
 const PLATFORMS = [
@@ -22,8 +23,9 @@ function itemDate(item: QueueItem): Date {
   return new Date(scheduled ?? item.created_at);
 }
 
-export function WeeklyCalendarView({ items, onItemClick }: WeeklyCalendarViewProps) {
+export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyCalendarViewProps) {
   const [anchor, setAnchor] = useState<Date>(new Date());
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const weekStart = startOfWeek(anchor, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(anchor, { weekStartsOn: 1 });
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
@@ -126,32 +128,58 @@ export function WeeklyCalendarView({ items, onItemClick }: WeeklyCalendarViewPro
                 {days.map((d) => {
                   const key = `${format(d, "yyyy-MM-dd")}|${p.value}`;
                   const cellItems = grid.get(key) ?? [];
+                  const isDragOver = dragOverKey === key;
                   return (
                     <Card
                       key={key}
+                      onDragOver={(e) => {
+                        if (!onReschedule) return;
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = "move";
+                        if (dragOverKey !== key) setDragOverKey(key);
+                      }}
+                      onDragLeave={() => {
+                        if (dragOverKey === key) setDragOverKey(null);
+                      }}
+                      onDrop={(e) => {
+                        if (!onReschedule) return;
+                        e.preventDefault();
+                        setDragOverKey(null);
+                        const id = e.dataTransfer.getData("text/post-card-id");
+                        if (id) onReschedule(id, d, p.value as "instagram" | "linkedin");
+                      }}
                       className={cn(
-                        "min-h-[120px] p-1.5 space-y-1 bg-card/50",
-                        isSameDay(d, new Date()) && "ring-1 ring-primary/40"
+                        "min-h-[120px] p-1.5 space-y-1 bg-card/50 transition-colors",
+                        isSameDay(d, new Date()) && "ring-1 ring-primary/40",
+                        isDragOver && "ring-2 ring-primary bg-primary/5"
                       )}
                     >
                       {cellItems.length === 0 ? (
                         <div className="h-full flex items-center justify-center text-[10px] text-muted-foreground/40">
-                          —
+                          {isDragOver ? "Drop here" : "—"}
                         </div>
                       ) : (
                         cellItems.map((item) => {
                           const meta = STATUS_META[item.approval_status];
                           const TypeIcon = item.type === "comment" ? MessageSquare : FileText;
+                          const draggable = item.type === "post" && !!onReschedule;
                           return (
                             <button
                               key={`${item.type}-${item.id}`}
                               onClick={() => onItemClick(item)}
+                              draggable={draggable}
+                              onDragStart={(e) => {
+                                if (!draggable) return;
+                                e.dataTransfer.effectAllowed = "move";
+                                e.dataTransfer.setData("text/post-card-id", item.id);
+                              }}
                               className={cn(
                                 "w-full text-left rounded border px-1.5 py-1 text-[11px] leading-tight",
                                 "hover:border-primary/50 transition-colors",
+                                draggable && "cursor-grab active:cursor-grabbing",
                                 meta.color
                               )}
-                              title={item.draft_copy}
+                              title={draggable ? "Drag to reschedule" : item.draft_copy}
                             >
                               <div className="flex items-center gap-1 mb-0.5">
                                 <TypeIcon className="h-2.5 w-2.5 shrink-0" />

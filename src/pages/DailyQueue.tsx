@@ -38,7 +38,7 @@ const TYPE_FILTERS: { value: string; label: string; icon: React.ElementType }[] 
 ];
 
 export default function DailyQueue() {
-  const { queueItems, isLoading, error, isAdmin, updateStatus, updateCard, updateComment, deleteCard, deleteComment } = usePostCards();
+  const { queueItems, cards, isLoading, error, isAdmin, updateStatus, updateCard, updateComment, deleteCard, deleteComment, reschedulePost } = usePostCards();
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -209,6 +209,21 @@ export default function DailyQueue() {
           onItemClick={(item) => {
             if (item.type === "comment") setEditingComment(item);
             else setEditingPostCard(item);
+          }}
+          onReschedule={(id, date, platform) => {
+            const card = cards.find((c) => c.id === id);
+            const existing = card?.scheduled_for ? new Date(card.scheduled_for) : null;
+            const target = new Date(date);
+            if (existing) {
+              target.setHours(existing.getHours(), existing.getMinutes(), 0, 0);
+            } else {
+              target.setHours(12, 0, 0, 0);
+            }
+            reschedulePost.mutate({
+              id,
+              scheduled_for: target.toISOString(),
+              platform: card?.platform !== platform ? platform : undefined,
+            });
           }}
         />
       ) : (
