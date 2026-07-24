@@ -23,8 +23,9 @@ function itemDate(item: QueueItem): Date {
   return new Date(scheduled ?? item.created_at);
 }
 
-export function WeeklyCalendarView({ items, onItemClick }: WeeklyCalendarViewProps) {
+export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyCalendarViewProps) {
   const [anchor, setAnchor] = useState<Date>(new Date());
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const weekStart = startOfWeek(anchor, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(anchor, { weekStartsOn: 1 });
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
