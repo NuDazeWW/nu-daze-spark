@@ -305,6 +305,24 @@ export default function PostGenerator() {
                 </Select>
               </div>
 
+              <div className="rounded-md border p-3 space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="analyze-visually" className="text-xs flex items-center gap-1.5">
+                      <Eye className="h-3.5 w-3.5 text-primary" /> Analyze media visually
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground leading-snug">
+                      AI looks at the actual image{selectedAssets.some(a => a.asset_type === "video") ? " or samples 3 video frames" : ""} so copy references what's in it. Strategy rules still apply.
+                    </p>
+                  </div>
+                  <Switch
+                    id="analyze-visually"
+                    checked={analyzeVisually}
+                    onCheckedChange={setAnalyzeVisually}
+                  />
+                </div>
+              </div>
+
               {/* Reminder about account tags */}
               <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                 <Info className="h-3 w-3 shrink-0" />
@@ -316,8 +334,9 @@ export default function PostGenerator() {
 
               {isGenerating && (
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Generating with AI…</p>
+                  <p className="text-xs text-muted-foreground">{prepStage || "Generating with AI…"}</p>
                   <Progress value={undefined} className="animate-pulse" />
+
                 </div>
               )}
 
