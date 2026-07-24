@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 interface WeeklyCalendarViewProps {
   items: QueueItem[];
   onItemClick: (item: QueueItem) => void;
+  onReschedule?: (postCardId: string, date: Date, platform: "instagram" | "linkedin") => void;
 }
 
 const PLATFORMS = [
