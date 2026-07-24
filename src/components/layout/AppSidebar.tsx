@@ -27,7 +27,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import nudazeLogo from "@/assets/nudaze-logo.png";
+import nudazeLogo from "@/assets/pimpsocial-logo.png";
 
 const mainNav = [
   { title: "Dashboard", icon: LayoutDashboard, href: "/" },
