@@ -203,6 +203,14 @@ export default function DailyQueue() {
               : "Try adjusting your search or filters."
           }
         />
+      ) : view === "calendar" ? (
+        <WeeklyCalendarView
+          items={filtered}
+          onItemClick={(item) => {
+            if (item.type === "comment") setEditingComment(item);
+            else setEditingPostCard(item);
+          }}
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((item) => {
