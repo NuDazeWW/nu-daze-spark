@@ -137,17 +137,32 @@ export function AppSidebar() {
           <SidebarGroupLabel>NuDaze Platform</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Decision Clarity OS">
-                <a
-                  href="https://drift-signal-engine.lovable.app?from=copilot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2"
+              {canAccessDdi ? (
+                <SidebarMenuButton asChild tooltip="Decision Clarity OS">
+                  <a
+                    href="https://drift-signal-engine.lovable.app?from=copilot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2"
+                  >
+                    <ExternalLink className="size-4" />
+                    <span>Decision Clarity OS</span>
+                  </a>
+                </SidebarMenuButton>
+              ) : (
+                <SidebarMenuButton
+                  disabled
+                  tooltip={
+                    user
+                      ? "You don't have permission to access Decision Clarity OS"
+                      : "Sign in to access Decision Clarity OS"
+                  }
+                  className="cursor-not-allowed opacity-60"
                 >
-                  <ExternalLink className="size-4" />
+                  <Lock className="size-4" />
                   <span>Decision Clarity OS</span>
-                </a>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              )}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
