@@ -52,7 +52,8 @@ const settingsNav = [
 
 export function AppSidebar() {
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
+  const canAccessDdi = Boolean(user) && isAdmin;
 
   return (
     <Sidebar>
