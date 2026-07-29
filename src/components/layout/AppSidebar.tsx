@@ -13,6 +13,7 @@ import {
   AtSign,
   Building2,
   ExternalLink,
+  Lock,
 } from "lucide-react";
 import {
   Sidebar,
