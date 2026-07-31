@@ -64,7 +64,7 @@ export default function Auth() {
             <p className="mt-1 text-sm text-muted-foreground">
               {isLogin
                 ? "Enter your credentials to continue"
-                : "Set up your NuDaze account"}
+                : "Set up your SocialMotive account"}
             </p>
           </div>
 
@@ -74,7 +74,7 @@ export default function Auth() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@nudaze.com"
+                placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

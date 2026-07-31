@@ -117,7 +117,7 @@ export default function ApprovedContent() {
     const a = document.createElement("a");
     a.href = url;
     const now = new Date();
-    a.download = `NuDaze-export-${now.toISOString().slice(0, 10)}.txt`;
+    a.download = `SocialMotive-export-${now.toISOString().slice(0, 10)}.txt`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
     toast({ title: `${ids.length} card${ids.length !== 1 ? "s" : ""} exported as text file` });

@@ -7,12 +7,12 @@ export default function RepurposeCenter() {
     <div className="animate-fade-in">
       <PageHeader
         title="Repurpose Center"
-        description="Cross-platform reuse suggestions for NuDaze-origin content."
+        description="Cross-platform reuse suggestions for brand-origin content."
       />
       <EmptyState
         icon={Repeat2}
         title="No repurpose suggestions"
-        description="AI-generated reuse opportunities from ingested NuDaze content will surface here automatically."
+        description="AI-generated reuse opportunities from ingested brand content will surface here automatically."
       />
     </div>
   );
