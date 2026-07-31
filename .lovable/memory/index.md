@@ -1,8 +1,9 @@
 # Project Memory
 
 ## Core
-NuDaze Content Copilot — activation module of the federated NuDaze Motorsport Platform. Dark mode only. NuDaze brand: deep navy bg, teal primary, gold accent.
-Plus Jakarta Sans font. Lovable Cloud backend with strict RLS via has_role() security definer.
+SocialMotive — AI-powered social intelligence platform (formerly NuDaze Content Copilot / PimpSocial AI). Dark mode only. Deep Plum #1B1028 bg, Signal Turquoise #19D8D2 primary, Electric Citrine #C7FF27 accent, Social Coral, Warm Gold, Soft Bone.
+Space Grotesk display / Inter body / IBM Plex Mono metadata. Lovable Cloud backend with strict RLS via has_role() security definer.
+
 Roles in user_roles table (admin/member). Never store roles on profiles.
 Quota counts at Approved status. Comments use separate engagement_targets table. Repurpose suggestions on ingest.
 Edge function generate-reels is misnamed — it generates post cards. Rename deferred to avoid deploy risk; document only.
