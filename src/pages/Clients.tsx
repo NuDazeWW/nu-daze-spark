@@ -103,7 +103,7 @@ export default function Clients() {
     <div className="animate-fade-in">
       <PageHeader
         title="Clients"
-        description="Manage the brands and workspaces Content Copilot serves. Each client scopes its own assets, sources, strategy, generation, queue, and approvals."
+        description="Manage the brands and workspaces SocialMotive serves. Each client scopes its own assets, sources, strategy, generation, queue, and approvals."
       >
         <Button onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" />Add Client</Button>
       </PageHeader>

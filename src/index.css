@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,69 +6,83 @@
 
 @layer base {
   :root {
-    /* NuDaze Dark-Only Theme */
-    --background: 215 32% 10%;
-    --foreground: 210 20% 92%;
+    /* SocialMotive Dark-Only Theme — Deep Plum foundation */
+    --background: 268 43% 11%;
+    --foreground: 40 35% 93%;
 
-    --card: 215 28% 13%;
-    --card-foreground: 210 20% 92%;
+    --card: 268 35% 15%;
+    --card-foreground: 40 35% 93%;
 
-    --popover: 215 28% 13%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 268 38% 13%;
+    --popover-foreground: 40 35% 93%;
 
-    --primary: 175 65% 45%;
-    --primary-foreground: 215 32% 10%;
+    /* Signal Turquoise — primary interactive accent */
+    --primary: 178 79% 47%;
+    --primary-foreground: 268 43% 11%;
 
-    --secondary: 215 24% 18%;
-    --secondary-foreground: 210 20% 85%;
+    --secondary: 268 26% 20%;
+    --secondary-foreground: 40 25% 88%;
 
-    --muted: 215 20% 16%;
-    --muted-foreground: 215 15% 55%;
+    --muted: 268 22% 18%;
+    --muted-foreground: 269 12% 64%;
 
-    --accent: 42 75% 55%;
-    --accent-foreground: 215 32% 10%;
+    /* Electric Citrine — intelligence / recommendation accent */
+    --accent: 76 100% 58%;
+    --accent-foreground: 268 43% 11%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 20% 95%;
+    --destructive: 4 76% 45%;
+    --destructive-foreground: 40 35% 95%;
 
-    --border: 215 18% 20%;
-    --input: 215 18% 20%;
-    --ring: 175 65% 45%;
+    --border: 268 20% 24%;
+    --input: 268 20% 24%;
+    --ring: 178 79% 47%;
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
-    /* NuDaze brand extensions */
-    --nudaze-navy: 215 32% 10%;
-    --nudaze-navy-light: 215 28% 13%;
-    --nudaze-navy-lighter: 215 24% 18%;
-    --nudaze-teal: 175 65% 45%;
-    --nudaze-teal-glow: 175 70% 55%;
-    --nudaze-gold: 42 75% 55%;
-    --nudaze-gold-soft: 42 60% 65%;
-    --nudaze-slate: 215 15% 55%;
-    --nudaze-success: 152 60% 45%;
-    --nudaze-warning: 38 92% 50%;
-    --nudaze-info: 205 85% 55%;
+    /* SocialMotive brand palette */
+    --brand-plum: 268 43% 11%;
+    --brand-plum-light: 268 35% 15%;
+    --brand-plum-lighter: 268 26% 20%;
+    --brand-midnight: 265 49% 7%;
+    --brand-turquoise: 178 79% 47%;
+    --brand-turquoise-glow: 178 79% 60%;
+    --brand-citrine: 76 100% 58%;
+    --brand-coral: 348 100% 69%;
+    --brand-gold: 42 69% 52%;
+    --brand-gold-soft: 42 60% 65%;
+    --brand-bone: 40 35% 93%;
+    --brand-ink: 268 26% 14%;
+    --brand-muted: 269 9% 45%;
 
-    /* Sidebar */
-    --sidebar-background: 215 35% 8%;
-    --sidebar-foreground: 210 20% 85%;
-    --sidebar-primary: 175 65% 45%;
-    --sidebar-primary-foreground: 215 32% 10%;
-    --sidebar-accent: 215 24% 14%;
-    --sidebar-accent-foreground: 210 20% 85%;
-    --sidebar-border: 215 18% 16%;
-    --sidebar-ring: 175 65% 45%;
+    /* Semantic meaning tokens */
+    --brand-opportunity: 76 100% 58%;
+    --brand-signal: 178 79% 47%;
+    --brand-attention: 348 100% 69%;
+    --brand-premium: 42 69% 52%;
+    --brand-success: 76 100% 58%;
+    --brand-warning: 42 69% 52%;
+    --brand-info: 178 79% 47%;
 
-    /* Gradients */
-    --gradient-teal: linear-gradient(135deg, hsl(175 65% 45%), hsl(195 70% 50%));
-    --gradient-gold: linear-gradient(135deg, hsl(42 75% 55%), hsl(32 80% 50%));
-    --gradient-navy: linear-gradient(180deg, hsl(215 35% 8%), hsl(215 32% 12%));
+    /* Sidebar — Midnight */
+    --sidebar-background: 265 49% 7%;
+    --sidebar-foreground: 40 25% 88%;
+    --sidebar-primary: 178 79% 47%;
+    --sidebar-primary-foreground: 268 43% 11%;
+    --sidebar-accent: 268 30% 14%;
+    --sidebar-accent-foreground: 40 25% 88%;
+    --sidebar-border: 268 22% 16%;
+    --sidebar-ring: 178 79% 47%;
 
-    /* Shadows */
-    --shadow-card: 0 1px 3px 0 hsl(0 0% 0% / 0.3), 0 1px 2px -1px hsl(0 0% 0% / 0.3);
-    --shadow-elevated: 0 4px 12px -2px hsl(0 0% 0% / 0.4), 0 2px 6px -2px hsl(0 0% 0% / 0.3);
-    --shadow-glow-teal: 0 0 20px -5px hsl(175 65% 45% / 0.25);
+    /* Gradients — convergence: signal to intelligence */
+    --gradient-signal: linear-gradient(135deg, hsl(178 79% 47%), hsl(76 100% 58%));
+    --gradient-social: linear-gradient(135deg, hsl(348 100% 69%), hsl(178 79% 47%));
+    --gradient-gold: linear-gradient(135deg, hsl(42 69% 52%), hsl(76 100% 58%));
+    --gradient-plum: linear-gradient(180deg, hsl(265 49% 7%), hsl(268 43% 13%));
+
+    /* Elevation — restrained, tonal */
+    --shadow-card: 0 1px 3px 0 hsl(265 49% 4% / 0.4), 0 1px 2px -1px hsl(265 49% 4% / 0.3);
+    --shadow-elevated: 0 12px 40px hsl(265 49% 4% / 0.24);
+    --shadow-glow-signal: 0 0 20px -5px hsl(178 79% 47% / 0.3);
   }
 }
 
@@ -82,19 +96,32 @@
     font-feature-settings: "cv11", "ss01";
   }
 
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+    letter-spacing: -0.01em;
+  }
+
   /* Scrollbar styling for dark theme */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: hsl(215 32% 10%);
+    background: hsl(var(--brand-plum));
   }
   ::-webkit-scrollbar-thumb {
-    background: hsl(215 18% 25%);
+    background: hsl(268 20% 28%);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(215 18% 32%);
+    background: hsl(268 20% 36%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

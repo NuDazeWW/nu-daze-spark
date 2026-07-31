@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import nudazeLogo from "@/assets/nudaze-logo.png";
+import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -48,11 +48,12 @@ export default function Auth() {
       <div className="w-full max-w-sm space-y-8 px-6">
         <div className="space-y-3 text-center">
           <img
-            src={nudazeLogo}
-            alt="NuDaze"
-            className="mx-auto h-20 w-auto"
+            src={socialMotiveLogo}
+            alt="SocialMotive"
+            className="mx-auto w-full max-w-[280px] rounded-md"
           />
-          <p className="text-sm text-muted-foreground">Content Copilot</p>
+          <p className="text-sm text-muted-foreground">Signals become direction.</p>
+
         </div>
 
         <div className="space-y-6 rounded-lg border border-border bg-card p-6 shadow-card">
@@ -63,7 +64,7 @@ export default function Auth() {
             <p className="mt-1 text-sm text-muted-foreground">
               {isLogin
                 ? "Enter your credentials to continue"
-                : "Set up your NuDaze account"}
+                : "Set up your SocialMotive account"}
             </p>
           </div>
 
@@ -73,7 +74,7 @@ export default function Auth() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@nudaze.com"
+                placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

@@ -19,8 +19,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ['"Space Grotesk"', "Inter", "system-ui", "sans-serif"],
+        mono: ['"IBM Plex Mono"', "ui-monospace", "monospace"],
       },
+
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -65,30 +68,42 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        nudaze: {
-          navy: "hsl(var(--nudaze-navy))",
-          "navy-light": "hsl(var(--nudaze-navy-light))",
-          "navy-lighter": "hsl(var(--nudaze-navy-lighter))",
-          teal: "hsl(var(--nudaze-teal))",
-          "teal-glow": "hsl(var(--nudaze-teal-glow))",
-          gold: "hsl(var(--nudaze-gold))",
-          "gold-soft": "hsl(var(--nudaze-gold-soft))",
-          slate: "hsl(var(--nudaze-slate))",
-          success: "hsl(var(--nudaze-success))",
-          warning: "hsl(var(--nudaze-warning))",
-          info: "hsl(var(--nudaze-info))",
+        brand: {
+          plum: "hsl(var(--brand-plum))",
+          "plum-light": "hsl(var(--brand-plum-light))",
+          "plum-lighter": "hsl(var(--brand-plum-lighter))",
+          midnight: "hsl(var(--brand-midnight))",
+          turquoise: "hsl(var(--brand-turquoise))",
+          "turquoise-glow": "hsl(var(--brand-turquoise-glow))",
+          citrine: "hsl(var(--brand-citrine))",
+          coral: "hsl(var(--brand-coral))",
+          gold: "hsl(var(--brand-gold))",
+          "gold-soft": "hsl(var(--brand-gold-soft))",
+          bone: "hsl(var(--brand-bone))",
+          ink: "hsl(var(--brand-ink))",
+          muted: "hsl(var(--brand-muted))",
+          opportunity: "hsl(var(--brand-opportunity))",
+          signal: "hsl(var(--brand-signal))",
+          attention: "hsl(var(--brand-attention))",
+          premium: "hsl(var(--brand-premium))",
+          success: "hsl(var(--brand-success))",
+          warning: "hsl(var(--brand-warning))",
+          info: "hsl(var(--brand-info))",
         },
       },
       borderRadius: {
+        xl: "1rem",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        pill: "999px",
       },
       boxShadow: {
         card: "var(--shadow-card)",
         elevated: "var(--shadow-elevated)",
-        "glow-teal": "var(--shadow-glow-teal)",
+        "glow-signal": "var(--shadow-glow-signal)",
       },
+
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
