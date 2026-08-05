@@ -14,6 +14,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -67,6 +68,26 @@ export default function Auth() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleForgotPassword() {
+    if (!email) {
+      toast({ title: "Enter your work email first", variant: "destructive" });
+      return;
+    }
+
+    setResetLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetLoading(false);
+
+    if (error) {
+      toast({ title: "Could not send recovery email", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    toast({ title: "Check your email", description: "We sent a secure link to set your password." });
   }
 
   return (
@@ -161,6 +182,17 @@ export default function Auth() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Loading..." : isLogin ? "Sign in" : "Create account"}
             </Button>
+            {isLogin && (
+              <Button
+                type="button"
+                variant="link"
+                className="w-full"
+                onClick={handleForgotPassword}
+                disabled={resetLoading}
+              >
+                {resetLoading ? "Sending..." : "Set or reset password"}
+              </Button>
+            )}
           </form>
 
           <div className="text-center">
