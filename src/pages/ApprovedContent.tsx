@@ -12,9 +12,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PostingPackageDrawer } from "@/components/queue/PostingPackageDrawer";
 import {
   CheckCircle2, Search, AlertCircle, Copy, Hash, AtSign, Users,
-  ArrowRight, Linkedin, Instagram, Download, Check,
+  ArrowRight, Linkedin, Instagram, Download, Check, Package,
 } from "lucide-react";
 
 const PLATFORM_ICON: Record<string, React.ElementType> = {
@@ -37,6 +38,8 @@ export default function ApprovedContent() {
   const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [packageId, setPackageId] = useState<string | null>(null);
+  const packageCard = cards.find((c) => c.id === packageId) ?? null;
 
   // Only approved, exported, posted cards
   const approvedCards = useMemo(() => {
@@ -214,11 +217,19 @@ export default function ApprovedContent() {
                 copiedId={copiedId}
                 onStatusChange={handleStatusChange}
                 isAdmin={isAdmin}
+                onOpenPackage={() => setPackageId(card.id)}
               />
             ))}
           </div>
         </>
       )}
+      <PostingPackageDrawer
+        card={packageCard}
+        open={!!packageCard}
+        onOpenChange={(o) => !o && setPackageId(null)}
+        canExport={isAdmin}
+        onMarkExported={(id) => handleStatusChange(id, "exported")}
+      />
     </div>
   );
 }
@@ -231,6 +242,7 @@ function ApprovedCard({
   copiedId,
   onStatusChange,
   isAdmin,
+  onOpenPackage,
 }: {
   card: PostCard;
   isSelected: boolean;
@@ -239,6 +251,7 @@ function ApprovedCard({
   copiedId: string | null;
   onStatusChange: (id: string, status: ApprovalStatus) => void;
   isAdmin: boolean;
+  onOpenPackage: () => void;
 }) {
   const PlatformIcon = PLATFORM_ICON[card.platform];
   const meta = STATUS_META[card.approval_status];
@@ -312,6 +325,10 @@ function ApprovedCard({
               <CopyBtn text={orgTags} label="Orgs" icon={Users} id="orgs" />
 
               <div className="flex-1" />
+
+              <Button size="sm" className="h-7 text-xs gap-1" onClick={onOpenPackage}>
+                <Package className="h-3 w-3" /> Posting package
+              </Button>
 
               {isAdmin && nextStatus && (
                 <Button

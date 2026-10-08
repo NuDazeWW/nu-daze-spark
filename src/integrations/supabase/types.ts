@@ -1065,14 +1065,18 @@ export type Database = {
           created_at: string
           created_by: string
           draft_copy: string
+          first_comment: string | null
           hashtags: string[] | null
           id: string
           import_source: string | null
           master_content_id: string | null
           objective: string | null
           org_tags: string[] | null
+          package_checksum: string | null
+          package_generated_at: string | null
           people_tags: string[] | null
           platform: Database["public"]["Enums"]["platform_type"]
+          posting_notes: string | null
           rationale: string | null
           revision_notes: string | null
           scheduled_for: string | null
@@ -1093,14 +1097,18 @@ export type Database = {
           created_at?: string
           created_by: string
           draft_copy: string
+          first_comment?: string | null
           hashtags?: string[] | null
           id?: string
           import_source?: string | null
           master_content_id?: string | null
           objective?: string | null
           org_tags?: string[] | null
+          package_checksum?: string | null
+          package_generated_at?: string | null
           people_tags?: string[] | null
           platform: Database["public"]["Enums"]["platform_type"]
+          posting_notes?: string | null
           rationale?: string | null
           revision_notes?: string | null
           scheduled_for?: string | null
@@ -1121,14 +1129,18 @@ export type Database = {
           created_at?: string
           created_by?: string
           draft_copy?: string
+          first_comment?: string | null
           hashtags?: string[] | null
           id?: string
           import_source?: string | null
           master_content_id?: string | null
           objective?: string | null
           org_tags?: string[] | null
+          package_checksum?: string | null
+          package_generated_at?: string | null
           people_tags?: string[] | null
           platform?: Database["public"]["Enums"]["platform_type"]
+          posting_notes?: string | null
           rationale?: string | null
           revision_notes?: string | null
           scheduled_for?: string | null
