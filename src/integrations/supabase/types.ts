@@ -357,6 +357,89 @@ export type Database = {
           },
         ]
       }
+      campaign_briefs: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          campaign_type: string
+          client_id: string | null
+          constraints: string | null
+          core_message: string | null
+          created_at: string
+          created_by: string
+          destination_url: string | null
+          id: string
+          objective: string | null
+          primary_cta: string | null
+          proof_points: string[]
+          status: string
+          success_metric: string | null
+          target_audience: string | null
+          target_channels: string[]
+          timing_window: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          campaign_type?: string
+          client_id?: string | null
+          constraints?: string | null
+          core_message?: string | null
+          created_at?: string
+          created_by?: string
+          destination_url?: string | null
+          id?: string
+          objective?: string | null
+          primary_cta?: string | null
+          proof_points?: string[]
+          status?: string
+          success_metric?: string | null
+          target_audience?: string | null
+          target_channels?: string[]
+          timing_window?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          campaign_type?: string
+          client_id?: string | null
+          constraints?: string | null
+          core_message?: string | null
+          created_at?: string
+          created_by?: string
+          destination_url?: string | null
+          id?: string
+          objective?: string | null
+          primary_cta?: string | null
+          proof_points?: string[]
+          status?: string
+          success_metric?: string | null
+          target_audience?: string | null
+          target_channels?: string[]
+          timing_window?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_briefs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_rules: {
         Row: {
           campaign_name: string
@@ -844,6 +927,78 @@ export type Database = {
           },
         ]
       }
+      master_content_objects: {
+        Row: {
+          brief_id: string
+          brief_version: number
+          client_id: string | null
+          core_message: string
+          created_at: string
+          created_by: string
+          cta: string | null
+          destination_url: string | null
+          id: string
+          is_stale: boolean
+          owner_id: string | null
+          proof_points: string[]
+          rationale: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          brief_id: string
+          brief_version?: number
+          client_id?: string | null
+          core_message: string
+          created_at?: string
+          created_by?: string
+          cta?: string | null
+          destination_url?: string | null
+          id?: string
+          is_stale?: boolean
+          owner_id?: string | null
+          proof_points?: string[]
+          rationale?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          brief_id?: string
+          brief_version?: number
+          client_id?: string | null
+          core_message?: string
+          created_at?: string
+          created_by?: string
+          cta?: string | null
+          destination_url?: string | null
+          id?: string
+          is_stale?: boolean
+          owner_id?: string | null
+          proof_points?: string[]
+          rationale?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_content_objects_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_content_objects_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_rules: {
         Row: {
           char_limit: number | null
@@ -903,6 +1058,7 @@ export type Database = {
           assigned_to: string | null
           audience: string | null
           batch_id: string | null
+          brief_id: string | null
           campaign_pillar: string | null
           client_id: string | null
           content_type: Database["public"]["Enums"]["content_type"]
@@ -912,6 +1068,7 @@ export type Database = {
           hashtags: string[] | null
           id: string
           import_source: string | null
+          master_content_id: string | null
           objective: string | null
           org_tags: string[] | null
           people_tags: string[] | null
@@ -929,6 +1086,7 @@ export type Database = {
           assigned_to?: string | null
           audience?: string | null
           batch_id?: string | null
+          brief_id?: string | null
           campaign_pillar?: string | null
           client_id?: string | null
           content_type: Database["public"]["Enums"]["content_type"]
@@ -938,6 +1096,7 @@ export type Database = {
           hashtags?: string[] | null
           id?: string
           import_source?: string | null
+          master_content_id?: string | null
           objective?: string | null
           org_tags?: string[] | null
           people_tags?: string[] | null
@@ -955,6 +1114,7 @@ export type Database = {
           assigned_to?: string | null
           audience?: string | null
           batch_id?: string | null
+          brief_id?: string | null
           campaign_pillar?: string | null
           client_id?: string | null
           content_type?: Database["public"]["Enums"]["content_type"]
@@ -964,6 +1124,7 @@ export type Database = {
           hashtags?: string[] | null
           id?: string
           import_source?: string | null
+          master_content_id?: string | null
           objective?: string | null
           org_tags?: string[] | null
           people_tags?: string[] | null
@@ -985,10 +1146,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "post_cards_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_briefs"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "post_cards_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_cards_master_content_id_fkey"
+            columns: ["master_content_id"]
+            isOneToOne: false
+            referencedRelation: "master_content_objects"
             referencedColumns: ["id"]
           },
         ]
