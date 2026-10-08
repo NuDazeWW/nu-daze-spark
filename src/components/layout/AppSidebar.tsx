@@ -14,6 +14,7 @@ import {
   Building2,
   ExternalLink,
   Lock,
+  FileText,
 } from "lucide-react";
 import {
   Sidebar,
@@ -38,6 +39,7 @@ const mainNav = [
 ];
 
 const contentNav = [
+  { title: "Campaign Briefs", icon: FileText, href: "/briefs" },
   { title: "AI Post Generator", icon: Sparkles, href: "/generator" },
   { title: "Daily Queue", icon: CalendarDays, href: "/queue" },
   { title: "Comment Generator", icon: MessageSquare, href: "/comments" },

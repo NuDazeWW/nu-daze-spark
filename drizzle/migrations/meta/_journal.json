@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791486597755,
+      "tag": "0000_campaign_briefs_master_content",
+      "breakpoints": true
+    }
+  ]
+}
