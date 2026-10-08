@@ -172,14 +172,16 @@ ${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}`, {
       draft_copy: v.draft_copy,
       hashtags: v.hashtags,
       suggested_asset_description: v.suggested_asset_description,
-      rationale: v.rationale,
-      source_references: [`Brief: ${brief.title} (v${brief.version})`],
+      rationale: `Source: brief "${brief.title}" v${brief.version}. ${v.rationale}`,
       approval_status: "draft",
       created_by: user.id,
       import_source: "brief",
     }));
     const { error: pErr } = await sb.from("post_cards").insert(rows);
-    if (pErr) return json({ error: pErr.message }, 500);
+    if (pErr) {
+      await sb.from("master_content_objects").delete().eq("id", mco.id);
+      return json({ error: pErr.message }, 500);
+    }
 
     return json({ master_content_id: mco.id, variants: rows.length });
   } catch (e: any) {
