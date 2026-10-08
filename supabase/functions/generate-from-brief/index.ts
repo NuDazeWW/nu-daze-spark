@@ -12,8 +12,37 @@ const json = (b: unknown, status = 200) =>
 const CHANNELS: Record<string, { platform: string; content_type: string; guide: string }> = {
   linkedin_post: { platform: "linkedin", content_type: "post", guide: "LinkedIn post: professional, strategic, B2B insight, strong first line, short paragraphs, under 1300 chars." },
   instagram_feed: { platform: "instagram", content_type: "post", guide: "Instagram feed caption: visual-first, socially native, hook in first 125 chars, scannable line breaks." },
-  instagram_story: { platform: "instagram", content_type: "story", guide: "Instagram Story: 2-3 frame modular storyboard (Frame 1/2/3), short on-screen text, one interactive sticker prompt." },
-  instagram_reel: { platform: "instagram", content_type: "reel", guide: "Instagram Reel: 0-3s hook, beat-by-beat shot list with on-screen text, then caption direction." },
+  instagram_story: {
+    platform: "instagram",
+    content_type: "story",
+    guide: `Instagram Story: return a complete, production-ready 2-3 frame storyboard inside draft_copy, never a caption alone. Use this exact structure for every frame:
+FRAME [number] — [purpose]
+Visual: [specific scene, asset treatment, composition, or motion]
+On-screen text: [final concise words to display]
+Spoken/voiceover: [final script, or "None"]
+Sticker/interaction: [specific sticker and prompt, or "None"]
+Transition: [how the frame moves to the next, or "End"]
+After the frames add:
+STORY CAPTION: [final optional supporting caption]
+CTA/LINK: [final action and link-sticker wording].
+Keep on-screen text brief and include at least one purposeful interaction across the sequence.`,
+  },
+  instagram_reel: {
+    platform: "instagram",
+    content_type: "reel",
+    guide: `Instagram Reel: return a complete, production-ready Reel outline and script inside draft_copy, never a caption alone. Use this exact structure:
+REEL CONCEPT: [one sentence]
+DURATION: [recommended total seconds]
+0:00-0:03 HOOK
+Visual/shot: [specific footage, framing, and action]
+Spoken/voiceover: [final word-for-word script]
+On-screen text: [final words to display]
+Then add enough timestamped beats to cover the full Reel. Every beat must include Visual/shot, Spoken/voiceover, and On-screen text.
+END FRAME/CTA: [specific final visual, final spoken line, on-screen CTA]
+EDITING NOTES: [pace, cuts, transitions, music/audio direction, captions]
+FINAL CAPTION: [platform-ready caption]
+Do not use placeholders, omit timing, or summarize the script.`,
+  },
 };
 
 async function callAI(key: string, prompt: string, tool: any) {
@@ -95,7 +124,7 @@ Constraints: ${brief.constraints ?? "(none)"}`;
     const channels = (brief.target_channels ?? []).filter((c: string) => CHANNELS[c]);
     if (!channels.length) return json({ error: "No target channels selected" }, 400);
 
-    const res = await callAI(key, `Create ONE platform-neutral master content object from this approved brief, then adapt it into a platform-native variant for each channel. Each variant must preserve the same approved message but reflect genuinely different platform behavior (not resized text). Only use proof points supplied in the brief.
+    const res = await callAI(key, `Create ONE platform-neutral master content object from this approved brief, then adapt it into a platform-native variant for each channel. Each variant must preserve the same approved message but reflect genuinely different platform behavior (not resized text). Only use proof points supplied in the brief. Treat each channel guide as a required output contract. For Stories and Reels, draft_copy must contain the complete production outline and final word-for-word script in the requested structure; a caption by itself is invalid.
 
 BRIEF
 ${briefText}
@@ -130,7 +159,7 @@ ${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}`, {
               type: "object",
               properties: {
                 channel: { type: "string", enum: channels },
-                draft_copy: { type: "string" },
+                draft_copy: { type: "string", description: "Complete channel-native deliverable. For Stories and Reels this must include the full production outline, all on-screen text, and final spoken/voiceover script—not only a caption." },
                 hashtags: { type: "array", items: { type: "string" } },
                 suggested_asset_description: { type: "string" },
                 rationale: { type: "string", description: "Which brief fields drove this output and why" },
