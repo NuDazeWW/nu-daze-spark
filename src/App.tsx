@@ -14,6 +14,7 @@ import AssetLibrary from "./pages/AssetLibrary";
 import ConnectedSources from "./pages/ConnectedSources";
 import Strategy from "./pages/Strategy";
 import PostGenerator from "./pages/PostGenerator";
+import CampaignBriefs from "./pages/CampaignBriefs";
 import DailyQueue from "./pages/DailyQueue";
 import CommentGenerator from "./pages/CommentGenerator";
 import ApprovedContent from "./pages/ApprovedContent";
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/assets" element={<AssetLibrary />} />
               <Route path="/sources" element={<ConnectedSources />} />
               <Route path="/strategy" element={<Strategy />} />
+              <Route path="/briefs" element={<CampaignBriefs />} />
               <Route path="/generator" element={<PostGenerator />} />
               <Route path="/queue" element={<DailyQueue />} />
               <Route path="/comments" element={<CommentGenerator />} />
