@@ -8,12 +8,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Copy, Pencil, Trash2, ChevronRight, ChevronLeft, MoreVertical,
-  Check, Users, Hash, Building2, Target, Megaphone, BookOpen,
+  Check, Users, Hash, Building2, Target, Megaphone, BookOpen, Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import type { PostCard, ApprovalStatus } from "@/hooks/usePostCards";
 import { STATUS_META, APPROVAL_FLOW } from "@/hooks/usePostCards";
+import { NativePreviewDialog } from "@/components/preview/NativePostPreview";
 
 interface PostCardItemProps {
   card: PostCard;
@@ -31,6 +32,7 @@ const copyToClipboard = async (text: string, label: string) => {
 
 export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, isUpdating }: PostCardItemProps) {
   const [expanded, setExpanded] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const statusMeta = STATUS_META[card.approval_status];
   const currentIndex = APPROVAL_FLOW.indexOf(card.approval_status);
 
@@ -119,6 +121,9 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         </div>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0 space-y-3">
+        <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setPreviewOpen(true)}>
+          <Eye className="h-3.5 w-3.5" />Preview
+        </Button>
         {/* Draft copy */}
         <div
           className={`text-sm whitespace-pre-wrap cursor-pointer ${!expanded ? "line-clamp-4" : ""}`}
@@ -148,7 +153,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
           {(card.people_tags ?? []).length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap">
               <Users className="h-3 w-3 text-muted-foreground shrink-0" />
-              {card.people_tags!.map((t) => (
+               {(card.people_tags ?? []).map((t) => (
                 <Badge key={t} variant="secondary" className="text-[10px]">{t}</Badge>
               ))}
             </div>
@@ -156,7 +161,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
           {(card.org_tags ?? []).length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap">
               <Building2 className="h-3 w-3 text-muted-foreground shrink-0" />
-              {card.org_tags!.map((t) => (
+               {(card.org_tags ?? []).map((t) => (
                 <Badge key={t} variant="outline" className="text-[10px]">{t}</Badge>
               ))}
             </div>
@@ -193,6 +198,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
           </details>
         )}
       </CardContent>
+      <NativePreviewDialog card={card} open={previewOpen} onOpenChange={setPreviewOpen} />
     </Card>
   );
 }
