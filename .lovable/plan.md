@@ -1,44 +1,35 @@
+# Native LinkedIn and Instagram Previews
 
-# Add Multi-Client Support (NuDaze + PSRC)
+## What you’ll get
+A **Preview** action on post cards in Daily Queue and a preview inside the Posting Package in Approved Content. Previews use the selected client’s identity, actual draft copy, hashtags, and available attached media—not invented posts or engagement counts.
 
-Introduce a `clients` concept so Content Copilot can serve multiple brands. NuDaze becomes the default client; PSRC is added with its social handles pre-seeded. All content-scoped data (assets, sources, strategy, generation, queue, approvals, comments) is filtered by an active client selected in the top bar.
+### LinkedIn
+- Familiar feed layout with author identity, timestamp treatment, copy, media, and platform action icons.
+- Collapsed copy with a working “see more” control.
+- Character-limit warnings and an optional first-comment preview in the Posting Package.
 
-## Scope
+### Instagram
+- Feed preview with account header, image/video, carousel navigation when multiple images are available, caption truncation, and hashtags.
+- Story preview in a 9:16 frame with frame navigation and the generated storyboard’s on-screen text.
+- Reel preview in a 9:16 frame with playable attached video, caption, and recognizable platform controls.
+- Clearly separate production scripts from audience-facing captions. Story/Reel outlines remain available to review; they won’t masquerade as published captions.
 
-### 1. Database (one migration)
-- New table `public.clients`: `id`, `slug`, `name`, `is_active`, `created_at`, `updated_at`.
-- New table `public.client_members` (`client_id`, `user_id`, unique) — controls which clients a user can see. Admins (via `has_role`) see all clients automatically.
-- Security-definer helper `public.user_can_access_client(_user_id uuid, _client_id uuid) returns boolean` — true if admin OR row exists in `client_members`.
-- Add nullable `client_id uuid references public.clients(id)` to the following content-scoped tables:
-  - `source_assets`, `connected_sources`, `asset_summaries`
-  - `brand_voice_rules`, `platform_rules`, `audience_definitions`, `campaign_rules`, `hashtag_banks`, `cta_banks`, `cadence_targets`, `engagement_targets`
-  - `post_cards`, `post_versions`, `generation_batches`, `comments`, `external_posts`, `repurpose_suggestions`, `account_tags`
-- Update existing RLS policies: add `AND public.user_can_access_client(auth.uid(), client_id)` on SELECT/INSERT/UPDATE/DELETE where `client_id` is set. Rows with `client_id IS NULL` remain visible (legacy NuDaze data) until backfilled.
-- Backfill: seed `clients` with `nudaze` and `psrc`; set all existing rows' `client_id` to the NuDaze client id.
-- Seed PSRC `account_tags` for the three handles (LinkedIn company "Partnership Readiness Standards Council", Instagram `@prscstandards`, LinkedIn personal Shirley Johnson).
-- Grants + RLS on new tables per platform rules.
+### Media and checks
+- Use existing referenced assets and short-lived private media links. No new permissions or public storage.
+- Show honest missing-media, loading, and failed-media states. Suggested visuals are not presented as finished assets.
+- Offer fit/fill inspection and warn when the chosen media would be cropped, when vertical formats lack suitable media, or when the caption exceeds platform limits.
+- Native layouts are simulations, not a guarantee of identical rendering on every platform version. Previewing does not publish or modify the post.
 
-### 2. Frontend
-- `ClientContext` + `useActiveClient` hook. Persists selected client in `localStorage`, hydrates from `clients` filtered by membership.
-- `ClientSwitcher` component in the app header (top of `AppLayout`) — dropdown showing accessible clients, badge with active client name.
-- Update all data hooks (`useAssets`, `useConnectedSources`, `useStrategyTable`, `usePostCards`, `useExternalPosts`, `useHashtagBanks`, `useAccountTags`, `useDashboardStats`) to:
-  - Filter queries by `client_id = activeClientId`.
-  - Set `client_id` on inserts.
-  - Include `activeClientId` in query keys so switching refetches.
-- Admin-only "Clients" settings page (`/settings/clients`) to create clients and manage member access. Sidebar entry under Settings.
+## Design
+Keep SocialMotive’s current dark application styling around the preview, with platform-specific surfaces inside the mock post. Size previews consistently, keep text readable, and use accessible controls without fake interactive likes or comments.
 
-### 3. Deferred (not in this pass)
-- Per-client theming/branding, per-client edge-function prompts, per-client storage buckets, and audit backfill of `client_id NOT NULL`. These can follow once flow is validated.
+## Technical approach
+- Add a reusable native-preview view and dialog shared by Daily Queue and the existing Posting Package.
+- Isolate caption/storyboard extraction into a small tested utility; preserve the original draft and fall back explicitly when a structured caption cannot be identified.
+- Resolve only accessible referenced image/video assets through the existing authenticated Cloud client, preserving reference order and excluding blocked/archived assets.
+- Keep this update frontend-only: no schema, AI-generation, approval, or publishing changes.
 
-## Technical Notes
-- Legacy rows (`client_id IS NULL`) stay readable to avoid a hard cutover; a follow-up migration can enforce NOT NULL after review.
-- `user_can_access_client` is SECURITY DEFINER to avoid recursive RLS on `client_members`.
-- Query-key strategy: `["assets", clientId]`, etc., so React Query cache is per-client.
-- Edge functions that write rows will read `client_id` from the request body and validate membership before insert.
-
-## Out of scope
-- Auto-publishing to PSRC socials (product still export-only).
-- Migrating role storage — `user_roles` unchanged.
-- DDI handoff receiver changes.
-
-Proceed?
+## Verification
+- Test caption extraction, storyboard parsing, media filtering, and limit calculations.
+- Check LinkedIn, Instagram feed, Story, and Reel views in the running app, including expansion, frame/media navigation, empty media, and error states.
+- Check narrow layouts for overflow and ensure existing editing, review, and package controls still work.
