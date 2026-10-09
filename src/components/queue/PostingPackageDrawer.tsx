@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { NativePostPreview } from "@/components/preview/NativePostPreview";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
 } from "lucide-react";
@@ -190,7 +192,15 @@ export function PostingPackageDrawer({
             {card.scheduled_for && ` · ${new Date(card.scheduled_for).toLocaleString()}`}</SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-5 mt-5">
+        <Tabs defaultValue="package" className="mt-5">
+          <TabsList className="w-full">
+            <TabsTrigger value="package" className="flex-1">Posting package</TabsTrigger>
+            <TabsTrigger value="preview" className="flex-1">Native preview</TabsTrigger>
+          </TabsList>
+          <TabsContent value="preview" className="mt-4">
+            <NativePostPreview key={card.id} card={card} enabled={open} firstComment={firstComment} />
+          </TabsContent>
+          <TabsContent value="package" className="space-y-5 mt-5">
           <div className={`rounded-lg border p-3 space-y-1.5 ${failCount ? "border-destructive/40 bg-destructive/5" : "border-primary/30 bg-primary/5"}`}>
             <div className="flex items-center gap-2 text-sm font-medium">
               <ShieldCheck className="h-4 w-4" /> {failCount ? `${failCount} blocking issue${failCount > 1 ? "s" : ""}` : "Ready to post"}
@@ -270,7 +280,8 @@ export function PostingPackageDrawer({
               </Button>
             )}
           </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </SheetContent>
     </Sheet>
   );

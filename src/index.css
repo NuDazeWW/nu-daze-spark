@@ -83,6 +83,53 @@
     --shadow-card: 0 1px 3px 0 hsl(265 49% 4% / 0.4), 0 1px 2px -1px hsl(265 49% 4% / 0.3);
     --shadow-elevated: 0 12px 40px hsl(265 49% 4% / 0.24);
     --shadow-glow-signal: 0 0 20px -5px hsl(178 79% 47% / 0.3);
+
+    /* Native social platform simulations are intentionally separate from app chrome. */
+    --native-surface: 0 0% 100%;
+    --native-ink: 0 0% 12%;
+    --native-muted: 0 0% 42%;
+    --native-border: 0 0% 88%;
+    --native-media-surface: 0 0% 6%;
+    --native-overlay-ink: 0 0% 100%;
+    --native-overlay: 0 0% 0%;
+    --native-avatar: 0 0% 92%;
+  }
+}
+
+@layer components {
+  .native-stage { display: flex; justify-content: center; padding: 16px 0; min-width: 0; }
+  .native-feed { width: 100%; max-width: 470px; background: hsl(var(--native-surface)); color: hsl(var(--native-ink)); border: 1px solid hsl(var(--native-border)); border-radius: 6px; overflow: hidden; font-family: Arial, system-ui, sans-serif; letter-spacing: 0; }
+  .native-header { display: flex; align-items: center; gap: 10px; padding: 14px; }
+  .native-avatar { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--native-avatar)); color: hsl(var(--native-ink)); font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .native-muted { color: hsl(var(--native-muted)); }
+  .native-copy { padding: 0 14px 14px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+  .native-more { height: auto; padding: 0; font-size: 12px; color: hsl(var(--native-muted)); background: transparent; }
+  .native-more:hover { background: hsl(var(--native-avatar)); color: hsl(var(--native-ink)); }
+  .native-feed-media { position: relative; background: hsl(var(--native-media-surface)); width: 100%; overflow: hidden; }
+  .native-linkedin-media { aspect-ratio: 1.91; }
+  .native-instagram-media { aspect-ratio: 4 / 5; }
+  .native-media { width: 100%; height: 100%; display: block; }
+  .native-media-fill { object-fit: cover; }
+  .native-media-fit { object-fit: contain; }
+  .native-media-empty { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: hsl(var(--native-overlay-ink) / .65); background: hsl(var(--native-media-surface)); font-size: 12px; }
+  .native-counter { position: absolute; top: 12px; right: 12px; padding: 3px 9px; border-radius: 20px; background: hsl(var(--native-overlay) / .6); color: hsl(var(--native-overlay-ink)); font-size: 11px; }
+  .native-linkedin-actions { border-top: 1px solid hsl(var(--native-border)); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 12px 4px; color: hsl(var(--native-muted)); font-size: 11px; }
+  .native-linkedin-actions span { display: flex; justify-content: center; align-items: center; gap: 5px; }
+  .native-linkedin-actions svg { width: 17px; height: 17px; }
+  .native-instagram-actions { display: flex; gap: 16px; padding: 14px; }
+  .native-instagram-actions svg { width: 23px; height: 23px; }
+  .native-first-comment { margin: 0 14px 14px; padding: 10px; border-radius: 6px; background: hsl(var(--native-avatar)); overflow-wrap: anywhere; }
+  .native-vertical { position: relative; width: 100%; max-width: 320px; aspect-ratio: 9 / 16; background: hsl(var(--native-media-surface)); color: hsl(var(--native-overlay-ink)); overflow: hidden; border-radius: 6px; font-family: Arial, system-ui, sans-serif; }
+  .native-vertical-header { position: absolute; top: 0; left: 0; right: 0; padding: 12px; background: linear-gradient(hsl(var(--native-overlay) / .7), hsl(var(--native-overlay) / 0)); pointer-events: none; }
+  .native-progress { flex: 1; height: 2px; background: hsl(var(--native-overlay-ink) / .35); }
+  .native-progress-active { background: hsl(var(--native-overlay-ink)); }
+  .native-story-text { position: absolute; top: 32%; left: 8%; width: 84%; max-height: 36%; overflow-y: auto; padding: 12px; font-size: 18px; font-weight: 600; text-align: center; line-height: 1.35; background: hsl(var(--native-overlay) / .65); border-radius: 4px; overflow-wrap: anywhere; }
+  .native-vertical-footer { position: absolute; bottom: 44px; left: 0; right: 0; padding: 16px; padding-right: 50px; background: linear-gradient(hsl(var(--native-overlay) / 0), hsl(var(--native-overlay) / .8)); pointer-events: none; }
+  .native-reply { display: flex; gap: 10px; align-items: center; border: 1px solid hsl(var(--native-overlay-ink) / .7); border-radius: 24px; padding: 10px; font-size: 11px; }
+  .native-reel-actions { position: absolute; right: 12px; bottom: 100px; display: flex; flex-direction: column; gap: 22px; pointer-events: none; }
+  @media (max-width: 480px) {
+    .native-linkedin-actions span { flex-direction: column; gap: 4px; }
+    .native-story-text { font-size: 16px; }
   }
 }
 
