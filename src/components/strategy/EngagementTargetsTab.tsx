@@ -15,7 +15,7 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type EngagementTarget = Tables<"engagement_targets">;
 
-const PLATFORMS = ["linkedin", "instagram"] as const;
+const PLATFORMS = ["linkedin", "instagram", "facebook"] as const;
 
 export function EngagementTargetsTab() {
   const { data, isLoading, error, isAdmin, insert, update, remove, isInserting, isUpdating, isDeleting } =
@@ -23,7 +23,7 @@ export function EngagementTargetsTab() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<EngagementTarget | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState({ platform: "linkedin" as "linkedin" | "instagram", daily_target: "5", min_relevance_threshold: "0.7", risk_tolerance: "safe_only", topic_category: "", is_active: true });
+  const [form, setForm] = useState({ platform: "linkedin" as "linkedin" | "instagram" | "facebook", daily_target: "5", min_relevance_threshold: "0.7", risk_tolerance: "safe_only", topic_category: "", is_active: true });
 
   const openCreate = () => { setEditing(null); setForm({ platform: "linkedin", daily_target: "5", min_relevance_threshold: "0.7", risk_tolerance: "safe_only", topic_category: "", is_active: true }); setFormOpen(true); };
   const openEdit = (r: EngagementTarget) => {
@@ -78,7 +78,7 @@ export function EngagementTargetsTab() {
       <StrategyFormDialog open={formOpen} onOpenChange={setFormOpen} title={editing ? "Edit Engagement Target" : "Add Engagement Target"}>
         <div className="space-y-4">
           <div><Label>Platform</Label>
-            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" }))}>
+            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" | "facebook" }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{PLATFORMS.map((p) => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent>
             </Select>

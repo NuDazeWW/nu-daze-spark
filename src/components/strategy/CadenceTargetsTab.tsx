@@ -16,7 +16,7 @@ import type { Tables } from "@/integrations/supabase/types";
 type CadenceTarget = Tables<"cadence_targets">;
 
 const CONTENT_TYPES = ["post", "story", "reel", "article", "carousel", "comment"] as const;
-const PLATFORMS = ["linkedin", "instagram"] as const;
+const PLATFORMS = ["linkedin", "instagram", "facebook"] as const;
 
 export function CadenceTargetsTab() {
   const { data, isLoading, error, isAdmin, insert, update, remove, isInserting, isUpdating, isDeleting } =
@@ -24,7 +24,7 @@ export function CadenceTargetsTab() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<CadenceTarget | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState({ platform: "linkedin" as "linkedin" | "instagram", content_type: "post" as "post" | "story" | "reel" | "article" | "carousel" | "comment", daily_target: "1", weekly_target: "5", is_active: true });
+  const [form, setForm] = useState({ platform: "linkedin" as "linkedin" | "instagram" | "facebook", content_type: "post" as "post" | "story" | "reel" | "article" | "carousel" | "comment", daily_target: "1", weekly_target: "5", is_active: true });
 
   const openCreate = () => { setEditing(null); setForm({ platform: "linkedin", content_type: "post", daily_target: "1", weekly_target: "5", is_active: true }); setFormOpen(true); };
   const openEdit = (r: CadenceTarget) => {
@@ -79,7 +79,7 @@ export function CadenceTargetsTab() {
       <StrategyFormDialog open={formOpen} onOpenChange={setFormOpen} title={editing ? "Edit Cadence Target" : "Add Cadence Target"}>
         <div className="space-y-4">
           <div><Label>Platform</Label>
-            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" }))}>
+            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" | "facebook" }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{PLATFORMS.map((p) => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent>
             </Select>

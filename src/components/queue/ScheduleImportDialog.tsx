@@ -16,7 +16,7 @@ import type { Database } from "@/integrations/supabase/types";
 type Platform = Database["public"]["Enums"]["platform_type"];
 type ContentType = Database["public"]["Enums"]["content_type"];
 
-const PLATFORMS: Platform[] = ["linkedin", "instagram"];
+const PLATFORMS: Platform[] = ["linkedin", "instagram", "facebook"];
 const CONTENT_TYPES: ContentType[] = ["post", "story", "reel", "article", "carousel", "comment"];
 
 const TEMPLATE = `date,platform,content_type,draft_copy,hashtags,people_tags,org_tags,objective,audience,campaign_pillar,source_url

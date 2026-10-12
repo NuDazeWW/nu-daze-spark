@@ -12,7 +12,7 @@ import { commentLabel } from "@/lib/contentPresentation";
 interface WeeklyCalendarViewProps {
   items: QueueItem[];
   onItemClick: (item: QueueItem) => void;
-  onReschedule?: (postCardId: string, date: Date, platform: "instagram" | "linkedin") => void;
+  onReschedule?: (postCardId: string, date: Date, platform: "instagram" | "linkedin" | "facebook") => void;
 }
 
 const PLATFORMS = [
@@ -148,7 +148,7 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                         e.preventDefault();
                         setDragOverKey(null);
                         const id = e.dataTransfer.getData("text/post-card-id");
-                        if (id) onReschedule(id, d, p.value as "instagram" | "linkedin");
+                        if (id) onReschedule(id, d, p.value as "instagram" | "linkedin" | "facebook");
                       }}
                       className={cn(
                         "min-h-[120px] p-1.5 space-y-1 bg-card/50 transition-colors",

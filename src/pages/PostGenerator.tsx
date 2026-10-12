@@ -44,7 +44,7 @@ export default function PostGenerator() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [platform, setPlatform] = useState<"instagram" | "linkedin">("instagram");
+  const [platform, setPlatform] = useState<"instagram" | "linkedin" | "facebook">("instagram");
   const [contentType, setContentType] = useState<string>("reel");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCount, setGeneratedCount] = useState<number | null>(null);
@@ -283,7 +283,7 @@ export default function PostGenerator() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-xs">Platform</Label>
-                <Select value={platform} onValueChange={(v) => setPlatform(v as "instagram" | "linkedin")}>
+                <Select value={platform} onValueChange={(v) => setPlatform(v as "instagram" | "linkedin" | "facebook")}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="instagram">Instagram</SelectItem>
