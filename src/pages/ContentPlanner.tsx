@@ -163,7 +163,7 @@ export default function ContentPlanner() {
     const gaps = new Map<string, number>();
     for (let w = weekStart(qs); w <= qe; w = addDays(w, 7)) {
       for (const c of weekCoverage(stocked, targets, w)) {
-        if (c.have < c.target) gaps.set(`${cap(c.platform)} ${c.content_type}s`, (gaps.get(`${cap(c.platform)} ${c.content_type}s`) ?? 0) + c.target - c.have);
+        if (c.have < c.target) gaps.set(`${cap(c.platform)} ${c.content_type === "story" ? "storie" : c.content_type}s`, (gaps.get(`${cap(c.platform)} ${c.content_type === "story" ? "storie" : c.content_type}s`) ?? 0) + c.target - c.have);
       }
     }
     return { label: `Q${Math.floor(qs.getMonth() / 3) + 1} ${format(qs, "yyyy")}`, gaps: [...gaps.entries()].sort((a, b) => b[1] - a[1]) };
