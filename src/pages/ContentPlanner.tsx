@@ -53,6 +53,7 @@ export default function ContentPlanner() {
   const [undo, setUndo] = useState<{ id: string; scheduled_for: string | null }[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [shiftDays, setShiftDays] = useState(7);
+  const [trayDragOver, setTrayDragOver] = useState(false);
 
   const minMonth = startOfMonth(addMonths(new Date(), -1));
   const maxMonth = startOfMonth(addMonths(new Date(), 12));
@@ -152,6 +153,13 @@ export default function ContentPlanner() {
     if (base) d.setHours(base.getHours(), base.getMinutes(), 0, 0);
     else d.setHours({ linkedin: 9, instagram: 12, facebook: 15 }[p.platform] ?? 10, 0, 0, 0);
     writeDates([{ id, scheduled_for: d.toISOString() }], p.scheduled_for ? "post_rescheduled" : "post_scheduled");
+  }
+
+  function dropOnTray(id: string) {
+    if (!canEdit) return;
+    const p = posts.find((x) => x.id === id);
+    if (!p || !p.scheduled_for) return;
+    writeDates([{ id, scheduled_for: null }], "post_unscheduled");
   }
 
   const toggle = (id: string) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -258,13 +266,26 @@ export default function ContentPlanner() {
         </div>
 
         {/* Unscheduled tray */}
-        <Card className="w-full shrink-0 p-3 lg:w-72">
+        <Card
+          onDragOver={(e) => { if (canEdit) { e.preventDefault(); setTrayDragOver(true); } }}
+          onDragLeave={() => setTrayDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setTrayDragOver(false);
+            const id = e.dataTransfer.getData("text/plain");
+            if (id) dropOnTray(id);
+          }}
+          className={cn("w-full shrink-0 p-3 lg:w-72 transition-colors",
+            trayDragOver && canEdit && "border-primary ring-2 ring-primary/40 bg-primary/5")}
+        >
           <div className="mb-2 flex items-center gap-2">
             <CalendarRange className="h-4 w-4" />
             <h2 className="font-semibold">Unscheduled</h2>
             <Badge variant="secondary" className="ml-auto">{unscheduled.length}</Badge>
           </div>
-          <p className="mb-2 text-xs text-muted-foreground">Approved posts with no date. Drag one onto a day.</p>
+          <p className="mb-2 text-xs text-muted-foreground">
+            Approved posts with no date. Drag one onto a day — or drag a scheduled post here to clear its date.
+          </p>
           <div className="mb-2 grid grid-cols-2 gap-2">
             <Select value={trayPlatform} onValueChange={setTrayPlatform}>
               <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
