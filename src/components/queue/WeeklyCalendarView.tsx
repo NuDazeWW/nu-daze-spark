@@ -183,7 +183,9 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                             >
                               <div className="flex items-center gap-1 mb-0.5">
                                 <TypeIcon className="h-2.5 w-2.5 shrink-0" />
-                                <span className="truncate font-medium">{meta.label}</span>
+                                <span className="truncate font-medium">
+                                  {item.postCard ? postLabel(item.postCard) : meta.label}
+                                </span>
                               </div>
                               <div className="line-clamp-2 text-foreground/80">
                                 {item.draft_copy || "(no copy)"}
