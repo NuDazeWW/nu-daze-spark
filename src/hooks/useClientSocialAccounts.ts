@@ -9,6 +9,7 @@ export type SocialAccount = {
   handle: string | null;
   profile_url: string | null;
   is_active: boolean;
+  avatar_path?: string | null;
 };
 
 export function useClientSocialAccounts(clientId: string | null | undefined) {
@@ -18,7 +19,7 @@ export function useClientSocialAccounts(clientId: string | null | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("social_accounts")
-        .select("id,client_id,platform,account_name,handle,profile_url,is_active")
+        .select("id,client_id,platform,account_name,handle,profile_url,is_active,avatar_path")
         .eq("client_id", clientId!)
         .eq("is_active", true)
         .order("platform");
