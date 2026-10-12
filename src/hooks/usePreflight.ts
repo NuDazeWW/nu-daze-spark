@@ -85,6 +85,25 @@ export function usePreflight(card: PostCard | null) {
     onError: (e: Error) => toast.error("Could not override", { description: e.message }),
   });
 
+  const canApply = (f: PreflightFinding) =>
+    !!card && !!f.excerpt && !!f.suggestion && card.draft_copy.includes(f.excerpt);
+
+  const apply = useMutation({
+    mutationFn: async (f: PreflightFinding) => {
+      if (!canApply(f)) throw new Error("The quoted phrase is no longer in the draft");
+      const next = card!.draft_copy.replace(f.excerpt!, f.suggestion!);
+      const { error } = await supabase.from("post_cards")
+        .update({ draft_copy: next, updated_by: user!.id } as never).eq("id", card!.id);
+      if (error) throw error;
+      await log(`Preflight suggestion applied (${f.check}): "${f.excerpt}" → "${f.suggestion}"`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["post_cards"] });
+      toast.success("Suggestion applied", { description: "Re-run preflight to confirm the fix." });
+    },
+    onError: (e: Error) => toast.error("Could not apply", { description: e.message }),
+  });
+
   const gate = card ? preflightGate(review, card) : { state: "none" as GateState, clear: false };
-  return { review, isLoading, gate, run, acknowledge, override };
+  return { review, isLoading, gate, run, acknowledge, override, apply, canApply };
 }
