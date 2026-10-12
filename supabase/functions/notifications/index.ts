@@ -10,12 +10,13 @@ const PRESETS: Record<string, { host: string; port: number; secure: boolean }> =
   gmail: { host: "smtp.gmail.com", port: 465, secure: true },
   outlook: { host: "smtp.office365.com", port: 587, secure: false },
   yahoo: { host: "smtp.mail.yahoo.com", port: 465, secure: true },
+  apple: { host: "smtp.mail.me.com", port: 587, secure: false },
 };
 
 const Body = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("save_provider"),
-    provider: z.enum(["sendgrid", "gmail", "outlook", "yahoo", "smtp"]),
+    provider: z.enum(["sendgrid", "gmail", "outlook", "yahoo", "apple", "smtp"]),
     from_email: z.string().email().max(255),
     from_name: z.string().max(120).optional().default("SocialMotive"),
     smtp_host: z.string().max(255).optional(),
@@ -103,6 +104,7 @@ function dayRangeUtc(date: string, tz: string) {
 
 async function runDue() {
   const prov = await loadProvider();
+  if (prov && (prov.p as Provider & { sending_paused?: boolean }).sending_paused) return { sent: 0, paused: true };
   if (!prov) return { skipped: "no provider" };
   const { data: prefs } = await admin.from("notification_preferences").select("*").eq("is_active", true);
   const { data: clients } = await admin.from("clients").select("id,name");
