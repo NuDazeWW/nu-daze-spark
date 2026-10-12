@@ -13,6 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Building2, Plus, Loader2, Users, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Tables } from "@/integrations/supabase/types";
+import { useWorkspace } from "@/hooks/useWorkspace";
+import { SocialAccountsDialog, useSocialAccounts } from "@/components/settings/SocialAccountsDialog";
+import { AtSign } from "lucide-react";
 
 type Client = Tables<"clients">;
 type ClientMember = Tables<"client_members">;
@@ -37,6 +40,9 @@ export default function Clients() {
   const [platforms, setPlatforms] = useState<string[]>(["linkedin", "instagram"]);
   const [memberDialogClient, setMemberDialogClient] = useState<Client | null>(null);
   const [memberEmail, setMemberEmail] = useState("");
+  const [accountsClient, setAccountsClient] = useState<Client | null>(null);
+  const { entitySingular, entityPlural } = useWorkspace();
+  const { data: socialAccounts = [] } = useSocialAccounts();
 
   const { data: clients = [], isLoading } = useQuery({
     queryKey: ["clients", "all"],
@@ -60,12 +66,13 @@ export default function Clients() {
 
   const createClient = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("clients").insert({ name, slug: slug.toLowerCase().trim(), platforms } as never);
+      const { data: created, error } = await supabase.from("clients").insert({ name, slug: slug.toLowerCase().trim(), platforms } as never).select("id").single();
       if (error) throw error;
+      await supabase.from("social_accounts").insert(platforms.map((p) => ({ client_id: created.id, platform: p, account_name: name.trim() })) as never);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["clients"] });
-      toast({ title: "Client created" });
+      toast({ title: `${entitySingular} created` });
       setDialogOpen(false);
       setName(""); setSlug("");
       setPlatforms(["linkedin", "instagram"]);
@@ -115,10 +122,10 @@ export default function Clients() {
   return (
     <div className="animate-fade-in">
       <PageHeader
-        title="Clients"
-        description="Manage the brands and workspaces SocialMotive serves. Each client scopes its own assets, sources, strategy, generation, queue, and approvals."
+        title={entityPlural}
+        description={`Each ${entitySingular.toLowerCase()} has its own social accounts, assets, sources, strategy, generation, queue, and approvals.`}
       >
-        <Button onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" />Add Client</Button>
+        <Button onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" />Add {entitySingular}</Button>
       </PageHeader>
 
       {isLoading ? (
@@ -141,9 +148,11 @@ export default function Clients() {
                     {!c.is_active && <Badge variant="outline" className="text-[10px]">Inactive</Badge>}
                   </div>
                   <div className="flex flex-wrap gap-1 mb-3">
-                    {(c.platforms ?? []).map((p) => (
-                      <Badge key={p} variant="secondary" className="text-[10px]">{platformLabel(p)}</Badge>
-                    ))}
+                    {(c.platforms ?? []).map((p) => {
+                      const n = socialAccounts.filter((a) => a.client_id === c.id && a.platform === p).length;
+                      return <Badge key={p} variant="secondary" className="text-[10px]">{platformLabel(p)}{n > 1 ? ` ×${n}` : ""}</Badge>;
+                    })}
+                    <Button variant="ghost" size="sm" className="h-5 px-1.5 text-[10px]" onClick={() => setAccountsClient(c)}><AtSign className="mr-0.5 h-3 w-3" />Accounts</Button>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">
@@ -160,9 +169,11 @@ export default function Clients() {
         </div>
       )}
 
+      <SocialAccountsDialog client={accountsClient} onClose={() => setAccountsClient(null)} />
+
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Add Client</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Add {entitySingular}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div>
               <Label>Name</Label>
@@ -190,10 +201,10 @@ export default function Clients() {
                   </label>
                 ))}
               </div>
-              <p className="text-[10px] text-muted-foreground mt-1">Select at least one platform for this client.</p>
+              <p className="text-[10px] text-muted-foreground mt-1">Select at least one platform. You can add more accounts per platform afterwards.</p>
             </div>
             <Button onClick={() => createClient.mutate()} disabled={!name.trim() || !slug.trim() || platforms.length === 0 || createClient.isPending} className="w-full">
-              {createClient.isPending ? "Creating…" : "Create Client"}
+              {createClient.isPending ? "Creating…" : `Create ${entitySingular}`}
             </Button>
           </div>
         </DialogContent>

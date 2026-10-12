@@ -64,6 +64,33 @@ export type Database = {
           },
         ]
       }
+      activity_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          target: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          target?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          target?: string | null
+        }
+        Relationships: []
+      }
       approval_log: {
         Row: {
           action: Database["public"]["Enums"]["approval_status"]
@@ -1439,6 +1466,50 @@ export type Database = {
         }
         Relationships: []
       }
+      social_accounts: {
+        Row: {
+          account_name: string
+          client_id: string
+          created_at: string
+          handle: string | null
+          id: string
+          is_active: boolean
+          platform: Database["public"]["Enums"]["platform_type"]
+          profile_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_name: string
+          client_id: string
+          created_at?: string
+          handle?: string | null
+          id?: string
+          is_active?: boolean
+          platform: Database["public"]["Enums"]["platform_type"]
+          profile_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          client_id?: string
+          created_at?: string
+          handle?: string | null
+          id?: string
+          is_active?: boolean
+          platform?: Database["public"]["Enums"]["platform_type"]
+          profile_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_accounts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       source_assets: {
         Row: {
           asset_type: Database["public"]["Enums"]["asset_type"]
@@ -1540,11 +1611,97 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_invites: {
+        Row: {
+          accepted_at: string | null
+          client_ids: string[]
+          created_at: string
+          email: string
+          id: string
+          invited_by: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          client_ids?: string[]
+          created_at?: string
+          email: string
+          id?: string
+          invited_by?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          client_ids?: string[]
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+        }
+        Relationships: []
+      }
+      workspace_settings: {
+        Row: {
+          auto_admin_domain: string | null
+          client_limit: number | null
+          company_logo_url: string | null
+          company_name: string
+          created_at: string
+          entity_label_plural: string
+          entity_label_singular: string
+          id: boolean
+          org_type: string
+          plan_name: string
+          seat_limit: number | null
+          setup_progress: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          auto_admin_domain?: string | null
+          client_limit?: number | null
+          company_logo_url?: string | null
+          company_name?: string
+          created_at?: string
+          entity_label_plural?: string
+          entity_label_singular?: string
+          id?: boolean
+          org_type?: string
+          plan_name?: string
+          seat_limit?: number | null
+          setup_progress?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          auto_admin_domain?: string | null
+          client_limit?: number | null
+          company_logo_url?: string | null
+          company_name?: string
+          created_at?: string
+          entity_label_plural?: string
+          entity_label_singular?: string
+          id?: boolean
+          org_type?: string
+          plan_name?: string
+          seat_limit?: number | null
+          setup_progress?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      can_create_content: { Args: { _user_id: string }; Returns: boolean }
+      can_edit_content: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1552,10 +1709,39 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_workspace_users: {
+        Args: never
+        Returns: {
+          display_name: string
+          email: string
+          last_sign_in_at: string
+          role: string
+          user_id: string
+        }[]
+      }
+      log_activity: {
+        Args: { _action: string; _details: Json; _target: string }
+        Returns: undefined
+      }
+      remove_workspace_user: { Args: { _user_id: string }; Returns: undefined }
+      reset_workspace_content: {
+        Args: { _confirm: string }
+        Returns: undefined
+      }
+      set_workspace_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      transfer_ownership: { Args: { _new_owner: string }; Returns: undefined }
       user_can_access_client: {
         Args: { _client_id: string; _user_id: string }
         Returns: boolean
       }
+      workspace_role: { Args: { _user_id: string }; Returns: string }
+      workspace_usage: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "member" | "owner" | "editor" | "reviewer" | "viewer"
