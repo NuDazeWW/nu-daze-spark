@@ -86,15 +86,17 @@ export function PreflightPanel({ pf, isAdmin }: { pf: Preflight; isAdmin: boolea
               {gate.state !== "pass" && gate.state !== "acknowledged" && gate.state !== "overridden" && (
                 <div className="pt-1">
                   {f.severity === "advisory" ? (
-                    <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-muted-foreground"
+                    <Button variant="outline" size="sm" className="h-7 px-3 text-xs gap-1.5"
                       disabled={acknowledge.isPending}
                       onClick={() => acknowledge.mutate()}>
-                      Bypass — I was notified, keep as is
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      Bypass — notified, keep as is
                     </Button>
                   ) : isAdmin ? (
-                    <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-muted-foreground"
+                    <Button variant="outline" size="sm" className="h-7 px-3 text-xs gap-1.5"
                       onClick={() => setBypassOpen(true)}>
-                      Bypass — I was notified, keep as is
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      Bypass — notified, keep as is
                     </Button>
                   ) : (
                     <p className="text-[10px] text-muted-foreground">Only an admin can bypass a blocking issue.</p>
