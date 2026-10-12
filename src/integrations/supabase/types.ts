@@ -761,6 +761,7 @@ export type Database = {
       }
       external_posts: {
         Row: {
+          author_context: Json | null
           author_name: string | null
           client_id: string | null
           created_at: string
@@ -778,6 +779,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          author_context?: Json | null
           author_name?: string | null
           client_id?: string | null
           created_at?: string
@@ -795,6 +797,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          author_context?: Json | null
           author_name?: string | null
           client_id?: string | null
           created_at?: string

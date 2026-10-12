@@ -1,0 +1,3 @@
+ALTER TABLE public.external_posts ADD COLUMN author_context jsonb;
+ALTER TABLE public.external_posts ADD CONSTRAINT external_posts_author_context_object CHECK (author_context IS NULL OR jsonb_typeof(author_context) = 'object');
+COMMENT ON COLUMN public.external_posts.author_context IS 'Optional author title, employer, handle, bio/category, platform profile URL, and manual/source provenance. Never inferred from post topics.';

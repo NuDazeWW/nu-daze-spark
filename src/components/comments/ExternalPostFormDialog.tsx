@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import type { Database } from "@/integrations/supabase/types";
+import { AuthorContextFields } from "./AuthorDetails";
+import { readAuthorContext, safeAuthorProfile, type AuthorContext } from "@/lib/authorContext";
 
 type PlatformType = Database["public"]["Enums"]["platform_type"];
 type RiskFlag = Database["public"]["Enums"]["risk_flag"];
@@ -18,6 +20,7 @@ interface ExternalPostFormDialogProps {
     external_url: string;
     platform: PlatformType;
     author_name?: string;
+    author_context?: AuthorContext;
     post_content?: string;
     topic?: string;
     relevance_score?: number;
@@ -32,6 +35,7 @@ export function ExternalPostFormDialog({ open, onOpenChange, onSave, isPending }
   const [url, setUrl] = useState("");
   const [platform, setPlatform] = useState<PlatformType>("linkedin");
   const [authorName, setAuthorName] = useState("");
+  const [authorContext, setAuthorContext] = useState<AuthorContext>({});
   const [postContent, setPostContent] = useState("");
   const [topic, setTopic] = useState("");
   const [relevanceScore, setRelevanceScore] = useState([0.8]);
@@ -44,6 +48,7 @@ export function ExternalPostFormDialog({ open, onOpenChange, onSave, isPending }
       external_url: url,
       platform,
       author_name: authorName || undefined,
+      author_context: { ...readAuthorContext(authorContext), provenance: "manual" },
       post_content: postContent || undefined,
       topic: topic || undefined,
       relevance_score: relevanceScore[0],
@@ -54,6 +59,7 @@ export function ExternalPostFormDialog({ open, onOpenChange, onSave, isPending }
     // Reset form
     setUrl("");
     setAuthorName("");
+    setAuthorContext({});
     setPostContent("");
     setTopic("");
     setRelevanceScore([0.8]);
@@ -77,7 +83,7 @@ export function ExternalPostFormDialog({ open, onOpenChange, onSave, isPending }
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Platform *</Label>
-              <Select value={platform} onValueChange={(v) => setPlatform(v as PlatformType)}>
+              <Select value={platform} onValueChange={(v) => { setPlatform(v as PlatformType); setAuthorContext({}); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="linkedin">LinkedIn</SelectItem>
@@ -91,8 +97,10 @@ export function ExternalPostFormDialog({ open, onOpenChange, onSave, isPending }
             </div>
           </div>
 
-          <div>
-            <Label>Post Content</Label>
+           <AuthorContextFields value={authorContext} onChange={setAuthorContext} platform={platform} />
+
+           <div>
+             <Label>Post Content</Label>
             <Textarea value={postContent} onChange={(e) => setPostContent(e.target.value)} rows={3} placeholder="Paste the post text here…" />
           </div>
 
@@ -131,7 +139,7 @@ export function ExternalPostFormDialog({ open, onOpenChange, onSave, isPending }
             <Input value={commentAngle} onChange={(e) => setCommentAngle(e.target.value)} placeholder="e.g. Share NuDaze perspective on AI-first workflows" />
           </div>
 
-          <Button onClick={handleSave} disabled={isPending || !url.trim()} className="w-full">
+          <Button onClick={handleSave} disabled={isPending || !url.trim() || Boolean(authorContext.profile_url?.trim() && !safeAuthorProfile(authorContext.profile_url.trim(), platform))} className="w-full">
             {isPending ? "Adding…" : "Add External Post"}
           </Button>
         </div>

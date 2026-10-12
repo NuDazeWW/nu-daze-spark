@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useActiveClient } from "@/contexts/ClientContext";
 import type { Tables, Database } from "@/integrations/supabase/types";
+import { readAuthorContext, type AuthorContext } from "@/lib/authorContext";
 
 export type ExternalPost = Tables<"external_posts">;
 export type Comment = Tables<"comments">;
@@ -165,11 +166,30 @@ export function useExternalPosts() {
     onError: (e) => toast({ title: "Bulk action failed", description: e.message, variant: "destructive" }),
   });
 
+  const updateAuthorContext = useMutation({
+    mutationFn: async ({ id, context }: { id: string; context: AuthorContext }) => {
+      if (!activeClientId) throw new Error("Select a client first");
+      const clean = readAuthorContext(context);
+      delete clean.evidence;
+      const { data, error } = await supabase.from("external_posts")
+        .update({ author_context: { ...clean, provenance: "manual" } })
+        .eq("id", id).eq("client_id", activeClientId).select("id").single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["external_posts"] });
+      qc.invalidateQueries({ queryKey: ["comments_queue"] });
+      toast({ title: "Author details saved" });
+    },
+  });
+
   const addPost = useMutation({
     mutationFn: async (post: {
       external_url: string;
       platform: PlatformType;
       author_name?: string;
+      author_context?: AuthorContext;
       post_content?: string;
       topic?: string;
       relevance_score?: number;
@@ -240,7 +260,7 @@ export function useExternalPosts() {
 
   return {
     posts, isLoading, error,
-    addPost, generateComments, scrapePosts,
+    addPost, generateComments, scrapePosts, updateAuthorContext,
     commentsMap, updateComment,
     markCommented, unmarkCommented,
     deletePost, bulkDelete, bulkMarkCommented,
