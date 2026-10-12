@@ -736,6 +736,75 @@ export type Database = {
           },
         ]
       }
+      email_provider_secrets: {
+        Row: {
+          id: boolean
+          secret: string
+          updated_at: string
+        }
+        Insert: {
+          id?: boolean
+          secret: string
+          updated_at?: string
+        }
+        Update: {
+          id?: boolean
+          secret?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_provider_settings: {
+        Row: {
+          connected_as: string | null
+          from_email: string | null
+          from_name: string | null
+          id: boolean
+          last_test_at: string | null
+          last_test_error: string | null
+          last_test_ok: boolean | null
+          provider: string
+          smtp_host: string | null
+          smtp_port: number | null
+          smtp_secure: boolean
+          smtp_username: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          connected_as?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          id?: boolean
+          last_test_at?: string | null
+          last_test_error?: string | null
+          last_test_ok?: boolean | null
+          provider?: string
+          smtp_host?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean
+          smtp_username?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          connected_as?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          id?: boolean
+          last_test_at?: string | null
+          last_test_error?: string | null
+          last_test_ok?: boolean | null
+          provider?: string
+          smtp_host?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean
+          smtp_username?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       engagement_targets: {
         Row: {
           client_id: string | null
@@ -1032,6 +1101,87 @@ export type Database = {
           },
         ]
       }
+      notification_log: {
+        Row: {
+          created_at: string
+          dedupe_key: string
+          error: string | null
+          id: string
+          kind: string
+          ok: boolean
+          post_card_id: string | null
+          preference_id: string | null
+          recipient_email: string
+        }
+        Insert: {
+          created_at?: string
+          dedupe_key: string
+          error?: string | null
+          id?: string
+          kind: string
+          ok: boolean
+          post_card_id?: string | null
+          preference_id?: string | null
+          recipient_email: string
+        }
+        Update: {
+          created_at?: string
+          dedupe_key?: string
+          error?: string | null
+          id?: string
+          kind?: string
+          ok?: boolean
+          post_card_id?: string | null
+          preference_id?: string | null
+          recipient_email?: string
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          client_ids: string[]
+          created_at: string
+          created_by: string | null
+          daily_digest: boolean
+          id: string
+          is_active: boolean
+          post_went_out: boolean
+          recipient_email: string
+          send_time: string
+          time_zone: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          client_ids?: string[]
+          created_at?: string
+          created_by?: string | null
+          daily_digest?: boolean
+          id?: string
+          is_active?: boolean
+          post_went_out?: boolean
+          recipient_email: string
+          send_time?: string
+          time_zone?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          client_ids?: string[]
+          created_at?: string
+          created_by?: string | null
+          daily_digest?: boolean
+          id?: string
+          is_active?: boolean
+          post_went_out?: boolean
+          recipient_email?: string
+          send_time?: string
+          time_zone?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       platform_rules: {
         Row: {
           char_limit: number | null
@@ -1110,6 +1260,7 @@ export type Database = {
           people_tags: string[] | null
           platform: Database["public"]["Enums"]["platform_type"]
           post_number: number | null
+          posted_at: string | null
           posted_url: string | null
           posting_notes: string | null
           rationale: string | null
@@ -1144,6 +1295,7 @@ export type Database = {
           people_tags?: string[] | null
           platform: Database["public"]["Enums"]["platform_type"]
           post_number?: number | null
+          posted_at?: string | null
           posted_url?: string | null
           posting_notes?: string | null
           rationale?: string | null
@@ -1178,6 +1330,7 @@ export type Database = {
           people_tags?: string[] | null
           platform?: Database["public"]["Enums"]["platform_type"]
           post_number?: number | null
+          posted_at?: string | null
           posted_url?: string | null
           posting_notes?: string | null
           rationale?: string | null

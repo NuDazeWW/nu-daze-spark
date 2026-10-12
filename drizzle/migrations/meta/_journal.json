@@ -85,6 +85,13 @@
       "when": 1791837029412,
       "tag": "0011_social_account_avatars",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791847456063,
+      "tag": "0012_notification_emails",
+      "breakpoints": true
     }
   ]
 }

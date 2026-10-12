@@ -13,6 +13,7 @@ export const SETUP_STEPS = [
   { key: "brand_voice", title: "Brand voice basics", description: "Tone and language rules the AI must follow." },
   { key: "cadence", title: "Cadence targets", description: "How many posts per week, per platform." },
   { key: "team", title: "Invite your team", description: "Add teammates with the right role." },
+  { key: "email", title: "Email provider", description: "Connect the email account used for team notifications." },
 ] as const;
 export type SetupStepKey = (typeof SETUP_STEPS)[number]["key"];
 
