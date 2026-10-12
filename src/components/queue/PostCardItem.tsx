@@ -17,6 +17,8 @@ import { STATUS_META, APPROVAL_FLOW } from "@/hooks/usePostCards";
 import { NativePreviewDialog } from "@/components/preview/NativePostPreview";
 import { usePreflight } from "@/hooks/usePreflight";
 import { PreflightBadge, PreflightDialog } from "@/components/preflight/PreflightPanel";
+import { PostNumber, StatusProgress, WhereIsIt, PostHistoryButton, postLabel } from "@/components/tracking/PostTracking";
+import { useNavigate } from "react-router-dom";
 
 interface PostCardItemProps {
   card: PostCard;
@@ -25,6 +27,7 @@ interface PostCardItemProps {
   onStatusChange: (status: ApprovalStatus, notes?: string) => void;
   onDelete: () => void;
   isUpdating: boolean;
+  statusDates?: Partial<Record<ApprovalStatus, string>>;
 }
 
 const copyToClipboard = async (text: string, label: string) => {
@@ -32,7 +35,8 @@ const copyToClipboard = async (text: string, label: string) => {
   toast.success(`${label} copied to clipboard`);
 };
 
-export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, isUpdating }: PostCardItemProps) {
+export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, isUpdating, statusDates }: PostCardItemProps) {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [preflightOpen, setPreflightOpen] = useState(false);
@@ -48,6 +52,10 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
     }
     onStatusChange(status);
     if (status === "in_review") pf.run.mutate();
+    if (status === "approved")
+      toast.success(`${postLabel(card)} moved to Approved Content`, {
+        action: { label: "View it", onClick: () => navigate(`/approved?post=${card.id}`) },
+      });
   };
   const currentIndex = APPROVAL_FLOW.indexOf(card.approval_status);
 
@@ -65,7 +73,8 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
     <Card className="group">
       <CardHeader className="py-3 px-4 space-y-0">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <PostNumber card={card} />
             <Badge className={`text-[10px] shrink-0 ${statusMeta.color}`}>
               {statusMeta.label}
             </Badge>
@@ -136,15 +145,18 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         </div>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0 space-y-3">
-        <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setPreviewOpen(true)}>
-          <Eye className="h-3.5 w-3.5" />Preview
-        </Button>
-        <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 ml-2" onClick={() => { setGateIntent(null); setPreflightOpen(true); }}>
-          <ShieldCheck className="h-3.5 w-3.5" />Preflight
-        </Button>
-        <span className="ml-2 align-middle">
+        <StatusProgress card={card} dates={statusDates} />
+        <WhereIsIt card={card} here="queue" />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setPreviewOpen(true)}>
+            <Eye className="h-3.5 w-3.5" />Preview
+          </Button>
+          <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => { setGateIntent(null); setPreflightOpen(true); }}>
+            <ShieldCheck className="h-3.5 w-3.5" />Preflight
+          </Button>
+          <PostHistoryButton card={card} />
           <PreflightBadge state={pf.run.isPending ? "none" : pf.gate.state} review={pf.review} onClick={() => { setGateIntent(null); setPreflightOpen(true); }} />
-        </span>
+        </div>
         {/* Draft copy */}
         <div
           className={`text-sm whitespace-pre-wrap cursor-pointer ${!expanded ? "line-clamp-4" : ""}`}
