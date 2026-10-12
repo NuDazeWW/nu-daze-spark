@@ -160,6 +160,13 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
           </Button>
         )}
 
+        {ext?.external_url && ["approved","exported"].includes(comment.approval_status) && (
+          <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5"
+            onClick={async () => { await navigator.clipboard.writeText(comment.draft_copy); toast({ title: "Comment copied — paste it on the post" }); window.open(ext.external_url, "_blank", "noopener,noreferrer"); }}>
+            <ExternalLink className="h-3.5 w-3.5" />Copy & open post
+          </Button>
+        )}
+
         {/* Tone & rationale */}
         <div className="flex items-center gap-3 text-[10px] text-muted-foreground/60 pt-1 flex-wrap">
           {comment.tone && <span>Tone: {comment.tone}</span>}
