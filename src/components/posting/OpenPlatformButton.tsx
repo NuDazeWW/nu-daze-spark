@@ -27,7 +27,16 @@ export function OpenPlatformButton({
     if (copyText) {
       try { await navigator.clipboard.writeText(copyText); toast({ title: "Copied — paste it into " + name }); } catch { /* ignore */ }
     }
-    window.open(url, "_blank", "noopener,noreferrer");
+    // Programmatic anchor click: more reliable than window.open under popup
+    // blockers, and guarantees a top-level new tab (LinkedIn refuses to load
+    // inside embedded frames, which shows ERR_BLOCKED_BY_RESPONSE).
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
     onOpened?.();
   };
 
