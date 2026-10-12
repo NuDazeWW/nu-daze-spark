@@ -3,7 +3,8 @@ import { addDays, addWeeks, endOfWeek, format, isSameDay, startOfWeek } from "da
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Instagram, Linkedin, Facebook } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Instagram, Linkedin, Facebook, ExternalLink } from "lucide-react";
+import { useClientSocialAccounts, postingUrl } from "@/hooks/useClientSocialAccounts";
 import { STATUS_META, type QueueItem } from "@/hooks/usePostCards";
 import { postLabel } from "@/components/tracking/PostTracking";
 import { cn } from "@/lib/utils";
@@ -190,7 +191,9 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                                    {item.postCard ? postLabel(item.postCard) : commentLabel(item.comment?.external_posts)}
                                 </span>
                               </div>
-                               <div className="text-[11px] mb-1">{meta.label}</div>
+                               <div className="text-[11px] mb-1 flex items-center gap-1">{meta.label}
+                                 {item.postCard && ["approved", "exported"].includes(item.approval_status) && <CalendarOpenIcon card={item.postCard} />}
+                               </div>
                               <div className="line-clamp-2 text-foreground/80">
                                 {item.draft_copy || "(no copy)"}
                               </div>
@@ -207,5 +210,22 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
         </div>
       </div>
     </div>
+  );
+}
+
+function CalendarOpenIcon({ card }: { card: NonNullable<QueueItem["postCard"]> }) {
+  const { data: accounts = [] } = useClientSocialAccounts(card.client_id);
+  const url = postingUrl(card.platform, accounts.find((a) => a.platform === card.platform));
+  if (!url) return null;
+  return (
+    <span role="link" tabIndex={0} aria-label={`Copy and open ${card.platform}`} title={`Copy & open ${card.platform}`}
+      className="ml-auto inline-flex rounded p-0.5 hover:bg-foreground/10"
+      onClick={async (e) => {
+        e.stopPropagation();
+        await navigator.clipboard.writeText([card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")).catch(() => {});
+        window.open(url, "_blank", "noopener,noreferrer");
+      }}>
+      <ExternalLink className="h-3 w-3" />
+    </span>
   );
 }
