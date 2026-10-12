@@ -104,6 +104,41 @@ export function usePreflight(card: PostCard | null) {
     onError: (e: Error) => toast.error("Could not apply", { description: e.message }),
   });
 
+  // AI proposes a full rewrite; nothing is saved until the user keeps it.
+  const proposeRewrite = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("preflight-rewrite", { body: { post_card_id: card!.id } });
+      if (error) {
+        let msg = error.message;
+        try { const body = await (error as any).context?.json(); msg = body?.error ?? msg; } catch { /* ignore */ }
+        throw new Error(msg);
+      }
+      if (data?.error) throw new Error(data.error);
+      return data as { draft_copy: string; changes: string[] };
+    },
+    onError: (e: Error) => toast.error("AI fix failed", { description: e.message }),
+  });
+
+  const keepRewrite = useMutation({
+    mutationFn: async (next: string) => {
+      const { error } = await supabase.from("post_cards")
+        .update({ draft_copy: next, updated_by: user!.id } as never).eq("id", card!.id);
+      if (error) throw error;
+      await supabase.from("post_versions").insert({
+        post_card_id: card!.id, client_id: card!.client_id, draft_copy: next,
+        hashtags: card!.hashtags, people_tags: card!.people_tags, org_tags: card!.org_tags,
+        version_number: Date.now() % 2147483647, edit_source: "preflight_ai_fix", created_by: user!.id,
+      } as never);
+      await log("Preflight: AI fix-all rewrite kept");
+    },
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["post_cards"] });
+      toast.success("New version saved", { description: "Re-checking now…" });
+      run.mutate();
+    },
+    onError: (e: Error) => toast.error("Could not save", { description: e.message }),
+  });
+
   const gate = card ? preflightGate(review, card) : { state: "none" as GateState, clear: false };
-  return { review, isLoading, gate, run, acknowledge, override, apply, canApply };
+  return { review, isLoading, gate, run, acknowledge, override, apply, canApply, proposeRewrite, keepRewrite };
 }
