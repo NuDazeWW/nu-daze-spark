@@ -2,6 +2,7 @@ import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useClientSocialAccounts, postingUrl, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { useToast } from "@/hooks/use-toast";
+import { openInNewTab } from "@/lib/openInNewTab";
 
 /** Opens the client's saved account for a platform. Optionally copies text first. Never publishes. */
 export function OpenPlatformButton({
@@ -27,16 +28,7 @@ export function OpenPlatformButton({
     if (copyText) {
       try { await navigator.clipboard.writeText(copyText); toast({ title: "Copied — paste it into " + name }); } catch { /* ignore */ }
     }
-    // Programmatic anchor click: more reliable than window.open under popup
-    // blockers, and guarantees a top-level new tab (LinkedIn refuses to load
-    // inside embedded frames, which shows ERR_BLOCKED_BY_RESPONSE).
-    const a = document.createElement("a");
-    a.href = url;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    openInNewTab(url);
     onOpened?.();
   };
 

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { openInNewTab } from "@/lib/openInNewTab";
 import { addDays, addWeeks, endOfWeek, format, isSameDay, startOfWeek } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -223,7 +224,7 @@ function CalendarOpenIcon({ card }: { card: NonNullable<QueueItem["postCard"]> }
       onClick={async (e) => {
         e.stopPropagation();
         await navigator.clipboard.writeText([card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")).catch(() => {});
-        window.open(url, "_blank", "noopener,noreferrer");
+        openInNewTab(url);
       }}>
       <ExternalLink className="h-3 w-3" />
     </span>
