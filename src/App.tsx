@@ -22,6 +22,12 @@ import RepurposeCenter from "./pages/RepurposeCenter";
 import AccountTags from "./pages/AccountTags";
 import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
+import WorkspaceSettings from "./pages/settings/WorkspaceSettings";
+import Team from "./pages/settings/Team";
+import Usage from "./pages/settings/Usage";
+import Setup from "./pages/Setup";
+import WhatsNew from "./pages/WhatsNew";
+import Help from "./pages/Help";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +60,12 @@ const App = () => (
               <Route path="/repurpose" element={<RepurposeCenter />} />
               <Route path="/settings/tags" element={<AccountTags />} />
               <Route path="/settings/clients" element={<Clients />} />
+              <Route path="/settings/workspace" element={<WorkspaceSettings />} />
+              <Route path="/settings/team" element={<Team />} />
+              <Route path="/settings/usage" element={<Usage />} />
+              <Route path="/setup" element={<Setup />} />
+              <Route path="/whats-new" element={<WhatsNew />} />
+              <Route path="/help" element={<Help />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

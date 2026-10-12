@@ -15,7 +15,15 @@ import {
   ExternalLink,
   Lock,
   FileText,
+  Briefcase,
+  Users,
+  BarChart3,
+  ListChecks,
+  HelpCircle,
+  Megaphone,
 } from "lucide-react";
+import { useWorkspace } from "@/hooks/useWorkspace";
+import { APP_VERSION } from "@/lib/appVersion";
 import {
   Sidebar,
   SidebarContent,
@@ -47,15 +55,25 @@ const contentNav = [
   { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
 ];
 
-const settingsNav = [
-  { title: "Clients", icon: Building2, href: "/settings/clients" },
-  { title: "Account Tags", icon: AtSign, href: "/settings/tags" },
+const adminSettingsNav = [
+  { title: "Workspace", icon: Briefcase, href: "/settings/workspace" },
+  { title: "Setup", icon: ListChecks, href: "/setup" },
+  { title: "Team", icon: Users, href: "/settings/team" },
+  { title: "Usage & Activity", icon: BarChart3, href: "/settings/usage" },
 ];
 
 export function AppSidebar() {
   const location = useLocation();
   const { user, signOut, isAdmin } = useAuth();
   const canAccessDdi = Boolean(user) && isAdmin;
+  const ws = useWorkspace();
+  const settingsNav = [
+    { title: ws.entityPlural, icon: Building2, href: "/settings/clients" },
+    { title: "Account Tags", icon: AtSign, href: "/settings/tags" },
+    ...(ws.canManage ? adminSettingsNav : []),
+    { title: "Help", icon: HelpCircle, href: "/help" },
+    { title: "What's new", icon: Megaphone, href: "/whats-new" },
+  ];
 
   return (
     <Sidebar className="sm-dark">
@@ -67,6 +85,13 @@ export function AppSidebar() {
             className="w-full h-auto rounded-md object-contain"
           />
         </Link>
+        {ws.settings?.company_name && (
+          <div className="mt-2 flex items-center gap-2 text-xs text-sidebar-foreground/70">
+            <span>for</span>
+            {ws.settings.company_logo_url && <img src={ws.settings.company_logo_url} alt="" className="h-5 max-w-[80px] object-contain" />}
+            <span className="font-semibold text-sidebar-foreground">{ws.settings.company_name}</span>
+          </div>
+        )}
       </SidebarHeader>
 
 
@@ -182,6 +207,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <Link to="/whats-new" className="px-2 pt-1 text-[10px] font-mono text-sidebar-foreground/50 hover:underline">SocialMotive v{APP_VERSION}</Link>
       </SidebarFooter>
     </Sidebar>
   );
