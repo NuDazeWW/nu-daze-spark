@@ -133,6 +133,12 @@ export default function NotificationsPage() {
             <Button onClick={() => add(user.email!, true)}>Turn on for me</Button>
           </CardContent></Card>
         )}
+        {ws.canManage && prefs.length > 1 && (
+          <div className="flex justify-end gap-2">
+            <Button size="sm" variant="outline" onClick={async () => { const { error } = await supabase.from("notification_preferences").update({ is_active: false }).in("id", prefs.map((p) => p.id)); if (error) toast.error(error.message); else { refresh(); toast.success("All recipients paused"); } }}>Pause all</Button>
+            <Button size="sm" variant="outline" onClick={async () => { const { error } = await supabase.from("notification_preferences").update({ is_active: true }).in("id", prefs.map((p) => p.id)); if (error) toast.error(error.message); else { refresh(); toast.success("All recipients resumed"); } }}>Resume all</Button>
+          </div>
+        )}
         {prefs.map((p) => <PrefCard key={p.id} pref={p} canDelete={ws.canManage || p.user_id === user?.id} onChange={refresh} />)}
       </>)}
 

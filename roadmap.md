@@ -13,3 +13,7 @@
 - [x] Usage, activity log, version + What's new, Help, export, reset tool
 - [x] Verify in preview
 - [x] Add and verify account photo/logo resizing before upload in Native Preview.
+# Notifications & domains
+- [x] Apple Mail / iCloud email provider; global pause; pause/resume all recipients
+- [ ] Rename this instance's web address to socialmotive.nudaze.com (blocked: DNS record at NuDaze's domain host)
+- [ ] Own web address per sold copy (each copy's operator connects its domain at handover)
