@@ -1654,6 +1654,7 @@ export type Database = {
           entity_label_plural: string
           entity_label_singular: string
           id: boolean
+          is_demo_master: boolean
           org_type: string
           plan_name: string
           seat_limit: number | null
@@ -1670,6 +1671,7 @@ export type Database = {
           entity_label_plural?: string
           entity_label_singular?: string
           id?: boolean
+          is_demo_master?: boolean
           org_type?: string
           plan_name?: string
           seat_limit?: number | null
@@ -1686,6 +1688,7 @@ export type Database = {
           entity_label_plural?: string
           entity_label_singular?: string
           id?: boolean
+          is_demo_master?: boolean
           org_type?: string
           plan_name?: string
           seat_limit?: number | null
@@ -1723,6 +1726,7 @@ export type Database = {
         Args: { _action: string; _details: Json; _target: string }
         Returns: undefined
       }
+      prepare_blank_copy: { Args: { _confirm: string }; Returns: undefined }
       remove_workspace_user: { Args: { _user_id: string }; Returns: undefined }
       reset_workspace_content: {
         Args: { _confirm: string }
