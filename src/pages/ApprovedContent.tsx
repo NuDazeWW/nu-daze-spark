@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -346,6 +347,7 @@ function ApprovedCard({
               <CopyBtn text={hashtags} label="Hashtags" icon={Hash} id="hashtags" />
               <CopyBtn text={peopleTags} label="People" icon={AtSign} id="people" />
               <CopyBtn text={orgTags} label="Orgs" icon={Users} id="orgs" />
+              <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="ghost" />
 
               <div className="flex-1" />
 
