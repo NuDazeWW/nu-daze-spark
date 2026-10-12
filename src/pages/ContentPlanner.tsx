@@ -155,6 +155,13 @@ export default function ContentPlanner() {
     writeDates([{ id, scheduled_for: d.toISOString() }], p.scheduled_for ? "post_rescheduled" : "post_scheduled");
   }
 
+  function dropOnTray(id: string) {
+    if (!canEdit) return;
+    const p = posts.find((x) => x.id === id);
+    if (!p || !p.scheduled_for) return;
+    writeDates([{ id, scheduled_for: null }], "post_unscheduled");
+  }
+
   const toggle = (id: string) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   // Quarter summaries for the next 4 quarters
