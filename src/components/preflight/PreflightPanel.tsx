@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ShieldCheck, ShieldAlert, ShieldX, Shield, Loader2, Copy, RefreshCw } from "lucide-react";
+import { ShieldCheck, ShieldAlert, ShieldX, Shield, Loader2, Copy, RefreshCw, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import type { GateState, PreflightReview } from "@/hooks/usePreflight";
 import type { usePreflight } from "@/hooks/usePreflight";
@@ -70,6 +70,12 @@ export function PreflightPanel({ pf, isAdmin }: { pf: Preflight; isAdmin: boolea
               {f.suggestion && (
                 <div className="flex items-start gap-2">
                   <p className="text-xs text-primary/90 flex-1">{f.suggestion}</p>
+                  {pf.canApply(f) && (
+                    <Button variant="outline" size="sm" className="h-6 px-2 text-[10px] shrink-0"
+                      disabled={pf.apply.isPending} onClick={() => pf.apply.mutate(f)}>
+                      <Wand2 className="h-3 w-3 mr-1" />Apply
+                    </Button>
+                  )}
                   <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" aria-label="Copy suggestion"
                     onClick={() => { navigator.clipboard.writeText(f.suggestion!); toast.success("Suggestion copied"); }}>
                     <Copy className="h-3 w-3" />
