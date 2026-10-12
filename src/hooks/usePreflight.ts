@@ -121,14 +121,16 @@ export function usePreflight(card: PostCard | null) {
 
   const keepRewrite = useMutation({
     mutationFn: async (next: string) => {
+      const { count } = await supabase.from("post_versions").select("id", { count: "exact", head: true }).eq("post_card_id", card!.id);
+      // Preserve the pre-fix draft so the original stays recoverable.
+      await supabase.from("post_versions").insert({
+        post_card_id: card!.id, client_id: card!.client_id, draft_copy: card!.draft_copy,
+        hashtags: card!.hashtags, people_tags: card!.people_tags, org_tags: card!.org_tags,
+        version_number: (count ?? 0) + 1, edit_source: "before_preflight_ai_fix", created_by: user!.id,
+      } as never);
       const { error } = await supabase.from("post_cards")
         .update({ draft_copy: next, updated_by: user!.id } as never).eq("id", card!.id);
       if (error) throw error;
-      await supabase.from("post_versions").insert({
-        post_card_id: card!.id, client_id: card!.client_id, draft_copy: next,
-        hashtags: card!.hashtags, people_tags: card!.people_tags, org_tags: card!.org_tags,
-        version_number: Date.now() % 2147483647, edit_source: "preflight_ai_fix", created_by: user!.id,
-      } as never);
       await log("Preflight: AI fix-all rewrite kept");
     },
     onSuccess: async () => {
