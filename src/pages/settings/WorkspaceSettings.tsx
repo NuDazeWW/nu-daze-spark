@@ -175,19 +175,21 @@ function WorkspaceSettingsInner() {
         </CardContent>
       </Card>
 
+      {/* A copy already prepared blank for a new organization never shows the blank-copy tool. */}
+      {!(locked && !s.company_name) && (
       <Card className="border-destructive/40">
         <CardHeader>
           <CardTitle className="text-base text-destructive flex items-center gap-2">Danger zone {locked && <Badge variant="outline" className="gap-1"><Lock className="h-3 w-3" />Locked demo workspace</Badge>}</CardTitle>
           <CardDescription>
             {locked
-              ? "These tools are permanently disabled in this NuDaze demo workspace to prevent mistakes. They work only in sold copies, for the Owner."
-              : "Owner-only tools for a new copy. Both permanently delete data and can't be undone."}
+              ? "These tools are permanently disabled in this NuDaze demo workspace to prevent mistakes. In a sold copy, our team runs the blank-copy preparation during handover — the new organization never sees it."
+              : "Operator-only tools, run by our team during handover before the new organization gets access. Both permanently delete data and can't be undone. Preparing a blank copy locks itself afterwards so it can only ever run once."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {[
             { key: "reset", title: "Reset to clean workspace", desc: `Deletes all briefs, posts, comments, reviews and assets. Settings, strategy, ${plural.toLowerCase()} and team stay.`, rpc: "reset_workspace_content" as const, cta: "Reset workspace content…" },
-            { key: "blank", title: "Prepare blank copy for a new organization", desc: `One step: deletes all content, strategy, ${plural.toLowerCase()}, social accounts, invites, activity and every team member except you, and resets the company profile and setup checklist so the new organization starts fresh.`, rpc: "prepare_blank_copy" as const, cta: "Prepare blank copy…" },
+            { key: "blank", title: "Prepare blank copy for a new organization", desc: `One step, run once by our team during handover: deletes all content, strategy, ${plural.toLowerCase()}, social accounts, invites, activity and every team member except the operator, and resets the company profile and setup checklist so the new organization starts fresh. Locks itself afterwards.`, rpc: "prepare_blank_copy" as const, cta: "Prepare blank copy…" },
           ].map((tool) => (
             <div key={tool.key} className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-3">
               <div className="min-w-0 flex-1">
