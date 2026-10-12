@@ -11,4 +11,4 @@
 - [x] Setup wizard + Dashboard checklist (complete for NuDaze), preview-as-buyer
 - [x] Team: invites, 5 roles, seat limits, ownership transfer, removal
 - [x] Usage, activity log, version + What's new, Help, export, reset tool
-- [ ] Verify in preview
+- [x] Verify in preview
