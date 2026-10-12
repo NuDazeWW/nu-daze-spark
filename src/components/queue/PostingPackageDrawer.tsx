@@ -12,6 +12,8 @@ import { NativePostPreview } from "@/components/preview/NativePostPreview";
 import { usePreflight } from "@/hooks/usePreflight";
 import { PreflightPanel } from "@/components/preflight/PreflightPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
+import { Input } from "@/components/ui/input";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
 } from "lucide-react";
@@ -70,6 +72,8 @@ export function PostingPackageDrawer({
   const [checksum, setChecksum] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [openedPlatform, setOpenedPlatform] = useState(false);
+  const [postedUrl, setPostedUrl] = useState("");
 
   useEffect(() => {
     setFirstComment(card?.first_comment ?? "");
@@ -161,6 +165,15 @@ export function PostingPackageDrawer({
     a.download = `SocialMotive-${card.platform}-${card.content_type}-${checksum}.txt`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
+  };
+
+  const markPosted = async () => {
+    const { error } = await supabase.from("post_cards")
+      .update({ approval_status: "posted", posted_url: postedUrl.trim() || null }).eq("id", card.id);
+    if (error) return toast({ title: "Couldn't mark as posted", description: error.message, variant: "destructive" });
+    toast({ title: "Marked as posted" });
+    setOpenedPlatform(false);
+    qc.invalidateQueries();
   };
 
   const markExported = async () => {
