@@ -174,6 +174,10 @@ function SetupInner() {
               <p className="text-xs text-muted-foreground">Manage everyone later on the <Link className="underline" to="/settings/team">Team</Link> page.</p>
             </>)}
 
+            {step === "email" && (
+              <p className="text-sm text-muted-foreground">Connect the email account (SendGrid, Gmail, Outlook, Yahoo or your own mail server) used for team notifications on the <Link className="underline" to="/settings/email-provider">Email Provider</Link> page, then choose who gets notified on <Link className="underline" to="/settings/notifications">Notifications</Link>.</p>
+            )}
+
             <div className="flex justify-between pt-2">
               <Button variant="ghost" disabled={idx === 0} onClick={() => setStep(SETUP_STEPS[idx - 1].key)}>Back</Button>
               <div className="flex gap-2">
