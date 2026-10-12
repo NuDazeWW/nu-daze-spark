@@ -2,6 +2,7 @@ import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useClientSocialAccounts, postingUrl, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { useToast } from "@/hooks/use-toast";
+import { openInNewTab } from "@/lib/openInNewTab";
 
 /** Opens the client's saved account for a platform. Optionally copies text first. Never publishes. */
 export function OpenPlatformButton({
@@ -27,7 +28,7 @@ export function OpenPlatformButton({
     if (copyText) {
       try { await navigator.clipboard.writeText(copyText); toast({ title: "Copied — paste it into " + name }); } catch { /* ignore */ }
     }
-    window.open(url, "_blank", "noopener,noreferrer");
+    openInNewTab(url);
     onOpened?.();
   };
 
