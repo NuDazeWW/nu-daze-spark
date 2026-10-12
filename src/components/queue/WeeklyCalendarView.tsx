@@ -185,8 +185,8 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                             >
                               <div className="flex items-center gap-1 mb-0.5">
                                 <TypeIcon className="h-2.5 w-2.5 shrink-0" />
-                                <span className="truncate font-medium">
-                                   {item.postCard ? `Post · ${postLabel(item.postCard)}` : commentLabel(item.comment?.external_posts)}
+                                 <span className="min-w-0 break-words font-medium">
+                                   {item.postCard ? postLabel(item.postCard) : commentLabel(item.comment?.external_posts)}
                                 </span>
                               </div>
                                <div className="text-[11px] mb-1">{meta.label}</div>
