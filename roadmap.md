@@ -12,4 +12,4 @@
 - [x] Team: invites, 5 roles, seat limits, ownership transfer, removal
 - [x] Usage, activity log, version + What's new, Help, export, reset tool
 - [x] Verify in preview
-- [ ] Add and verify account photo/logo resizing before upload in Native Preview.
+- [x] Add and verify account photo/logo resizing before upload in Native Preview.
