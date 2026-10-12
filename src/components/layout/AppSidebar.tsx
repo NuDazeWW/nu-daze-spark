@@ -21,6 +21,7 @@ import {
   ListChecks,
   HelpCircle,
   Megaphone,
+  CalendarRange,
 } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { APP_VERSION } from "@/lib/appVersion";
@@ -51,6 +52,7 @@ const contentNav = [
   { title: "Campaign Briefs", icon: FileText, href: "/briefs" },
   { title: "AI Post Generator", icon: Sparkles, href: "/generator" },
   { title: "Daily Queue", icon: CalendarDays, href: "/queue" },
+  { title: "Content Planner", icon: CalendarRange, href: "/planner" },
   { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
   { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
   { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
