@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useStatusDates, postLabel, matchesPostNumber } from "@/components/tracking/PostTracking";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { usePostCards, STATUS_META, type ApprovalStatus, type QueueItemType } from "@/hooks/usePostCards";
@@ -41,6 +43,16 @@ export default function DailyQueue() {
   const { queueItems, cards, isLoading, error, isAdmin, updateStatus, updateCard, updateComment, deleteCard, deleteComment, reschedulePost } = usePostCards();
 
   const [search, setSearch] = useState("");
+  const statusDates = useStatusDates();
+  const [params, setParams] = useSearchParams();
+  const jumpId = params.get("post");
+  useEffect(() => {
+    if (!jumpId) return;
+    const c = cards.find((x) => x.id === jumpId);
+    if (!c) return;
+    setSearch(postLabel(c)); setStatusFilter("all"); setPlatformFilter("all"); setTypeFilter("all");
+    setParams({}, { replace: true });
+  }, [jumpId, cards, setParams]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -56,9 +68,11 @@ export default function DailyQueue() {
       if (platformFilter !== "all" && item.platform !== platformFilter) return false;
       if (typeFilter !== "all" && item.type !== typeFilter) return false;
       if (search) {
+        if (item.postCard && matchesPostNumber(item.postCard, search)) return true;
         const q = search.toLowerCase();
         const searchable = [
           item.draft_copy,
+          item.postCard ? postLabel(item.postCard) : null,
           item.postCard?.objective,
           item.postCard?.campaign_pillar,
           item.postCard?.audience,
@@ -252,6 +266,7 @@ export default function DailyQueue() {
                   onStatusChange={(status, notes) => updateStatus.mutate({ id: item.id, status, notes, itemType: "post" })}
                   onDelete={() => setDeletingItem({ id: item.id, type: "post" })}
                   isUpdating={updateStatus.isPending}
+                  statusDates={statusDates[item.id]}
                 />
               );
             }

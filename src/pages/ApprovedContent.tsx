@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { PostNumber, StatusProgress, WhereIsIt, PostHistoryButton, useStatusDates, postLabel, matchesPostNumber } from "@/components/tracking/PostTracking";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { usePostCards, STATUS_META, type PostCard, type ApprovalStatus } from "@/hooks/usePostCards";
@@ -34,8 +36,18 @@ export default function ApprovedContent() {
   const { toast } = useToast();
 
   const [search, setSearch] = useState("");
+  const allDates = useStatusDates();
+  const [params, setParams] = useSearchParams();
+  const jumpId = params.get("post");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [platformFilter, setPlatformFilter] = useState<string>("all");
+  useEffect(() => {
+    if (!jumpId) return;
+    const c = cards.find((x) => x.id === jumpId);
+    if (!c) return;
+    setSearch(postLabel(c)); setStatusFilter("all"); setPlatformFilter("all");
+    setParams({}, { replace: true });
+  }, [jumpId, cards, setParams]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [packageId, setPackageId] = useState<string | null>(null);
@@ -50,6 +62,8 @@ export default function ApprovedContent() {
       const q = search.toLowerCase();
       result = result.filter(
         (c) =>
+          matchesPostNumber(c, search) ||
+          postLabel(c).toLowerCase().includes(q) ||
           c.draft_copy.toLowerCase().includes(q) ||
           (c.hashtags ?? []).some((h) => h.toLowerCase().includes(q)) ||
           (c.campaign_pillar ?? "").toLowerCase().includes(q)
@@ -218,6 +232,7 @@ export default function ApprovedContent() {
                 onStatusChange={handleStatusChange}
                 isAdmin={isAdmin}
                 onOpenPackage={() => setPackageId(card.id)}
+                statusDates={allDates[card.id]}
               />
             ))}
           </div>
@@ -243,6 +258,7 @@ function ApprovedCard({
   onStatusChange,
   isAdmin,
   onOpenPackage,
+  statusDates,
 }: {
   card: PostCard;
   isSelected: boolean;
@@ -252,6 +268,7 @@ function ApprovedCard({
   onStatusChange: (id: string, status: ApprovalStatus) => void;
   isAdmin: boolean;
   onOpenPackage: () => void;
+  statusDates?: Partial<Record<ApprovalStatus, string>>;
 }) {
   const PlatformIcon = PLATFORM_ICON[card.platform];
   const meta = STATUS_META[card.approval_status];
@@ -292,11 +309,16 @@ function ApprovedCard({
           <div className="flex-1 min-w-0 space-y-2">
             {/* Header */}
             <div className="flex items-center gap-2 flex-wrap">
+              <PostNumber card={card} />
               {PlatformIcon && <PlatformIcon className="h-4 w-4 text-muted-foreground" />}
               <span className="text-xs text-muted-foreground capitalize">{card.content_type}</span>
               <Badge variant="outline" className={`text-[10px] ${meta.color}`}>{meta.label}</Badge>
               {card.campaign_pillar && <Badge variant="secondary" className="text-[10px]">{card.campaign_pillar}</Badge>}
+              <span className="flex-1" />
+              <PostHistoryButton card={card} />
+              <WhereIsIt card={card} here="approved" />
             </div>
+            <StatusProgress card={card} dates={statusDates} />
 
             {/* Copy text */}
             <p className="text-sm whitespace-pre-wrap leading-relaxed">{card.draft_copy}</p>
