@@ -332,8 +332,6 @@ export function PostingPackageDrawer({
               </div>
             </div>
           )}
-            </div>
-          )}
           </TabsContent>
         </Tabs>
       </SheetContent>
