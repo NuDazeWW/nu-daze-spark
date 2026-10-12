@@ -216,6 +216,7 @@ function WorkspaceSettingsInner() {
           ))}
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }
