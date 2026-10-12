@@ -36,6 +36,7 @@ export function PreflightBadge({ state, review, onClick }: { state: GateState; r
 export function PreflightPanel({ pf, isAdmin }: { pf: Preflight; isAdmin: boolean }) {
   const { review, gate, run, acknowledge, override } = pf;
   const [reason, setReason] = useState("");
+  const [bypassOpen, setBypassOpen] = useState(false);
   const blocking = review?.findings.filter((f) => f.severity === "blocking") ?? [];
   const advisory = review?.findings.filter((f) => f.severity === "advisory") ?? [];
 
@@ -82,6 +83,24 @@ export function PreflightPanel({ pf, isAdmin }: { pf: Preflight; isAdmin: boolea
                   </Button>
                 </div>
               )}
+              {gate.state !== "pass" && gate.state !== "acknowledged" && gate.state !== "overridden" && (
+                <div className="pt-1">
+                  {f.severity === "advisory" ? (
+                    <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-muted-foreground"
+                      disabled={acknowledge.isPending}
+                      onClick={() => acknowledge.mutate()}>
+                      Bypass — I was notified, keep as is
+                    </Button>
+                  ) : isAdmin ? (
+                    <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-muted-foreground"
+                      onClick={() => setBypassOpen(true)}>
+                      Bypass — I was notified, keep as is
+                    </Button>
+                  ) : (
+                    <p className="text-[10px] text-muted-foreground">Only an admin can bypass a blocking issue.</p>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -100,6 +119,20 @@ export function PreflightPanel({ pf, isAdmin }: { pf: Preflight; isAdmin: boolea
             onClick={() => override.mutate(reason.trim(), { onSuccess: () => setReason("") })}>Override and allow</Button>
         </div>
       )}
+
+      <Dialog open={bypassOpen} onOpenChange={setBypassOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bypass blocking issue</DialogTitle>
+            <DialogDescription>You were notified of this issue and choose to keep the draft as is. This is logged with your reason.</DialogDescription>
+          </DialogHeader>
+          <Textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is this safe to keep?" />
+          <Button size="sm" variant="destructive" disabled={reason.trim().length < 8 || override.isPending}
+            onClick={() => override.mutate(reason.trim(), { onSuccess: () => { setReason(""); setBypassOpen(false); } })}>
+            Bypass and allow
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
