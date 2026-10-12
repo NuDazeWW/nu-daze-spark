@@ -65,7 +65,8 @@ function EngagementBadge({ engagement }: { engagement: number }) {
   );
 }
 
-function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRegenerating }: {
+function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRegenerating, postUrl }: {
+  postUrl?: string | null;
   comment: { id: string; draft_copy: string; tone: string | null };
   onSave: (id: string, text: string) => void;
   isSaving: boolean;
@@ -122,6 +123,11 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
             </TooltipTrigger>
             <TooltipContent>Copy comment</TooltipContent>
           </Tooltip>
+          <Button variant="outline" size="sm" className="h-6 text-[10px] px-2" disabled={!postUrl}
+            title={postUrl ? "Copy the comment and open the original post" : "No link saved for this post"}
+            onClick={async (e) => { e.stopPropagation(); if (!postUrl) return; await navigator.clipboard.writeText(text); toast.success("Comment copied — paste it on the post"); onCopied?.(); window.open(postUrl, "_blank", "noopener,noreferrer"); }}>
+            <ExternalLink className="h-3 w-3 mr-1" />Copy & open post
+          </Button>
         </div>
       </div>
       <Textarea
@@ -502,6 +508,7 @@ export default function CommentGenerator() {
 
                   {comment && (
                     <InlineComment
+                      postUrl={post.external_url}
                       comment={comment}
                       onSave={handleCommentSave}
                       isSaving={updateComment.isPending}

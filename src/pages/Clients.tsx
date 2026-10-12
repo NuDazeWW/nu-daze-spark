@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -53,6 +54,15 @@ export default function Clients() {
     },
     enabled: isAdmin,
   });
+
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    const id = params.get("accounts");
+    if (!id || clients.length === 0) return;
+    const c = clients.find((x) => x.id === id);
+    if (c) setAccountsClient(c);
+    setParams({}, { replace: true });
+  }, [params, clients, setParams]);
 
   const { data: memberships = [] } = useQuery({
     queryKey: ["client_members", "all"],

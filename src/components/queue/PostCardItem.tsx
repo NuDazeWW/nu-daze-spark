@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
@@ -156,6 +157,10 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
             <ShieldCheck className="h-3.5 w-3.5" />Preflight
           </Button>
           <PostHistoryButton card={card} />
+          {["approved", "exported"].includes(card.approval_status) && (
+            <OpenPlatformButton clientId={card.client_id} platform={card.platform}
+              copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")} />
+          )}
           <PreflightBadge state={pf.run.isPending ? "none" : pf.gate.state} review={pf.review} onClick={() => { setGateIntent(null); setPreflightOpen(true); }} />
         </div>
         {/* Draft copy */}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { PostCard } from "@/hooks/usePostCards";
@@ -21,7 +22,7 @@ import {
 const LIMITS: Record<string, number> = { linkedin: 3000, instagram: 2200, facebook: 63206 };
 const MAX_HASHTAGS: Record<string, number> = { linkedin: 5, instagram: 30, facebook: 30 };
 
-type Check = { level: "pass" | "warn" | "fail"; label: string };
+type Check = { level: "pass" | "warn" | "fail"; label: string; fix?: { label: string; to: string }[] };
 
 async function sha256(text: string) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
@@ -73,6 +74,7 @@ export function PostingPackageDrawer({
   const [copied, setCopied] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [openedPlatform, setOpenedPlatform] = useState(false);
+  const [tab, setTab] = useState("package");
   const [postedUrl, setPostedUrl] = useState("");
 
   useEffect(() => {
@@ -109,28 +111,29 @@ export function PostingPackageDrawer({
   const checks: Check[] = useMemo(() => {
     if (!card) return [];
     const c: Check[] = [];
+    const edit = { label: "Fix in Daily Queue", to: `/queue?post=${card.id}&edit=1` };
     const limit = LIMITS[card.platform] ?? 3000;
     const len = card.draft_copy.length;
     c.push(len > limit
-      ? { level: "fail", label: `Copy is ${len}/${limit} characters — over the ${card.platform} limit` }
+      ? { level: "fail", label: `Copy is ${len}/${limit} characters — over the ${card.platform} limit`, fix: [edit] }
       : { level: "pass", label: `Copy length ${len}/${limit}` });
     const tags = card.hashtags?.length ?? 0;
     const maxTags = MAX_HASHTAGS[card.platform] ?? 30;
     c.push(tags > maxTags
-      ? { level: "warn", label: `${tags} hashtags — recommended max ${maxTags}` }
+      ? { level: "warn", label: `${tags} hashtags — recommended max ${maxTags}`, fix: [edit] }
       : { level: "pass", label: `${tags} hashtag${tags === 1 ? "" : "s"}` });
     const needsMedia = card.platform === "instagram" || ["story", "reel", "carousel"].includes(card.content_type);
     if (needsMedia && assets.length === 0) {
       c.push(card.suggested_asset_description
-        ? { level: "warn", label: "No media attached — only a suggested asset description" }
-        : { level: "fail", label: "Visual format with no media attached" });
+        ? { level: "warn", label: "No media attached — only a suggested asset description", fix: [{ ...edit, label: "Attach media" }, { label: "Asset Library", to: "/assets" }] }
+        : { level: "fail", label: "Visual format with no media attached", fix: [{ ...edit, label: "Attach media" }, { label: "Asset Library", to: "/assets" }] });
     } else c.push({ level: "pass", label: assets.length ? `${assets.length} media file${assets.length === 1 ? "" : "s"} attached` : "No media required" });
     const blocked = assets.filter((a) => a.permission_state !== "generation_allowed");
-    if (blocked.length) c.push({ level: "warn", label: `${blocked.length} asset(s) not cleared for use (${blocked.map((b) => b.permission_state).join(", ")})` });
+    if (blocked.length) c.push({ level: "warn", label: `${blocked.length} asset(s) not cleared for use (${blocked.map((b) => b.permission_state).join(", ")})`, fix: [{ label: "Review in Asset Library", to: "/assets" }] });
     if (card.approval_status === "approved" || card.approval_status === "exported" || card.approval_status === "posted")
       c.push({ level: "pass", label: "Approved through review" });
-    else c.push({ level: "fail", label: "Not yet approved" });
-    if (!card.scheduled_for) c.push({ level: "warn", label: "No scheduled time set" });
+    else c.push({ level: "fail", label: "Not yet approved", fix: [{ label: "Review in Daily Queue", to: `/queue?post=${card.id}` }] });
+    if (!card.scheduled_for) c.push({ level: "warn", label: "No scheduled time set", fix: [{ label: "Schedule", to: `/queue?post=${card.id}&edit=1` }] });
     return c;
   }, [card, assets]);
 
@@ -139,6 +142,9 @@ export function PostingPackageDrawer({
   const failCount = checks.filter((c) => c.level === "fail").length + preflightFail;
 
   if (!card) return null;
+  const postReason = !["approved", "exported", "posted"].includes(card.approval_status)
+    ? "Approve first"
+    : failCount > 0 ? `Fix ${failCount} blocking issue${failCount === 1 ? "" : "s"} first` : null;
 
   const copy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -209,7 +215,7 @@ export function PostingPackageDrawer({
             {card.scheduled_for && ` · ${new Date(card.scheduled_for).toLocaleString()}`}</SheetDescription>
         </SheetHeader>
 
-        <Tabs defaultValue="package" className="mt-5">
+        <Tabs value={tab} onValueChange={setTab} className="mt-5">
           <TabsList className="w-full">
             <TabsTrigger value="package" className="flex-1">Posting package</TabsTrigger>
             <TabsTrigger value="preview" className="flex-1">Native preview</TabsTrigger>
@@ -228,13 +234,16 @@ export function PostingPackageDrawer({
             </div>
             {card && (pf.gate.clear
               ? <div className="flex items-center gap-2 text-xs"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /><span className="text-muted-foreground">Preflight cleared</span></div>
-              : <div className="flex items-center gap-2 text-xs"><XCircle className="h-3.5 w-3.5 text-destructive" /><span>Preflight not cleared ({pf.gate.state}) — see Preflight tab</span></div>)}
+              : <div className="flex items-center gap-2 text-xs"><XCircle className="h-3.5 w-3.5 text-destructive" /><span>Preflight not cleared ({pf.gate.state})</span><Button size="sm" variant="link" className="h-auto p-0 text-xs" onClick={() => setTab("preflight")}>Fix in Preflight</Button></div>)}
             {checks.map((c, i) => (
               <div key={i} className="flex items-center gap-2 text-xs">
                 {c.level === "pass" ? <CheckCircle2 className="h-3.5 w-3.5 text-primary" /> :
                   c.level === "warn" ? <AlertTriangle className="h-3.5 w-3.5 text-accent" /> :
                     <XCircle className="h-3.5 w-3.5 text-destructive" />}
                 <span className={c.level === "pass" ? "text-muted-foreground" : ""}>{c.label}</span>
+                {c.level !== "pass" && c.fix?.map((f) => (
+                  <Link key={f.label} to={f.to} onClick={() => onOpenChange(false)} className="text-primary underline underline-offset-2 hover:no-underline">{f.label}</Link>
+                ))}
               </div>
             ))}
           </div>
@@ -297,6 +306,12 @@ export function PostingPackageDrawer({
               <Copy className="h-3.5 w-3.5 mr-1" /> Copy full package
             </Button>
             <Button variant="outline" size="sm" onClick={download}><Download className="h-3.5 w-3.5 mr-1" /> Download</Button>
+            <span title={postReason ?? "Copies caption + hashtags and opens the platform. You post it yourself."}>
+              <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="default"
+                disabled={!!postReason}
+                copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")}
+                onOpened={() => setOpenedPlatform(true)} />
+            </span>
             <Button variant="ghost" size="sm" onClick={save} disabled={saving}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>
             {canExport && card.approval_status === "approved" && (
               <Button size="sm" className="ml-auto" disabled={failCount > 0} onClick={markExported}>
@@ -305,30 +320,16 @@ export function PostingPackageDrawer({
             )}
           </div>
 
-          {["approved", "exported"].includes(card.approval_status) && (
+          {openedPlatform && (
             <div className="rounded-md border p-3 space-y-2">
-              <p className="text-sm font-medium">Ready to post</p>
-              <p className="text-xs text-muted-foreground">
-                Copies the caption and hashtags, then opens {card.platform}. You post it yourself — nothing is published automatically.
-                {firstComment && " Copy the first comment separately above."}
-              </p>
-              <OpenPlatformButton
-                clientId={card.client_id}
-                platform={card.platform}
-                variant="default"
-                disabled={failCount > 0}
-                copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")}
-                onOpened={() => setOpenedPlatform(true)}
-              />
-              {openedPlatform && (
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <Input className="h-8 flex-1 min-w-[200px]" placeholder="Live post link (optional)"
-                    value={postedUrl} onChange={(e) => setPostedUrl(e.target.value)} />
-                  <Button size="sm" variant="outline" onClick={markPosted}>
-                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Mark as posted
-                  </Button>
-                </div>
-              )}
+              <p className="text-sm font-medium">Posted it?</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <Input className="h-8 flex-1 min-w-[200px]" placeholder="Live post link (optional)"
+                  value={postedUrl} onChange={(e) => setPostedUrl(e.target.value)} />
+                <Button size="sm" variant="outline" onClick={markPosted}>
+                  <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Mark as posted
+                </Button>
+              </div>
             </div>
           )}
           </TabsContent>

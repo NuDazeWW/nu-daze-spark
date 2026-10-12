@@ -38,7 +38,7 @@ export function SidebarPostTo() {
                 </SidebarMenuButton>
               ) : isAdmin ? (
                 <SidebarMenuButton asChild tooltip={`Add a profile link for ${label}`}>
-                  <Link to="/clients">
+                  <Link to={`/settings/clients?accounts=${activeClientId}`}>
                     <Plus className="size-4" />
                     <span className="truncate">{label} — add link</span>
                   </Link>
@@ -53,6 +53,7 @@ export function SidebarPostTo() {
           );
         })}
       </SidebarMenu>
+      <p className="px-2 pt-1 text-[10px] text-sidebar-foreground/50">Profile links are set in Settings › Clients › Accounts.</p>
     </SidebarGroup>
   );
 }
