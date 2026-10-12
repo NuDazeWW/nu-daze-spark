@@ -1,5 +1,5 @@
-# Native preview update
-- [ ] Implement caption/story parsing and accessible media resolution.
-- [ ] Build LinkedIn and Instagram feed, Story, Reel previews.
-- [ ] Integrate Daily Queue and Posting Package.
-- [ ] Verify tests and running app, document architecture.
+# SocialMotive brand and card clarity
+- [ ] Make comment author/topic labels prominent and distinguish post/comment card types.
+- [ ] Apply consistent brand-based status colors to queue, calendar, and approved cards.
+- [ ] Apply updated brand guide to shared styling and all pages, preserving native platform previews and client content.
+- [ ] Verify real queue/approved flows, page coverage, accessibility, and existing tests.
