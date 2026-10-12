@@ -4,3 +4,4 @@
 - Brief edits to strategic fields bump the version, revert approval, and flag linked master objects stale via a DB trigger, so drift is enforced server-side.
 - Brief AI generation runs in the generate-from-brief edge function using the caller's session, so tenant RLS applies to every read and write.
 - Native social previews share one read-only view between Queue and Posting Package, parse production outlines separately from captions, and resolve tenant-scoped cleared media with short-lived signed URLs; this avoids draft mutation, invented content, and public media exposure.
+- AI Preflight results live in `preflight_reviews` (latest row per post card, tied to a draft checksum); approval and export are gated client-side until the latest non-stale review passes, is acknowledged (advisory), or is overridden with a logged reason; rule checks are shared from `supabase/functions/_shared/preflightRules.ts` so app and edge function agree.

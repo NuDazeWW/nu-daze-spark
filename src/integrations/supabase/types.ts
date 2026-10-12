@@ -1237,6 +1237,78 @@ export type Database = {
           },
         ]
       }
+      preflight_reviews: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          ai_error: string | null
+          client_id: string | null
+          created_at: string
+          draft_checksum: string
+          findings: Json
+          id: string
+          model: string | null
+          overall_status: string
+          overridden_at: string | null
+          overridden_by: string | null
+          override_reason: string | null
+          post_card_id: string
+          run_by: string
+          voice_score: number | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          ai_error?: string | null
+          client_id?: string | null
+          created_at?: string
+          draft_checksum: string
+          findings?: Json
+          id?: string
+          model?: string | null
+          overall_status?: string
+          overridden_at?: string | null
+          overridden_by?: string | null
+          override_reason?: string | null
+          post_card_id: string
+          run_by: string
+          voice_score?: number | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          ai_error?: string | null
+          client_id?: string | null
+          created_at?: string
+          draft_checksum?: string
+          findings?: Json
+          id?: string
+          model?: string | null
+          overall_status?: string
+          overridden_at?: string | null
+          overridden_by?: string | null
+          override_reason?: string | null
+          post_card_id?: string
+          run_by?: string
+          voice_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preflight_reviews_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preflight_reviews_post_card_id_fkey"
+            columns: ["post_card_id"]
+            isOneToOne: false
+            referencedRelation: "post_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

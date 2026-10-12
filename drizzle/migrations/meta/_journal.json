@@ -15,6 +15,13 @@
       "when": 1791489000388,
       "tag": "0001_posting_package_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791817846287,
+      "tag": "0002_preflight_reviews",
+      "breakpoints": true
     }
   ]
 }
