@@ -266,13 +266,26 @@ export default function ContentPlanner() {
         </div>
 
         {/* Unscheduled tray */}
-        <Card className="w-full shrink-0 p-3 lg:w-72">
+        <Card
+          onDragOver={(e) => { if (canEdit) { e.preventDefault(); setTrayDragOver(true); } }}
+          onDragLeave={() => setTrayDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setTrayDragOver(false);
+            const id = e.dataTransfer.getData("text/plain");
+            if (id) dropOnTray(id);
+          }}
+          className={cn("w-full shrink-0 p-3 lg:w-72 transition-colors",
+            trayDragOver && canEdit && "border-primary ring-2 ring-primary/40 bg-primary/5")}
+        >
           <div className="mb-2 flex items-center gap-2">
             <CalendarRange className="h-4 w-4" />
             <h2 className="font-semibold">Unscheduled</h2>
             <Badge variant="secondary" className="ml-auto">{unscheduled.length}</Badge>
           </div>
-          <p className="mb-2 text-xs text-muted-foreground">Approved posts with no date. Drag one onto a day.</p>
+          <p className="mb-2 text-xs text-muted-foreground">
+            Approved posts with no date. Drag one onto a day — or drag a scheduled post here to clear its date.
+          </p>
           <div className="mb-2 grid grid-cols-2 gap-2">
             <Select value={trayPlatform} onValueChange={setTrayPlatform}>
               <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
