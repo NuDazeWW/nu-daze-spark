@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { AuthorDetails } from "@/components/comments/AuthorDetails";
+import { authorContextSearch } from "@/lib/authorContext";
 
 const RISK_ICON = {
   safe: Shield,
@@ -137,7 +139,7 @@ type SortKey = "recent" | "relevance" | "engagement";
 export default function CommentGenerator() {
   const {
     posts, isLoading, error,
-    addPost, generateComments, scrapePosts,
+    addPost, generateComments, scrapePosts, updateAuthorContext,
     commentsMap, updateComment,
     markCommented, unmarkCommented,
     deletePost, bulkDelete, bulkMarkCommented,
@@ -158,7 +160,7 @@ export default function CommentGenerator() {
       if (platformFilter !== "all" && p.platform !== platformFilter) return false;
       if (search) {
         const q = search.toLowerCase();
-        const searchable = [p.author_name, p.topic, p.post_content, p.external_url]
+        const searchable = [p.author_name, p.topic, p.post_content, p.external_url, authorContextSearch(p.author_context)]
           .filter(Boolean).join(" ").toLowerCase();
         if (!searchable.includes(q)) return false;
       }
@@ -485,9 +487,9 @@ export default function CommentGenerator() {
                   </div>
                 </CardHeader>
                 <CardContent className="px-4 pb-4 pt-0 space-y-2">
-                  {post.author_name && (
-                    <p className="text-xs font-medium">{post.author_name}</p>
-                  )}
+                   <AuthorDetails name={post.author_name} context={post.author_context} platform={post.platform}
+                     onSave={context => updateAuthorContext.mutateAsync({ id: post.id, context })}
+                     isPending={updateAuthorContext.isPending} />
                   {post.post_content && (
                     <p className="text-sm text-muted-foreground line-clamp-3">{post.post_content}</p>
                   )}

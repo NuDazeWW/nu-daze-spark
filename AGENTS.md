@@ -8,3 +8,4 @@
 - Posts are identified to users by a sequential `post_number` shown as SM-NNNN on every screen (shared helpers in `src/components/tracking/PostTracking.tsx`); cross-screen jump links use `?post=<id>` so one ID tracks a post from draft to posted.
 - Page surface selection is centralized in `contentPresentation.ts` and applied by AppLayout to body-level semantic tokens so portalled controls inherit the reading theme; command/navigation surfaces explicitly retain dark tokens.
 - Content type and lifecycle status are independent presentation attributes; shared status classes drive cards, badges, calendar chips, filters, and pipeline charts so colors stay consistent across screens.
+- External-post author context is optional structured data with manual/source provenance; shared presentation validates platform profile links, while discovery retains only details grounded in retrieved evidence to prevent inferred identities.
