@@ -193,7 +193,7 @@ body[data-sm-surface="reading"] {
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: 178.08 100% 24.51%;
+  --primary: 178.08 100% 23.5%;
   --primary-foreground: 0 0% 100%;
   --secondary: 270 22% 92%;
   --secondary-foreground: var(--foreground);
@@ -205,9 +205,9 @@ body[data-sm-surface="reading"] {
   --accent-foreground: var(--foreground);
   --destructive: 3.846 76.923% 40%;
   --destructive-foreground: 0 0% 100%;
-  --brand-signal: 178.08 100% 24.51%;
+  --brand-signal: 178.08 100% 23.5%;
   --brand-info: var(--brand-signal);
-  --brand-attention: 346.4 60.976% 48.235%;
+  --brand-attention: 346.4 60.976% 45%;
   --brand-warning: 42.609 100% 27.059%;
   --brand-premium: var(--brand-warning);
   --brand-opportunity: 73.217 100% 21%;
@@ -284,3 +284,5 @@ body[data-sm-surface="reading"] [role="dialog"] [class*="text-brand-warning/"] {
 .sm-dark { background-color: hsl(var(--brand-midnight)); }
 .sm-dark a { min-height: 44px; }
 [class*="tracking-"] { letter-spacing: 0; }
+.sm-type.sm-type-post { color: hsl(var(--brand-signal)); border-color: hsl(var(--brand-signal) / .4); background: hsl(var(--brand-signal) / .08); }
+.sm-type.sm-type-comment { color: hsl(var(--brand-attention)); border-color: hsl(var(--brand-attention) / .4); background: hsl(var(--brand-attention) / .08); }
