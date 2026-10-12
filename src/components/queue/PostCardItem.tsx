@@ -70,12 +70,13 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const orgString = (card.org_tags ?? []).join(" ");
 
   return (
-    <Card className="group">
+    <Card className="group sm-content-card" data-status={card.approval_status} data-content-type="post">
       <CardHeader className="py-3 px-4 space-y-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
             <PostNumber card={card} />
-            <Badge className={`text-[10px] shrink-0 ${statusMeta.color}`}>
+            <Badge variant="outline" className="sm-type sm-type-post gap-1"><BookOpen className="h-3 w-3" />Post</Badge>
+            <Badge variant="outline" className={`text-xs shrink-0 ${statusMeta.color}`}>
               {statusMeta.label}
             </Badge>
             <Badge variant="outline" className="text-[10px] capitalize shrink-0">{card.platform}</Badge>
@@ -165,18 +166,18 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
           {card.draft_copy}
         </div>
         {card.draft_copy.length > 200 && (
-          <button
-            className="text-[10px] text-primary hover:underline"
+          <Button variant="link" size="sm"
+            className="px-0 text-xs"
             onClick={() => setExpanded(!expanded)}
           >
             {expanded ? "Show less" : "Show more"}
-          </button>
+          </Button>
         )}
 
         {/* Revision notes */}
         {card.revision_notes && (
-          <div className="rounded-md bg-amber-500/5 border border-amber-500/20 p-2">
-            <p className="text-[10px] font-medium text-amber-400 mb-0.5">Revision Notes</p>
+          <div className="rounded-md bg-brand-attention/5 border border-brand-attention/20 p-2">
+            <p className="text-xs font-medium text-brand-attention mb-0.5">Revision Notes</p>
             <p className="text-xs text-muted-foreground">{card.revision_notes}</p>
           </div>
         )}

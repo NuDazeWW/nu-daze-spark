@@ -1,14 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* SocialMotive Dark-Only Theme — Deep Plum foundation */
-    --background: 268 43% 11%;
-    --foreground: 40 35% 93%;
+  :root, .sm-dark {
+    /* SocialMotive command theme — reading surfaces override semantic roles below. */
+    --background: var(--brand-plum);
+    --foreground: var(--brand-bone);
 
     --card: 268 35% 15%;
     --card-foreground: 40 35% 93%;
@@ -17,7 +15,7 @@
     --popover-foreground: 40 35% 93%;
 
     /* Signal Turquoise — primary interactive accent */
-    --primary: 178 79% 47%;
+    --primary: var(--brand-turquoise);
     --primary-foreground: 268 43% 11%;
 
     --secondary: 268 26% 20%;
@@ -27,7 +25,7 @@
     --muted-foreground: 269 12% 64%;
 
     /* Electric Citrine — intelligence / recommendation accent */
-    --accent: 76 100% 58%;
+    --accent: var(--brand-citrine);
     --accent-foreground: 268 43% 11%;
 
     --destructive: 4 76% 45%;
@@ -38,21 +36,35 @@
     --ring: 178 79% 47%;
 
     --radius: 0.625rem;
+    --status-draft: 275 22% 73%;
+    --status-draft-tint: 275 22% 73% / .12;
+    --status-review: var(--brand-turquoise);
+    --status-review-tint: var(--brand-turquoise) / .12;
+    --status-revision: var(--brand-coral);
+    --status-revision-tint: var(--brand-coral) / .12;
+    --status-approved: var(--brand-gold);
+    --status-approved-tint: var(--brand-gold) / .12;
+    --status-exported: var(--brand-bone);
+    --status-exported-tint: var(--brand-bone) / .12;
+    --status-posted: var(--brand-citrine);
+    --status-posted-tint: var(--brand-citrine) / .12;
+    --status-archived: 270 8% 64%;
+    --status-archived-tint: 270 8% 64% / .08;
 
     /* SocialMotive brand palette */
-    --brand-plum: 268 43% 11%;
+    --brand-plum: 267.500 42.857% 10.980%;
     --brand-plum-light: 268 35% 15%;
     --brand-plum-lighter: 268 26% 20%;
-    --brand-midnight: 265 49% 7%;
-    --brand-turquoise: 178 79% 47%;
+    --brand-midnight: 264.706 48.571% 6.863%;
+    --brand-turquoise: 178.115 79.253% 47.255%;
     --brand-turquoise-glow: 178 79% 60%;
-    --brand-citrine: 76 100% 58%;
-    --brand-coral: 348 100% 69%;
-    --brand-gold: 42 69% 52%;
+    --brand-citrine: 75.556 100.000% 57.647%;
+    --brand-coral: 348.375 100.000% 68.627%;
+    --brand-gold: 42.395 68.724% 52.353%;
     --brand-gold-soft: 42 60% 65%;
-    --brand-bone: 40 35% 93%;
-    --brand-ink: 268 26% 14%;
-    --brand-muted: 269 9% 45%;
+    --brand-bone: 40.000 35.294% 93.333%;
+    --brand-ink: 268.421 26.027% 14.314%;
+    --brand-muted: 268.571 9.251% 44.510%;
 
     /* Semantic meaning tokens */
     --brand-opportunity: 76 100% 58%;
@@ -81,7 +93,7 @@
 
     /* Elevation — restrained, tonal */
     --shadow-card: 0 1px 3px 0 hsl(265 49% 4% / 0.4), 0 1px 2px -1px hsl(265 49% 4% / 0.3);
-    --shadow-elevated: 0 12px 40px hsl(265 49% 4% / 0.24);
+    --shadow-elevated: 0 12px 40px hsl(var(--brand-midnight) / 0.24);
     --shadow-glow-signal: 0 0 20px -5px hsl(178 79% 47% / 0.3);
 
     /* Native social platform simulations are intentionally separate from app chrome. */
@@ -145,7 +157,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 
   /* Scrollbar styling for dark theme */
@@ -172,3 +184,105 @@
     }
   }
 }
+
+/* Reading/detail surfaces also cover portals mounted outside the page. */
+body[data-sm-surface="reading"] {
+  --background: 40 35.294% 93.333%;
+  --foreground: 268.421 25.714% 14.314%;
+  --card: 270 28.571% 97.255%;
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: 178.08 100% 23.5%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 270 22% 92%;
+  --secondary-foreground: var(--foreground);
+  --muted: 270 22% 92%;
+  --muted-foreground: 268.571 9.091% 44.51%;
+  --border: 267.692 20% 87.255%;
+  --input: 267.692 20% 76%;
+  --accent: 76.25 100% 57.647%;
+  --accent-foreground: var(--foreground);
+  --destructive: 3.846 76.923% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --brand-signal: 178.08 100% 23.5%;
+  --brand-info: var(--brand-signal);
+  --brand-attention: 346.4 60.976% 45%;
+  --brand-warning: 42.609 100% 27.059%;
+  --brand-premium: var(--brand-warning);
+  --brand-opportunity: 73.217 100% 21%;
+  --brand-success: var(--brand-opportunity);
+  --brand-coral: var(--brand-attention);
+  --brand-gold: var(--brand-premium);
+  --brand-turquoise: var(--brand-signal);
+  --status-draft: 275 18% 42%;
+  --status-draft-tint: 275 25% 92%;
+  --status-review: var(--brand-signal);
+  --status-review-tint: 176.471 77.273% 91.373%;
+  --status-revision: var(--brand-attention);
+  --status-revision-tint: 346 100% 94%;
+  --status-approved: var(--brand-premium);
+  --status-approved-tint: 43.75 100% 90.588%;
+  --status-exported: var(--foreground);
+  --status-exported-tint: 40 35% 93%;
+  --status-posted: var(--brand-opportunity);
+  --status-posted-tint: 78.261 100% 90.98%;
+  --status-archived: var(--muted-foreground);
+  --status-archived-tint: 270 12% 94%;
+}
+
+@layer components {
+  .sm-content-card, .sm-status, .sm-pipeline {
+    --status-color: var(--status-draft);
+    --status-tint: var(--status-draft-tint);
+  }
+  [data-status="draft"], .sm-status-draft { --status-color: var(--status-draft); --status-tint: var(--status-draft-tint); }
+  [data-status="in_review"], .sm-status-in_review { --status-color: var(--status-review); --status-tint: var(--status-review-tint); }
+  [data-status="needs_revision"], .sm-status-needs_revision { --status-color: var(--status-revision); --status-tint: var(--status-revision-tint); }
+  [data-status="approved"], .sm-status-approved { --status-color: var(--status-approved); --status-tint: var(--status-approved-tint); }
+  [data-status="exported"], .sm-status-exported { --status-color: var(--status-exported); --status-tint: var(--status-exported-tint); }
+  [data-status="posted"], .sm-status-posted { --status-color: var(--status-posted); --status-tint: var(--status-posted-tint); }
+  [data-status="archived"], .sm-status-archived { --status-color: var(--status-archived); --status-tint: var(--status-archived-tint); }
+  .sm-content-card { border-left: 4px solid hsl(var(--status-color)); overflow-wrap: anywhere; background: hsl(var(--card)); }
+  .sm-content-card[data-status="archived"] { border-left-style: dashed; }
+  .sm-status { color: hsl(var(--status-color)); background: hsl(var(--status-tint)); border-color: hsl(var(--status-color) / .4); font-family: "Space Grotesk", Arial, sans-serif; font-size: 12px; }
+  .sm-status:hover { color: hsl(var(--status-color)); background: hsl(var(--status-tint)); }
+  .sm-status-archived { border-style: dashed; }
+  .sm-status-filter { min-height: 44px; }
+  .sm-status-filter[data-state="active"] { box-shadow: inset 0 0 0 1px hsl(var(--status-color, var(--primary))); font-weight: 700; }
+  .sm-pipeline { background: hsl(var(--status-color)); }
+  .sm-type { font-family: "Space Grotesk", Arial, sans-serif; font-size: 12px; }
+  .sm-type-post { color: hsl(var(--brand-signal)); border-color: hsl(var(--brand-signal) / .4); background: hsl(var(--brand-signal) / .08); }
+  .sm-type-comment { color: hsl(var(--brand-attention)); border-color: hsl(var(--brand-attention) / .4); background: hsl(var(--brand-attention) / .08); }
+  .sm-control { min-height: 44px; }
+  .sm-control:has(> svg:only-child) { min-width: 44px; }
+  .sm-input, [role="combobox"], textarea { min-height: 44px; border-radius: var(--radius); }
+  .sm-page { overflow-wrap: anywhere; }
+  .sm-page nav, [data-sidebar="menu-button"], [role="tab"], label { font-family: "Space Grotesk", Arial, sans-serif; }
+  [data-sidebar="menu-button"] { min-height: 44px; }
+  .sm-card { border-radius: 16px; }
+  .sm-dark { color: hsl(var(--foreground)); }
+  body[data-sm-surface="reading"] [role="dialog"] { color: hsl(var(--foreground)); }
+  :focus-visible { outline: 1px solid hsl(var(--ring)); outline-offset: 2px; box-shadow: 0 0 0 3px hsl(var(--ring) / .35); }
+  button, input, select, textarea, a { transition-timing-function: cubic-bezier(.22, 1, .36, 1); }
+  @media (max-width: 640px) {
+    .sm-page { padding: 16px; }
+    [role="dialog"] { max-width: calc(100vw - 24px); }
+  }
+}
+
+/* Named status treatments must outrank generic Badge/Button variants. */
+.sm-status.sm-status { color: hsl(var(--status-color)); background: hsl(var(--status-tint)); border-color: hsl(var(--status-color) / .4); }
+body[data-sm-surface="reading"] .sm-page [class*="text-muted-foreground/"],
+body[data-sm-surface="reading"] [role="dialog"] [class*="text-muted-foreground/"] { color: hsl(var(--muted-foreground)); }
+body[data-sm-surface="reading"] .sm-page [class*="text-primary/"],
+body[data-sm-surface="reading"] [role="dialog"] [class*="text-primary/"] { color: hsl(var(--primary)); }
+body[data-sm-surface="reading"] .sm-page .text-accent,
+body[data-sm-surface="reading"] [role="dialog"] .text-accent { color: hsl(var(--brand-opportunity)); }
+body[data-sm-surface="reading"] .sm-page [class*="text-brand-warning/"],
+body[data-sm-surface="reading"] [role="dialog"] [class*="text-brand-warning/"] { color: hsl(var(--brand-warning)); }
+.sm-dark { background-color: hsl(var(--brand-midnight)); }
+.sm-dark a { min-height: 44px; }
+[class*="tracking-"] { letter-spacing: 0; }
+.sm-type.sm-type-post { color: hsl(var(--brand-signal)); border-color: hsl(var(--brand-signal) / .4); background: hsl(var(--brand-signal) / .08); }
+.sm-type.sm-type-comment { color: hsl(var(--brand-attention)); border-color: hsl(var(--brand-attention) / .4); background: hsl(var(--brand-attention) / .08); }

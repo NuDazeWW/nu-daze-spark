@@ -13,11 +13,11 @@ type Preflight = ReturnType<typeof usePreflight>;
 
 const GATE_META: Record<GateState, { label: string; cls: string; Icon: typeof Shield }> = {
   none: { label: "Preflight not run", cls: "border-border text-muted-foreground", Icon: Shield },
-  stale: { label: "Preflight out of date", cls: "border-accent/40 text-accent", Icon: ShieldAlert },
+  stale: { label: "Preflight out of date", cls: "border-brand-warning/40 text-brand-warning", Icon: ShieldAlert },
   pass: { label: "Preflight pass", cls: "border-primary/40 text-primary", Icon: ShieldCheck },
   acknowledged: { label: "Warnings acknowledged", cls: "border-primary/40 text-primary", Icon: ShieldCheck },
-  overridden: { label: "Preflight overridden", cls: "border-accent/40 text-accent", Icon: ShieldAlert },
-  warnings: { label: "Preflight warnings", cls: "border-accent/40 text-accent", Icon: ShieldAlert },
+  overridden: { label: "Preflight overridden", cls: "border-brand-warning/40 text-brand-warning", Icon: ShieldAlert },
+  warnings: { label: "Preflight warnings", cls: "border-brand-warning/40 text-brand-warning", Icon: ShieldAlert },
   blocked: { label: "Preflight blocked", cls: "border-destructive/50 text-destructive", Icon: ShieldX },
 };
 
@@ -52,8 +52,8 @@ export function PreflightPanel({ pf, isAdmin }: { pf: Preflight; isAdmin: boolea
         </Button>
       </div>
 
-      {gate.state === "stale" && <p className="text-xs text-accent">The draft changed after this review. Re-run before approving.</p>}
-      {review?.ai_error && <p className="text-xs text-accent">AI review unavailable: {review.ai_error}. Rule checks still ran.</p>}
+      {gate.state === "stale" && <p className="text-xs text-brand-warning">The draft changed after this review. Re-run before approving.</p>}
+      {review?.ai_error && <p className="text-xs text-brand-warning">AI review unavailable: {review.ai_error}. Rule checks still ran.</p>}
       {review && review.findings.length === 0 && <p className="text-sm text-muted-foreground">No issues found.</p>}
 
       {[{ title: "Blocking", list: blocking }, { title: "Advisory", list: advisory }].map(({ title, list }) => list.length > 0 && (

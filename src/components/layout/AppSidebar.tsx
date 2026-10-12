@@ -58,7 +58,7 @@ export function AppSidebar() {
   const canAccessDdi = Boolean(user) && isAdmin;
 
   return (
-    <Sidebar>
+    <Sidebar className="sm-dark">
       <SidebarHeader className="px-4 py-5">
         <Link to="/" className="block w-full">
           <img
@@ -137,7 +137,7 @@ export function AppSidebar() {
         <SidebarSeparator />
 
         <SidebarGroup>
-          <SidebarGroupLabel>NuDaze Platform</SidebarGroupLabel>
+          <SidebarGroupLabel>SocialMotive Platform</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
               {canAccessDdi ? (

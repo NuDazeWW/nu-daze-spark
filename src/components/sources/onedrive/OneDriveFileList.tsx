@@ -92,7 +92,7 @@ export function OneDriveFileList({
                 >
                   {isImported ? (
                     <>
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-brand-success mr-1" />
                       <span className="text-xs">Imported</span>
                     </>
                   ) : isImporting ? (

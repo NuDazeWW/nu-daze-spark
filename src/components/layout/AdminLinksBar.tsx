@@ -14,7 +14,7 @@ export function AdminLinksBar() {
     : "Sign in to access admin tools";
 
   return (
-    <div className="flex items-center gap-4 border-b border-border/50 bg-card/50 px-4 py-1.5">
+    <div className="sm-dark flex flex-wrap items-center gap-4 border-b border-border/50 bg-card/50 px-4 py-1.5">
       <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
         {!canAccess && <Lock className="h-3 w-3" />}
         ADMIN

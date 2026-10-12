@@ -290,7 +290,7 @@ export default function ConnectedSources() {
                     )}
                     {source.last_synced_at && (
                       <p className="text-[10px] text-muted-foreground/60 flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                        <CheckCircle2 className="h-3 w-3 text-brand-success" />
                         Last synced {format(new Date(source.last_synced_at), "MMM d, yyyy 'at' h:mm a")}
                       </p>
                     )}

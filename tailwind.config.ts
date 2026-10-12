@@ -92,6 +92,7 @@ export default {
         },
       },
       borderRadius: {
+        control: "var(--radius)",
         xl: "1rem",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

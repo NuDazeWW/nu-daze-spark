@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import type { CommentWithPost, ApprovalStatus } from "@/hooks/usePostCards";
 import { STATUS_META, APPROVAL_FLOW } from "@/hooks/usePostCards";
+import { commentLabel } from "@/lib/contentPresentation";
 
 interface CommentCardItemProps {
   comment: CommentWithPost;
@@ -31,8 +32,8 @@ const RISK_ICON = {
 };
 
 const RISK_COLOR = {
-  safe: "text-emerald-400",
-  review_needed: "text-amber-400",
+  safe: "text-brand-success",
+  review_needed: "text-brand-attention",
   blocked: "text-destructive",
 };
 
@@ -56,14 +57,14 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
   const RiskIcon = RISK_ICON[riskFlag];
 
   return (
-    <Card className="group border-l-2 border-l-blue-500/40">
+    <Card className="group sm-content-card" data-status={comment.approval_status} data-content-type="comment">
       <CardHeader className="py-3 px-4 space-y-0">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <Badge className={`text-[10px] shrink-0 ${statusMeta.color}`}>
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <Badge variant="outline" className={`text-xs shrink-0 ${statusMeta.color}`}>
               {statusMeta.label}
             </Badge>
-            <Badge variant="outline" className="text-[10px] shrink-0 gap-1">
+            <Badge variant="outline" className="sm-type sm-type-comment shrink-0 gap-1">
               <MessageSquare className="h-2.5 w-2.5" />Comment
             </Badge>
             {ext && (
@@ -122,6 +123,7 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
         </div>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0 space-y-3">
+        <h3 className="text-lg font-semibold leading-snug break-words">{commentLabel(ext)}</h3>
         {/* External post context */}
         {ext && (
           <div className="rounded-md bg-muted/30 border p-2.5 space-y-1">
@@ -153,9 +155,9 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
           {comment.draft_copy}
         </div>
         {comment.draft_copy.length > 200 && (
-          <button className="text-[10px] text-primary hover:underline" onClick={() => setExpanded(!expanded)}>
+          <Button variant="link" size="sm" className="px-0 text-xs" onClick={() => setExpanded(!expanded)}>
             {expanded ? "Show less" : "Show more"}
-          </button>
+          </Button>
         )}
 
         {/* Tone & rationale */}

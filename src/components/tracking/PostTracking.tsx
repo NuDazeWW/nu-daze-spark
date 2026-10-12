@@ -69,7 +69,7 @@ export function StatusProgress({ card, dates }: { card: PostCard; dates?: Partia
             <Tooltip key={s}>
               <TooltipTrigger asChild>
                 <div className="flex-1 min-w-0">
-                  <div className={`h-1 rounded-full ${current ? (status === "needs_revision" ? "bg-accent" : "bg-primary") : done ? "bg-primary/50" : "bg-muted"}`} />
+                  <div className={`h-1 rounded-full ${current ? (status === "needs_revision" ? "bg-brand-attention" : `sm-pipeline sm-status-${status}`) : done ? "bg-primary/50" : "bg-muted"}`} />
                   <p className={`mt-1 text-[9px] truncate ${current ? "text-foreground font-medium" : "text-muted-foreground/70"}`}>
                     {STATUS_META[s].label}
                   </p>
@@ -82,7 +82,7 @@ export function StatusProgress({ card, dates }: { card: PostCard; dates?: Partia
           );
         })}
       </div>
-      {status === "needs_revision" && <p className="text-[10px] text-accent">Sent back for revision</p>}
+      {status === "needs_revision" && <p className="text-xs text-brand-attention">Sent back for revision</p>}
       {status === "archived" && <p className="text-[10px] text-muted-foreground">Archived</p>}
     </div>
   );
