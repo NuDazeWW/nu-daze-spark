@@ -31,8 +31,8 @@ const RISK_ICON = {
 };
 
 const RISK_COLOR = {
-  safe: "text-emerald-400",
-  review_needed: "text-amber-400",
+  safe: "text-brand-success",
+  review_needed: "text-brand-warning",
   blocked: "text-destructive",
 };
 
@@ -48,13 +48,13 @@ function EngagementBadge({ engagement }: { engagement: number }) {
   let color: string;
   if (engagement >= 100) {
     tier = "🔥 Hot";
-    color = "bg-orange-500/15 text-orange-400 border-orange-500/30";
+    color = "bg-brand-attention/15 text-brand-attention border-brand-attention/30";
   } else if (engagement >= 30) {
     tier = "📈 Rising";
-    color = "bg-amber-500/15 text-amber-400 border-amber-500/30";
+    color = "bg-brand-warning/15 text-brand-warning border-brand-warning/30";
   } else {
     tier = "💬 Active";
-    color = "bg-sky-500/15 text-sky-400 border-sky-500/30";
+    color = "bg-brand-signal/15 text-brand-signal border-brand-signal/30";
   }
   return (
     <Badge variant="outline" className={`text-[9px] ${color}`}>
@@ -115,7 +115,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopy}>
-                {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                {copied ? <Check className="h-3 w-3 text-brand-success" /> : <Copy className="h-3 w-3" />}
               </Button>
             </TooltipTrigger>
             <TooltipContent>Copy comment</TooltipContent>
@@ -260,7 +260,7 @@ export default function CommentGenerator() {
           </div>
           <Progress value={targetProgress} className="h-2" />
           {targetData.completed >= targetData.target && (
-            <p className="text-[10px] text-emerald-400 mt-1.5">🎉 Daily target reached!</p>
+            <p className="text-[10px] text-brand-success mt-1.5">🎉 Daily target reached!</p>
           )}
         </div>
       )}
@@ -393,12 +393,12 @@ export default function CommentGenerator() {
             return (
               <Card
                 key={post.id}
-                className={`transition-colors ${isSelected ? "ring-1 ring-primary/40 bg-primary/5" : ""} ${isBlocked ? "opacity-50" : "cursor-pointer"} ${isCommented ? "opacity-60 border-emerald-500/30" : ""}`}
+                className={`transition-colors ${isSelected ? "ring-1 ring-primary/40 bg-primary/5" : ""} ${isBlocked ? "opacity-50" : "cursor-pointer"} ${isCommented ? "opacity-60 border-brand-success/30" : ""}`}
                 onClick={() => !isBlocked && !isCommented && toggleSelect(post.id)}
               >
                 <CardHeader className="py-3 px-4 space-y-0">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0 flex-wrap">
                       {!isBlocked && !isCommented && (
                         <Checkbox
                           checked={isSelected}
@@ -416,7 +416,7 @@ export default function CommentGenerator() {
                               className="h-5 w-5 shrink-0"
                               onClick={(e) => { e.stopPropagation(); unmarkCommented.mutate(post.id); }}
                             >
-                              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                              <CheckCircle2 className="h-4 w-4 text-brand-success" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>Unmark — return to active queue</TooltipContent>
@@ -495,7 +495,7 @@ export default function CommentGenerator() {
                     <p className="text-[10px] text-primary/70 italic">💡 {post.recommended_comment_angle}</p>
                   )}
                   {post.risk_notes && (
-                    <p className="text-[10px] text-amber-400/70">⚠️ {post.risk_notes}</p>
+                    <p className="text-[10px] text-brand-warning/70">⚠️ {post.risk_notes}</p>
                   )}
 
                   {comment && (

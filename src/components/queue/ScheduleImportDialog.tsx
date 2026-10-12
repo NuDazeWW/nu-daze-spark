@@ -139,7 +139,7 @@ export function ScheduleImportDialog({ open, onOpenChange }: Props) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "nudaze_schedule_template.csv";
+    a.download = "SocialMotive-schedule-template.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -228,7 +228,7 @@ export function ScheduleImportDialog({ open, onOpenChange }: Props) {
           {parsed.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3 text-emerald-500" />{validRows.length} valid</Badge>
+                <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3 text-brand-success" />{validRows.length} valid</Badge>
                 {invalidCount > 0 && <Badge variant="destructive">{invalidCount} invalid</Badge>}
               </div>
               {invalidCount > 0 && (

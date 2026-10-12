@@ -287,7 +287,7 @@ function ApprovedCard({
             className="h-7 px-2 text-xs gap-1"
             onClick={() => onCopy(text, label, card.id)}
           >
-            {isCopied ? <Check className="h-3 w-3 text-emerald-400" /> : <Icon className="h-3 w-3" />}
+            {isCopied ? <Check className="h-3 w-3 text-brand-success" /> : <Icon className="h-3 w-3" />}
             {label}
           </Button>
         </TooltipTrigger>

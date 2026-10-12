@@ -39,7 +39,7 @@ export function OneDrivePreview({
           >
             {isImported ? (
               <>
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mr-1" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-brand-success mr-1" />
                 Imported
               </>
             ) : isImporting ? (

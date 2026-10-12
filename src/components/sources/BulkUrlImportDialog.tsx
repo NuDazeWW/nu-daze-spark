@@ -125,7 +125,7 @@ export function BulkUrlImportDialog({ open, onOpenChange }: BulkUrlImportDialogP
               {results.map((r, i) => (
                 <div key={i} className="flex items-start gap-2 text-sm">
                   {r.success ? (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-brand-success mt-0.5 shrink-0" />
                   ) : (
                     <XCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
                   )}

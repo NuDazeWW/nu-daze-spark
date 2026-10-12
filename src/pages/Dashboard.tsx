@@ -1,3 +1,4 @@
+import { STATUS_META } from "@/hooks/usePostCards";
 import { useMemo } from "react";
 import { useDdiHandoff } from "@/hooks/useDdiHandoff";
 import { useNavigate } from "react-router-dom";
@@ -22,28 +23,13 @@ const PLATFORM_ICON: Record<string, React.ElementType> = {
   instagram: Instagram,
 };
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  draft: { label: "Drafts", color: "bg-muted text-muted-foreground" },
-  in_review: { label: "In Review", color: "bg-primary/20 text-primary" },
-  needs_revision: { label: "Revision", color: "bg-accent/20 text-accent" },
-  approved: { label: "Approved", color: "bg-emerald-500/20 text-emerald-400" },
-  exported: { label: "Exported", color: "bg-blue-500/20 text-blue-400" },
-  posted: { label: "Posted", color: "bg-violet-500/20 text-violet-400" },
-  archived: { label: "Archived", color: "bg-muted text-muted-foreground" },
-};
-
-const PIPELINE_COLORS: Record<string, string> = {
-  draft: "bg-muted-foreground/60",
-  in_review: "bg-primary",
-  needs_revision: "bg-accent",
-  approved: "bg-emerald-500",
-  exported: "bg-blue-500",
-  posted: "bg-violet-500",
-  archived: "bg-muted-foreground/30",
-};
+const STATUS_LABELS: Record<string, { label: string; color: string }> = STATUS_META;
+const PIPELINE_COLORS: Record<string, string> = Object.fromEntries(
+  Object.keys(STATUS_META).map((status) => [status, `sm-pipeline sm-status-${status}`]),
+);
 
 const ASSET_HEALTH_META: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  generation_allowed: { label: "Usable", icon: ShieldCheck, color: "text-emerald-400" },
+  generation_allowed: { label: "Usable", icon: ShieldCheck, color: "text-brand-success" },
   summarization_only: { label: "Summary Only", icon: Eye, color: "text-accent" },
   blocked: { label: "Blocked", icon: ShieldX, color: "text-destructive" },
   archived: { label: "Archived", icon: Archive, color: "text-muted-foreground" },
@@ -52,7 +38,7 @@ const ASSET_HEALTH_META: Record<string, { label: string; icon: React.ElementType
 function cadenceColor(current: number, target: number) {
   if (target === 0) return "text-muted-foreground";
   const pct = current / target;
-  if (pct >= 0.8) return "text-emerald-400";
+  if (pct >= 0.8) return "text-brand-success";
   if (pct >= 0.4) return "text-accent";
   return "text-destructive";
 }
@@ -64,7 +50,7 @@ function WowIndicator({ current, previous }: { current: number; previous: number
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="inline-flex items-center gap-0.5 text-emerald-400 text-[10px] font-medium">
+          <span className="inline-flex items-center gap-0.5 text-brand-success text-[10px] font-medium">
             <TrendingUp className="h-3 w-3" />+{diff}
           </span>
         </TooltipTrigger>
@@ -117,7 +103,7 @@ export default function Dashboard() {
         {[
           { label: "Posts This Week", value: totalStats.postsThisWeek, icon: FileText, color: "text-primary" },
           { label: "Comments Today", value: totalStats.commentsToday, icon: MessageSquare, color: "text-accent" },
-          { label: "Total Assets", value: totalStats.totalAssets, icon: Image, color: "text-emerald-400" },
+          { label: "Total Assets", value: totalStats.totalAssets, icon: Image, color: "text-brand-success" },
         ].map((s) => (
           <Card key={s.label} className="border-border/40">
             <CardContent className="flex items-center gap-3 py-4 px-5">
