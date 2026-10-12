@@ -16,13 +16,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { CheckCircle2, Loader2, Mail, XCircle } from "lucide-react";
 
-type ProviderKey = "sendgrid" | "gmail" | "outlook" | "yahoo" | "smtp";
+type ProviderKey = "sendgrid" | "gmail" | "outlook" | "yahoo" | "apple" | "smtp";
 
 const PROVIDERS: { key: ProviderKey; label: string; secretLabel: string; steps: string[] }[] = [
   { key: "sendgrid", label: "SendGrid", secretLabel: "SendGrid API key", steps: ["In SendGrid, open Settings › API Keys and create a key with Mail Send permission.", "Verify your from address under Settings › Sender Authentication."] },
   { key: "gmail", label: "Gmail / Google Workspace", secretLabel: "App password", steps: ["Turn on 2-Step Verification for the Google account.", "Go to myaccount.google.com/apppasswords and create an app password.", "Paste the 16-character password here (not your normal password)."] },
   { key: "outlook", label: "Outlook / Microsoft 365", secretLabel: "App password", steps: ["Turn on two-step verification for the Microsoft account.", "Create an app password under Security › Advanced security options.", "Business accounts: your IT admin may need to allow SMTP sending. If it's blocked, use SendGrid or Custom SMTP."] },
   { key: "yahoo", label: "Yahoo Mail", secretLabel: "App password", steps: ["In Yahoo Account Security, turn on 2-step verification.", "Choose Generate app password and paste it here."] },
+  { key: "apple", label: "Apple Mail / iCloud", secretLabel: "App-specific password", steps: ["Sign in at account.apple.com and make sure two-factor authentication is on.", "Under Sign-In and Security, choose App-Specific Passwords and create one named SocialMotive.", "Use your @icloud.com, @me.com or @mac.com address as the from address and paste the password here."] },
   { key: "smtp", label: "Custom mail server (SMTP)", secretLabel: "Password", steps: ["Ask your email host for the SMTP server, port and login details."] },
 ];
 
@@ -126,6 +127,13 @@ function Inner() {
                 </p>
               )}
             </div>
+            <label className="flex items-center gap-2 text-xs">
+              <Switch checked={!s!.sending_paused} onCheckedChange={async (v) => {
+                const { error } = await supabase.from("email_provider_settings").update({ sending_paused: !v }).eq("id", true);
+                if (error) toast.error(error.message); else { refresh(); toast.success(v ? "Notification emails resumed" : "All notification emails paused — your connection is kept"); }
+              }} />
+              {s!.sending_paused ? "Sending paused" : "Sending on"}
+            </label>
             <Button variant="outline" size="sm" onClick={() => setEditing((v) => !v)}>{editing ? "Cancel" : "Replace"}</Button>
             <Button variant="outline" size="sm" disabled={busy === "disconnect"} onClick={disconnect}>Disconnect</Button>
           </CardContent>
