@@ -22,6 +22,8 @@ import {
   HelpCircle,
   Megaphone,
   CalendarRange,
+  Bell,
+  Mail,
 } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { APP_VERSION } from "@/lib/appVersion";
@@ -63,6 +65,7 @@ const adminSettingsNav = [
   { title: "Setup", icon: ListChecks, href: "/setup" },
   { title: "Team", icon: Users, href: "/settings/team" },
   { title: "Usage & Activity", icon: BarChart3, href: "/settings/usage" },
+  { title: "Email Provider", icon: Mail, href: "/settings/email-provider" },
 ];
 
 export function AppSidebar() {
@@ -72,6 +75,7 @@ export function AppSidebar() {
   const settingsNav = [
     { title: ws.entityPlural, icon: Building2, href: "/settings/clients" },
     { title: "Account Tags", icon: AtSign, href: "/settings/tags" },
+    { title: "Notifications", icon: Bell, href: "/settings/notifications" },
     ...(ws.canManage ? adminSettingsNav : []),
     { title: "Help", icon: HelpCircle, href: "/help" },
     { title: "What's new", icon: Megaphone, href: "/whats-new" },
