@@ -51,8 +51,9 @@ export default function DailyQueue() {
     const c = cards.find((x) => x.id === jumpId);
     if (!c) return;
     setSearch(postLabel(c)); setStatusFilter("all"); setPlatformFilter("all"); setTypeFilter("all");
+    if (params.get("edit")) { const qi = queueItems.find((q) => q.type === "post" && q.id === jumpId); if (qi) setEditingPostCard(qi); }
     setParams({}, { replace: true });
-  }, [jumpId, cards, setParams]);
+  }, [jumpId, cards, queueItems, params, setParams]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
