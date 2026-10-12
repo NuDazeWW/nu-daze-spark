@@ -528,6 +528,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          platforms: string[]
           slug: string
           updated_at: string
         }
@@ -536,6 +537,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          platforms?: string[]
           slug: string
           updated_at?: string
         }
@@ -544,6 +546,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          platforms?: string[]
           slug?: string
           updated_at?: string
         }
@@ -1593,7 +1596,7 @@ export type Database = {
         | "summarization_only"
         | "blocked"
         | "archived"
-      platform_type: "linkedin" | "instagram"
+      platform_type: "linkedin" | "instagram" | "facebook"
       repurpose_type:
         | "repost_as_is"
         | "cross_platform_rewrite"
@@ -1766,7 +1769,7 @@ export const Constants = {
         "blocked",
         "archived",
       ],
-      platform_type: ["linkedin", "instagram"],
+      platform_type: ["linkedin", "instagram", "facebook"],
       repurpose_type: [
         "repost_as_is",
         "cross_platform_rewrite",
