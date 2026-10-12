@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Instagram, Linkedin } from "lucide-react";
 import { STATUS_META, type QueueItem } from "@/hooks/usePostCards";
+import { postLabel } from "@/components/tracking/PostTracking";
 import { cn } from "@/lib/utils";
 
 interface WeeklyCalendarViewProps {
