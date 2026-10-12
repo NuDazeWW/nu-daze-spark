@@ -119,6 +119,20 @@ export function PreflightPanel({ pf, isAdmin }: { pf: Preflight; isAdmin: boolea
             onClick={() => override.mutate(reason.trim(), { onSuccess: () => setReason("") })}>Override and allow</Button>
         </div>
       )}
+
+      <Dialog open={bypassOpen} onOpenChange={setBypassOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bypass blocking issue</DialogTitle>
+            <DialogDescription>You were notified of this issue and choose to keep the draft as is. This is logged with your reason.</DialogDescription>
+          </DialogHeader>
+          <Textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is this safe to keep?" />
+          <Button size="sm" variant="destructive" disabled={reason.trim().length < 8 || override.isPending}
+            onClick={() => override.mutate(reason.trim(), { onSuccess: () => { setReason(""); setBypassOpen(false); } })}>
+            Bypass and allow
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
