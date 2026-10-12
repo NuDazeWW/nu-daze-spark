@@ -42,8 +42,7 @@ export function SocialAccountsDialog({ client, onClose }: { client: { id: string
   const add = useMutation({
     mutationFn: async () => {
       if (!client || !name.trim()) throw new Error("Enter an account name");
-      if (url && !/^https:\/\//.test(url.trim())) throw new Error("Profile link must start with https://");
-      const { error } = await supabase.from("social_accounts").insert({ client_id: client.id, platform, account_name: name.trim(), handle: handle.trim() || null, profile_url: url.trim() || null } as never);
+      const { error } = await supabase.from("social_accounts").insert({ client_id: client.id, platform, account_name: name.trim(), handle: handle.trim() || null, profile_url: normalizeUrl(url) } as never);
       if (error) throw error;
       await sync(client.id);
     },
@@ -70,8 +69,8 @@ export function SocialAccountsDialog({ client, onClose }: { client: { id: string
               <Badge variant="outline">{PL[a.platform]}</Badge>
               <span className="font-medium">{a.account_name}</span>
               {a.handle && <span className="text-muted-foreground font-mono text-xs">{a.handle}</span>}
-              {a.profile_url && <a href={a.profile_url} target="_blank" rel="noopener noreferrer" className="text-xs underline">profile</a>}
-              <Button size="icon" variant="ghost" className="ml-auto h-7 w-7" onClick={() => remove.mutate(a.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+              <ProfileLinkEditor id={a.id} value={a.profile_url} onSaved={() => qc.invalidateQueries({ queryKey: ["social_accounts"] })} />
+              <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => remove.mutate(a.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
             </li>
           ))}
           {rows.length === 0 && <li className="py-2 text-sm text-muted-foreground">No accounts yet.</li>}
@@ -88,5 +87,33 @@ export function SocialAccountsDialog({ client, onClose }: { client: { id: string
         <Button onClick={() => add.mutate()} disabled={add.isPending}><Plus className="mr-2 h-4 w-4" />Add account</Button>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function normalizeUrl(raw: string): string | null {
+  const v = raw.trim();
+  if (!v) return null;
+  const withScheme = /^https?:\/\//i.test(v) ? v.replace(/^http:/i, "https:") : `https://${v.replace(/^\/+/, "")}`;
+  try { return new URL(withScheme).toString(); } catch { throw new Error("That doesn't look like a web address"); }
+}
+
+function ProfileLinkEditor({ id, value, onSaved }: { id: string; value: string | null; onSaved: () => void }) {
+  const [v, setV] = useState(value ?? "");
+  const [saving, setSaving] = useState(false);
+  const dirty = v.trim() !== (value ?? "");
+  const save = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("social_accounts").update({ profile_url: normalizeUrl(v) } as never).eq("id", id);
+      if (error) throw error;
+      toast.success("Profile link saved"); onSaved();
+    } catch (e) { toast.error((e as Error).message); } finally { setSaving(false); }
+  };
+  return (
+    <div className="flex flex-1 items-center gap-1 min-w-0">
+      <Input className="h-7 text-xs" placeholder="Profile link, e.g. linkedin.com/company/…" value={v} onChange={(e) => setV(e.target.value)} />
+      {dirty && <Button size="sm" variant="outline" className="h-7 text-xs" onClick={save} disabled={saving}>Save</Button>}
+      {!dirty && value && <a href={value} target="_blank" rel="noopener noreferrer" className="text-xs underline shrink-0">open</a>}
+    </div>
   );
 }
