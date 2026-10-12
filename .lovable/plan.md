@@ -1,58 +1,55 @@
-# SocialMotive: Commercial-Ready Edition (first sold copy)
+# SocialMotive: Commercial-Ready Demo Edition
 
-Goal: turn this NuDaze-run build into a clean, self-managed product that any buyer (agency or multi-department brand) can set up and run in their own Lovable account.
+Goal: add every feature a buyer needs to run their own copy, while this copy stays the NuDaze demo. NuDaze content, clients and admins stay. Every new setup step shows as already completed for NuDaze, but each one fully works and can be edited or rerun.
 
-## Recommendations, in build order
+## What gets built
 
-### 1. Remove NuDaze from the product ("white-label clean")
-- Move all NuDaze-specific wording, starter content, sample posts, strategy rules and default client out of the app and into an optional "demo data" pack.
-- Add a Workspace Branding page: buyer's company name, logo, accent color, favicon. The SocialMotive look stays the default.
-- Remove the NuDaze-email auto-admin rule and hard-coded admin accounts; the first person to sign up becomes the owner.
+### 1. Workspace Branding (prefilled with NuDaze / SocialMotive)
+- New Settings page: company name, logo, accent color, favicon.
+- Prefilled with the current look. Changes apply across the app right away.
 
-### 2. First-run setup wizard
-Walks the owner through, in order:
-1. Company profile and branding
-2. Organization type: Agency (many clients) or Brand (many departments)
-3. First client or department, with its social accounts (LinkedIn, Instagram, Facebook)
-4. Brand voice basics, content pillars, banned phrases
-5. Weekly cadence targets per platform
-6. Invite teammates
-Progress shows on the Dashboard until complete; can be skipped and resumed.
+### 2. First-run setup wizard (shown as complete for NuDaze)
+Steps: company profile and branding, organization type, first client or department with its social accounts, brand voice basics, cadence targets, invite teammates.
+- The Dashboard shows a setup checklist marked done for NuDaze. Any step can be reopened.
+- "Preview as new buyer" button lets an admin walk the wizard without changing data.
 
-### 3. Flexible structure: clients and departments
-- Rename "Clients" to a configurable label ("Clients" for agencies, "Departments" or "Brands" for companies).
-- Each client/department has its own social accounts, strategy rules, cadence, assets and team — already isolated by existing data rules.
-- Allow several accounts per platform per department (e.g. two LinkedIn pages).
+### 3. Agency or Brand mode with departments
+- Setting: Agency (many clients) or Brand (many departments). Changes the label everywhere ("Clients" or "Departments").
+- NuDaze is set to Agency mode with NuDaze Flagship already in place.
+- Each client/department can hold several social accounts per platform (e.g. two LinkedIn pages). The current platform selections become accounts automatically.
 
 ### 4. Team, roles and seat limits
-- Invite by email with a role: Owner, Admin, Editor, Reviewer, Viewer.
-- Assign people to specific clients/departments.
-- Owner-only: transfer ownership, remove users.
-- Seat limit setting tied to the plan.
+- Invite by email with a role: Owner, Admin, Editor, Reviewer, Viewer; assign to specific clients/departments.
+- Current admins keep their access; Shirley becomes Owner.
+- Owner can transfer ownership and remove users; seat limit shown and enforced.
 
-### 5. Billing for the buyer's end users (optional per sale)
-- Only needed if a buyer resells access. Default: off, since each buyer already pays you for their copy.
-- If switched on: plans with seat and client limits, enforced in the app.
+### 5. Plans and usage (optional per sale)
+- Plan settings with seat and client limits, off by default for NuDaze (unlimited).
+- Usage page: AI generations this month, posts approved, seats used.
 
 ### 6. Easy updates across sold copies
-- Keep one "master" project (this one, cleaned) as the source; each sale is a remix of it.
-- Keep all buyer-specific settings in the database, never in code, so updates can be copied into each copy without overwriting the buyer's setup.
-- Add a visible version number and "What's new" page.
-- Write a short release checklist for pushing updates to buyer copies.
+- This project stays the master; each sale is a remix.
+- All buyer settings live in the database, so updates don't overwrite them.
+- Version number in the footer and a "What's new" page.
+- "Reset to clean workspace" admin tool (with strong confirmation) that buyers use once to clear demo data; NuDaze never needs to run it.
 
 ### 7. Commercial polish
-- In-app help pages and empty-state guidance on every screen.
-- Terms, privacy and data export (buyer can download all their content).
-- Usage page: AI generations this month, posts approved, seats used.
-- Error-friendly messages and an admin activity log.
+- Help pages and empty-state guidance on each screen.
+- Data export: download all content per client/department.
+- Admin activity log of key actions (invites, role changes, approvals, settings).
 
-## Suggested first slice
-Steps 1, 2 and 3 together: a buyer can install a clean copy, brand it, pick agency or brand mode and set up departments. Then 4, then 6, then 5 and 7.
+## Build order
+1. Branding + Agency/Brand mode + social accounts
+2. Setup wizard and checklist
+3. Team roles, invites and seat limits
+4. Usage, plans, version and What's new
+5. Export, activity log, help and reset tool
 
 ## Technical details
-- New `workspace_settings` table (single row): name, logo path, colors, org type, entity label, setup progress, version.
-- New `social_accounts` table per client (platform, handle, profile URL), replacing reliance on `clients.platforms` (kept, deprecated later).
-- Extend `app_role` enum with owner/editor/reviewer/viewer; keep checks in `has_role()`; bootstrap owner via signup trigger only when no owner exists.
-- Drop the NuDaze domain admin trigger; move NuDaze seed data to an admin-triggered "load demo data" function.
-- Brand tokens read from workspace settings at runtime with SocialMotive defaults.
+- New `workspace_settings` table (single row): name, logo path, colors, org type, entity label, setup progress, plan limits, version. Seeded with NuDaze values and all setup steps complete.
+- New `social_accounts` table per client (platform, handle, profile URL), backfilled from `clients.platforms` (kept, later deprecated).
+- New `workspace_invites` and `activity_log` tables with RLS and grants.
+- Extend `app_role` with owner/editor/reviewer/viewer; permissions checked via `has_role()`; prevent removing the last owner by trigger.
+- NuDaze domain auto-admin trigger kept for this copy, controlled by a setting so buyers can turn it off.
+- Branding colors applied as runtime overrides of existing tokens, with SocialMotive defaults.
 - Record "buyer settings live in data, not code" in AGENTS.md.
