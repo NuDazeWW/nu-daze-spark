@@ -16,8 +16,8 @@ import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
 } from "lucide-react";
 
-const LIMITS: Record<string, number> = { linkedin: 3000, instagram: 2200 };
-const MAX_HASHTAGS: Record<string, number> = { linkedin: 5, instagram: 30 };
+const LIMITS: Record<string, number> = { linkedin: 3000, instagram: 2200, facebook: 63206 };
+const MAX_HASHTAGS: Record<string, number> = { linkedin: 5, instagram: 30, facebook: 30 };
 
 type Check = { level: "pass" | "warn" | "fail"; label: string };
 

@@ -55,4 +55,8 @@ export function isPreviewMedia(asset: { asset_type: string; permission_state: st
     !asset.deleted_at && (!asset.expires_at || new Date(asset.expires_at).getTime() > Date.now());
 }
 
-export function previewLimit(platform: string) { return platform === "instagram" ? 2200 : 3000; }
+export function previewLimit(platform: string) {
+  if (platform === "instagram") return 2200;
+  if (platform === "facebook") return 63206;
+  return 3000;
+}

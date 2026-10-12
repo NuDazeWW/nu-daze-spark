@@ -3,7 +3,7 @@ import { addDays, addWeeks, endOfWeek, format, isSameDay, startOfWeek } from "da
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Instagram, Linkedin } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Instagram, Linkedin, Facebook } from "lucide-react";
 import { STATUS_META, type QueueItem } from "@/hooks/usePostCards";
 import { postLabel } from "@/components/tracking/PostTracking";
 import { cn } from "@/lib/utils";
