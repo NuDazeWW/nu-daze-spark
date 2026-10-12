@@ -1472,6 +1472,7 @@ export type Database = {
       social_accounts: {
         Row: {
           account_name: string
+          avatar_path: string | null
           client_id: string
           created_at: string
           handle: string | null
@@ -1483,6 +1484,7 @@ export type Database = {
         }
         Insert: {
           account_name: string
+          avatar_path?: string | null
           client_id: string
           created_at?: string
           handle?: string | null
@@ -1494,6 +1496,7 @@ export type Database = {
         }
         Update: {
           account_name?: string
+          avatar_path?: string | null
           client_id?: string
           created_at?: string
           handle?: string | null
