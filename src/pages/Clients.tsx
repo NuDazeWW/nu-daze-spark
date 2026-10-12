@@ -11,10 +11,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Building2, Plus, Loader2, Users, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Client = Tables<"clients">;
 type ClientMember = Tables<"client_members">;
+
+const PLATFORM_OPTIONS = [
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "instagram", label: "Instagram" },
+  { value: "facebook", label: "Facebook" },
+] as const;
+
+function platformLabel(p: string) {
+  return PLATFORM_OPTIONS.find((o) => o.value === p)?.label ?? p;
+}
 
 export default function Clients() {
   const { isAdmin } = useAuth();
