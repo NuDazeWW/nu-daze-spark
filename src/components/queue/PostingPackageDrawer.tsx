@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { NativePostPreview } from "@/components/preview/NativePostPreview";
+import { usePreflight } from "@/hooks/usePreflight";
+import { PreflightPanel } from "@/components/preflight/PreflightPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
@@ -128,7 +130,9 @@ export function PostingPackageDrawer({
     return c;
   }, [card, assets]);
 
-  const failCount = checks.filter((c) => c.level === "fail").length;
+  const pf = usePreflight(card);
+  const preflightFail = card && !pf.gate.clear ? 1 : 0;
+  const failCount = checks.filter((c) => c.level === "fail").length + preflightFail;
 
   if (!card) return null;
 
@@ -196,7 +200,11 @@ export function PostingPackageDrawer({
           <TabsList className="w-full">
             <TabsTrigger value="package" className="flex-1">Posting package</TabsTrigger>
             <TabsTrigger value="preview" className="flex-1">Native preview</TabsTrigger>
+            <TabsTrigger value="preflight" className="flex-1">Preflight</TabsTrigger>
           </TabsList>
+          <TabsContent value="preflight" className="mt-4">
+            <PreflightPanel pf={pf} isAdmin={canExport} />
+          </TabsContent>
           <TabsContent value="preview" className="mt-4">
             <NativePostPreview key={card.id} card={card} enabled={open} firstComment={firstComment} />
           </TabsContent>
@@ -205,6 +213,9 @@ export function PostingPackageDrawer({
             <div className="flex items-center gap-2 text-sm font-medium">
               <ShieldCheck className="h-4 w-4" /> {failCount ? `${failCount} blocking issue${failCount > 1 ? "s" : ""}` : "Ready to post"}
             </div>
+            {card && (pf.gate.clear
+              ? <div className="flex items-center gap-2 text-xs"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /><span className="text-muted-foreground">Preflight cleared</span></div>
+              : <div className="flex items-center gap-2 text-xs"><XCircle className="h-3.5 w-3.5 text-destructive" /><span>Preflight not cleared ({pf.gate.state}) — see Preflight tab</span></div>)}
             {checks.map((c, i) => (
               <div key={i} className="flex items-center gap-2 text-xs">
                 {c.level === "pass" ? <CheckCircle2 className="h-3.5 w-3.5 text-primary" /> :

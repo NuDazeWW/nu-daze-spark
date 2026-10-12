@@ -8,13 +8,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Copy, Pencil, Trash2, ChevronRight, ChevronLeft, MoreVertical,
-  Check, Users, Hash, Building2, Target, Megaphone, BookOpen, Eye,
+  Check, Users, Hash, Building2, Target, Megaphone, BookOpen, Eye, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import type { PostCard, ApprovalStatus } from "@/hooks/usePostCards";
 import { STATUS_META, APPROVAL_FLOW } from "@/hooks/usePostCards";
 import { NativePreviewDialog } from "@/components/preview/NativePostPreview";
+import { usePreflight } from "@/hooks/usePreflight";
+import { PreflightBadge, PreflightDialog } from "@/components/preflight/PreflightPanel";
 
 interface PostCardItemProps {
   card: PostCard;
@@ -33,7 +35,20 @@ const copyToClipboard = async (text: string, label: string) => {
 export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, isUpdating }: PostCardItemProps) {
   const [expanded, setExpanded] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [preflightOpen, setPreflightOpen] = useState(false);
+  const [gateIntent, setGateIntent] = useState<string | null>(null);
+  const pf = usePreflight(card);
   const statusMeta = STATUS_META[card.approval_status];
+
+  const changeStatus = (status: ApprovalStatus) => {
+    if ((status === "approved" || status === "exported") && !pf.gate.clear) {
+      setGateIntent(`Preflight must pass before moving to ${STATUS_META[status].label}. Run it, fix or acknowledge findings${isAdmin ? ", or override blocking issues with a reason" : ""}.`);
+      setPreflightOpen(true);
+      return;
+    }
+    onStatusChange(status);
+    if (status === "in_review") pf.run.mutate();
+  };
   const currentIndex = APPROVAL_FLOW.indexOf(card.approval_status);
 
   const canAdvance = currentIndex < APPROVAL_FLOW.indexOf("archived") && card.approval_status !== "archived";
@@ -62,7 +77,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
             {canRevert && prevStatus && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onStatusChange(prevStatus)} disabled={isUpdating}>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => changeStatus(prevStatus)} disabled={isUpdating}>
                     <ChevronLeft className="h-3.5 w-3.5" />
                   </Button>
                 </TooltipTrigger>
@@ -72,7 +87,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
             {canAdvance && nextStatus && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onStatusChange(nextStatus)} disabled={isUpdating}>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => changeStatus(nextStatus)} disabled={isUpdating}>
                     <ChevronRight className="h-3.5 w-3.5" />
                   </Button>
                 </TooltipTrigger>
@@ -124,6 +139,12 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setPreviewOpen(true)}>
           <Eye className="h-3.5 w-3.5" />Preview
         </Button>
+        <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 ml-2" onClick={() => { setGateIntent(null); setPreflightOpen(true); }}>
+          <ShieldCheck className="h-3.5 w-3.5" />Preflight
+        </Button>
+        <span className="ml-2 align-middle">
+          <PreflightBadge state={pf.run.isPending ? "none" : pf.gate.state} review={pf.review} onClick={() => { setGateIntent(null); setPreflightOpen(true); }} />
+        </span>
         {/* Draft copy */}
         <div
           className={`text-sm whitespace-pre-wrap cursor-pointer ${!expanded ? "line-clamp-4" : ""}`}
@@ -199,6 +220,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         )}
       </CardContent>
       <NativePreviewDialog card={card} open={previewOpen} onOpenChange={setPreviewOpen} />
+      <PreflightDialog open={preflightOpen} onOpenChange={setPreflightOpen} pf={pf} isAdmin={isAdmin} intent={gateIntent} />
     </Card>
   );
 }
