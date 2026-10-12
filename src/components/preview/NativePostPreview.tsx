@@ -6,6 +6,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { PostCard } from "@/hooks/usePostCards";
 import { useActiveClient } from "@/contexts/ClientContext";
 import { usePreviewMedia, type PreviewMedia } from "@/hooks/usePreviewMedia";
+import { AccountPhotoControl, PreviewAvatar, usePreviewAccount } from "./PreviewAccountIdentity";
 import { extractPreviewCopy, parseStoryFrames, previewLimit, withHashtags } from "@/lib/nativePreview";
 
 function Media({ asset, fill, onRatio }: { asset?: PreviewMedia; fill: boolean; onRatio: (ratio: number) => void }) {
@@ -39,8 +40,8 @@ export function NativePostPreview({ card, enabled = true, firstComment }: { card
   const count = isStory ? Math.max(1, frames.length) : Math.max(1, media.length);
   const selectedMedia = isStory ? media[index] ?? media[0] : media[index];
   const frame = frames[index];
-  const name = activeClient?.id === card.client_id ? activeClient.name : "Client account";
-  const initials = name.split(/\s+/).map((s) => s[0]).slice(0, 2).join("");
+  const { account, avatarUrl } = usePreviewAccount(card.client_id, card.platform);
+  const name = account?.account_name || (activeClient?.id === card.client_id ? activeClient.name : "Client account");
   const targetRatio = vertical ? 9 / 16 : isLinkedIn ? 1.91 : 4 / 5;
   const limit = previewLimit(card.platform);
   useEffect(() => { setIndex(0); setExpanded(false); setRatio(null); }, [card.id, card.draft_copy]);
@@ -65,7 +66,7 @@ export function NativePostPreview({ card, enabled = true, firstComment }: { card
       </Button>}
   </div>;
   const header = <div className="native-header">
-    <span className="native-avatar" aria-hidden="true">{initials}</span>
+    <PreviewAvatar name={name} url={avatarUrl} />
     <div className="min-w-0 flex-1"><strong className="block truncate text-sm">{name}</strong>
       {isLinkedIn && <span className="native-muted flex items-center gap-1 text-xs">Just now · <Globe2 className="h-3 w-3" /></span>}
     </div>
@@ -88,7 +89,7 @@ export function NativePostPreview({ card, enabled = true, firstComment }: { card
         {mediaView}
         <div className="native-vertical-header">
           {isStory && <div className="flex gap-1 mb-2" aria-hidden="true">{Array.from({ length: count }, (_, i) => <div key={i} className={`native-progress ${i <= index ? "native-progress-active" : ""}`} />)}</div>}
-          <div className="flex items-center gap-2"><span className="native-avatar">{initials}</span><strong className="text-sm truncate flex-1">{name}</strong>
+          <div className="flex items-center gap-2"><PreviewAvatar name={name} url={avatarUrl} /><strong className="text-sm truncate flex-1">{name}</strong>
             {isStory ? <X className="h-4 w-4" aria-hidden="true" /> : <Volume2 className="h-4 w-4" aria-hidden="true" />}</div>
         </div>
         {isStory && frame?.onScreen && <div className="native-story-text">{frame.onScreen}</div>}
@@ -111,6 +112,7 @@ export function NativePostPreview({ card, enabled = true, firstComment }: { card
     </div>
     {navigation}
     {vertical && !isStory && copy && <div className="text-sm whitespace-pre-wrap break-words">{caption || "Caption not identified"}</div>}
+    {card.client_id && <AccountPhotoControl account={account} clientId={card.client_id} hasPhoto={!!avatarUrl} />}
     <div className="text-xs space-y-1 text-muted-foreground" role="status">
       <p className={caption.length > limit ? "text-destructive" : ""}>{caption.length.toLocaleString()} / {limit.toLocaleString()} characters{caption.length > limit && " — over platform limit"}</p>
       {isFetching && <p>Loading attached media…</p>}
