@@ -53,6 +53,7 @@ export default function ContentPlanner() {
   const [undo, setUndo] = useState<{ id: string; scheduled_for: string | null }[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [shiftDays, setShiftDays] = useState(7);
+  const [trayDragOver, setTrayDragOver] = useState(false);
 
   const minMonth = startOfMonth(addMonths(new Date(), -1));
   const maxMonth = startOfMonth(addMonths(new Date(), 12));
