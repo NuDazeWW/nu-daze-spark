@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useClientSocialAccounts, type SocialAccount } from "@/hooks/useClientSocialAccounts";
+import { Button } from "@/components/ui/button";
+import { AccountPhotoEditor } from "./AccountPhotoEditor";
 
 /** Picks the saved social account for this platform so previews show the real account name and photo. */
 export function usePreviewAccount(clientId: string | null | undefined, platform: string) {
@@ -15,7 +17,8 @@ export function usePreviewAccount(clientId: string | null | undefined, platform:
     enabled: !!account?.avatar_path,
     staleTime: 30 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await supabase.storage.from("account-avatars").createSignedUrl(account!.avatar_path!, 3600);
+      if (!account?.avatar_path) return null;
+      const { data, error } = await supabase.storage.from("account-avatars").createSignedUrl(account.avatar_path, 3600);
       if (error) throw error;
       return data.signedUrl;
     },
@@ -36,12 +39,11 @@ export function AccountPhotoControl({ account, clientId, hasPhoto }: { account: 
   const qc = useQueryClient();
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   if (!account) return <p className="text-xs text-muted-foreground">No saved account for this platform — add one in Settings › Clients › Accounts to show its real name and photo.</p>;
   if (!isAdmin) return hasPhoto ? null : <p className="text-xs text-muted-foreground">No account photo saved — ask an admin to add one.</p>;
 
   const upload = async (file: File) => {
-    if (!file.type.startsWith("image/")) return toast.error("Please choose an image file");
-    if (file.size > 5 * 1024 * 1024) return toast.error("Image must be under 5 MB");
     setBusy(true);
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -52,6 +54,7 @@ export function AccountPhotoControl({ account, clientId, hasPhoto }: { account: 
       if (error) throw error;
       if (account.avatar_path) await supabase.storage.from("account-avatars").remove([account.avatar_path]);
       await qc.invalidateQueries({ queryKey: ["social_accounts", clientId] });
+      setSelectedFile(null);
       toast.success("Account photo saved");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Upload failed");
@@ -61,13 +64,20 @@ export function AccountPhotoControl({ account, clientId, hasPhoto }: { account: 
     }
   };
 
-  return <div className="flex items-center gap-2">
-    <input ref={input} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
-    <button type="button" disabled={busy} onClick={() => input.current?.click()}
-      className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium hover:bg-muted disabled:opacity-50">
+  return <div className="flex items-center gap-2 flex-wrap">
+    <input ref={input} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(event) => {
+      const file = event.target.files?.[0];
+      event.target.value = "";
+      if (!file) return;
+      if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) return toast.error("Please choose a PNG, JPEG or WebP image");
+      if (file.size > 20 * 1024 * 1024) return toast.error("Image must be under 20 MB");
+      setSelectedFile(file);
+    }} />
+    <Button variant="outline" size="sm" disabled={busy} onClick={() => input.current?.click()} className="text-xs">
       {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
       {hasPhoto ? "Change account photo" : "Add account photo"}
-    </button>
+    </Button>
     {!hasPhoto && <span className="text-xs text-muted-foreground">Shows as {account.account_name}'s profile picture</span>}
+    <AccountPhotoEditor file={selectedFile} busy={busy} onCancel={() => setSelectedFile(null)} onSave={upload} />
   </div>;
 }
