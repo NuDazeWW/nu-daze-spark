@@ -18,6 +18,7 @@ interface WeeklyCalendarViewProps {
 const PLATFORMS = [
   { value: "instagram", label: "Instagram", icon: Instagram },
   { value: "linkedin", label: "LinkedIn", icon: Linkedin },
+  { value: "facebook", label: "Facebook", icon: Facebook },
 ];
 
 function itemDate(item: QueueItem): Date {
