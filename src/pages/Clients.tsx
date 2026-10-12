@@ -60,7 +60,7 @@ export default function Clients() {
 
   const createClient = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("clients").insert({ name, slug: slug.toLowerCase().trim() } as never);
+      const { error } = await supabase.from("clients").insert({ name, slug: slug.toLowerCase().trim(), platforms } as never);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -68,6 +68,7 @@ export default function Clients() {
       toast({ title: "Client created" });
       setDialogOpen(false);
       setName(""); setSlug("");
+      setPlatforms(["linkedin", "instagram"]);
     },
     onError: (e: Error) => toast({ title: "Failed to create client", description: e.message, variant: "destructive" }),
   });
