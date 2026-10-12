@@ -81,7 +81,7 @@ export function PlatformRulesTab() {
           <div><Label>Platform</Label>
             <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" | "facebook" }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="instagram">Instagram</SelectItem></SelectContent>
+              <SelectContent><SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem><SelectItem value="instagram">Instagram</SelectItem></SelectContent>
             </Select>
           </div>
           <div><Label>Character Limit</Label><Input type="number" value={form.char_limit} onChange={(e) => setForm((f) => ({ ...f, char_limit: e.target.value }))} placeholder="Optional" /></div>
