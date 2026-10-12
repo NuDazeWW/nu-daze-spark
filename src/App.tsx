@@ -16,6 +16,7 @@ import Strategy from "./pages/Strategy";
 import PostGenerator from "./pages/PostGenerator";
 import CampaignBriefs from "./pages/CampaignBriefs";
 import DailyQueue from "./pages/DailyQueue";
+import ContentPlanner from "./pages/ContentPlanner";
 import CommentGenerator from "./pages/CommentGenerator";
 import ApprovedContent from "./pages/ApprovedContent";
 import RepurposeCenter from "./pages/RepurposeCenter";
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/briefs" element={<CampaignBriefs />} />
               <Route path="/generator" element={<PostGenerator />} />
               <Route path="/queue" element={<DailyQueue />} />
+              <Route path="/planner" element={<ContentPlanner />} />
               <Route path="/comments" element={<CommentGenerator />} />
               <Route path="/approved" element={<ApprovedContent />} />
               <Route path="/repurpose" element={<RepurposeCenter />} />
