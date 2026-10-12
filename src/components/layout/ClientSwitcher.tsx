@@ -1,5 +1,6 @@
 import { Check, ChevronsUpDown, Building2 } from "lucide-react";
 import { useActiveClient } from "@/contexts/ClientContext";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +13,7 @@ import {
 
 export function ClientSwitcher() {
   const { clients, activeClient, setActiveClientId } = useActiveClient();
+  const { entitySingular } = useWorkspace();
 
   if (clients.length === 0) return null;
 
@@ -22,7 +24,7 @@ export function ClientSwitcher() {
           <span className="flex items-center gap-2 truncate">
             <Building2 className="h-3.5 w-3.5 text-primary" />
             <span className="truncate text-xs font-medium">
-              {activeClient?.name ?? "Select client"}
+              {activeClient?.name ?? `Select ${entitySingular.toLowerCase()}`}
             </span>
           </span>
           <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
