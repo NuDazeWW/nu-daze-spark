@@ -12,6 +12,8 @@ import { NativePostPreview } from "@/components/preview/NativePostPreview";
 import { usePreflight } from "@/hooks/usePreflight";
 import { PreflightPanel } from "@/components/preflight/PreflightPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
+import { Input } from "@/components/ui/input";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
 } from "lucide-react";
@@ -70,6 +72,8 @@ export function PostingPackageDrawer({
   const [checksum, setChecksum] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [openedPlatform, setOpenedPlatform] = useState(false);
+  const [postedUrl, setPostedUrl] = useState("");
 
   useEffect(() => {
     setFirstComment(card?.first_comment ?? "");
@@ -161,6 +165,15 @@ export function PostingPackageDrawer({
     a.download = `SocialMotive-${card.platform}-${card.content_type}-${checksum}.txt`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
+  };
+
+  const markPosted = async () => {
+    const { error } = await supabase.from("post_cards")
+      .update({ approval_status: "posted", posted_url: postedUrl.trim() || null }).eq("id", card.id);
+    if (error) return toast({ title: "Couldn't mark as posted", description: error.message, variant: "destructive" });
+    toast({ title: "Marked as posted" });
+    setOpenedPlatform(false);
+    qc.invalidateQueries();
   };
 
   const markExported = async () => {
@@ -291,6 +304,33 @@ export function PostingPackageDrawer({
               </Button>
             )}
           </div>
+
+          {["approved", "exported"].includes(card.approval_status) && (
+            <div className="rounded-md border p-3 space-y-2">
+              <p className="text-sm font-medium">Ready to post</p>
+              <p className="text-xs text-muted-foreground">
+                Copies the caption and hashtags, then opens {card.platform}. You post it yourself — nothing is published automatically.
+                {firstComment && " Copy the first comment separately above."}
+              </p>
+              <OpenPlatformButton
+                clientId={card.client_id}
+                platform={card.platform}
+                variant="default"
+                disabled={failCount > 0}
+                copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")}
+                onOpened={() => setOpenedPlatform(true)}
+              />
+              {openedPlatform && (
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <Input className="h-8 flex-1 min-w-[200px]" placeholder="Live post link (optional)"
+                    value={postedUrl} onChange={(e) => setPostedUrl(e.target.value)} />
+                  <Button size="sm" variant="outline" onClick={markPosted}>
+                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Mark as posted
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
           </TabsContent>
         </Tabs>
       </SheetContent>

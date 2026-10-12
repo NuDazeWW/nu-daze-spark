@@ -1110,6 +1110,7 @@ export type Database = {
           people_tags: string[] | null
           platform: Database["public"]["Enums"]["platform_type"]
           post_number: number | null
+          posted_url: string | null
           posting_notes: string | null
           rationale: string | null
           revision_notes: string | null
@@ -1143,6 +1144,7 @@ export type Database = {
           people_tags?: string[] | null
           platform: Database["public"]["Enums"]["platform_type"]
           post_number?: number | null
+          posted_url?: string | null
           posting_notes?: string | null
           rationale?: string | null
           revision_notes?: string | null
@@ -1176,6 +1178,7 @@ export type Database = {
           people_tags?: string[] | null
           platform?: Database["public"]["Enums"]["platform_type"]
           post_number?: number | null
+          posted_url?: string | null
           posting_notes?: string | null
           rationale?: string | null
           revision_notes?: string | null

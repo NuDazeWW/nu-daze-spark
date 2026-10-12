@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
+import { SidebarPostTo } from "./SidebarPostTo";
 
 const mainNav = [
   { title: "Dashboard", icon: LayoutDashboard, href: "/" },
@@ -65,7 +66,6 @@ const adminSettingsNav = [
 export function AppSidebar() {
   const location = useLocation();
   const { user, signOut, isAdmin } = useAuth();
-  const canAccessDdi = Boolean(user) && isAdmin;
   const ws = useWorkspace();
   const settingsNav = [
     { title: ws.entityPlural, icon: Building2, href: "/settings/clients" },
@@ -161,39 +161,7 @@ export function AppSidebar() {
 
         <SidebarSeparator />
 
-        <SidebarGroup>
-          <SidebarGroupLabel>SocialMotive Platform</SidebarGroupLabel>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              {canAccessDdi ? (
-                <SidebarMenuButton asChild tooltip="Decision Clarity OS">
-                  <a
-                    href="https://drift-signal-engine.lovable.app?from=copilot"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    <ExternalLink className="size-4" />
-                    <span>Decision Clarity OS</span>
-                  </a>
-                </SidebarMenuButton>
-              ) : (
-                <SidebarMenuButton
-                  disabled
-                  tooltip={
-                    user
-                      ? "You don't have permission to access Decision Clarity OS"
-                      : "Sign in to access Decision Clarity OS"
-                  }
-                  className="cursor-not-allowed opacity-60"
-                >
-                  <Lock className="size-4" />
-                  <span>Decision Clarity OS</span>
-                </SidebarMenuButton>
-              )}
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
+        <SidebarPostTo />
       </SidebarContent>
 
       <SidebarFooter className="px-3 py-3">

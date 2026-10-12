@@ -1,0 +1,1 @@
+ALTER TABLE public.post_cards ADD COLUMN IF NOT EXISTS posted_url text;
