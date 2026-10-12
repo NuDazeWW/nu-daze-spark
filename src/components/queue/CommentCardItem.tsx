@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { openInNewTab } from "@/lib/openInNewTab";
+import { openInNewTab, copyThenOpen } from "@/lib/openInNewTab";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -163,7 +163,7 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
 
         {ext?.external_url && ["approved","exported"].includes(comment.approval_status) && (
           <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5"
-            onClick={async () => { await navigator.clipboard.writeText(comment.draft_copy); toast.success("Comment copied — paste it on the post"); openInNewTab(ext.external_url); }}>
+            onClick={() => { copyThenOpen(comment.draft_copy, ext.external_url).then((ok) => { if (ok) toast.success("Comment copied — paste it on the post"); }); }}>
             <ExternalLink className="h-3.5 w-3.5" />Copy & open post
           </Button>
         )}
