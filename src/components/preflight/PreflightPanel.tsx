@@ -36,6 +36,7 @@ export function PreflightBadge({ state, review, onClick }: { state: GateState; r
 export function PreflightPanel({ pf, isAdmin }: { pf: Preflight; isAdmin: boolean }) {
   const { review, gate, run, acknowledge, override } = pf;
   const [reason, setReason] = useState("");
+  const [bypassOpen, setBypassOpen] = useState(false);
   const blocking = review?.findings.filter((f) => f.severity === "blocking") ?? [];
   const advisory = review?.findings.filter((f) => f.severity === "advisory") ?? [];
 
