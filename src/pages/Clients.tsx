@@ -140,6 +140,11 @@ export default function Clients() {
                     </div>
                     {!c.is_active && <Badge variant="outline" className="text-[10px]">Inactive</Badge>}
                   </div>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {(c.platforms ?? []).map((p) => (
+                      <Badge key={p} variant="secondary" className="text-[10px]">{platformLabel(p)}</Badge>
+                    ))}
+                  </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">
                       {memberCount} explicit member{memberCount === 1 ? "" : "s"} · admins always have access
