@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { openInNewTab } from "@/lib/openInNewTab";
+import { copyThenOpen } from "@/lib/openInNewTab";
 import { Link } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -126,7 +126,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
           </Tooltip>
           <Button variant="outline" size="sm" className="h-6 text-[10px] px-2" disabled={!postUrl}
             title={postUrl ? "Copy the comment and open the original post" : "No link saved for this post"}
-            onClick={async (e) => { e.stopPropagation(); if (!postUrl) return; await navigator.clipboard.writeText(text); toast.success("Comment copied — paste it on the post"); onCopied?.(); openInNewTab(postUrl); }}>
+            onClick={(e) => { e.stopPropagation(); if (!postUrl) return; copyThenOpen(text, postUrl).then((ok) => { if (ok) toast.success("Comment copied — paste it on the post"); }); onCopied?.(); }}>
             <ExternalLink className="h-3 w-3 mr-1" />Copy & open post
           </Button>
         </div>

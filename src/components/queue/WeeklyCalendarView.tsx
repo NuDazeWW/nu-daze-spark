@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { openInNewTab } from "@/lib/openInNewTab";
+import { copyThenOpen } from "@/lib/openInNewTab";
 import { addDays, addWeeks, endOfWeek, format, isSameDay, startOfWeek } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -221,10 +221,9 @@ function CalendarOpenIcon({ card }: { card: NonNullable<QueueItem["postCard"]> }
   return (
     <span role="link" tabIndex={0} aria-label={`Copy and open ${card.platform}`} title={`Copy & open ${card.platform}`}
       className="ml-auto inline-flex rounded p-0.5 hover:bg-foreground/10"
-      onClick={async (e) => {
+      onClick={(e) => {
         e.stopPropagation();
-        await navigator.clipboard.writeText([card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")).catch(() => {});
-        openInNewTab(url);
+        copyThenOpen([card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n"), url);
       }}>
       <ExternalLink className="h-3 w-3" />
     </span>
