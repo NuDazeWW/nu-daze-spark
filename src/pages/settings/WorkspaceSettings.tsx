@@ -16,7 +16,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, Lock } from "lucide-react";
 import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 
 const EXPORT_TABLES = ["campaign_briefs", "master_content_objects", "post_cards", "comments", "external_posts", "source_assets", "brand_voice_rules", "cadence_targets", "social_accounts"] as const;
@@ -99,14 +99,16 @@ function WorkspaceSettingsInner() {
     } finally { setExporting(false); }
   }
 
-  async function resetWorkspace() {
-    const { error } = await supabase.rpc("reset_workspace_content", { _confirm: confirmText });
+  async function runDanger(rpc: "reset_workspace_content" | "prepare_blank_copy") {
+    const { error } = await supabase.rpc(rpc, { _confirm: confirmText });
     if (error) { toast.error(error.message); return; }
-    toast.success("Workspace content cleared");
+    toast.success(rpc === "prepare_blank_copy" ? "Blank copy prepared" : "Workspace content cleared");
+    ws.refresh();
     setConfirmText("");
     qc.invalidateQueries();
   }
 
+  const locked = Boolean(s?.is_demo_master);
   if (!s) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin" /></div>;
 
   return (
@@ -173,26 +175,45 @@ function WorkspaceSettingsInner() {
         </CardContent>
       </Card>
 
-      {ws.isOwner && (
-        <Card className="border-destructive/40">
-          <CardHeader><CardTitle className="text-base text-destructive">Reset to clean workspace</CardTitle>
-            <CardDescription>Permanently deletes all briefs, posts, comments, reviews and assets. Settings, strategy, {plural.toLowerCase()} and team stay. Meant for a new copy that starts from demo data.</CardDescription></CardHeader>
-          <CardContent>
-            <AlertDialog>
-              <AlertDialogTrigger asChild><Button variant="destructive">Reset workspace content…</Button></AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader><AlertDialogTitle>Delete all content?</AlertDialogTitle>
-                  <AlertDialogDescription>This can't be undone. Type <strong>{s.company_name}</strong> to confirm.</AlertDialogDescription></AlertDialogHeader>
-                <Input value={confirmText} onChange={(e) => setConfirmText(e.target.value)} />
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction disabled={confirmText !== s.company_name} onClick={resetWorkspace} className="bg-destructive">Delete everything</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </CardContent>
-        </Card>
-      )}
+      <Card className="border-destructive/40">
+        <CardHeader>
+          <CardTitle className="text-base text-destructive flex items-center gap-2">Danger zone {locked && <Badge variant="outline" className="gap-1"><Lock className="h-3 w-3" />Locked demo workspace</Badge>}</CardTitle>
+          <CardDescription>
+            {locked
+              ? "These tools are permanently disabled in this NuDaze demo workspace to prevent mistakes. They work only in sold copies, for the Owner."
+              : "Owner-only tools for a new copy. Both permanently delete data and can't be undone."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[
+            { key: "reset", title: "Reset to clean workspace", desc: `Deletes all briefs, posts, comments, reviews and assets. Settings, strategy, ${plural.toLowerCase()} and team stay.`, rpc: "reset_workspace_content" as const, cta: "Reset workspace content…" },
+            { key: "blank", title: "Prepare blank copy for a new buyer", desc: `One step: deletes all content, strategy, ${plural.toLowerCase()}, social accounts, invites, activity and every team member except you, and resets the company profile and setup checklist so the buyer starts fresh.`, rpc: "prepare_blank_copy" as const, cta: "Prepare blank copy…" },
+          ].map((tool) => (
+            <div key={tool.key} className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">{tool.title}</p>
+                <p className="text-xs text-muted-foreground">{tool.desc}</p>
+              </div>
+              {locked || !ws.isOwner ? (
+                <Button variant="destructive" disabled title={locked ? "Disabled in the demo workspace" : "Owner only"}><Lock className="mr-2 h-4 w-4" />{tool.cta.replace("…", "")}</Button>
+              ) : (
+                <AlertDialog onOpenChange={() => setConfirmText("")}>
+                  <AlertDialogTrigger asChild><Button variant="destructive">{tool.cta}</Button></AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader><AlertDialogTitle>{tool.title}?</AlertDialogTitle>
+                      <AlertDialogDescription>This can't be undone. Type <strong>{s.company_name}</strong> to confirm.</AlertDialogDescription></AlertDialogHeader>
+                    <Input value={confirmText} onChange={(e) => setConfirmText(e.target.value)} />
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction disabled={confirmText !== s.company_name} onClick={() => runDanger(tool.rpc)} className="bg-destructive">Delete permanently</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }
