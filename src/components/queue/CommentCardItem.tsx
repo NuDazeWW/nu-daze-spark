@@ -61,7 +61,7 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
       <CardHeader className="py-3 px-4 space-y-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <Badge className={`text-[10px] shrink-0 ${statusMeta.color}`}>
+            <Badge variant="outline" className={`text-xs shrink-0 ${statusMeta.color}`}>
               {statusMeta.label}
             </Badge>
             <Badge variant="outline" className="sm-type sm-type-comment shrink-0 gap-1">

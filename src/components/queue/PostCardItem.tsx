@@ -76,7 +76,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
             <PostNumber card={card} />
             <Badge variant="outline" className="sm-type sm-type-post gap-1"><BookOpen className="h-3 w-3" />Post</Badge>
-            <Badge className={`text-[10px] shrink-0 ${statusMeta.color}`}>
+            <Badge variant="outline" className={`text-xs shrink-0 ${statusMeta.color}`}>
               {statusMeta.label}
             </Badge>
             <Badge variant="outline" className="text-[10px] capitalize shrink-0">{card.platform}</Badge>

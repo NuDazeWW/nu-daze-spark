@@ -68,8 +68,8 @@ export function AssetThumbnail({ filePath, assetType, title, onClick }: AssetThu
           <video src={url} muted preload="metadata" className="w-full h-full object-cover"
             onLoadedData={(e) => { const vid = e.currentTarget; if (vid.duration > 1) vid.currentTime = 1; }}
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-            <Play className="h-8 w-8 text-white drop-shadow-lg" fill="white" />
+          <div className="absolute inset-0 flex items-center justify-center bg-brand-midnight/30 group-hover:bg-brand-midnight/40 transition-colors">
+            <Play className="h-8 w-8 text-brand-bone" fill="currentColor" />
           </div>
         </>
       ) : (
