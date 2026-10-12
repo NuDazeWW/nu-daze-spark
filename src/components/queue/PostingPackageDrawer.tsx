@@ -304,6 +304,33 @@ export function PostingPackageDrawer({
               </Button>
             )}
           </div>
+
+          {["approved", "exported"].includes(card.approval_status) && (
+            <div className="rounded-md border p-3 space-y-2">
+              <p className="text-sm font-medium">Ready to post</p>
+              <p className="text-xs text-muted-foreground">
+                Copies the caption and hashtags, then opens {card.platform}. You post it yourself — nothing is published automatically.
+                {firstComment && " Copy the first comment separately above."}
+              </p>
+              <OpenPlatformButton
+                clientId={card.client_id}
+                platform={card.platform}
+                variant="default"
+                disabled={failCount > 0}
+                copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")}
+                onOpened={() => setOpenedPlatform(true)}
+              />
+              {openedPlatform && (
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <Input className="h-8 flex-1 min-w-[200px]" placeholder="Live post link (optional)"
+                    value={postedUrl} onChange={(e) => setPostedUrl(e.target.value)} />
+                  <Button size="sm" variant="outline" onClick={markPosted}>
+                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Mark as posted
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
           </TabsContent>
         </Tabs>
       </SheetContent>
