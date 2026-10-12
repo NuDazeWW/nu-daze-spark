@@ -81,7 +81,7 @@ function TeamInner() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <PageHeader title="Team" description="Invite teammates, set their role and choose which {label} they can work in.".replace("{label}", ws.entityPlural.toLowerCase())}>
+      <PageHeader title="Team" description={`Invite teammates, set their role and choose which ${ws.entityPlural.toLowerCase()} they can work in.`}>
         <Badge variant="outline" className="font-mono">{seatsUsed} / {limit ?? "∞"} seats</Badge>
       </PageHeader>
 
