@@ -34,6 +34,7 @@ export default function Clients() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [platforms, setPlatforms] = useState<string[]>(["linkedin", "instagram"]);
   const [memberDialogClient, setMemberDialogClient] = useState<Client | null>(null);
   const [memberEmail, setMemberEmail] = useState("");
 
