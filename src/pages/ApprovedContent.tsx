@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { PostNumber, StatusProgress, WhereIsIt, PostHistoryButton, useStatusDates, postLabel, matchesPostNumber } from "@/components/tracking/PostTracking";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { usePostCards, STATUS_META, type PostCard, type ApprovalStatus } from "@/hooks/usePostCards";
@@ -230,6 +232,7 @@ export default function ApprovedContent() {
                 onStatusChange={handleStatusChange}
                 isAdmin={isAdmin}
                 onOpenPackage={() => setPackageId(card.id)}
+                statusDates={allDates[card.id]}
               />
             ))}
           </div>
@@ -255,6 +258,7 @@ function ApprovedCard({
   onStatusChange,
   isAdmin,
   onOpenPackage,
+  statusDates,
 }: {
   card: PostCard;
   isSelected: boolean;
@@ -264,6 +268,7 @@ function ApprovedCard({
   onStatusChange: (id: string, status: ApprovalStatus) => void;
   isAdmin: boolean;
   onOpenPackage: () => void;
+  statusDates?: Partial<Record<ApprovalStatus, string>>;
 }) {
   const PlatformIcon = PLATFORM_ICON[card.platform];
   const meta = STATUS_META[card.approval_status];
