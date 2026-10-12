@@ -764,6 +764,7 @@ export type Database = {
           last_test_error: string | null
           last_test_ok: boolean | null
           provider: string
+          sending_paused: boolean
           smtp_host: string | null
           smtp_port: number | null
           smtp_secure: boolean
@@ -780,6 +781,7 @@ export type Database = {
           last_test_error?: string | null
           last_test_ok?: boolean | null
           provider?: string
+          sending_paused?: boolean
           smtp_host?: string | null
           smtp_port?: number | null
           smtp_secure?: boolean
@@ -796,6 +798,7 @@ export type Database = {
           last_test_error?: string | null
           last_test_ok?: boolean | null
           provider?: string
+          sending_paused?: boolean
           smtp_host?: string | null
           smtp_port?: number | null
           smtp_secure?: boolean

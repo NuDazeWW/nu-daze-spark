@@ -1,0 +1,3 @@
+ALTER TABLE public.email_provider_settings DROP CONSTRAINT email_provider_settings_provider_check;
+ALTER TABLE public.email_provider_settings ADD CONSTRAINT email_provider_settings_provider_check CHECK (provider = ANY (ARRAY['none','sendgrid','gmail','outlook','yahoo','apple','smtp']));
+ALTER TABLE public.email_provider_settings ADD COLUMN IF NOT EXISTS sending_paused boolean NOT NULL DEFAULT false;

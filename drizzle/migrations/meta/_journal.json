@@ -92,6 +92,13 @@
       "when": 1791847456063,
       "tag": "0012_notification_emails",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791847775054,
+      "tag": "0013_apple_mail_and_pause",
+      "breakpoints": true
     }
   ]
 }
