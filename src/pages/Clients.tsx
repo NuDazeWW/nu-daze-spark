@@ -173,7 +173,26 @@ export default function Clients() {
               <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="acme" />
               <p className="text-[10px] text-muted-foreground mt-1">URL-safe short identifier</p>
             </div>
-            <Button onClick={() => createClient.mutate()} disabled={!name.trim() || !slug.trim() || createClient.isPending} className="w-full">
+            <div>
+              <Label>Social platforms</Label>
+              <div className="mt-2 space-y-2">
+                {PLATFORM_OPTIONS.map((o) => (
+                  <label key={o.value} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <Checkbox
+                      checked={platforms.includes(o.value)}
+                      onCheckedChange={(checked) =>
+                        setPlatforms((prev) =>
+                          checked ? [...prev, o.value] : prev.filter((p) => p !== o.value)
+                        )
+                      }
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1">Select at least one platform for this client.</p>
+            </div>
+            <Button onClick={() => createClient.mutate()} disabled={!name.trim() || !slug.trim() || platforms.length === 0 || createClient.isPending} className="w-full">
               {createClient.isPending ? "Creating…" : "Create Client"}
             </Button>
           </div>
