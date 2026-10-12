@@ -222,7 +222,7 @@ export function PostingPackageDrawer({
             <TabsTrigger value="preflight" className="flex-1">Preflight</TabsTrigger>
           </TabsList>
           <TabsContent value="preflight" className="mt-4">
-            <PreflightPanel pf={pf} isAdmin={canExport} />
+            <PreflightPanel pf={pf} isAdmin={canExport} draft={card.draft_copy} />
           </TabsContent>
           <TabsContent value="preview" className="mt-4">
             <NativePostPreview key={card.id} card={card} enabled={open} firstComment={firstComment} />

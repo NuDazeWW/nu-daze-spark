@@ -238,7 +238,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         )}
       </CardContent>
       <NativePreviewDialog card={card} open={previewOpen} onOpenChange={setPreviewOpen} />
-      <PreflightDialog open={preflightOpen} onOpenChange={setPreflightOpen} pf={pf} isAdmin={isAdmin} intent={gateIntent} />
+      <PreflightDialog open={preflightOpen} onOpenChange={setPreflightOpen} pf={pf} isAdmin={isAdmin} intent={gateIntent} draft={card.draft_copy} />
     </Card>
   );
 }
