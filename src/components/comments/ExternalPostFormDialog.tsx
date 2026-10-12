@@ -86,7 +86,7 @@ export function ExternalPostFormDialog({ open, onOpenChange, onSave, isPending }
               <Select value={platform} onValueChange={(v) => { setPlatform(v as PlatformType); setAuthorContext({}); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem>
                   <SelectItem value="instagram">Instagram</SelectItem>
                 </SelectContent>
               </Select>

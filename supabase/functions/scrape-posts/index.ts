@@ -61,7 +61,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const platform = body.platform || "linkedin"; // default to linkedin
     const customQuery = body.query || "";
-    if (!["linkedin", "instagram"].includes(platform) || typeof customQuery !== "string" || customQuery.length > 1000) {
+    if (!["linkedin", "instagram", "facebook"].includes(platform) || typeof customQuery !== "string" || customQuery.length > 1000) {
       return new Response(JSON.stringify({ error: "Invalid platform or search query" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -91,10 +91,10 @@ serve(async (req) => {
     let searchQuery = customQuery;
     if (!searchQuery) {
       const topicParts = topics.length > 0 ? topics.slice(0, 3).join(" OR ") : "digital marketing AI branding";
-      searchQuery = `site:linkedin.com/posts OR site:linkedin.com/feed ${topicParts} 2026`;
+      searchQuery = platform === "facebook" ? `site:facebook.com/posts ${topicParts} 2026` : `site:linkedin.com/posts OR site:linkedin.com/feed ${topicParts} 2026`;
     } else {
       // Append social post site filters to custom queries too
-      searchQuery = `${searchQuery} site:linkedin.com/posts OR site:linkedin.com/feed`;
+      searchQuery = platform === "facebook" ? `${searchQuery} site:facebook.com/posts` : `${searchQuery} site:linkedin.com/posts OR site:linkedin.com/feed`;
     }
 
     console.log("Searching Firecrawl with query:", searchQuery);
@@ -288,7 +288,7 @@ Return ONLY actual social media posts worth engaging with (relevance >= 0.5). If
       const idx = postsToInsert.length;
       postsToInsert.push({
         external_url: source.url,
-        platform: platform as "linkedin" | "instagram",
+        platform: platform as "linkedin" | "instagram" | "facebook",
         author_name: eval_.author_name || null,
         author_context: groundedAuthorContext(eval_.author_context, `${source.title}\n${source.description}\n${source.content}`, platform),
         post_content: eval_.post_summary || source.description || source.content?.substring(0, 500) || null,

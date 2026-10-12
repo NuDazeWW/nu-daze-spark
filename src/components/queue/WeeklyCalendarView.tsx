@@ -3,7 +3,7 @@ import { addDays, addWeeks, endOfWeek, format, isSameDay, startOfWeek } from "da
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Instagram, Linkedin } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Instagram, Linkedin, Facebook } from "lucide-react";
 import { STATUS_META, type QueueItem } from "@/hooks/usePostCards";
 import { postLabel } from "@/components/tracking/PostTracking";
 import { cn } from "@/lib/utils";
@@ -12,12 +12,13 @@ import { commentLabel } from "@/lib/contentPresentation";
 interface WeeklyCalendarViewProps {
   items: QueueItem[];
   onItemClick: (item: QueueItem) => void;
-  onReschedule?: (postCardId: string, date: Date, platform: "instagram" | "linkedin") => void;
+  onReschedule?: (postCardId: string, date: Date, platform: "instagram" | "linkedin" | "facebook") => void;
 }
 
 const PLATFORMS = [
   { value: "instagram", label: "Instagram", icon: Instagram },
   { value: "linkedin", label: "LinkedIn", icon: Linkedin },
+  { value: "facebook", label: "Facebook", icon: Facebook },
 ];
 
 function itemDate(item: QueueItem): Date {
@@ -148,7 +149,7 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                         e.preventDefault();
                         setDragOverKey(null);
                         const id = e.dataTransfer.getData("text/post-card-id");
-                        if (id) onReschedule(id, d, p.value as "instagram" | "linkedin");
+                        if (id) onReschedule(id, d, p.value as "instagram" | "linkedin" | "facebook");
                       }}
                       className={cn(
                         "min-h-[120px] p-1.5 space-y-1 bg-card/50 transition-colors",

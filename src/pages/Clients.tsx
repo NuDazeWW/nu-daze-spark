@@ -11,10 +11,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Building2, Plus, Loader2, Users, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Client = Tables<"clients">;
 type ClientMember = Tables<"client_members">;
+
+const PLATFORM_OPTIONS = [
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "instagram", label: "Instagram" },
+  { value: "facebook", label: "Facebook" },
+] as const;
+
+function platformLabel(p: string) {
+  return PLATFORM_OPTIONS.find((o) => o.value === p)?.label ?? p;
+}
 
 export default function Clients() {
   const { isAdmin } = useAuth();
@@ -23,6 +34,7 @@ export default function Clients() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [platforms, setPlatforms] = useState<string[]>(["linkedin", "instagram"]);
   const [memberDialogClient, setMemberDialogClient] = useState<Client | null>(null);
   const [memberEmail, setMemberEmail] = useState("");
 
@@ -48,7 +60,7 @@ export default function Clients() {
 
   const createClient = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("clients").insert({ name, slug: slug.toLowerCase().trim() } as never);
+      const { error } = await supabase.from("clients").insert({ name, slug: slug.toLowerCase().trim(), platforms } as never);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -56,6 +68,7 @@ export default function Clients() {
       toast({ title: "Client created" });
       setDialogOpen(false);
       setName(""); setSlug("");
+      setPlatforms(["linkedin", "instagram"]);
     },
     onError: (e: Error) => toast({ title: "Failed to create client", description: e.message, variant: "destructive" }),
   });
@@ -127,6 +140,11 @@ export default function Clients() {
                     </div>
                     {!c.is_active && <Badge variant="outline" className="text-[10px]">Inactive</Badge>}
                   </div>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {(c.platforms ?? []).map((p) => (
+                      <Badge key={p} variant="secondary" className="text-[10px]">{platformLabel(p)}</Badge>
+                    ))}
+                  </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">
                       {memberCount} explicit member{memberCount === 1 ? "" : "s"} · admins always have access
@@ -155,7 +173,26 @@ export default function Clients() {
               <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="acme" />
               <p className="text-[10px] text-muted-foreground mt-1">URL-safe short identifier</p>
             </div>
-            <Button onClick={() => createClient.mutate()} disabled={!name.trim() || !slug.trim() || createClient.isPending} className="w-full">
+            <div>
+              <Label>Social platforms</Label>
+              <div className="mt-2 space-y-2">
+                {PLATFORM_OPTIONS.map((o) => (
+                  <label key={o.value} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <Checkbox
+                      checked={platforms.includes(o.value)}
+                      onCheckedChange={(checked) =>
+                        setPlatforms((prev) =>
+                          checked ? [...prev, o.value] : prev.filter((p) => p !== o.value)
+                        )
+                      }
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1">Select at least one platform for this client.</p>
+            </div>
+            <Button onClick={() => createClient.mutate()} disabled={!name.trim() || !slug.trim() || platforms.length === 0 || createClient.isPending} className="w-full">
               {createClient.isPending ? "Creating…" : "Create Client"}
             </Button>
           </div>

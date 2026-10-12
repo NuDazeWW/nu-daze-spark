@@ -22,7 +22,7 @@ export function PlatformRulesTab() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<PlatformRule | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState({ rule_name: "", rule_content: "", platform: "linkedin" as "linkedin" | "instagram", char_limit: "", is_active: true });
+  const [form, setForm] = useState({ rule_name: "", rule_content: "", platform: "linkedin" as "linkedin" | "instagram" | "facebook", char_limit: "", is_active: true });
 
   const openCreate = () => {
     setEditing(null);
@@ -79,9 +79,9 @@ export function PlatformRulesTab() {
         <div className="space-y-4">
           <div><Label>Rule Name</Label><Input value={form.rule_name} onChange={(e) => setForm((f) => ({ ...f, rule_name: e.target.value }))} /></div>
           <div><Label>Platform</Label>
-            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" }))}>
+            <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" | "facebook" }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="instagram">Instagram</SelectItem></SelectContent>
+              <SelectContent><SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem><SelectItem value="instagram">Instagram</SelectItem></SelectContent>
             </Select>
           </div>
           <div><Label>Character Limit</Label><Input type="number" value={form.char_limit} onChange={(e) => setForm((f) => ({ ...f, char_limit: e.target.value }))} placeholder="Optional" /></div>

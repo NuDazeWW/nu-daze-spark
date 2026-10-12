@@ -31,6 +31,7 @@ const TYPES: Record<string, string> = {
 const CHANNELS: Record<string, string> = {
   linkedin_post: "LinkedIn post",
   instagram_feed: "Instagram feed",
+  facebook_post: "Facebook post",
   instagram_story: "Instagram Story",
   instagram_reel: "Instagram Reel",
 };

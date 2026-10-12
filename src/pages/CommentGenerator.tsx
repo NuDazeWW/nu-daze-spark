@@ -278,7 +278,7 @@ export default function CommentGenerator() {
           <SelectContent>
             <SelectItem value="all">All Platforms</SelectItem>
             <SelectItem value="instagram">Instagram</SelectItem>
-            <SelectItem value="linkedin">LinkedIn</SelectItem>
+            <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem>
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortKey)}>
