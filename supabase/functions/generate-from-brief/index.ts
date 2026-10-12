@@ -12,6 +12,7 @@ const json = (b: unknown, status = 200) =>
 const CHANNELS: Record<string, { platform: string; content_type: string; guide: string }> = {
   linkedin_post: { platform: "linkedin", content_type: "post", guide: "LinkedIn post: professional, strategic, B2B insight, strong first line, short paragraphs, under 1300 chars." },
   instagram_feed: { platform: "instagram", content_type: "post", guide: "Instagram feed caption: visual-first, socially native, hook in first 125 chars, scannable line breaks." },
+  facebook_post: { platform: "facebook", content_type: "post", guide: "Facebook post: conversational and community-oriented, clear hook in the first line, short paragraphs, question or prompt to spark comments, minimal hashtags (0-3), under 1500 chars." },
   instagram_story: {
     platform: "instagram",
     content_type: "story",
