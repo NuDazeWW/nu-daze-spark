@@ -57,11 +57,11 @@ function PrefCard({ pref, canDelete, onChange }: { pref: Pref; canDelete: boolea
           </label>
           <label className="flex items-start gap-3 rounded-md border border-border p-3">
             <Switch checked={pref.post_went_out} onCheckedChange={(v) => patch({ post_went_out: v })} />
-            <span><span className="block text-sm font-medium">Post went out</span><span className="text-xs text-muted-foreground">Sent when a post is marked Posted (within about 10 minutes), with the live link if saved.</span></span>
+            <span><span className="block text-sm font-medium">Post went out</span><span className="text-xs text-muted-foreground">Sent as soon as a post is marked Posted, with the live link if saved.</span></span>
           </label>
         </div>
         <div className="flex flex-wrap items-end gap-4">
-          <div className="space-y-1.5"><Label className="text-xs">Morning email time</Label><Input type="time" className="w-32" defaultValue={String(pref.send_time).slice(0, 5)} onBlur={(e) => e.target.value && patch({ send_time: e.target.value })} /></div>
+          <div className="space-y-1.5"><Label className="text-xs">Morning email hour</Label><Input type="time" className="w-32" defaultValue={String(pref.send_time).slice(0, 5)} onBlur={(e) => e.target.value && patch({ send_time: e.target.value })} /></div>
           <div className="space-y-1.5"><Label className="text-xs">Time zone</Label>
             <select className="h-10 rounded-md border border-input bg-background px-3 text-sm" value={pref.time_zone} onChange={(e) => patch({ time_zone: e.target.value })}>
               {Array.from(new Set([pref.time_zone, ...TZS])).map((t) => <option key={t} value={t}>{t}</option>)}
