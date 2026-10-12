@@ -33,13 +33,13 @@ export const APPROVAL_FLOW: ApprovalStatus[] = [
 ];
 
 export const STATUS_META: Record<ApprovalStatus, { label: string; color: string }> = {
-  draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
-  in_review: { label: "In Review", color: "bg-blue-500/15 text-blue-400 border-blue-500/30" },
-  needs_revision: { label: "Needs Revision", color: "bg-amber-500/15 text-amber-400 border-amber-500/30" },
-  approved: { label: "Approved", color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
-  exported: { label: "Exported", color: "bg-purple-500/15 text-purple-400 border-purple-500/30" },
-  posted: { label: "Posted", color: "bg-primary/15 text-primary border-primary/30" },
-  archived: { label: "Archived", color: "bg-muted text-muted-foreground/60" },
+  draft: { label: "Draft", color: "sm-status sm-status-draft" },
+  in_review: { label: "In Review", color: "sm-status sm-status-in_review" },
+  needs_revision: { label: "Needs Revision", color: "sm-status sm-status-needs_revision" },
+  approved: { label: "Approved", color: "sm-status sm-status-approved" },
+  exported: { label: "Exported", color: "sm-status sm-status-exported" },
+  posted: { label: "Posted", color: "sm-status sm-status-posted" },
+  archived: { label: "Archived", color: "sm-status sm-status-archived" },
 };
 
 export function usePostCards() {

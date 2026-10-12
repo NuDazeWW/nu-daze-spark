@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Insta
 import { STATUS_META, type QueueItem } from "@/hooks/usePostCards";
 import { postLabel } from "@/components/tracking/PostTracking";
 import { cn } from "@/lib/utils";
+import { commentLabel } from "@/lib/contentPresentation";
 
 interface WeeklyCalendarViewProps {
   items: QueueItem[];
@@ -165,7 +166,7 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                           const TypeIcon = item.type === "comment" ? MessageSquare : FileText;
                           const draggable = item.type === "post" && !!onReschedule;
                           return (
-                            <button
+                            <Button variant="ghost"
                               key={`${item.type}-${item.id}`}
                               onClick={() => onItemClick(item)}
                               draggable={draggable}
@@ -175,7 +176,7 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                                 e.dataTransfer.setData("text/post-card-id", item.id);
                               }}
                               className={cn(
-                                "w-full text-left rounded border px-1.5 py-1 text-[11px] leading-tight",
+                                "w-full h-auto block whitespace-normal text-left rounded border px-1.5 py-1 text-xs leading-tight",
                                 "hover:border-primary/50 transition-colors",
                                 draggable && "cursor-grab active:cursor-grabbing",
                                 meta.color
@@ -185,13 +186,14 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                               <div className="flex items-center gap-1 mb-0.5">
                                 <TypeIcon className="h-2.5 w-2.5 shrink-0" />
                                 <span className="truncate font-medium">
-                                  {item.postCard ? postLabel(item.postCard) : meta.label}
+                                   {item.postCard ? `Post · ${postLabel(item.postCard)}` : commentLabel(item.comment?.external_posts)}
                                 </span>
                               </div>
+                               <div className="text-[11px] mb-1">{meta.label}</div>
                               <div className="line-clamp-2 text-foreground/80">
                                 {item.draft_copy || "(no copy)"}
                               </div>
-                            </button>
+                            </Button>
                           );
                         })
                       )}

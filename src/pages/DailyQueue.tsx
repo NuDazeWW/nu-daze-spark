@@ -150,10 +150,11 @@ export default function DailyQueue() {
           const Icon = tf.icon;
           const isActive = typeFilter === tf.value;
           return (
-            <button
+            <Button variant="outline" size="sm"
               key={tf.value}
               onClick={() => setTypeFilter(tf.value)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition-colors ${
+              aria-pressed={isActive}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition-colors ${tf.value !== "all" ? `sm-type sm-type-${tf.value}` : ""} ${
                 isActive
                   ? "bg-primary/10 text-primary border-primary/30"
                   : "text-muted-foreground hover:text-foreground hover:border-border"
@@ -164,7 +165,7 @@ export default function DailyQueue() {
               {count > 0 && (
                 <Badge variant="secondary" className="ml-0.5 h-4 min-w-[16px] px-1 text-[10px]">{count}</Badge>
               )}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -178,7 +179,7 @@ export default function DailyQueue() {
               <TabsTrigger
                 key={sf.value}
                 value={sf.value}
-                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-xs px-3 py-1.5 rounded-full border"
+                className={`sm-status-filter text-xs px-3 py-1.5 rounded-full border ${sf.value !== "all" ? STATUS_META[sf.value as ApprovalStatus].color : ""}`}
               >
                 {sf.label}
                 {count > 0 && (
@@ -194,7 +195,7 @@ export default function DailyQueue() {
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search queue…" className="pl-9" />
+          <Input aria-label="Search queue" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search post number, copy, author or topic…" className="pl-9" />
         </div>
         <Select value={platformFilter} onValueChange={setPlatformFilter}>
           <SelectTrigger className="w-[140px]"><SelectValue placeholder="All platforms" /></SelectTrigger>

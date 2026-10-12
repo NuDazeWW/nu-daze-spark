@@ -302,7 +302,7 @@ function ApprovedCard({
     card.approval_status === "exported" ? "posted" : null;
 
   return (
-    <Card className={`transition-colors ${isSelected ? "border-primary/40 bg-primary/5" : "border-border/40"}`}>
+    <Card data-status={card.approval_status} data-content-type="post" className={`sm-content-card transition-colors ${isSelected ? "ring-2 ring-primary/40" : ""}`}>
       <CardContent className="py-4 px-5">
         <div className="flex items-start gap-3">
           <Checkbox checked={isSelected} onCheckedChange={onToggleSelect} className="mt-1" />
@@ -310,6 +310,7 @@ function ApprovedCard({
             {/* Header */}
             <div className="flex items-center gap-2 flex-wrap">
               <PostNumber card={card} />
+              <Badge variant="outline" className="sm-type sm-type-post">Post</Badge>
               {PlatformIcon && <PlatformIcon className="h-4 w-4 text-muted-foreground" />}
               <span className="text-xs text-muted-foreground capitalize">{card.content_type}</span>
               <Badge variant="outline" className={`text-[10px] ${meta.color}`}>{meta.label}</Badge>
