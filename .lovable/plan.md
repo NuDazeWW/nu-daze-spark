@@ -4,9 +4,10 @@ Goal: add every feature a buyer needs to run their own copy, while this copy sta
 
 ## What gets built
 
-### 1. Workspace Branding (prefilled with NuDaze / SocialMotive)
-- New Settings page: company name, logo, accent color, favicon.
-- Prefilled with the current look. Changes apply across the app right away.
+### 1. Workspace profile (SocialMotive always stays the app brand)
+- SocialMotive's name, logo, colors and look are fixed in every sold copy and can't be changed.
+- New Settings page for the buyer's own company: company name and company logo, shown next to the SocialMotive brand (e.g. "SocialMotive for NuDaze").
+- Prefilled with NuDaze for this demo.
 
 ### 2. First-run setup wizard (shown as complete for NuDaze)
 Steps: company profile and branding, organization type, first client or department with its social accounts, brand voice basics, cadence targets, invite teammates.
