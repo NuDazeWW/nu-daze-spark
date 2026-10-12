@@ -187,7 +187,7 @@ function WorkspaceSettingsInner() {
         <CardContent className="space-y-4">
           {[
             { key: "reset", title: "Reset to clean workspace", desc: `Deletes all briefs, posts, comments, reviews and assets. Settings, strategy, ${plural.toLowerCase()} and team stay.`, rpc: "reset_workspace_content" as const, cta: "Reset workspace content…" },
-            { key: "blank", title: "Prepare blank copy for a new buyer", desc: `One step: deletes all content, strategy, ${plural.toLowerCase()}, social accounts, invites, activity and every team member except you, and resets the company profile and setup checklist so the buyer starts fresh.`, rpc: "prepare_blank_copy" as const, cta: "Prepare blank copy…" },
+            { key: "blank", title: "Prepare blank copy for a new organization", desc: `One step: deletes all content, strategy, ${plural.toLowerCase()}, social accounts, invites, activity and every team member except you, and resets the company profile and setup checklist so the buyer starts fresh.`, rpc: "prepare_blank_copy" as const, cta: "Prepare blank copy…" },
           ].map((tool) => (
             <div key={tool.key} className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-3">
               <div className="min-w-0 flex-1">

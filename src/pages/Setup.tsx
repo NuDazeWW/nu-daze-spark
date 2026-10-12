@@ -105,8 +105,8 @@ function SetupInner() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <PageHeader title="Workspace setup" description={preview ? "Previewing the setup a new buyer sees. Nothing you enter is saved." : `${ws.setupCompleted} of ${ws.setupTotal} steps complete. Reopen any step to change it.`}>
-        <Button variant="outline" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new buyer"}</Button>
+      <PageHeader title="Workspace setup" description={preview ? "Previewing the setup a new organization sees. Nothing you enter is saved." : `${ws.setupCompleted} of ${ws.setupTotal} steps complete. Reopen any step to change it.`}>
+        <Button variant="outline" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
       </PageHeader>
       {preview && <Alert><AlertDescription>Preview mode: this is what a brand-new workspace looks like. Changes are not saved.</AlertDescription></Alert>}
 
