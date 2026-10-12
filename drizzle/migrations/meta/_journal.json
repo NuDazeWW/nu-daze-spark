@@ -43,6 +43,13 @@
       "when": 1791825458201,
       "tag": "0005_add_facebook_platform",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791826658352,
+      "tag": "0006_workspace_roles_enum",
+      "breakpoints": true
     }
   ]
 }
