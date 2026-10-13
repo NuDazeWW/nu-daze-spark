@@ -36,7 +36,7 @@ type Provider = {
 };
 
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-const APP_URL = "https://contentpilot.nudaze.com";
+const APP_URL = "https://socialmotive.nudaze.com";
 
 async function sendMail(p: Provider, secret: string, to: string, subject: string, html: string, text: string) {
   const fromName = p.from_name || "SocialMotive";
