@@ -4,6 +4,7 @@ import { useDdiHandoff } from "@/hooks/useDdiHandoff";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SetupChecklist } from "@/components/settings/SetupChecklist";
+import { ReadinessPanel } from "@/components/dashboard/ReadinessPanel";
 import { ExpirationAlerts } from "@/components/assets/ExpirationAlerts";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -99,6 +100,7 @@ export default function Dashboard() {
         description="Your content operations at a glance."
       />
       <SetupChecklist />
+      <ReadinessPanel />
 
       {/* Total Stats Header */}
       <div className="grid grid-cols-3 gap-3">
