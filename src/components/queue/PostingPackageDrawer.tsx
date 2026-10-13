@@ -221,11 +221,16 @@ export function PostingPackageDrawer({
           <SheetTitle className="flex items-center gap-2"><Package className="h-5 w-5 text-primary" /> Posting Package</SheetTitle>
           <SheetDescription className="capitalize">{card.platform} · {card.content_type}
             {card.scheduled_for && ` · ${new Date(card.scheduled_for).toLocaleString()}`}</SheetDescription>
-          {canCreate && (
-            <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => setSplitOpen(true)}>
-              <Split className="mr-2 h-4 w-4" /> Split across platforms
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/review?post=${card.id}`); toast({ title: "Executive review link copied" }); }}>
+              Copy executive review link
             </Button>
-          )}
+            {canCreate && (
+              <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => setSplitOpen(true)}>
+                <Split className="mr-2 h-4 w-4" /> Split across platforms
+              </Button>
+            )}
+          </div>
         </SheetHeader>
         {splitOpen && <SplitPlatformsDialog card={card} open={splitOpen} onOpenChange={setSplitOpen} />}
 
