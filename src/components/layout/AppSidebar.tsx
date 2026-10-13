@@ -28,6 +28,11 @@ import {
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { APP_VERSION } from "@/lib/appVersion";
 import {
+  NavHoverProvider,
+  NavHoverWrapper,
+  NAV_HOVER_LISTS,
+} from "./SidebarHoverList";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
