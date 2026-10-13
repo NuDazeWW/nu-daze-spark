@@ -6,6 +6,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { UsageMetersPanel } from "@/components/billing/UsageMetersPanel";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const ACTION_LABEL: Record<string, string> = {
@@ -49,6 +50,7 @@ function UsageInner() {
       <PageHeader title="Usage & activity" description="This month's activity and a log of important workspace changes.">
         <Badge variant="outline">{s?.plan_name ?? "Unlimited"} plan</Badge>
       </PageHeader>
+      <UsageMetersPanel />
       <div className="grid gap-4 md:grid-cols-2">
         <Card><CardHeader><CardTitle className="text-base">Plan limits</CardTitle></CardHeader>
           <CardContent className="space-y-4">
