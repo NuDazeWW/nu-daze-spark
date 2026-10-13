@@ -34,6 +34,7 @@ import {
   Pause,
   PieChart,
   Send,
+  Repeat2,
   Shield,
   ShieldCheck,
   Bell,
