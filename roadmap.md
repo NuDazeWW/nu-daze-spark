@@ -29,3 +29,5 @@
 # Priority 1 — roadmap Stage 2
 - [x] Executive Voice Engine: voice profiles (Strategy → Voices), AI sample analysis, "Write as" selector in Campaign Briefs, voice badge on post cards
 - [x] Content Motive Score™: 0-100 score with 5 sub-scores computed in Preflight, shown in Preflight panel, Posting Package, queue chips, and Dashboard at-risk
+# Priority 2 — integration
+- [x] Bulk Export & ZIP Package (Section 18): ZIP (copy + cleared media + manifest with SHA-256 + CSV), CSV presets (SocialMotive/Buffer/Hootsuite/Meta), JSON; from Approved Content
