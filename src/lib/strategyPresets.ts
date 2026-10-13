@@ -143,4 +143,96 @@ export const STRATEGY_PRESETS: StrategyPreset[] = [
       hashtags: ["#Branding", "#CreativeAgency", "#Design", "#Marketing", "#CaseStudy", "#BrandStrategy"],
     },
   },
+  {
+    key: "nonprofit", name: "Non-Profit & Cause", description: "Mission-led storytelling that inspires donors, volunteers, and advocates.",
+    draft: {
+      voice_rules: [
+        { rule_name: "Mission first, always", rule_content: "Every post connects back to the cause and the people it serves.", category: "tone" },
+        { rule_name: "Dignity in storytelling", rule_content: "Tell beneficiary stories with consent and respect; never exploit hardship for engagement.", category: "language" },
+        { rule_name: "Gratitude and hope", rule_content: "Celebrate supporters and progress; acknowledge challenges with honesty and optimism.", category: "personality" },
+        { rule_name: "Transparent impact", rule_content: "Use real numbers and outcomes; show where donations and effort go.", category: "language" },
+      ],
+      banned_phrases: ["guilt trip", "pity", "savior", "help the helpless", "these poor people"],
+      required_language: ["Tax-deductible where applicable", "Donation disclosures required by law"],
+      audiences: [
+        { segment_name: "Donors & sponsors", description: "Individuals and businesses who fund the mission and want to see impact.", platforms: ["linkedin", "facebook"] },
+        { segment_name: "Volunteers & advocates", description: "People who give time and amplify the cause in their networks.", platforms: ["instagram", "facebook"] },
+        { segment_name: "Community served", description: "Beneficiaries and their families who engage with programs.", platforms: ["instagram", "facebook"] },
+      ],
+      pillars: [
+        { name: "Impact stories", description: "Real outcomes and beneficiary journeys told with dignity." },
+        { name: "Donor & volunteer spotlight", description: "Celebrate the people who make the work possible." },
+        { name: "Behind the mission", description: "Day-to-day program work and team dedication." },
+        { name: "Calls to action", description: "Campaigns, events, and giving drives." },
+      ],
+      platform_rules: [
+        P("linkedin", "Impact & partnership", "Outcome data, corporate partnerships, and board-level updates; 120-200 words."),
+        P("instagram", "Visual storytelling", "Photo-led stories and Reels of programs in action; hopeful, human captions."),
+        P("facebook", "Community & events", "Event promotion, fundraiser updates, and volunteer recruitment; one clear ask per post."),
+      ],
+      ctas: ["Donate today", "Volunteer with us", "Share our mission", "Register for the event", "See your impact"],
+      hashtags: ["#NonProfit", "#GiveBack", "#Community", "#MakeADifference", "#Charity", "#Volunteer", "#SocialImpact", "#Fundraising"],
+    },
+  },
+  {
+    key: "healthcare", name: "Healthcare & Wellness", description: "Trustworthy, compliant content that educates and reassures patients.",
+    draft: {
+      voice_rules: [
+        { rule_name: "Accuracy over engagement", rule_content: "Every health claim must be evidence-based and sourced; when in doubt, leave it out.", category: "language" },
+        { rule_name: "Warm and reassuring", rule_content: "Write with empathy; avoid clinical coldness and fear-based messaging.", category: "tone" },
+        { rule_name: "Plain-language health", rule_content: "Explain medical terms simply; write at an accessible reading level.", category: "language" },
+        { rule_name: "Privacy first", rule_content: "Never share patient-identifiable information; use only consented, anonymized stories.", category: "compliance" },
+      ],
+      banned_phrases: ["miracle cure", "guaranteed results", "breakthrough treatment", "doctors hate this", "secret remedy"],
+      required_language: ["Consult your physician", "Not medical advice", "Results may vary"],
+      audiences: [
+        { segment_name: "Patients & families", description: "People seeking care information and reassurance.", platforms: ["facebook", "instagram"] },
+        { segment_name: "Referring professionals", description: "Physicians and partners who refer patients.", platforms: ["linkedin"] },
+        { segment_name: "Community & employers", description: "Local organizations and workplace wellness buyers.", platforms: ["linkedin", "facebook"] },
+      ],
+      pillars: [
+        { name: "Health education", description: "Preventive tips, myth-busting, and condition awareness." },
+        { name: "Meet the team", description: "Provider profiles that build trust and familiarity." },
+        { name: "Patient experience", description: "Consented testimonials and care journeys." },
+        { name: "Community health", description: "Screenings, events, and local health initiatives." },
+      ],
+      platform_rules: [
+        P("linkedin", "Professional credibility", "Clinical insights, practice news, and industry commentary; measured tone, 120-200 words."),
+        P("instagram", "Accessible wellness", "Friendly tips, team intros, and facility tours; warm visuals, no graphic medical imagery."),
+        P("facebook", "Community care", "Hours, services, events, and patient resources; clear and practical."),
+      ],
+      ctas: ["Book an appointment", "Learn more about this service", "Meet our providers", "Download the patient guide"],
+      hashtags: ["#Healthcare", "#Wellness", "#PatientCare", "#HealthTips", "#PreventiveCare", "#CommunityHealth", "#HealthyLiving"],
+    },
+  },
+  {
+    key: "sports", name: "Sports & Athletics", description: "High-energy content that rallies fans, athletes, and sponsors.",
+    draft: {
+      voice_rules: [
+        { rule_name: "Energy with substance", rule_content: "Match the excitement of the game while staying credible and specific.", category: "tone" },
+        { rule_name: "Celebrate the team", rule_content: "Credit athletes, coaches, and staff; win together, lose together.", category: "personality" },
+        { rule_name: "Fan-first language", rule_content: "Write like you're in the stands with them; inclusive, passionate, never corporate.", category: "language" },
+      ],
+      banned_phrases: ["guaranteed win", "crush the competition", "losers", "easy victory"],
+      required_language: [],
+      audiences: [
+        { segment_name: "Fans & community", description: "Supporters who follow scores, stories, and events.", platforms: ["instagram", "facebook"] },
+        { segment_name: "Sponsors & partners", description: "Businesses investing in the team or program.", platforms: ["linkedin"] },
+        { segment_name: "Athletes & recruits", description: "Current and prospective players and their families.", platforms: ["instagram"] },
+      ],
+      pillars: [
+        { name: "Game day", description: "Previews, live energy, and results." },
+        { name: "Athlete stories", description: "Profiles, journeys, and behind-the-scenes training." },
+        { name: "Community & fans", description: "Fan moments, youth programs, and local pride." },
+        { name: "Partners & sponsors", description: "Sponsor recognition and partnership news." },
+      ],
+      platform_rules: [
+        P("instagram", "Action-first visuals", "Game photos and Reels with punchy captions; Stories for live moments and polls."),
+        P("facebook", "Event hub", "Schedules, ticket links, recaps, and community events."),
+        P("linkedin", "Business of sport", "Sponsorship announcements, partnerships, and organizational milestones; professional tone."),
+      ],
+      ctas: ["Get your tickets", "Join us on game day", "Follow the season", "Become a sponsor", "Share your fan photos"],
+      hashtags: ["#GameDay", "#TeamSpirit", "#Athletics", "#SportsCommunity", "#GoTeam", "#Champions", "#FanZone", "#TrainHard"],
+    },
+  },
 ];
