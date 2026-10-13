@@ -14,6 +14,7 @@ import { usePreflight } from "@/hooks/usePreflight";
 import { PreflightPanel } from "@/components/preflight/PreflightPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
+import { PublishComposer } from "@/components/posting/PublishComposer";
 import { Input } from "@/components/ui/input";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
@@ -220,7 +221,11 @@ export function PostingPackageDrawer({
             <TabsTrigger value="package" className="flex-1">Posting package</TabsTrigger>
             <TabsTrigger value="preview" className="flex-1">Native preview</TabsTrigger>
             <TabsTrigger value="preflight" className="flex-1">Preflight</TabsTrigger>
+            <TabsTrigger value="publish" className="flex-1">Publish</TabsTrigger>
           </TabsList>
+          <TabsContent value="publish" className="mt-4">
+            <PublishComposer key={card.id} card={card} canPublish={canExport} />
+          </TabsContent>
           <TabsContent value="preflight" className="mt-4">
             <PreflightPanel pf={pf} isAdmin={canExport} draft={card.draft_copy} />
           </TabsContent>
