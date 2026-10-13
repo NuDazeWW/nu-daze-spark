@@ -87,6 +87,7 @@ export function AppSidebar() {
   ];
 
   return (
+    <NavHoverProvider>
     <Sidebar className="sm-dark">
       <SidebarHeader className="px-4 py-5">
         <Link to="/" className="block w-full">
