@@ -64,6 +64,7 @@ const contentNav = [
   { title: "Campaign Briefs", icon: FileText, href: "/briefs" },
   { title: "Social Post Generator", icon: Sparkles, href: "/generator" },
   { title: "Daily Queue", icon: CalendarDays, href: "/queue" },
+  { title: "Executive Review", icon: CalendarDays, href: "/review" },
   { title: "Content Planner", icon: CalendarRange, href: "/planner" },
   { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
   { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
