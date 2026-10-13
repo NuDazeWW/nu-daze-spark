@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch", "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: MODEL, store: false, reasoning: { effort: "low" },
+        model: MODEL, store: false, stream: true, reasoning: { effort: "low" },
         instructions: `${instructions} Write 4-8 voice rules (categories such as tone, personality, language, formatting), 2-4 audiences, 3-6 content pillars, 1-2 rules per platform, 5-10 CTAs, 8-15 hashtags without spaces. banned_phrases: wording the brand should avoid. required_language: only legally/brand-required wording explicitly stated.`,
         input: [{ role: "user", content: `COMPANY: ${b.company_name ?? "(unknown)"}\n${toneText ? `DESIRED TONE SLIDERS: ${toneText}\n` : ""}${material.slice(0, 100000)}` }],
         text: { format: { type: "json_schema", name: "strategy", strict: true, schema: SCHEMA } },
@@ -111,8 +111,21 @@ Deno.serve(async (req) => {
       console.error(r.status, t);
       return json({ error: msg }, r.status === 429 || r.status === 402 ? r.status : 500);
     }
-    const d = await r.json();
-    const text = d.output_text ?? (d.output ?? []).flatMap((o: any) => o.content ?? []).map((c: any) => c.text ?? "").join("");
+    const reader = r.body!.pipeThrough(new TextDecoderStream()).getReader();
+    let buf = "", text = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += value;
+      let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, i).trim();
+        buf = buf.slice(i + 1);
+        if (!line.startsWith("data:")) continue;
+        try { const ev = JSON.parse(line.slice(5).trim()); if (ev.type === "response.output_text.delta") text += ev.delta ?? ""; } catch { /* skip */ }
+      }
+    }
+    if (!text.trim()) return json({ error: "AI returned nothing — please try again." }, 500);
     const result = JSON.parse(text);
     return json({ result, sources });
   } catch (e) {
