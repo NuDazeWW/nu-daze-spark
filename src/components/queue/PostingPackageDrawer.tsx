@@ -12,6 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { NativePostPreview } from "@/components/preview/NativePostPreview";
 import { usePreflight } from "@/hooks/usePreflight";
 import { PreflightPanel } from "@/components/preflight/PreflightPanel";
+import { MediaStudio } from "@/components/media/MediaStudio";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { PublishComposer } from "@/components/posting/PublishComposer";
@@ -68,6 +70,7 @@ export function PostingPackageDrawer({
   onMarkExported: (id: string) => Promise<void>;
 }) {
   const { toast } = useToast();
+  const { canCreate } = useWorkspace();
   const qc = useQueryClient();
   const [firstComment, setFirstComment] = useState("");
   const [notes, setNotes] = useState("");
@@ -221,8 +224,12 @@ export function PostingPackageDrawer({
             <TabsTrigger value="package" className="flex-1">Posting package</TabsTrigger>
             <TabsTrigger value="preview" className="flex-1">Native preview</TabsTrigger>
             <TabsTrigger value="preflight" className="flex-1">Preflight</TabsTrigger>
+            <TabsTrigger value="media" className="flex-1">AI media</TabsTrigger>
             <TabsTrigger value="publish" className="flex-1">Publish</TabsTrigger>
           </TabsList>
+          <TabsContent value="media" className="mt-4">
+            <MediaStudio key={card.id} clientId={card.client_id} postCardId={card.id} platform={card.platform} canCreate={canCreate} defaultPrompt={card.suggested_asset_description ?? ""} />
+          </TabsContent>
           <TabsContent value="publish" className="mt-4">
             <PublishComposer key={card.id} card={card} canPublish={canExport} />
           </TabsContent>

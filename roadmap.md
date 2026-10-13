@@ -31,3 +31,8 @@
 - [x] Content Motive Score™: 0-100 score with 5 sub-scores computed in Preflight, shown in Preflight panel, Posting Package, queue chips, and Dashboard at-risk
 # Priority 2 — integration
 - [x] Bulk Export & ZIP Package (Section 18): ZIP (copy + cleared media + manifest with SHA-256 + CSV), CSV presets (SocialMotive/Buffer/Hootsuite/Meta), JSON; from Approved Content
+
+## Checkpoint (after Phase 3 + 6)
+- [x] Phase 3 Brand Kit Studio (/settings/brand-kit)
+- [x] Phase 6 AI media (images) — /media-studio + Posting Package "AI media" tab; video = coming soon
+- [ ] Reserved for checkpoint review: Phase 5 dispatcher/retries, real OAuth, AI video, approval diff, portfolio intelligence, performance logging, feedback learning, executive review mode
