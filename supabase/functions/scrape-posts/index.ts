@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.103.0";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { groundedAuthorContext } from "./authorContext.ts";
+import { fallbackSearch } from "./htmlFallback.ts";
 
 
 serve(async (req) => {
@@ -24,12 +25,6 @@ serve(async (req) => {
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     const firecrawlKey = Deno.env.get("FIRECRAWL_API_KEY");
 
-    if (!firecrawlKey) {
-      return new Response(JSON.stringify({ error: "Firecrawl not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
     if (!lovableKey) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
@@ -106,33 +101,33 @@ serve(async (req) => {
       searchQuery = platform === "facebook" ? `${searchQuery} site:facebook.com/posts` : `${searchQuery} site:linkedin.com/posts OR site:linkedin.com/feed`;
     }
 
-    console.log("Searching Firecrawl with query:", searchQuery);
+    // Pasted post URLs are fetched directly; site filters only apply to keyword searches.
+    const directUrls = /https?:\/\//i.test(customQuery);
+    const effectiveQuery = directUrls ? customQuery : searchQuery;
 
-    // Search with Firecrawl
-    const searchResponse = await fetch("https://api.firecrawl.dev/v1/search", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${firecrawlKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: searchQuery,
-        limit: 10,
-        scrapeOptions: { formats: ["markdown"] },
-      }),
-    });
-
-    if (!searchResponse.ok) {
-      const errData = await searchResponse.json().catch(() => ({}));
-      console.error("Firecrawl search error:", searchResponse.status, errData);
-      return new Response(
-        JSON.stringify({ error: `Search failed: ${errData.error || searchResponse.status}` }),
-        { status: searchResponse.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    let searchResults: any[] = [];
+    let source = "firecrawl";
+    if (firecrawlKey && !directUrls) {
+      try {
+        const searchResponse = await fetch("https://api.firecrawl.dev/v1/search", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${firecrawlKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ query: effectiveQuery, limit: 10, scrapeOptions: { formats: ["markdown"] } }),
+        });
+        if (searchResponse.ok) {
+          searchResults = (await searchResponse.json()).data || [];
+        } else {
+          console.error("Firecrawl search error, using direct fetch fallback:", searchResponse.status, await searchResponse.text());
+        }
+      } catch (e) {
+        console.error("Firecrawl unreachable, using direct fetch fallback:", e);
+      }
     }
-
-    const searchData = await searchResponse.json();
-    const searchResults = searchData.data || [];
+    if (searchResults.length === 0) {
+      source = "direct";
+      searchResults = await fallbackSearch(effectiveQuery, 8);
+    }
+    console.log(`Find Posts via ${source}: ${searchResults.length} results`);
 
     if (searchResults.length === 0) {
       return new Response(
