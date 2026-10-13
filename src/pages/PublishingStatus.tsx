@@ -198,7 +198,7 @@ export default function PublishingStatus() {
         </div>
       </div>
 
-      <PostingPackageDrawer card={openCard} open={!!openCard} onOpenChange={(o) => !o && setOpenId(null)} canExport={isAdmin} />
+      <PostingPackageDrawer card={openCard} open={!!openCard} onOpenChange={(o) => !o && setOpenId(null)} canExport={isAdmin} onMarkExported={async (id) => { await supabase.from("post_cards").update({ approval_status: "exported" } as never).eq("id", id); qc.invalidateQueries({ queryKey: ["post_cards"] }); }} />
     </div>
   );
 }
