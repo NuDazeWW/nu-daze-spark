@@ -103,7 +103,7 @@ export function AppSidebar() {
           />
         </Link>
         {ws.settings?.company_name && (
-          <div className="mt-2 flex items-center gap-2 text-xs text-sidebar-foreground/70">
+          <div className="mt-2 flex items-center gap-2 text-xs text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
             <span>for</span>
             {ws.settings.company_logo_url && <img src={ws.settings.company_logo_url} alt="" className="h-5 max-w-[80px] object-contain" />}
             <span className="font-semibold text-sidebar-foreground">{ws.settings.company_name}</span>
@@ -195,7 +195,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <Link to="/whats-new" className="px-2 pt-1 text-[10px] font-mono text-sidebar-foreground/50 hover:underline">SocialMotive v{APP_VERSION}</Link>
+        <Link to="/whats-new" className="px-2 pt-1 text-[10px] font-mono text-sidebar-foreground/50 hover:underline group-data-[collapsible=icon]:hidden">SocialMotive v{APP_VERSION}</Link>
       </SidebarFooter>
     </Sidebar>
     </NavHoverProvider>

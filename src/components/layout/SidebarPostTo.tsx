@@ -8,6 +8,10 @@ import { useActiveClient } from "@/contexts/ClientContext";
 import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { useAuth } from "@/hooks/useAuth";
 
+const ADD_LINK_PILL =
+  "ml-auto shrink-0 rounded border border-sidebar-border bg-sidebar-accent/40 px-1.5 py-0.5 " +
+  "text-[10px] font-semibold uppercase tracking-wide text-sidebar-foreground/80 " +
+  "transition-colors group-data-[collapsible=icon]:hidden";
 
 export function SidebarPostTo() {
   const { activeClientId } = useActiveClient();
@@ -24,34 +28,40 @@ export function SidebarPostTo() {
           </SidebarMenuItem>
         )}
         {accounts.map((a) => {
-          const label = a.handle ? `${PLATFORM_LABEL[a.platform] ?? a.platform} · ${a.handle}` : a.account_name;
+          const platform = PLATFORM_LABEL[a.platform] ?? a.platform;
+          const tip = a.handle ? `${platform} · ${a.handle}` : platform;
           return (
             <SidebarMenuItem key={a.id}>
               {a.profile_url ? (
-                <SidebarMenuButton asChild tooltip={label}>
+                <SidebarMenuButton asChild tooltip={`${tip} — open`}>
                   <a href={a.profile_url} target="_blank" rel="noopener noreferrer">
                     <PlatformIcon platform={a.platform} className="size-4" />
-                    <span className="truncate">{label}</span>
+                    <span className="truncate">{platform}</span>
                   </a>
                 </SidebarMenuButton>
               ) : isAdmin ? (
-                <SidebarMenuButton asChild tooltip={`Add a profile link for ${label}`}>
+                <SidebarMenuButton asChild tooltip={`${tip} — add a profile link`}>
                   <Link to={`/settings/clients?accounts=${activeClientId}`}>
                     <PlatformIcon platform={a.platform} className="size-4" />
-                    <span className="truncate">{label} — <span className="underline">add link</span></span>
+                    <span className="truncate">{platform}</span>
+                    <span className={ADD_LINK_PILL}>Add link</span>
                   </Link>
                 </SidebarMenuButton>
               ) : (
-                <SidebarMenuButton disabled className="opacity-60">
+                <SidebarMenuButton
+                  disabled
+                  tooltip={`${tip} — an admin can add a profile link`}
+                >
                   <PlatformIcon platform={a.platform} className="size-4" />
-                  <span className="truncate">{label} — no link</span>
+                  <span className="truncate">{platform}</span>
+                  <span className={`${ADD_LINK_PILL} opacity-60`}>Add link</span>
                 </SidebarMenuButton>
               )}
             </SidebarMenuItem>
           );
         })}
       </SidebarMenu>
-      <p className="px-2 pt-1 text-[10px] text-sidebar-foreground/50">Profile links are set in Settings › Your Brand Profiles › Accounts.</p>
+      <p className="px-2 pt-1 text-[10px] text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden">Profile links are set in Settings › Your Brand Profiles › Accounts.</p>
     </CollapsibleNavGroup>
   );
 }
