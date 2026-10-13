@@ -113,16 +113,18 @@ export function AppSidebar() {
           <SidebarMenu>
             {mainNav.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === item.href}
-                  tooltip={item.title}
-                >
-                  <Link to={item.href}>
-                    <item.icon className="size-4" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
+                <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.href}
+                    tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}
+                  >
+                    <Link to={item.href}>
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </NavHoverWrapper>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -135,16 +137,18 @@ export function AppSidebar() {
           <SidebarMenu>
             {contentNav.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === item.href}
-                  tooltip={item.title}
-                >
-                  <Link to={item.href}>
-                    <item.icon className="size-4" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
+                <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.href}
+                    tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}
+                  >
+                    <Link to={item.href}>
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </NavHoverWrapper>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -156,16 +160,18 @@ export function AppSidebar() {
           <SidebarMenu>
             {settingsNav.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === item.href}
-                  tooltip={item.title}
-                >
-                  <Link to={item.href}>
-                    <item.icon className="size-4" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
+                <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.href}
+                    tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}
+                  >
+                    <Link to={item.href}>
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </NavHoverWrapper>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
