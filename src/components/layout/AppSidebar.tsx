@@ -24,6 +24,7 @@ import {
   CalendarRange,
   Bell,
   Mail,
+  ImagePlus, Palette,
 } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { APP_VERSION } from "@/lib/appVersion";
