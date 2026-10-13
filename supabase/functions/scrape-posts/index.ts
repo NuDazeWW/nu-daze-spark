@@ -131,7 +131,7 @@ serve(async (req) => {
 
     if (searchResults.length === 0) {
       return new Response(
-        JSON.stringify({ success: true, count: 0, message: "No results found for the search query." }),
+        JSON.stringify({ success: true, count: 0, message: source === "direct" && !directUrls ? "No results found. Without a Firecrawl key, keyword search is limited — paste LinkedIn or Facebook post links into the search box to read them directly." : "No results found for the search query." }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
