@@ -20,3 +20,6 @@
 - Billing lives in versioned `subscription_tier_definitions` + `credit_weight_definitions` (owner-edited via audited RPCs) and the service-written `workspace_billing` row; subscriptions stay pinned to their tier version until renewal, so config edits never change entitlements mid-cycle.
 - Metered actions go through `consume_usage` (dry-run pre-check, then deduct) in both UI (`useCreditGate`) and edge functions; anomalies pause only that bucket, and entitlements are granted only by the idempotent `stripe-webhook`, so redirects can't grant access.
 - Subdirectories (e.g. `src/`) have their own `AGENTS.md`; read it before changing files there.
+- Connected-folder browsing (OneDrive, SharePoint, Google Drive) goes through the single `browse-cloud-storage` function, which returns Graph-shaped items for every provider so one browser UI serves all drives.
+- Text generators (`generate-from-brief`, `generate-comments`) meter the `text_drafts` bucket via `consume_usage`: dry-run before the AI call, deduct only for drafts actually saved.
+- Find Posts (`scrape-posts`) prefers Firecrawl and falls back to direct public-page fetching (OpenGraph/meta/JSON-LD) so it never hard-fails without a paid key.
