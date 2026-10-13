@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { usePostCards, STATUS_META, type PostCard } from "@/hooks/usePostCards";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useActiveClient } from "@/contexts/ClientContext";
 import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { postLabel } from "@/components/tracking/PostTracking";
 
@@ -18,8 +22,29 @@ const fullCopy = (c: PostCard) =>
 export function ReadinessPanel() {
   const navigate = useNavigate();
   const { cards, comments, isLoading } = usePostCards() as any;
+  const { user } = useAuth();
+  const { activeClientId } = useActiveClient();
 
-  const { decisions, ready, risks, commentsWaiting } = useMemo(() => {
+  // Latest Motive Score per post, to flag low-scoring drafts at a glance.
+  const { data: lowScores = {} } = useQuery({
+    queryKey: ["motive_scores", activeClientId],
+    enabled: !!user && !!activeClientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("preflight_reviews")
+        .select("post_card_id, motive_score, created_at")
+        .eq("client_id", activeClientId!)
+        .not("motive_score", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      const latest: Record<string, number> = {};
+      for (const r of data ?? []) if (!(r.post_card_id in latest)) latest[r.post_card_id] = r.motive_score!;
+      return latest;
+    },
+  });
+
+  const { decisions, ready, risks, lowScore, commentsWaiting } = useMemo(() => {
     const now = new Date();
     const tomorrowEnd = endOfDay(addDays(now, 1));
     const weekEnd = endOfDay(addDays(now, 7));
@@ -35,9 +60,12 @@ export function ReadinessPanel() {
       .filter((c) => c.scheduled_for && !["approved", "exported", "posted", "archived"].includes(c.approval_status))
       .filter((c) => { const d = new Date(c.scheduled_for!); return d <= weekEnd; })
       .sort((a, b) => a.scheduled_for!.localeCompare(b.scheduled_for!));
+    const lowScore = posts.filter((c) =>
+      !["approved", "exported", "posted", "archived"].includes(c.approval_status) &&
+      (lowScores[c.id] ?? 100) < 60 && !risks.some((r) => r.id === c.id));
     const commentsWaiting = (comments ?? []).filter((c: any) => c.approval_status === "draft" || c.approval_status === "in_review").length;
-    return { decisions, ready, risks, commentsWaiting };
-  }, [cards, comments]);
+    return { decisions, ready, risks, lowScore, commentsWaiting };
+  }, [cards, comments, lowScores]);
 
   if (isLoading) return null;
 
@@ -77,13 +105,18 @@ export function ReadinessPanel() {
           ))}
         </Column>
 
-        <Column icon={AlertTriangle} title="At risk · next 7 days" count={risks.length} tone="risk" empty="Every scheduled post this week is approved.">
+        <Column icon={AlertTriangle} title="At risk · next 7 days" count={risks.length + lowScore.length} tone="risk" empty="Every scheduled post this week is approved.">
           {risks.slice(0, 6).map((c) => (
             <Row key={c.id} card={c} sub={`${when(c.scheduled_for!)} · not approved yet`}>
               <Button size="sm" variant="outline" onClick={() => navigate(`/queue?post=${c.id}`)}>Fix</Button>
             </Row>
           ))}
-          {risks.length > 6 && <More n={risks.length - 6} onClick={() => navigate("/queue")} />}
+          {lowScore.slice(0, Math.max(0, 6 - risks.length)).map((c) => (
+            <Row key={c.id} card={c} sub={`Motive Score ${lowScores[c.id]}/100 — needs stronger copy`}>
+              <Button size="sm" variant="outline" onClick={() => navigate(`/queue?post=${c.id}`)}>Fix</Button>
+            </Row>
+          ))}
+          {risks.length + lowScore.length > 6 && <More n={risks.length + lowScore.length - 6} onClick={() => navigate("/queue")} />}
         </Column>
       </div>
     </section>

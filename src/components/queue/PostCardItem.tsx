@@ -18,6 +18,7 @@ import { STATUS_META, APPROVAL_FLOW } from "@/hooks/usePostCards";
 import { NativePreviewDialog } from "@/components/preview/NativePostPreview";
 import { usePreflight } from "@/hooks/usePreflight";
 import { PreflightBadge, PreflightDialog } from "@/components/preflight/PreflightPanel";
+import { useVoiceProfiles } from "@/hooks/useVoiceProfiles";
 import { PostNumber, StatusProgress, WhereIsIt, PostHistoryButton, postLabel } from "@/components/tracking/PostTracking";
 import { useNavigate } from "react-router-dom";
 
@@ -43,6 +44,8 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const [preflightOpen, setPreflightOpen] = useState(false);
   const [gateIntent, setGateIntent] = useState<string | null>(null);
   const pf = usePreflight(card);
+  const { profiles: voices } = useVoiceProfiles();
+  const voice = card.voice_profile_id ? voices.find((v) => v.id === card.voice_profile_id) : null;
   const statusMeta = STATUS_META[card.approval_status];
 
   const changeStatus = (status: ApprovalStatus) => {
@@ -162,6 +165,11 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
               copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")} />
           )}
           <PreflightBadge state={pf.run.isPending ? "none" : pf.gate.state} review={pf.review} onClick={() => { setGateIntent(null); setPreflightOpen(true); }} />
+          {voice && (
+            <Badge variant="secondary" className="text-[10px]" title={`Written in ${voice.name}'s voice`}>
+              as {voice.name}{voice.role_title ? ` · ${voice.role_title}` : ""}
+            </Badge>
+          )}
         </div>
         {/* Draft copy */}
         <div

@@ -82,7 +82,7 @@ serve(async (req) => {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) return json({ error: "Invalid session" }, 401);
 
-    const { brief_id, mode } = await req.json();
+    const { brief_id, mode, voice_profile_id } = await req.json();
     const { data: brief } = await sb.from("campaign_briefs").select("*").eq("id", brief_id).maybeSingle();
     if (!brief) return json({ error: "Brief not found" }, 404);
 
@@ -118,9 +118,12 @@ Constraints: ${brief.constraints ?? "(none)"}`;
 
     if (brief.status !== "approved") return json({ error: "Brief must be approved before generating." }, 400);
 
-    const [{ data: voice }, { data: rules }] = await Promise.all([
+    const [{ data: voice }, { data: rules }, { data: execVoice }] = await Promise.all([
       sb.from("brand_voice_rules").select("rule_name, rule_content").eq("is_active", true).eq("client_id", brief.client_id).limit(15),
       sb.from("platform_rules").select("platform, rule_name, rule_content").eq("is_active", true).eq("client_id", brief.client_id).limit(20),
+      voice_profile_id
+        ? sb.from("voice_profiles").select("*").eq("id", voice_profile_id).eq("is_active", true).maybeSingle()
+        : Promise.resolve({ data: null }),
     ]);
     const channels = (brief.target_channels ?? []).filter((c: string) => CHANNELS[c]);
     if (!channels.length) return json({ error: "No target channels selected" }, 400);
@@ -135,6 +138,13 @@ ${(voice ?? []).map((v: any) => `- ${v.rule_name}: ${v.rule_content}`).join("\n"
 
 PLATFORM RULES
 ${(rules ?? []).map((r: any) => `- [${r.platform}] ${r.rule_name}: ${r.rule_content}`).join("\n") || "(none)"}
+${execVoice ? `
+WRITE AS (executive voice — every variant must sound like this person, first person):
+${execVoice.name}${execVoice.role_title ? `, ${execVoice.role_title}` : ""}
+Voice traits: ${(execVoice.voice_traits ?? []).join("; ") || "(none)"}
+Signature topics: ${(execVoice.topics ?? []).join("; ") || "(none)"}
+Point of view: ${execVoice.pov_statement ?? "(none)"}
+Never use these phrases/styles: ${(execVoice.banned_phrases ?? []).join("; ") || "(none)"}` : ""}
 
 CHANNELS
 ${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}`, {
@@ -206,6 +216,7 @@ ${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}`, {
       approval_status: "draft",
       created_by: user.id,
       import_source: "brief",
+      voice_profile_id: execVoice?.id ?? null,
     }));
     const { error: pErr } = await sb.from("post_cards").insert(rows);
     if (pErr) {

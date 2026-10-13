@@ -1315,6 +1315,7 @@ export type Database = {
           suggested_asset_description: string | null
           updated_at: string
           updated_by: string | null
+          voice_profile_id: string | null
         }
         Insert: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
@@ -1351,6 +1352,7 @@ export type Database = {
           suggested_asset_description?: string | null
           updated_at?: string
           updated_by?: string | null
+          voice_profile_id?: string | null
         }
         Update: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
@@ -1387,6 +1389,7 @@ export type Database = {
           suggested_asset_description?: string | null
           updated_at?: string
           updated_by?: string | null
+          voice_profile_id?: string | null
         }
         Relationships: [
           {
@@ -1422,6 +1425,13 @@ export type Database = {
             columns: ["repurposed_from_id"]
             isOneToOne: false
             referencedRelation: "post_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_cards_voice_profile_id_fkey"
+            columns: ["voice_profile_id"]
+            isOneToOne: false
+            referencedRelation: "voice_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1494,6 +1504,8 @@ export type Database = {
           findings: Json
           id: string
           model: string | null
+          motive_breakdown: Json | null
+          motive_score: number | null
           overall_status: string
           overridden_at: string | null
           overridden_by: string | null
@@ -1512,6 +1524,8 @@ export type Database = {
           findings?: Json
           id?: string
           model?: string | null
+          motive_breakdown?: Json | null
+          motive_score?: number | null
           overall_status?: string
           overridden_at?: string | null
           overridden_by?: string | null
@@ -1530,6 +1544,8 @@ export type Database = {
           findings?: Json
           id?: string
           model?: string | null
+          motive_breakdown?: Json | null
+          motive_score?: number | null
           overall_status?: string
           overridden_at?: string | null
           overridden_by?: string | null
@@ -1848,6 +1864,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      voice_profiles: {
+        Row: {
+          banned_phrases: string[]
+          client_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          linkedin_url: string | null
+          name: string
+          pov_statement: string | null
+          role_title: string | null
+          sample_posts: string[]
+          topics: string[]
+          updated_at: string
+          voice_traits: string[]
+        }
+        Insert: {
+          banned_phrases?: string[]
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          linkedin_url?: string | null
+          name: string
+          pov_statement?: string | null
+          role_title?: string | null
+          sample_posts?: string[]
+          topics?: string[]
+          updated_at?: string
+          voice_traits?: string[]
+        }
+        Update: {
+          banned_phrases?: string[]
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          linkedin_url?: string | null
+          name?: string
+          pov_statement?: string | null
+          role_title?: string | null
+          sample_posts?: string[]
+          topics?: string[]
+          updated_at?: string
+          voice_traits?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_profiles_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       workspace_invites: {
         Row: {

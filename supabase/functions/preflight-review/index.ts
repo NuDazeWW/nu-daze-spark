@@ -6,6 +6,7 @@ import {
   type PreflightFinding,
 } from "../_shared/preflightRules.ts";
 import { activeGuardrails } from "../_shared/guardrails.ts";
+import { motiveScore } from "../_shared/motiveScore.ts";
 
 const MODEL = "openai/gpt-6-astra";
 const json = (b: unknown, status = 200) =>
@@ -181,6 +182,16 @@ HASHTAGS: ${(card.hashtags ?? []).join(" ") || "(none)"}`;
     }
 
     const findings = [...ruleFindings, ...aiFindings];
+    const motive = motiveScore({
+      draft_copy: card.draft_copy,
+      hashtags: card.hashtags,
+      platform: card.platform,
+      content_type: card.content_type,
+      objective: card.objective,
+      audience: card.audience,
+      campaign_pillar: card.campaign_pillar,
+      recentPosts: (recentRes.data ?? []) as any[],
+    }, voiceScore);
     const { data: review, error } = await sb.from("preflight_reviews").insert({
       post_card_id: card.id,
       client_id: cid,
@@ -190,6 +201,8 @@ HASHTAGS: ${(card.hashtags ?? []).join(" ") || "(none)"}`;
       findings,
       ai_error: aiError,
       model: MODEL,
+      motive_score: motive.total,
+      motive_breakdown: motive,
       run_by: user.id,
     }).select().single();
     if (error) return json({ error: error.message }, 500);
