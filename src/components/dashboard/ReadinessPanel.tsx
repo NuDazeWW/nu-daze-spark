@@ -44,7 +44,7 @@ export function ReadinessPanel() {
     },
   });
 
-  const { decisions, ready, risks, commentsWaiting } = useMemo(() => {
+  const { decisions, ready, risks, lowScore, commentsWaiting } = useMemo(() => {
     const now = new Date();
     const tomorrowEnd = endOfDay(addDays(now, 1));
     const weekEnd = endOfDay(addDays(now, 7));
