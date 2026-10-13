@@ -91,6 +91,27 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_provider_credentials: {
+        Row: {
+          api_key: string
+          provider: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          api_key: string
+          provider: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          api_key?: string
+          provider?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       approval_log: {
         Row: {
           action: Database["public"]["Enums"]["approval_status"]
@@ -2256,6 +2277,8 @@ export type Database = {
       }
       workspace_settings: {
         Row: {
+          ai_image_provider: string
+          ai_video_provider: string
           auto_admin_domain: string | null
           client_limit: number | null
           company_logo_url: string | null
@@ -2275,6 +2298,8 @@ export type Database = {
           x_monthly_spend_cap_cents: number
         }
         Insert: {
+          ai_image_provider?: string
+          ai_video_provider?: string
           auto_admin_domain?: string | null
           client_limit?: number | null
           company_logo_url?: string | null
@@ -2294,6 +2319,8 @@ export type Database = {
           x_monthly_spend_cap_cents?: number
         }
         Update: {
+          ai_image_provider?: string
+          ai_video_provider?: string
           auto_admin_domain?: string | null
           client_limit?: number | null
           company_logo_url?: string | null
@@ -2319,6 +2346,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ai_provider_status: {
+        Args: never
+        Returns: {
+          configured: boolean
+          provider: string
+          updated_at: string
+        }[]
+      }
       can_create_content: { Args: { _user_id: string }; Returns: boolean }
       can_edit_content: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
