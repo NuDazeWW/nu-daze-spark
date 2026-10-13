@@ -90,7 +90,7 @@ export default function CampaignBriefs() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("master_content_objects")
-        .select("*, post_cards(id, platform, content_type, draft_copy, approval_status, campaign_pillar, scheduled_for, preflight_reviews(motive_score, created_at))")
+        .select("*, post_cards(id, platform, content_type, post_number, draft_copy, approval_status, campaign_pillar, scheduled_for, preflight_reviews(motive_score, created_at))")
         .eq("brief_id", selected!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
