@@ -127,6 +127,13 @@
       "when": 1791862446107,
       "tag": "0017_restrict_is_workspace_member_execute",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1791864022711,
+      "tag": "0018_social_publishing_phase1",
+      "breakpoints": true
     }
   ]
 }

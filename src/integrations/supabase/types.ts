@@ -287,6 +287,53 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_kits: {
+        Row: {
+          client_id: string
+          colors: Json
+          created_at: string
+          fonts: string[]
+          id: string
+          logo_path: string | null
+          product_image_paths: string[]
+          tone: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          client_id: string
+          colors?: Json
+          created_at?: string
+          fonts?: string[]
+          id?: string
+          logo_path?: string | null
+          product_image_paths?: string[]
+          tone?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          client_id?: string
+          colors?: Json
+          created_at?: string
+          fonts?: string[]
+          id?: string
+          logo_path?: string | null
+          product_image_paths?: string[]
+          tone?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_kits_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_voice_rules: {
         Row: {
           category: string
@@ -982,6 +1029,38 @@ export type Database = {
           },
         ]
       }
+      generation_counts: {
+        Row: {
+          client_id: string | null
+          id: string
+          image_count: number
+          video_count: number
+          year_month: string
+        }
+        Insert: {
+          client_id?: string | null
+          id?: string
+          image_count?: number
+          video_count?: number
+          year_month: string
+        }
+        Update: {
+          client_id?: string | null
+          id?: string
+          image_count?: number
+          video_count?: number
+          year_month?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_counts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guardrail_settings: {
         Row: {
           client_id: string | null
@@ -1226,6 +1305,65 @@ export type Database = {
         }
         Relationships: []
       }
+      notify_me: {
+        Row: {
+          created_at: string
+          email: string
+          feature_key: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          feature_key: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          feature_key?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      oauth_states: {
+        Row: {
+          client_id: string | null
+          code_verifier: string | null
+          created_at: string
+          platform: string
+          state: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          code_verifier?: string | null
+          created_at?: string
+          platform: string
+          state: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          code_verifier?: string | null
+          created_at?: string
+          platform?: string
+          state?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_states_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_rules: {
         Row: {
           char_limit: number | null
@@ -1281,6 +1419,7 @@ export type Database = {
       }
       post_cards: {
         Row: {
+          apply_ai_disclosure: boolean
           approval_status: Database["public"]["Enums"]["approval_status"]
           assigned_to: string | null
           audience: string | null
@@ -1297,6 +1436,7 @@ export type Database = {
           id: string
           import_source: string | null
           master_content_id: string | null
+          media_urls: string[]
           objective: string | null
           org_tags: string[] | null
           package_checksum: string | null
@@ -1307,17 +1447,21 @@ export type Database = {
           posted_at: string | null
           posted_url: string | null
           posting_notes: string | null
+          publishing_status: string
           rationale: string | null
           repurposed_from_id: string | null
           revision_notes: string | null
           scheduled_for: string | null
           source_references: string[] | null
           suggested_asset_description: string | null
+          target_account_ids: string[]
+          timezone: string
           updated_at: string
           updated_by: string | null
           voice_profile_id: string | null
         }
         Insert: {
+          apply_ai_disclosure?: boolean
           approval_status?: Database["public"]["Enums"]["approval_status"]
           assigned_to?: string | null
           audience?: string | null
@@ -1334,6 +1478,7 @@ export type Database = {
           id?: string
           import_source?: string | null
           master_content_id?: string | null
+          media_urls?: string[]
           objective?: string | null
           org_tags?: string[] | null
           package_checksum?: string | null
@@ -1344,17 +1489,21 @@ export type Database = {
           posted_at?: string | null
           posted_url?: string | null
           posting_notes?: string | null
+          publishing_status?: string
           rationale?: string | null
           repurposed_from_id?: string | null
           revision_notes?: string | null
           scheduled_for?: string | null
           source_references?: string[] | null
           suggested_asset_description?: string | null
+          target_account_ids?: string[]
+          timezone?: string
           updated_at?: string
           updated_by?: string | null
           voice_profile_id?: string | null
         }
         Update: {
+          apply_ai_disclosure?: boolean
           approval_status?: Database["public"]["Enums"]["approval_status"]
           assigned_to?: string | null
           audience?: string | null
@@ -1371,6 +1520,7 @@ export type Database = {
           id?: string
           import_source?: string | null
           master_content_id?: string | null
+          media_urls?: string[]
           objective?: string | null
           org_tags?: string[] | null
           package_checksum?: string | null
@@ -1381,12 +1531,15 @@ export type Database = {
           posted_at?: string | null
           posted_url?: string | null
           posting_notes?: string | null
+          publishing_status?: string
           rationale?: string | null
           repurposed_from_id?: string | null
           revision_notes?: string | null
           scheduled_for?: string | null
           source_references?: string[] | null
           suggested_asset_description?: string | null
+          target_account_ids?: string[]
+          timezone?: string
           updated_at?: string
           updated_by?: string | null
           voice_profile_id?: string | null
@@ -1598,6 +1751,100 @@ export type Database = {
         }
         Relationships: []
       }
+      publish_attempts: {
+        Row: {
+          attempt_number: number
+          attempted_at: string
+          client_id: string | null
+          cost_cents: number | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          platform: string
+          platform_post_id: string | null
+          post_card_id: string
+          social_account_id: string | null
+          status: string
+        }
+        Insert: {
+          attempt_number?: number
+          attempted_at?: string
+          client_id?: string | null
+          cost_cents?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          platform: string
+          platform_post_id?: string | null
+          post_card_id: string
+          social_account_id?: string | null
+          status: string
+        }
+        Update: {
+          attempt_number?: number
+          attempted_at?: string
+          client_id?: string | null
+          cost_cents?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          platform?: string
+          platform_post_id?: string | null
+          post_card_id?: string
+          social_account_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publish_attempts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publish_attempts_post_card_id_fkey"
+            columns: ["post_card_id"]
+            isOneToOne: false
+            referencedRelation: "post_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publish_attempts_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publishing_credentials: {
+        Row: {
+          client_id: string
+          client_secret: string
+          id: string
+          provider: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          client_id: string
+          client_secret: string
+          id?: string
+          provider: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          client_id?: string
+          client_secret?: string
+          id?: string
+          provider?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       repurpose_suggestions: {
         Row: {
           client_id: string | null
@@ -1717,41 +1964,91 @@ export type Database = {
         }
         Relationships: []
       }
+      social_account_tokens: {
+        Row: {
+          access_token: string
+          refresh_token: string | null
+          social_account_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          refresh_token?: string | null
+          social_account_id: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          refresh_token?: string | null
+          social_account_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_account_tokens_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: true
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_accounts: {
         Row: {
           account_name: string
           avatar_path: string | null
           client_id: string
+          connected_at: string | null
+          connection_metadata: Json
+          connection_status: string
           created_at: string
+          external_account_id: string | null
           handle: string | null
           id: string
           is_active: boolean
+          page_id: string | null
           platform: Database["public"]["Enums"]["platform_type"]
           profile_url: string | null
+          scopes: string[]
+          token_expires_at: string | null
           updated_at: string
         }
         Insert: {
           account_name: string
           avatar_path?: string | null
           client_id: string
+          connected_at?: string | null
+          connection_metadata?: Json
+          connection_status?: string
           created_at?: string
+          external_account_id?: string | null
           handle?: string | null
           id?: string
           is_active?: boolean
+          page_id?: string | null
           platform: Database["public"]["Enums"]["platform_type"]
           profile_url?: string | null
+          scopes?: string[]
+          token_expires_at?: string | null
           updated_at?: string
         }
         Update: {
           account_name?: string
           avatar_path?: string | null
           client_id?: string
+          connected_at?: string | null
+          connection_metadata?: Json
+          connection_status?: string
           created_at?: string
+          external_account_id?: string | null
           handle?: string | null
           id?: string
           is_active?: boolean
+          page_id?: string | null
           platform?: Database["public"]["Enums"]["platform_type"]
           profile_url?: string | null
+          scopes?: string[]
+          token_expires_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1964,6 +2261,7 @@ export type Database = {
           company_logo_url: string | null
           company_name: string
           created_at: string
+          default_timezone: string
           entity_label_plural: string
           entity_label_singular: string
           id: boolean
@@ -1974,6 +2272,7 @@ export type Database = {
           setup_progress: Json
           updated_at: string
           updated_by: string | null
+          x_monthly_spend_cap_cents: number
         }
         Insert: {
           auto_admin_domain?: string | null
@@ -1981,6 +2280,7 @@ export type Database = {
           company_logo_url?: string | null
           company_name?: string
           created_at?: string
+          default_timezone?: string
           entity_label_plural?: string
           entity_label_singular?: string
           id?: boolean
@@ -1991,6 +2291,7 @@ export type Database = {
           setup_progress?: Json
           updated_at?: string
           updated_by?: string | null
+          x_monthly_spend_cap_cents?: number
         }
         Update: {
           auto_admin_domain?: string | null
@@ -1998,6 +2299,7 @@ export type Database = {
           company_logo_url?: string | null
           company_name?: string
           created_at?: string
+          default_timezone?: string
           entity_label_plural?: string
           entity_label_singular?: string
           id?: boolean
@@ -2008,6 +2310,7 @@ export type Database = {
           setup_progress?: Json
           updated_at?: string
           updated_by?: string | null
+          x_monthly_spend_cap_cents?: number
         }
         Relationships: []
       }
@@ -2041,6 +2344,15 @@ export type Database = {
         Returns: undefined
       }
       prepare_blank_copy: { Args: { _confirm: string }; Returns: undefined }
+      publishing_credentials_status: {
+        Args: never
+        Returns: {
+          client_id_hint: string
+          configured: boolean
+          provider: string
+          updated_at: string
+        }[]
+      }
       remove_workspace_user: { Args: { _user_id: string }; Returns: undefined }
       reset_workspace_content: {
         Args: { _confirm: string }
@@ -2100,7 +2412,7 @@ export type Database = {
         | "summarization_only"
         | "blocked"
         | "archived"
-      platform_type: "linkedin" | "instagram" | "facebook"
+      platform_type: "linkedin" | "instagram" | "facebook" | "youtube" | "x"
       repurpose_type:
         | "repost_as_is"
         | "cross_platform_rewrite"
@@ -2273,7 +2585,7 @@ export const Constants = {
         "blocked",
         "archived",
       ],
-      platform_type: ["linkedin", "instagram", "facebook"],
+      platform_type: ["linkedin", "instagram", "facebook", "youtube", "x"],
       repurpose_type: [
         "repost_as_is",
         "cross_platform_rewrite",
