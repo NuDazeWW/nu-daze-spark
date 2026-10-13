@@ -222,6 +222,9 @@ export function PostingPackageDrawer({
           <SheetDescription className="capitalize">{card.platform} · {card.content_type}
             {card.scheduled_for && ` · ${new Date(card.scheduled_for).toLocaleString()}`}</SheetDescription>
           {canCreate && (
+            <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/review?post=${card.id}`); toast.success("Executive review link copied"); }}>
+              Copy executive review link
+            </Button>
             <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => setSplitOpen(true)}>
               <Split className="mr-2 h-4 w-4" /> Split across platforms
             </Button>

@@ -13,7 +13,9 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, RotateCcw, Trash2 } from "lucide-react";
+import { Clapperboard, Loader2, RotateCcw, Trash2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { resetDemoToCameraReady } from "@/lib/demoSeed";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { fmtUsd, startCheckout, useBilling, useCreditWeights, useTierDefinitions, type TierDefinition } from "@/hooks/useBilling";
@@ -205,6 +207,7 @@ function StripeConfigCard() {
 }
 
 function DemoControls({ onDone }: { onDone: () => void }) {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState("");
   const [purge, setPurge] = useState(false);
