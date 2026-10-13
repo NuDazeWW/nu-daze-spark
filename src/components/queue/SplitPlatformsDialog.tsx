@@ -56,10 +56,11 @@ export function SplitPlatformsDialog({ card, open, onOpenChange }: { card: PostC
     setSaving(true);
     const rows = keep.map((v) => ({
       client_id: card.client_id, created_by: user!.id, platform: v.platform as any, content_type: v.content_type as any,
-      draft_copy: v.draft_copy, original_ai_draft: v.draft_copy, approval_status: "draft" as const,
+      draft_copy: v.draft_copy, approval_status: "draft" as const,
       hashtags: v.tags.split(/[\s,]+/).map((t) => t.replace(/^#/, "")).filter(Boolean),
-      objective: card.objective, audience: card.audience, campaign_id: (card as any).campaign_id ?? null,
-      voice_profile_id: card.voice_profile_id ?? null, brief_id: (card as any).brief_id ?? null,
+      objective: card.objective, audience: card.audience, campaign_pillar: card.campaign_pillar,
+      voice_profile_id: card.voice_profile_id ?? null, brief_id: card.brief_id ?? null,
+      master_content_id: card.master_content_id ?? null, people_tags: card.people_tags, org_tags: card.org_tags,
       rationale: `Split across platforms: ${v.why}`, source_references: [`Adapted from ${postLabel(card as any)}`, ...(card.source_references ?? [])],
       repurposed_from_id: card.id,
     }));

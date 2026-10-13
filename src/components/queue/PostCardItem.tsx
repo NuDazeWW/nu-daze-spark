@@ -21,6 +21,9 @@ import { PreflightBadge, PreflightDialog } from "@/components/preflight/Prefligh
 import { useVoiceProfiles } from "@/hooks/useVoiceProfiles";
 import { PostNumber, StatusProgress, WhereIsIt, PostHistoryButton, postLabel } from "@/components/tracking/PostTracking";
 import { useNavigate } from "react-router-dom";
+import { Split } from "lucide-react";
+import { useWorkspace } from "@/hooks/useWorkspace";
+import { SplitPlatformsDialog } from "./SplitPlatformsDialog";
 
 interface PostCardItemProps {
   card: PostCard;
@@ -42,6 +45,8 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const [expanded, setExpanded] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [preflightOpen, setPreflightOpen] = useState(false);
+  const [splitOpen, setSplitOpen] = useState(false);
+  const { canCreate } = useWorkspace();
   const [gateIntent, setGateIntent] = useState<string | null>(null);
   const pf = usePreflight(card);
   const { profiles: voices } = useVoiceProfiles();
@@ -125,6 +130,11 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
                 {peopleString && (
                   <DropdownMenuItem onClick={() => copyToClipboard(peopleString, "Tags")}>
                     <Users className="mr-2 h-3.5 w-3.5" />Copy People Tags
+                  </DropdownMenuItem>
+                )}
+                {canCreate && card.content_type !== "comment" && (
+                  <DropdownMenuItem onClick={() => setSplitOpen(true)}>
+                    <Split className="mr-2 h-3.5 w-3.5" />Split across platforms
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
