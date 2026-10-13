@@ -243,6 +243,7 @@ export default function AssetLibrary() {
             >
               <Tags className="mr-2 h-4 w-4" />{bulkMode ? "Exit Bulk" : "Bulk Actions"}
             </Button>
+            <Button variant="outline" onClick={() => setOneDriveOpen(true)}><FolderOpen className="mr-2 h-4 w-4" />Connected Folders</Button>
             <Button variant="outline" onClick={() => setReelCreatorOpen(true)}><Film className="mr-2 h-4 w-4" />Create Video Reel</Button>
             <Button variant="outline" onClick={() => setBulkOpen(true)}><Sparkles className="mr-2 h-4 w-4" />AI Reel Cards</Button>
             <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
