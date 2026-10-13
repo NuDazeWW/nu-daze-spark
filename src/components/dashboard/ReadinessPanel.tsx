@@ -60,6 +60,9 @@ export function ReadinessPanel() {
       .filter((c) => c.scheduled_for && !["approved", "exported", "posted", "archived"].includes(c.approval_status))
       .filter((c) => { const d = new Date(c.scheduled_for!); return d <= weekEnd; })
       .sort((a, b) => a.scheduled_for!.localeCompare(b.scheduled_for!));
+    const lowScore = posts.filter((c) =>
+      !["approved", "exported", "posted", "archived"].includes(c.approval_status) &&
+      (lowScores[c.id] ?? 100) < 60 && !risks.some((r) => r.id === c.id));
     const commentsWaiting = (comments ?? []).filter((c: any) => c.approval_status === "draft" || c.approval_status === "in_review").length;
     return { decisions, ready, risks, commentsWaiting };
   }, [cards, comments]);
