@@ -982,6 +982,47 @@ export type Database = {
           },
         ]
       }
+      guardrail_settings: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          custom_terms: Json
+          disabled_terms: string[]
+          enabled_tiers: Json
+          id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          custom_terms?: Json
+          disabled_terms?: string[]
+          enabled_tiers?: Json
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          custom_terms?: Json
+          disabled_terms?: string[]
+          enabled_tiers?: Json
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guardrail_settings_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hashtag_banks: {
         Row: {
           bank_name: string
