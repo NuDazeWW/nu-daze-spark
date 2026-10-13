@@ -62,7 +62,7 @@ export function MotiveScore({ score, breakdown }: { score: number; breakdown?: M
             );
           })}
           <p className="text-[11px] text-muted-foreground pt-1">
-            Weakest: {breakdown.weakest.key} — {breakdown.weakest.hint}
+            Weakest: {PARTS.find((p) => p.key === breakdown.weakest.key)?.label ?? breakdown.weakest.key} — {breakdown.weakest.hint}
           </p>
         </div>
       )}

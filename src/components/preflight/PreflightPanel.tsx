@@ -46,6 +46,10 @@ const CHECK_TITLE: Record<string, string> = {
 const title = (c: string) => CHECK_TITLE[c] ?? c.replace(/_/g, " ");
 // Checks the AI can't fix by rewriting text.
 const NON_TEXT = new Set(["media", "weak_source"]);
+const AREA_LABEL: Record<string, string> = {
+  hook_strength: "Hook strength", strategic_fit: "Strategic fit", voice_fit: "Voice fit",
+  platform_fit: "Platform fit", originality: "Originality",
+};
 
 export function PreflightBadge({ state, review, onClick }: { state: GateState; review?: PreflightReview | null; onClick?: () => void }) {
   const m = GATE_META[state];
@@ -116,6 +120,10 @@ export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin:
   const h = headline(gate.state, blocking.length, advisory.length);
 
   const fixAll = () => proposeRewrite.mutate(undefined, { onSuccess: (d) => setProposal(d) });
+  const improveWeakest = () => {
+    const w = (review?.motive_breakdown as any)?.weakest;
+    if (w?.key) proposeRewrite.mutate({ key: w.key, hint: w.hint }, { onSuccess: (d) => setProposal(d) });
+  };
   const bypassAll = () => (blocking.length ? setBypassOpen(true) : acknowledge.mutate());
 
   return (
@@ -142,6 +150,14 @@ export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin:
         )}
         {review?.motive_score != null && (
           <MotiveScore score={review.motive_score} breakdown={review.motive_breakdown as any} />
+        )}
+        {review?.motive_score != null && (review.motive_breakdown as any)?.weakest?.key && gate.state !== "stale" && (
+          <Button size="sm" variant="outline" className="w-full justify-start"
+            onClick={improveWeakest} disabled={proposeRewrite.isPending || keepRewrite.isPending}>
+            {proposeRewrite.isPending ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Wand2 className="h-3.5 w-3.5 mr-1" />}
+            Improve weakest score area with AI
+            <span className="ml-1 text-muted-foreground font-normal">· {AREA_LABEL[(review.motive_breakdown as any).weakest.key] ?? (review.motive_breakdown as any).weakest.key}</span>
+          </Button>
         )}
         {review && findings.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-1">
