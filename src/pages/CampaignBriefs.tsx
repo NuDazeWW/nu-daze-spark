@@ -17,7 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { useVoiceProfiles } from "@/hooks/useVoiceProfiles";
 import { useCreditGate } from "@/components/billing/CreditGate";
-import { AlertTriangle, CheckCircle2, FileText, Layers, Loader2, Plus, Sparkles, Wand2 } from "lucide-react";
+import { printOnePager, angleOf } from "@/lib/campaignOnePager";
+import { Printer, AlertTriangle, CheckCircle2, FileText, Layers, Loader2, Plus, Sparkles, Wand2 } from "lucide-react";
 
 type Brief = any;
 
@@ -68,6 +69,7 @@ export default function CampaignBriefs() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [review, setReview] = useState<{ score: number; questions: string[]; issues: string[] } | null>(null);
   const [voiceId, setVoiceId] = useState<string>("");
+  const [threeAngles, setThreeAngles] = useState(true);
   const { profiles: voices } = useVoiceProfiles();
   const activeVoices = voices.filter((v) => v.is_active);
 
@@ -88,7 +90,7 @@ export default function CampaignBriefs() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("master_content_objects")
-        .select("*, post_cards(id, platform, content_type, draft_copy, approval_status)")
+        .select("*, post_cards(id, platform, content_type, draft_copy, approval_status, campaign_pillar, scheduled_for, preflight_reviews(motive_score, created_at))")
         .eq("brief_id", selected!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -137,9 +139,9 @@ export default function CampaignBriefs() {
   const generate = useMutation({
     mutationFn: async (id: string) => {
       const b: any = briefs.find((x: any) => x.id === id);
-      const qty = Math.max(b?.target_channels?.length ?? 1, 1);
+      const qty = Math.max(b?.target_channels?.length ?? 1, 1) * (threeAngles ? 3 : 1);
       if (!(await ensure({ bucket: "text_drafts", capability: "text_draft", quantity: qty, clientId: b?.client_id, label: `${qty} platform drafts` }))) return { variants: 0, skipped: true };
-      const { data, error } = await supabase.functions.invoke("generate-from-brief", { body: { brief_id: id, voice_profile_id: voiceId || undefined } });
+      const { data, error } = await supabase.functions.invoke("generate-from-brief", { body: { brief_id: id, voice_profile_id: voiceId || undefined, angles: threeAngles } });
       if (error || data?.error) throw new Error(data?.error ?? error?.message);
       return data;
     },
@@ -186,6 +188,7 @@ export default function CampaignBriefs() {
                 </div>
                 <div className="flex gap-2 flex-wrap justify-end">
                   <Button variant="outline" size="sm" onClick={() => setEditing({ ...selected })}>Edit</Button>
+                  <Button variant="outline" size="sm" onClick={() => printOnePager(selected, masters)}><Printer className="h-4 w-4 mr-1" />Campaign one-pager</Button>
                   <Button variant="outline" size="sm" disabled={runReview.isPending} onClick={() => runReview.mutate(selected.id)}>
                     {runReview.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Wand2 className="h-4 w-4 mr-1" />}AI completeness review
                   </Button>
@@ -206,6 +209,9 @@ export default function CampaignBriefs() {
                           </SelectContent>
                         </Select>
                       )}
+                      <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Data-Driven Insight, Founder Story and Bold Contrarian Take for every channel">
+                        <Checkbox checked={threeAngles} onCheckedChange={(c) => setThreeAngles(!!c)} />3 angles per channel
+                      </label>
                       <Button size="sm" disabled={generate.isPending} onClick={() => generate.mutate(selected.id)}>
                         {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set
                       </Button>
@@ -263,7 +269,7 @@ export default function CampaignBriefs() {
                       {(m.post_cards ?? []).map((p: any) => (
                         <div key={p.id} className="rounded-md border border-border p-3">
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs font-mono uppercase text-muted-foreground">{p.platform} · {p.content_type}</span>
+                            <span className="text-xs font-mono uppercase text-muted-foreground">{p.platform} · {p.content_type}{angleOf(p) ? ` · ${angleOf(p)}` : ""}</span>
                             <StatusBadge status={p.approval_status} />
                           </div>
                           <p className="text-xs line-clamp-4 whitespace-pre-line">{p.draft_copy}</p>
