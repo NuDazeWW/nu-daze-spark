@@ -63,6 +63,7 @@ export default function CampaignBriefs() {
   const { activeClientId } = useActiveClient();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { ensure } = useCreditGate();
   const [editing, setEditing] = useState<Brief | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [review, setReview] = useState<{ score: number; questions: string[]; issues: string[] } | null>(null);
@@ -135,7 +136,7 @@ export default function CampaignBriefs() {
 
   const generate = useMutation({
     mutationFn: async (id: string) => {
-      const b = briefs?.find((x: any) => x.id === id);
+      const b: any = briefs.find((x: any) => x.id === id);
       const qty = Math.max(b?.target_channels?.length ?? 1, 1);
       if (!(await ensure({ bucket: "text_drafts", capability: "text_draft", quantity: qty, clientId: b?.client_id, label: `${qty} platform drafts` }))) return { variants: 0, skipped: true };
       const { data, error } = await supabase.functions.invoke("generate-from-brief", { body: { brief_id: id, voice_profile_id: voiceId || undefined } });
