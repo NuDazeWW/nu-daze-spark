@@ -7,6 +7,7 @@ export interface DriveItem {
   webUrl?: string;
   lastModifiedDateTime?: string;
   "@microsoft.graph.downloadUrl"?: string;
+  thumbnailUrl?: string;
   remoteItem?: {
     id: string;
     folder?: { childCount: number };
@@ -25,7 +26,10 @@ export interface BreadcrumbItem {
   siteId?: string;
   driveId?: string;
   action?: string;
+  searchQuery?: string;
 }
+
+export type CloudProvider = "onedrive" | "sharepoint" | "google_drive";
 
 export type BrowseMode = "onedrive" | "sharepoint_sites" | "sharepoint_drive" | "remote_drive";
 
