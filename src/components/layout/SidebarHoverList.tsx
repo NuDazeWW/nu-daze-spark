@@ -41,6 +41,7 @@ import {
   Upload,
   UserPlus,
   Users,
+  Video,
   Wand2,
   type LucideIcon,
 } from "lucide-react";
@@ -60,8 +61,8 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
     { icon: Upload, label: "Uploads & bulk upload", description: "Images, video, PDFs, decks" },
     { icon: ShieldCheck, label: "Permission states", description: "Usable, summarization-only, blocked, archived" },
     { icon: Clock, label: "Freshness & expiry", description: "Outdated assets stop resurfacing" },
-    { icon: Video, label: "Reel creator", description: "Assemble Reels from cleared media", to: "/assets" },
-  ].map(({ icon: Video, ...rest }) => rest) as HoverListItem[] | never[],
+    { icon: Video, label: "Reel creator", description: "Assemble Reels from cleared media" },
+  ],
   "/sources": [
     { icon: Database, label: "Document libraries", description: "Approved connected sources" },
     { icon: Globe, label: "Linked webpages", description: "Articles and pages you own" },
