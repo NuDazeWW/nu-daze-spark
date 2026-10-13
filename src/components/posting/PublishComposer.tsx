@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { XLinkMeter } from "@/components/billing/XLinkMeter";
+import { precheckUsage, URL_RE } from "@/hooks/useBilling";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -117,6 +119,13 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         await save({ scheduled_for: when.toISOString(), publishing_status: "scheduled" });
         toast({ title: "Scheduled", description: `${selected.length} channel(s) · ${when.toLocaleString()} (${tz})` });
         return;
+      }
+      const xCount = selected.filter((a) => a.platform === "x").length;
+      if (xCount) {
+        const cap = URL_RE.test(copy) ? "x_link_post" : "x_text_post";
+        const pre = await precheckUsage("x_spend", cap, xCount, card.client_id ?? null, true);
+        if (!pre.ok) throw new Error(pre.reason === "not_in_tier" ? "X isn't included in your plan." : pre.reason === "paused" ? "X spend is paused by a usage alert." : "This post would cross your monthly X cap.");
+        await precheckUsage("x_spend", cap, xCount, card.client_id ?? null, false);
       }
       setRunning(true);
       await save({ publishing_status: "publishing" });
@@ -243,6 +252,8 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
             </div>
             <Switch checked={disclosure} onCheckedChange={setDisclosure} />
           </div>
+
+          <XLinkMeter text={copy} xChannels={selected.filter((a) => a.platform === "x").length} />
 
           {!isApproved && (
             <p className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">

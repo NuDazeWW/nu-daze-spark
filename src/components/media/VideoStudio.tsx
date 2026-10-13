@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useCreditGate } from "@/components/billing/CreditGate";
 import { Loader2, Save, Video } from "lucide-react";
 
 type Props = { clientId: string | null; postCardId?: string; defaultPrompt?: string };
@@ -37,8 +38,11 @@ export function VideoStudio({ clientId, postCardId, defaultPrompt = "" }: Props)
   const alive = useRef(true);
   useEffect(() => () => { alive.current = false; }, []);
 
+  const { ensure } = useCreditGate();
   const generate = async () => {
     if (!clientId) return toast.error("Pick a client first");
+    const cap = duration === "8" ? "video_8s_premium" : "video_6s_draft";
+    if (!(await ensure({ bucket: "credits", capability: cap, clientId, label: duration === "8" ? "8-second premium AI video" : "Draft AI video clip" }))) return;
     setBusy(true); setPath(null); setSrc(null);
     try {
       const { video_id } = await call({ client_id: clientId, prompt, aspect, duration: Number(duration), apply_brand: applyBrand });

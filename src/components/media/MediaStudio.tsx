@@ -1,3 +1,4 @@
+import { useCreditGate } from "@/components/billing/CreditGate";
 import { useEffect, useState } from "react";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
@@ -44,8 +45,10 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
     return () => { alive = false; if (made) URL.revokeObjectURL(made); };
   }, [raw, watermark, logoUrl, pos]);
 
+  const { ensure } = useCreditGate();
   const generate = async () => {
     if (!clientId) return toast.error("Pick a client first");
+    if (!(await ensure({ bucket: "credits", capability: "image_standard", clientId, label: "Standard AI image (5 credits)" }))) return;
     setBusy(true); setRaw(null);
     try {
       const { data, error } = await supabase.functions.invoke("generate-media", { body: { client_id: clientId, prompt, aspect, style, apply_brand: applyBrand } });

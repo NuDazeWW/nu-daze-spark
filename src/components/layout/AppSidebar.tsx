@@ -1,3 +1,4 @@
+import { SidebarUsageMeter } from "@/components/billing/SidebarUsageMeter";
 import { useLocation, Link } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -187,6 +188,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="px-3 py-3">
+        <SidebarUsageMeter />
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={signOut} tooltip="Sign out">
