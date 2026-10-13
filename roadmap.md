@@ -23,3 +23,6 @@
 - [x] Brand guide importer (PDF/Word/text)
 - [x] Industry starter kits (Strategy + Setup)
 - [x] Email links point to socialmotive.nudaze.com (make it Primary in Domains settings)
+# Priority 1 — operational ROI
+- [x] Repurpose Center: AI repurpose ideas from approved posts/cleared assets → review → Daily Queue draft
+- [x] Dashboard "Today at a glance": decisions needed, ready to post today/tomorrow, at-risk next 7 days
