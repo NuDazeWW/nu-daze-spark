@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Download, ImagePlus, Loader2, Palette, Save, Sparkles, Video } from "lucide-react";
 import { Link } from "react-router-dom";
+import { VideoStudio } from "./VideoStudio";
 
 type Props = { clientId: string | null; postCardId?: string; defaultPrompt?: string; platform?: string; canCreate: boolean };
 
@@ -128,8 +129,9 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
           <Button variant="outline" asChild className="gap-2"><a href={final} download="socialmotive-image.png"><Download className="h-4 w-4" /> Download</a></Button>
         </div>
       )}
-      <div className="flex items-center gap-2 rounded-md border border-border/40 px-3 py-2 text-xs text-muted-foreground">
-        <Video className="h-3.5 w-3.5" /> AI video clips for Reels and Stories <Badge variant="outline" className="text-[10px]">Coming soon</Badge>
+      <div className="border-t border-border/50 pt-4 space-y-3">
+        <h3 className="flex items-center gap-2 text-sm font-semibold"><Video className="h-4 w-4 text-primary" /> AI video clips for Reels, Stories & Shorts</h3>
+        <VideoStudio clientId={clientId} postCardId={postCardId} defaultPrompt={defaultPrompt} />
       </div>
       <p className="text-[11px] text-muted-foreground">AI images are saved as cleared assets and marked for the AI-assisted disclosure. Nothing is published automatically.</p>
     </div>
