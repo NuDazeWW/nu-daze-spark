@@ -5,6 +5,7 @@ import {
   draftChecksum, overallStatus, runRuleChecks, splitPhrases,
   type PreflightFinding,
 } from "../_shared/preflightRules.ts";
+import { activeGuardrails } from "../_shared/guardrails.ts";
 
 const MODEL = "openai/gpt-6-astra";
 const json = (b: unknown, status = 200) =>
@@ -117,7 +118,7 @@ Deno.serve(async (req) => {
     const scope = <T>(q: T) => (cid ? (q as any).eq("client_id", cid) : q) as T;
 
     const since = new Date(Date.now() - 30 * 86400000).toISOString();
-    const [voiceRes, platformRes, recentRes, brief, mediaRes] = await Promise.all([
+    const [voiceRes, platformRes, recentRes, brief, mediaRes, guardRes] = await Promise.all([
       scope(sb.from("brand_voice_rules").select("rule_name, rule_content, category").eq("is_active", true)),
       scope(sb.from("platform_rules").select("rule_name, rule_content").eq("is_active", true).eq("platform", card.platform)),
       scope(sb.from("post_cards").select("id, draft_copy, hashtags").neq("id", card.id).gte("created_at", since).neq("approval_status", "archived").limit(200)),
@@ -125,6 +126,7 @@ Deno.serve(async (req) => {
       (card.source_references ?? []).length
         ? sb.from("source_assets").select("id, title, asset_type, permission_state, deleted_at, expires_at, text_content, description").in("id", card.source_references)
         : Promise.resolve({ data: [] as any[] }),
+      cid ? sb.from("guardrail_settings").select("*").eq("client_id", cid).maybeSingle() : Promise.resolve({ data: null }),
     ]);
 
     const voice = voiceRes.data ?? [];
@@ -140,6 +142,7 @@ Deno.serve(async (req) => {
 
     const ruleFindings = runRuleChecks(card, {
       bannedPhrases, requiredLanguage, recentPosts: recentRes.data ?? [], clearedMediaCount,
+      guardrails: activeGuardrails(guardRes.data as any),
     });
 
     const b: any = brief.data;

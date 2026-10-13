@@ -1,4 +1,5 @@
 // Pure, dependency-free preflight rule checks shared by the edge function and the app.
+import { findTerm, type ActiveGuardrail } from "./guardrails.ts";
 
 export type PreflightSeverity = "blocking" | "advisory";
 export type PreflightStatus = "pass" | "warnings" | "blocked";
@@ -27,6 +28,7 @@ export interface PreflightContext {
   requiredLanguage: string[];
   recentPosts: { id: string; draft_copy: string; hashtags: string[] | null }[];
   clearedMediaCount: number;
+  guardrails?: ActiveGuardrail[];
 }
 
 export const CHAR_LIMITS: Record<string, number> = { linkedin: 3000, instagram: 2200 };
@@ -87,6 +89,21 @@ export function runRuleChecks(card: PreflightCardInput, ctx: PreflightContext): 
         suggestion: "Remove or rephrase this wording.",
       });
     }
+  }
+
+  const TIER_LABEL: Record<string, string> = { profanity: "Profanity or explicit language", risky_claims: "Risky claim or trigger word", cliches: "Overused cliché" };
+  const seen = new Set(ctx.bannedPhrases.map((p) => p.toLowerCase()));
+  for (const g of ctx.guardrails ?? []) {
+    if (seen.has(g.term.toLowerCase())) continue;
+    const idx = findTerm(copy, g.term);
+    if (idx < 0) continue;
+    seen.add(g.term.toLowerCase());
+    out.push({
+      check: `guardrail_${g.tier}`, severity: g.severity, source: "rules",
+      message: `${TIER_LABEL[g.tier]}: "${copy.slice(idx, idx + g.term.length)}"`,
+      excerpt: copy.slice(idx, idx + g.term.length),
+      suggestion: g.replacement ?? (g.tier === "profanity" ? "Remove this word." : "Rephrase or back it with a source."),
+    });
   }
 
   for (const req of ctx.requiredLanguage) {

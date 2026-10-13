@@ -156,6 +156,7 @@ function SetupInner() {
             {step === "brand_voice" && (<>
               <div className="space-y-1.5"><Label>Rule name</Label><Input value={voiceName} onChange={(e) => setVoiceName(e.target.value)} /></div>
               <div className="space-y-1.5"><Label>How should content sound?</Label><Textarea rows={4} value={voiceRule} onChange={(e) => setVoiceRule(e.target.value)} placeholder="Confident and specific. Plain language, no hype. Lead with a concrete insight." /></div>
+              <p className="text-xs text-muted-foreground">Faster: <Link className="underline" to="/strategy?builder=preset">pick an industry starter kit</Link>, <Link className="underline" to="/strategy?builder=website">generate a voice from your website</Link>, or <Link className="underline" to="/strategy?builder=document">import a brand guide</Link>.</p>
               <p className="text-xs text-muted-foreground">Saved to {activeClient?.name ?? "the workspace"}. Add banned phrases, hashtags and more in <Link className="underline" to="/strategy">Strategy & Rules</Link>.</p>
             </>)}
             {step === "cadence" && (
