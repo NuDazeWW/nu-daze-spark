@@ -171,7 +171,7 @@ export const STRATEGY_PRESETS: StrategyPreset[] = [
         P("facebook", "Community & events", "Event promotion, fundraiser updates, and volunteer recruitment; one clear ask per post."),
       ],
       ctas: ["Donate today", "Volunteer with us", "Share our mission", "Register for the event", "See your impact"],
-      hashtags: ["#NonProfit", "#GiveBack", "#Community", #MakeADifference", "#Charity", "#Volunteer", "#SocialImpact", "#Fundraising"],
+      hashtags: ["#NonProfit", "#GiveBack", "#Community", "#MakeADifference", "#Charity", "#Volunteer", "#SocialImpact", "#Fundraising"],
     },
   },
   {
