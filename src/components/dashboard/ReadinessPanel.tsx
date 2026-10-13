@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { usePostCards, STATUS_META, type PostCard } from "@/hooks/usePostCards";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useActiveClient } from "@/contexts/ClientContext";
 import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { postLabel } from "@/components/tracking/PostTracking";
 
@@ -18,6 +22,27 @@ const fullCopy = (c: PostCard) =>
 export function ReadinessPanel() {
   const navigate = useNavigate();
   const { cards, comments, isLoading } = usePostCards() as any;
+  const { user } = useAuth();
+  const { activeClientId } = useActiveClient();
+
+  // Latest Motive Score per post, to flag low-scoring drafts at a glance.
+  const { data: lowScores = {} } = useQuery({
+    queryKey: ["motive_scores", activeClientId],
+    enabled: !!user && !!activeClientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("preflight_reviews")
+        .select("post_card_id, motive_score, created_at")
+        .eq("client_id", activeClientId!)
+        .not("motive_score", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      const latest: Record<string, number> = {};
+      for (const r of data ?? []) if (!(r.post_card_id in latest)) latest[r.post_card_id] = r.motive_score!;
+      return latest;
+    },
+  });
 
   const { decisions, ready, risks, commentsWaiting } = useMemo(() => {
     const now = new Date();
