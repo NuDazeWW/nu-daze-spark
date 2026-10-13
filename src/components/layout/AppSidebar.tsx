@@ -24,7 +24,7 @@ import {
   CalendarRange,
   Bell,
   Mail,
-  ImagePlus, Palette,
+  ImagePlus, Palette, Send,
 } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { APP_VERSION } from "@/lib/appVersion";
@@ -64,6 +64,7 @@ const contentNav = [
   { title: "Content Planner", icon: CalendarRange, href: "/planner" },
   { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
   { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
+  { title: "Publishing Status", icon: Send, href: "/publishing" },
   { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
   { title: "Motive Media Studio", icon: ImagePlus, href: "/media-studio" },
   { title: "Brand Kit Studio", icon: Palette, href: "/settings/brand-kit" },
