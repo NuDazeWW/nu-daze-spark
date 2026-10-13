@@ -95,6 +95,17 @@ serve(async (req) => {
       ? `\n\nEngagement Targets:\n${engTargets.map((t: any) => `- ${t.platform}: ${t.daily_target}/day, risk: ${t.risk_tolerance}${t.topic_category ? `, topic: ${t.topic_category}` : ""}`).join("\n")}`
       : "";
 
+    // Text draft metering: one draft per eligible post, pre-checked before any AI call.
+    const eligible = posts.filter((p: any) => p.risk_flag !== "blocked");
+    const clientId = eligible[0]?.client_id ?? null;
+    const { data: pre, error: preErr } = await anonClient.rpc("consume_usage", { _bucket: "text_drafts", _capability: "text_draft", _quantity: Math.max(eligible.length, 1), _client_id: clientId, _dry_run: true });
+    if (preErr) {
+      return new Response(JSON.stringify({ error: preErr.message }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    if (!(pre as { ok: boolean }).ok) {
+      return new Response(JSON.stringify({ error: "Not enough text drafts left this cycle", code: "CREDITS_BLOCKED", detail: pre }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const results = [];
 
     for (const post of posts) {
@@ -213,6 +224,11 @@ Requirements:
         author: post.author_name,
         tone: commentData.tone,
       });
+    }
+
+    if (results.length > 0) {
+      const { error: meterErr } = await anonClient.rpc("consume_usage", { _bucket: "text_drafts", _capability: "text_draft", _quantity: results.length, _client_id: clientId, _dry_run: false });
+      if (meterErr) console.error("text draft metering failed", meterErr);
     }
 
     return new Response(

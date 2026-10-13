@@ -19,4 +19,4 @@
 - Content Motive Score™ is computed in `supabase/functions/_shared/motiveScore.ts` inside `preflight-review` (deterministic hook/strategic/platform/originality sub-scores plus the AI voice score) and stored as `motive_score`/`motive_breakdown` on `preflight_reviews`; UI rendering is shared via `src/components/preflight/MotiveScore.tsx`.
 - Billing lives in versioned `subscription_tier_definitions` + `credit_weight_definitions` (owner-edited via audited RPCs) and the service-written `workspace_billing` row; subscriptions stay pinned to their tier version until renewal, so config edits never change entitlements mid-cycle.
 - Metered actions go through `consume_usage` (dry-run pre-check, then deduct) in both UI (`useCreditGate`) and edge functions; anomalies pause only that bucket, and entitlements are granted only by the idempotent `stripe-webhook`, so redirects can't grant access.
-- Subdirectories (e.g. `src/`) have their own `AGENTS.md`; read it before changing files there.
+- Subdirectories (e.g. `src/`, `supabase/functions/`) have their own `AGENTS.md`; read it before changing files there.

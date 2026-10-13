@@ -128,6 +128,12 @@ Constraints: ${brief.constraints ?? "(none)"}`;
     const channels = (brief.target_channels ?? []).filter((c: string) => CHANNELS[c]);
     if (!channels.length) return json({ error: "No target channels selected" }, 400);
 
+    // Text draft metering: pre-check before spending AI, deduct only after drafts are saved.
+    const meter = (dry: boolean) => sb.rpc("consume_usage", { _bucket: "text_drafts", _capability: "text_draft", _quantity: channels.length, _client_id: brief.client_id, _dry_run: dry });
+    const { data: pre, error: preErr } = await meter(true);
+    if (preErr) return json({ error: preErr.message }, 403);
+    if (!(pre as { ok: boolean }).ok) return json({ error: "Not enough text drafts left this cycle", code: "CREDITS_BLOCKED", detail: pre }, 402);
+
     const res = await callAI(key, `Create ONE platform-neutral master content object from this approved brief, then adapt it into a platform-native variant for each channel. Each variant must preserve the same approved message but reflect genuinely different platform behavior (not resized text). Only use proof points supplied in the brief. Treat each channel guide as a required output contract. For Stories and Reels, draft_copy must contain the complete production outline and final word-for-word script in the requested structure; a caption by itself is invalid.
 
 BRIEF
@@ -224,6 +230,8 @@ ${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}`, {
       return json({ error: pErr.message }, 500);
     }
 
+    const { error: meterErr } = await meter(false);
+    if (meterErr) console.error("text draft metering failed", meterErr);
     return json({ master_content_id: mco.id, variants: rows.length });
   } catch (e: any) {
     console.error(e);

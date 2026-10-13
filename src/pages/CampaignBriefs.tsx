@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useVoiceProfiles } from "@/hooks/useVoiceProfiles";
+import { useCreditGate } from "@/components/billing/CreditGate";
 import { AlertTriangle, CheckCircle2, FileText, Layers, Loader2, Plus, Sparkles, Wand2 } from "lucide-react";
 
 type Brief = any;
@@ -62,6 +63,7 @@ export default function CampaignBriefs() {
   const { activeClientId } = useActiveClient();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { ensure } = useCreditGate();
   const [editing, setEditing] = useState<Brief | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [review, setReview] = useState<{ score: number; questions: string[]; issues: string[] } | null>(null);
@@ -134,11 +136,14 @@ export default function CampaignBriefs() {
 
   const generate = useMutation({
     mutationFn: async (id: string) => {
+      const b: any = briefs.find((x: any) => x.id === id);
+      const qty = Math.max(b?.target_channels?.length ?? 1, 1);
+      if (!(await ensure({ bucket: "text_drafts", capability: "text_draft", quantity: qty, clientId: b?.client_id, label: `${qty} platform drafts` }))) return { variants: 0, skipped: true };
       const { data, error } = await supabase.functions.invoke("generate-from-brief", { body: { brief_id: id, voice_profile_id: voiceId || undefined } });
       if (error || data?.error) throw new Error(data?.error ?? error?.message);
       return data;
     },
-    onSuccess: (d) => { qc.invalidateQueries({ queryKey: ["masters"] }); toast.success(`Master content created with ${d.variants} platform variants — now in the Daily Queue`); },
+    onSuccess: (d) => { if (d?.skipped) return; qc.invalidateQueries({ queryKey: ["masters"] }); toast.success(`Master content created with ${d.variants} platform variants — now in the Daily Queue`); },
     onError: (e: any) => toast.error(e.message),
   });
 

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useActiveClient } from "@/contexts/ClientContext";
+import { useCreditGate } from "@/components/billing/CreditGate";
 import type { Tables, Database } from "@/integrations/supabase/types";
 import { readAuthorContext, type AuthorContext } from "@/lib/authorContext";
 
@@ -12,6 +13,7 @@ type PlatformType = Database["public"]["Enums"]["platform_type"];
 type RiskFlag = Database["public"]["Enums"]["risk_flag"];
 
 export function useExternalPosts() {
+  const { ensure } = useCreditGate();
   const { user } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
@@ -214,6 +216,7 @@ export function useExternalPosts() {
 
   const generateComments = useMutation({
     mutationFn: async (postIds: string[]) => {
+      if (!(await ensure({ bucket: "text_drafts", capability: "text_draft", quantity: postIds.length, clientId: activeClientId, label: `${postIds.length} comment drafts` }))) return { count: 0, skipped: true };
       const { data, error } = await supabase.functions.invoke("generate-comments", {
         body: { external_post_ids: postIds },
       });
@@ -222,6 +225,7 @@ export function useExternalPosts() {
       return data;
     },
     onSuccess: (data) => {
+      if (data?.skipped) return;
       qc.invalidateQueries({ queryKey: ["external_posts"] });
       qc.invalidateQueries({ queryKey: ["external_post_comments"] });
       qc.invalidateQueries({ queryKey: ["comments_queue"] });
