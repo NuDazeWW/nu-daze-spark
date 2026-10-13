@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PageHeaderProps {
   title: string;
@@ -29,12 +30,22 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
   return (
     <div className="mb-6 space-y-3">
       {pathname !== "/" && (
-        <nav aria-label="Quick navigation" className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          <Link to="/" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 font-medium text-foreground hover:bg-muted">
-            <ArrowLeft className="h-3 w-3" />Back to workspace
-          </Link>
-          {!isSettings && <Link to="/settings/workspace" className="hover:text-foreground hover:underline">Workspace settings</Link>}
-          {related.map((r) => <Link key={r.to} to={r.to} className="hover:text-foreground hover:underline">{r.label}</Link>)}
+        <nav aria-label="Quick navigation" className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/" className="gap-1.5">
+              <ArrowLeft className="h-3.5 w-3.5" />Back to workspace
+            </Link>
+          </Button>
+          {!isSettings && (
+            <Button asChild variant="ghost" size="sm" className="border border-border/60">
+              <Link to="/settings/workspace">Workspace settings</Link>
+            </Button>
+          )}
+          {related.map((r) => (
+            <Button asChild key={r.to} variant="ghost" size="sm" className="border border-border/60">
+              <Link to={r.to}>{r.label}</Link>
+            </Button>
+          ))}
         </nav>
       )}
       <div className="flex flex-wrap items-start justify-between gap-4">
