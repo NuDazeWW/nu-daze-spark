@@ -26,3 +26,6 @@
 # Priority 1 — operational ROI
 - [x] Repurpose Center: AI repurpose ideas from approved posts/cleared assets → review → Daily Queue draft
 - [x] Dashboard "Today at a glance": decisions needed, ready to post today/tomorrow, at-risk next 7 days
+# Priority 1 — roadmap Stage 2
+- [x] Executive Voice Engine: voice profiles (Strategy → Voices), AI sample analysis, "Write as" selector in Campaign Briefs, voice badge on post cards
+- [x] Content Motive Score™: 0-100 score with 5 sub-scores computed in Preflight, shown in Preflight panel, Posting Package, queue chips, and Dashboard at-risk
