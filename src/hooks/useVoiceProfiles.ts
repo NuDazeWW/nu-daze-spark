@@ -30,12 +30,13 @@ export function useVoiceProfiles() {
 
   const save = useMutation({
     mutationFn: async (p: Partial<VoiceProfile> & { name: string }) => {
-      const payload = { ...p, client_id: activeClientId, updated_by: undefined } as never;
-      if (p.id) {
-        const { error } = await supabase.from("voice_profiles").update(payload).eq("id", p.id);
+      const { id, ...fields } = p;
+      if (id) {
+        const { error } = await supabase.from("voice_profiles").update(fields as never).eq("id", id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("voice_profiles").insert({ ...payload, created_by: user!.id });
+        const { error } = await supabase.from("voice_profiles")
+          .insert({ ...fields, client_id: activeClientId, created_by: user!.id } as never);
         if (error) throw error;
       }
     },
