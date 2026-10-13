@@ -144,7 +144,7 @@ export const STRATEGY_PRESETS: StrategyPreset[] = [
     },
   },
   {
-    key: "nonprofit", name: "Non-Profit & Cause", description: "Mission-led storytelling that inspires donors, volunteers, and advocates.",
+    key: "nonprofit", name: "Non-Profit & Cause", description: "Mission-led storytelling that inspires donors, members, sponsors, and volunteers.",
     draft: {
       voice_rules: [
         { rule_name: "Mission first, always", rule_content: "Every post connects back to the cause and the people it serves.", category: "tone" },
