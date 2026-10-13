@@ -190,5 +190,6 @@ export function AppSidebar() {
         <Link to="/whats-new" className="px-2 pt-1 text-[10px] font-mono text-sidebar-foreground/50 hover:underline">SocialMotive v{APP_VERSION}</Link>
       </SidebarFooter>
     </Sidebar>
+    </NavHoverProvider>
   );
 }
