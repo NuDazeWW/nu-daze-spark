@@ -1,3 +1,4 @@
+import type * as React from "react";
 import { Linkedin, Instagram, Facebook, Youtube, Globe } from "lucide-react";
 
 function XLogo({ className }: { className?: string }) {
@@ -8,7 +9,7 @@ function XLogo({ className }: { className?: string }) {
   );
 }
 
-const MAP: Record<string, (p: { className?: string }) => JSX.Element> = {
+const MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   linkedin: Linkedin, instagram: Instagram, facebook: Facebook, youtube: Youtube, x: XLogo,
 };
 
