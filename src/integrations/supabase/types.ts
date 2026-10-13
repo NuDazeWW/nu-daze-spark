@@ -1308,6 +1308,7 @@ export type Database = {
           posted_url: string | null
           posting_notes: string | null
           rationale: string | null
+          repurposed_from_id: string | null
           revision_notes: string | null
           scheduled_for: string | null
           source_references: string[] | null
@@ -1343,6 +1344,7 @@ export type Database = {
           posted_url?: string | null
           posting_notes?: string | null
           rationale?: string | null
+          repurposed_from_id?: string | null
           revision_notes?: string | null
           scheduled_for?: string | null
           source_references?: string[] | null
@@ -1378,6 +1380,7 @@ export type Database = {
           posted_url?: string | null
           posting_notes?: string | null
           rationale?: string | null
+          repurposed_from_id?: string | null
           revision_notes?: string | null
           scheduled_for?: string | null
           source_references?: string[] | null
@@ -1412,6 +1415,13 @@ export type Database = {
             columns: ["master_content_id"]
             isOneToOne: false
             referencedRelation: "master_content_objects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_cards_repurposed_from_id_fkey"
+            columns: ["repurposed_from_id"]
+            isOneToOne: false
+            referencedRelation: "post_cards"
             referencedColumns: ["id"]
           },
         ]
@@ -1576,11 +1586,17 @@ export type Database = {
         Row: {
           client_id: string | null
           created_at: string
+          created_by: string | null
+          dismissed: boolean
+          draft_copy: string | null
+          hashtags: string[]
           id: string
           is_actioned: boolean
           rationale: string
           repurpose_type: Database["public"]["Enums"]["repurpose_type"]
+          result_post_card_id: string | null
           source_asset_id: string | null
+          source_excerpt: string | null
           source_post_card_id: string | null
           target_content_type: Database["public"]["Enums"]["content_type"]
           target_platform: Database["public"]["Enums"]["platform_type"]
@@ -1588,11 +1604,17 @@ export type Database = {
         Insert: {
           client_id?: string | null
           created_at?: string
+          created_by?: string | null
+          dismissed?: boolean
+          draft_copy?: string | null
+          hashtags?: string[]
           id?: string
           is_actioned?: boolean
           rationale: string
           repurpose_type: Database["public"]["Enums"]["repurpose_type"]
+          result_post_card_id?: string | null
           source_asset_id?: string | null
+          source_excerpt?: string | null
           source_post_card_id?: string | null
           target_content_type: Database["public"]["Enums"]["content_type"]
           target_platform: Database["public"]["Enums"]["platform_type"]
@@ -1600,11 +1622,17 @@ export type Database = {
         Update: {
           client_id?: string | null
           created_at?: string
+          created_by?: string | null
+          dismissed?: boolean
+          draft_copy?: string | null
+          hashtags?: string[]
           id?: string
           is_actioned?: boolean
           rationale?: string
           repurpose_type?: Database["public"]["Enums"]["repurpose_type"]
+          result_post_card_id?: string | null
           source_asset_id?: string | null
+          source_excerpt?: string | null
           source_post_card_id?: string | null
           target_content_type?: Database["public"]["Enums"]["content_type"]
           target_platform?: Database["public"]["Enums"]["platform_type"]
@@ -1615,6 +1643,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repurpose_suggestions_result_post_card_id_fkey"
+            columns: ["result_post_card_id"]
+            isOneToOne: false
+            referencedRelation: "post_cards"
             referencedColumns: ["id"]
           },
           {
