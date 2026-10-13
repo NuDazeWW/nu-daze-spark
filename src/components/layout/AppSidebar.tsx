@@ -1,4 +1,5 @@
 import { useLocation, Link } from "react-router-dom";
+import { Link2 } from "lucide-react";
 import {
   LayoutDashboard,
   FolderOpen,
@@ -70,6 +71,7 @@ const adminSettingsNav = [
   { title: "Setup", icon: ListChecks, href: "/setup" },
   { title: "Team", icon: Users, href: "/settings/team" },
   { title: "Usage & Activity", icon: BarChart3, href: "/settings/usage" },
+  { title: "Social Connections", icon: Link2, href: "/settings/connections" },
   { title: "Email Provider", icon: Mail, href: "/settings/email-provider" },
 ];
 
