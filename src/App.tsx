@@ -31,6 +31,7 @@ import EmailProvider from "./pages/settings/EmailProvider";
 import Connections from "./pages/settings/Connections";
 import BrandKitPage from "./pages/settings/BrandKit";
 import MediaStudioPage from "./pages/MediaStudioPage";
+import PublishingStatus from "./pages/PublishingStatus";
 import Setup from "./pages/Setup";
 import WhatsNew from "./pages/WhatsNew";
 import Help from "./pages/Help";
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/settings/connections" element={<Connections />} />
               <Route path="/settings/brand-kit" element={<BrandKitPage />} />
               <Route path="/media-studio" element={<MediaStudioPage />} />
+              <Route path="/publishing" element={<PublishingStatus />} />
               <Route path="/settings/email-provider" element={<EmailProvider />} />
               <Route path="/setup" element={<Setup />} />
               <Route path="/whats-new" element={<WhatsNew />} />

@@ -17,6 +17,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { PublishComposer } from "@/components/posting/PublishComposer";
+import { ChangeView } from "@/components/review/ChangeView";
 import { Input } from "@/components/ui/input";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
@@ -224,9 +225,13 @@ export function PostingPackageDrawer({
             <TabsTrigger value="package" className="flex-1">Posting package</TabsTrigger>
             <TabsTrigger value="preview" className="flex-1">Native preview</TabsTrigger>
             <TabsTrigger value="preflight" className="flex-1">Preflight</TabsTrigger>
+            <TabsTrigger value="changes" className="flex-1">Changes</TabsTrigger>
             <TabsTrigger value="media" className="flex-1">AI media</TabsTrigger>
             <TabsTrigger value="publish" className="flex-1">Publish</TabsTrigger>
           </TabsList>
+          <TabsContent value="changes" className="mt-4">
+            <ChangeView card={card} />
+          </TabsContent>
           <TabsContent value="media" className="mt-4">
             <MediaStudio key={card.id} clientId={card.client_id} postCardId={card.id} platform={card.platform} canCreate={canCreate} defaultPrompt={card.suggested_asset_description ?? ""} />
           </TabsContent>

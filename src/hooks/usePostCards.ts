@@ -132,6 +132,18 @@ export function usePostCards() {
 
   const updateCard = useMutation({
     mutationFn: async ({ id, ...fields }: Partial<PostCard> & { id: string }) => {
+      if (typeof fields.draft_copy === "string") {
+        const { data: prev } = await supabase.from("post_cards")
+          .select("draft_copy, hashtags, people_tags, org_tags, client_id").eq("id", id).maybeSingle();
+        if (prev && prev.draft_copy !== fields.draft_copy) {
+          const { count } = await supabase.from("post_versions").select("id", { count: "exact", head: true }).eq("post_card_id", id);
+          await supabase.from("post_versions").insert({
+            post_card_id: id, version_number: (count ?? 0) + 1, draft_copy: prev.draft_copy,
+            hashtags: prev.hashtags, people_tags: prev.people_tags, org_tags: prev.org_tags,
+            edit_source: "before_human_edit", created_by: user!.id, client_id: prev.client_id,
+          } as never);
+        }
+      }
       const { error } = await supabase
         .from("post_cards")
         .update({ ...fields, updated_by: user!.id } as never)
