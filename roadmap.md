@@ -36,3 +36,4 @@
 - [x] Phase 3 Brand Kit Studio (/settings/brand-kit)
 - [x] Phase 6 AI media (images) — /media-studio + Posting Package "AI media" tab; video = coming soon
 - [ ] Reserved for checkpoint review: Phase 5 dispatcher/retries, real OAuth, AI video, approval diff, portfolio intelligence, performance logging, feedback learning, executive review mode
+- [ ] Cross-check the publishing build document against the previous remaining list; produce a consolidated status + next-up plan
