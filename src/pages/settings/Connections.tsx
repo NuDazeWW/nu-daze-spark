@@ -15,6 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useSearchParams } from "react-router-dom";
+import { AiProvidersPanel } from "@/components/media/AiProvidersPanel";
 import { CheckCircle2, Copy, ExternalLink, KeyRound, Link2, Loader2, PlugZap, RefreshCw, ShieldCheck, Unplug } from "lucide-react";
 
 type ProviderKey = "linkedin" | "meta" | "x" | "google";
@@ -260,17 +262,20 @@ function ClientChannels() {
 
 export default function Connections() {
   const ws = useWorkspace();
+  const [params] = useSearchParams();
   return (
     <div className="space-y-6">
-      <PageHeader title="Social Connections" description={`Connect each ${ws.entitySingular.toLowerCase()}'s social accounts and manage your platform developer apps.`} />
+      <PageHeader title="Social Connections" description={`Connect each ${ws.entitySingular.toLowerCase()}'s social accounts manage platform developer apps, and connect your own AI image and video tools.`} />
       <AdminOnly>
-        <Tabs defaultValue="channels">
+        <Tabs defaultValue={params.get("tab") ?? "channels"}>
           <TabsList>
             <TabsTrigger value="channels">Client channels</TabsTrigger>
             <TabsTrigger value="apps">Developer apps & keys</TabsTrigger>
+            <TabsTrigger value="ai">AI image & video tools</TabsTrigger>
           </TabsList>
           <TabsContent value="channels" className="mt-4"><ClientChannels /></TabsContent>
           <TabsContent value="apps" className="mt-4"><DeveloperApps /></TabsContent>
+          <TabsContent value="ai" className="mt-4"><AiProvidersPanel context="settings" /></TabsContent>
         </Tabs>
       </AdminOnly>
     </div>

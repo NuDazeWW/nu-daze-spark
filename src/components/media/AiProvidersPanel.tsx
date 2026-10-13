@@ -37,7 +37,7 @@ async function invoke(body: Record<string, unknown>) {
 
 export function AiProvidersPanel({ context }: { context: "settings" | "studio" }) {
   const qc = useQueryClient();
-  const { isAdmin } = useWorkspace() as unknown as { isAdmin: boolean };
+  const { canManage: isAdmin } = useWorkspace();
   const status = useQuery({
     queryKey: ["ai_provider_status"],
     queryFn: async () => {
