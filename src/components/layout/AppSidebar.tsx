@@ -58,13 +58,13 @@ const mainNav = [
 
 const contentNav = [
   { title: "Campaign Briefs", icon: FileText, href: "/briefs" },
-  { title: "AI Post Generator", icon: Sparkles, href: "/generator" },
+  { title: "Social Post Generator", icon: Sparkles, href: "/generator" },
   { title: "Daily Queue", icon: CalendarDays, href: "/queue" },
   { title: "Content Planner", icon: CalendarRange, href: "/planner" },
   { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
   { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
   { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
-  { title: "AI Media Studio", icon: ImagePlus, href: "/media-studio" },
+  { title: "Motive Media Studio", icon: ImagePlus, href: "/media-studio" },
   { title: "Brand Kit Studio", icon: Palette, href: "/settings/brand-kit" },
 ];
 
@@ -82,7 +82,7 @@ export function AppSidebar() {
   const { user, signOut, isAdmin } = useAuth();
   const ws = useWorkspace();
   const settingsNav = [
-    { title: ws.entityPlural, icon: Building2, href: "/settings/clients" },
+    { title: "Your Brand Profiles", icon: Building2, href: "/settings/clients" },
     { title: "Account Tags", icon: AtSign, href: "/settings/tags" },
     { title: "Notifications", icon: Bell, href: "/settings/notifications" },
     ...(ws.canManage ? adminSettingsNav : []),
@@ -92,7 +92,7 @@ export function AppSidebar() {
 
   return (
     <NavHoverProvider>
-    <Sidebar className="sm-dark">
+    <Sidebar collapsible="icon" className="sm-dark">
       <SidebarHeader className="px-4 py-5">
         <Link to="/" className="block w-full">
           <img

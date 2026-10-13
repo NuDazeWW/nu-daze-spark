@@ -39,4 +39,6 @@ export const PLATFORM_LABEL: Record<string, string> = {
   linkedin: "LinkedIn",
   instagram: "Instagram",
   facebook: "Facebook",
+  x: "X",
+  youtube: "YouTube",
 };
