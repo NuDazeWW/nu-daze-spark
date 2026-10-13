@@ -40,6 +40,11 @@ Deno.serve(async (req) => {
     const fullPrompt = `${style} style social media visual. ${prompt}${brandLine}
 Do not include any logos, watermarks, or brand names (a logo is added separately). Avoid text unless explicitly requested. Leave clean space in the bottom-right corner.`;
 
+    // Credit pre-check: never generate on credit.
+    const { data: pre, error: preErr } = await sb.rpc("consume_usage", { _bucket: "credits", _capability: "image_standard", _quantity: 1, _client_id: clientId, _dry_run: true });
+    if (preErr) return json({ error: preErr.message }, 403);
+    if (!(pre as { ok: boolean }).ok) return json({ error: "Not enough credits", code: "CREDITS_BLOCKED", detail: pre }, 402);
+
     const res = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -57,6 +62,7 @@ Do not include any logos, watermarks, or brand names (a logo is added separately
     const b64 = out?.data?.[0]?.b64_json;
     if (!b64) return json({ error: "The AI returned no image. Try a different description." }, 422);
 
+    await sb.rpc("consume_usage", { _bucket: "credits", _capability: "image_standard", _quantity: 1, _client_id: clientId, _dry_run: false });
     // usage counter (service role; table is read-only to users)
     try {
       const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
