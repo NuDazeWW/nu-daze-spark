@@ -2025,6 +2025,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_workspace_member: { Args: { _user_id: string }; Returns: boolean }
       list_workspace_users: {
         Args: never
         Returns: {
