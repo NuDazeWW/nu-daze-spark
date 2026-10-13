@@ -36,6 +36,7 @@ import {
   Send,
   Shield,
   ShieldCheck,
+  Bell,
   Sparkles,
   Target,
   Upload,
