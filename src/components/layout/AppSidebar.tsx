@@ -28,6 +28,11 @@ import {
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { APP_VERSION } from "@/lib/appVersion";
 import {
+  NavHoverProvider,
+  NavHoverWrapper,
+  NAV_HOVER_LISTS,
+} from "./SidebarHoverList";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -82,6 +87,7 @@ export function AppSidebar() {
   ];
 
   return (
+    <NavHoverProvider>
     <Sidebar className="sm-dark">
       <SidebarHeader className="px-4 py-5">
         <Link to="/" className="block w-full">
@@ -107,16 +113,18 @@ export function AppSidebar() {
           <SidebarMenu>
             {mainNav.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === item.href}
-                  tooltip={item.title}
-                >
-                  <Link to={item.href}>
-                    <item.icon className="size-4" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
+                <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.href}
+                    tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}
+                  >
+                    <Link to={item.href}>
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </NavHoverWrapper>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -129,16 +137,18 @@ export function AppSidebar() {
           <SidebarMenu>
             {contentNav.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === item.href}
-                  tooltip={item.title}
-                >
-                  <Link to={item.href}>
-                    <item.icon className="size-4" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
+                <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.href}
+                    tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}
+                  >
+                    <Link to={item.href}>
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </NavHoverWrapper>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -150,16 +160,18 @@ export function AppSidebar() {
           <SidebarMenu>
             {settingsNav.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === item.href}
-                  tooltip={item.title}
-                >
-                  <Link to={item.href}>
-                    <item.icon className="size-4" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
+                <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.href}
+                    tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}
+                  >
+                    <Link to={item.href}>
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </NavHoverWrapper>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -184,5 +196,6 @@ export function AppSidebar() {
         <Link to="/whats-new" className="px-2 pt-1 text-[10px] font-mono text-sidebar-foreground/50 hover:underline">SocialMotive v{APP_VERSION}</Link>
       </SidebarFooter>
     </Sidebar>
+    </NavHoverProvider>
   );
 }
