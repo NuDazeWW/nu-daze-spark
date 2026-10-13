@@ -5,6 +5,7 @@ import { useAssets, type SourceAsset } from "@/hooks/useAssets";
 import { AssetFormDialog, defaultAssetForm, type AssetFormData } from "@/components/assets/AssetFormDialog";
 import { BulkUploadDialog } from "@/components/assets/BulkUploadDialog";
 import { ReelCreatorDialog } from "@/components/assets/ReelCreatorDialog";
+import { OneDriveBrowserDialog } from "@/components/sources/OneDriveBrowserDialog";
 import { AssetLightbox } from "@/components/assets/AssetLightbox";
 import { AssetThumbnail } from "@/components/assets/AssetThumbnail";
 import { ExpirationAlerts } from "@/components/assets/ExpirationAlerts";
@@ -53,6 +54,7 @@ export default function AssetLibrary() {
   const { usageMap } = useAssetUsage();
   const [bulkOpen, setBulkOpen] = useState(false);
   const [reelCreatorOpen, setReelCreatorOpen] = useState(false);
+  const [oneDriveOpen, setOneDriveOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<SourceAsset | null>(null);
@@ -457,6 +459,7 @@ export default function AssetLibrary() {
       />
 
       <ReelCreatorDialog open={reelCreatorOpen} onOpenChange={setReelCreatorOpen} />
+      <OneDriveBrowserDialog open={oneDriveOpen} onOpenChange={setOneDriveOpen} />
 
       <AssetLightbox
         open={!!viewingAsset}
