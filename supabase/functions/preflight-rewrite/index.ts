@@ -67,7 +67,10 @@ Deno.serve(async (req) => {
         .map((a) => `Asset "${a.title}": ${(a.text_content ?? a.description ?? "").slice(0, 1500)}`),
     ].filter(Boolean).join("\n");
 
-    const prompt = `Rewrite this ${card.platform} ${card.content_type} draft so it resolves the reviewer findings.
+    const focusBlock = focus
+      ? `\nPRIMARY GOAL: Improve the "${focus.replace(/_/g, " ")}" part of the Content Motive Score, currently the weakest area. ${FOCUS_GUIDE[focus]}${parsed.data.focus_hint ? ` Reviewer hint: ${parsed.data.focus_hint}` : ""} Make minimal changes elsewhere.\n`
+      : "";
+    const prompt = `Rewrite this ${card.platform} ${card.content_type} draft so it ${focus ? "improves the targeted score area" : "resolves the reviewer findings"}.${focusBlock}
 Rules: keep the same intent, structure type, and language. Use ONLY facts in SOURCES; if a claim is unsupported, remove or soften it — never invent facts, names, numbers, or roles. Remove any internal notes or instructions from the copy. Output final publishable copy only (no placeholders, no brackets). Do not include hashtags.
 BRAND VOICE:
 ${(voiceRes.data ?? []).map((r: any) => `- ${r.rule_name}: ${r.rule_content}`).join("\n") || "(none)"}
@@ -76,7 +79,7 @@ ${(platformRes.data ?? []).map((r: any) => `- ${r.rule_name}: ${r.rule_content}`
 SOURCES:
 ${sources || "(none linked)"}
 FINDINGS:
-${findings.map((f) => `- [${f.check}] ${f.message}${f.excerpt ? ` | excerpt: "${f.excerpt}"` : ""}${f.suggestion ? ` | suggestion: ${f.suggestion}` : ""}`).join("\n")}
+${findings.map((f: any) => `- [${f.check}] ${f.message}${f.excerpt ? ` | excerpt: "${f.excerpt}"` : ""}${f.suggestion ? ` | suggestion: ${f.suggestion}` : ""}`).join("\n")}
 DRAFT:
 ${card.draft_copy}
 Return the rewritten draft and a short list of what you changed.`;
