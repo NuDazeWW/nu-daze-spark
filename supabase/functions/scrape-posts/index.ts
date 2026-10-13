@@ -57,6 +57,15 @@ serve(async (req) => {
       });
     }
 
+    // Only Owners, Admins and Editors may add industry posts (Find Posts)
+    const { data: canCreate, error: roleError } = await anonClient.rpc("can_create_content", { _user_id: user.id });
+    if (roleError || !canCreate) {
+      return new Response(JSON.stringify({ error: "Your role cannot add industry posts" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Get optional body params
     const body = await req.json().catch(() => ({}));
     const platform = body.platform || "linkedin"; // default to linkedin
