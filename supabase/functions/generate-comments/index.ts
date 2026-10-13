@@ -226,6 +226,11 @@ Requirements:
       });
     }
 
+    if (results.length > 0) {
+      const { error: meterErr } = await anonClient.rpc("consume_usage", { _bucket: "text_drafts", _capability: "text_draft", _quantity: results.length, _client_id: clientId, _dry_run: false });
+      if (meterErr) console.error("text draft metering failed", meterErr);
+    }
+
     return new Response(
       JSON.stringify({ success: true, results, count: results.length }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
