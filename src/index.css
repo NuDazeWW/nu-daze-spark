@@ -286,3 +286,10 @@ body[data-sm-surface="reading"] [role="dialog"] [class*="text-brand-warning/"] {
 [class*="tracking-"] { letter-spacing: 0; }
 .sm-type.sm-type-post { color: hsl(var(--brand-signal)); border-color: hsl(var(--brand-signal) / .4); background: hsl(var(--brand-signal) / .08); }
 .sm-type.sm-type-comment { color: hsl(var(--brand-attention)); border-color: hsl(var(--brand-attention) / .4); background: hsl(var(--brand-attention) / .08); }
+
+/* Sidebar hover lists */
+.sm-hover-panel { animation: sm-hover-panel-in .14s cubic-bezier(.22, 1, .36, 1); }
+@keyframes sm-hover-panel-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
