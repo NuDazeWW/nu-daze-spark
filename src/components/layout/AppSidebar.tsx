@@ -48,6 +48,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 import { SidebarPostTo } from "./SidebarPostTo";
+import { CollapsibleNavGroup } from "./CollapsibleNavGroup";
 
 const mainNav = [
   { title: "Dashboard", icon: LayoutDashboard, href: "/" },
@@ -112,8 +113,7 @@ export function AppSidebar() {
 
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Overview</SidebarGroupLabel>
+        <CollapsibleNavGroup id="overview" label="Overview">
           <SidebarMenu>
             {mainNav.map((item) => (
               <SidebarMenuItem key={item.href}>
@@ -132,12 +132,11 @@ export function AppSidebar() {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-        </SidebarGroup>
+        </CollapsibleNavGroup>
 
         <SidebarSeparator />
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Content</SidebarGroupLabel>
+        <CollapsibleNavGroup id="content" label="Content">
           <SidebarMenu>
             {contentNav.map((item) => (
               <SidebarMenuItem key={item.href}>
@@ -156,11 +155,13 @@ export function AppSidebar() {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-        </SidebarGroup>
+        </CollapsibleNavGroup>
         <SidebarSeparator />
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+        <SidebarPostTo />
+        <SidebarSeparator />
+
+        <CollapsibleNavGroup id="settings" label="Settings">
           <SidebarMenu>
             {settingsNav.map((item) => (
               <SidebarMenuItem key={item.href}>
@@ -179,11 +180,8 @@ export function AppSidebar() {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-        </SidebarGroup>
+        </CollapsibleNavGroup>
 
-        <SidebarSeparator />
-
-        <SidebarPostTo />
       </SidebarContent>
 
       <SidebarFooter className="px-3 py-3">
