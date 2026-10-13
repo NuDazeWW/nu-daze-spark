@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useVoiceProfiles } from "@/hooks/useVoiceProfiles";
 import { AlertTriangle, CheckCircle2, FileText, Layers, Loader2, Plus, Sparkles, Wand2 } from "lucide-react";
 
 type Brief = any;
@@ -64,6 +65,9 @@ export default function CampaignBriefs() {
   const [editing, setEditing] = useState<Brief | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [review, setReview] = useState<{ score: number; questions: string[]; issues: string[] } | null>(null);
+  const [voiceId, setVoiceId] = useState<string>("");
+  const { profiles: voices } = useVoiceProfiles();
+  const activeVoices = voices.filter((v) => v.is_active);
 
   const { data: briefs = [], isLoading } = useQuery({
     queryKey: ["briefs", activeClientId],
@@ -130,7 +134,7 @@ export default function CampaignBriefs() {
 
   const generate = useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke("generate-from-brief", { body: { brief_id: id } });
+      const { data, error } = await supabase.functions.invoke("generate-from-brief", { body: { brief_id: id, voice_profile_id: voiceId || undefined } });
       if (error || data?.error) throw new Error(data?.error ?? error?.message);
       return data;
     },
@@ -185,9 +189,22 @@ export default function CampaignBriefs() {
                       <CheckCircle2 className="h-4 w-4 mr-1" />Approve brief
                     </Button>
                   ) : (
-                    <Button size="sm" disabled={generate.isPending} onClick={() => generate.mutate(selected.id)}>
-                      {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set
-                    </Button>
+                    <>
+                      {activeVoices.length > 0 && (
+                        <Select value={voiceId || "brand"} onValueChange={(v) => setVoiceId(v === "brand" ? "" : v)}>
+                          <SelectTrigger className="h-8 w-[170px] text-xs"><SelectValue placeholder="Brand voice" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="brand">Brand voice (default)</SelectItem>
+                            {activeVoices.map((v) => (
+                              <SelectItem key={v.id} value={v.id}>Write as {v.name}{v.role_title ? ` · ${v.role_title}` : ""}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      <Button size="sm" disabled={generate.isPending} onClick={() => generate.mutate(selected.id)}>
+                        {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
