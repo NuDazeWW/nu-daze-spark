@@ -1,5 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
 import { draftChecksum } from "@/lib/preflightRules";
+import demo1 from "@/assets/demo/demo-1.jpg";
+import demo2 from "@/assets/demo/demo-2.jpg";
+import demo3 from "@/assets/demo/demo-3.jpg";
+import demo4 from "@/assets/demo/demo-4.jpg";
+import demo5 from "@/assets/demo/demo-5.jpg";
+import demo6 from "@/assets/demo/demo-6.jpg";
+import demo7 from "@/assets/demo/demo-7.jpg";
+import demo8 from "@/assets/demo/demo-8.jpg";
 
 /**
  * Camera-ready demo content for the NuDaze Flagship workspace.
@@ -96,6 +104,32 @@ const EXTERNAL = [
   { author: "Priya Raman", title: "Marketing Director, Atlas Partners", topic: "Approval bottlenecks", content: "Our approval cycle for a single LinkedIn post is 6 days. Six. What does yours look like?", angle: "Offer a practical tip: score drafts first so reviewers focus on judgment." },
 ];
 
+const MEDIA = [demo1, demo2, demo3, demo4, demo5, demo6, demo7, demo8];
+
+/** Uploads the bundled demo images once (reused by title) and returns asset IDs aligned with POSTS. */
+async function seedDemoMedia(clientId: string, userId: string): Promise<(string | null)[]> {
+  return Promise.all(POSTS.map(async (p, i) => {
+    const title = `Demo media ${i + 1} · ${p.pillar}`;
+    const { data: existing } = await supabase.from("source_assets").select("id").eq("client_id", clientId).eq("title", title).is("deleted_at", null).maybeSingle();
+    if (existing) return existing.id;
+    try {
+      const blob = await (await fetch(MEDIA[i])).blob();
+      const path = `${userId}/demo-${crypto.randomUUID()}.jpg`;
+      const { error: upErr } = await supabase.storage.from("source-assets").upload(path, blob, { contentType: "image/jpeg" });
+      if (upErr) throw upErr;
+      const { data, error } = await supabase.from("source_assets").insert({
+        client_id: clientId, title, description: p.asset, asset_type: "image", file_path: path,
+        permission_state: "generation_allowed", is_nudaze_origin: true, created_by: userId,
+      } as never).select("id").single();
+      if (error) throw error;
+      return (data as { id: string }).id;
+    } catch (e) {
+      console.error("demo media seed failed", e);
+      return null;
+    }
+  }));
+}
+
 export async function seedDemoContent(userId: string) {
   const { data: client } = await supabase.from("clients").select("id").eq("name", "NuDaze Flagship").maybeSingle();
   if (!client) throw new Error("NuDaze Flagship workspace not found");
@@ -126,13 +160,14 @@ export async function seedDemoContent(userId: string) {
   if (mErr) throw mErr;
 
   const { data: voice } = await supabase.from("voice_profiles").select("id").eq("client_id", clientId).limit(1).maybeSingle();
+  const mediaIds = await seedDemoMedia(clientId, userId);
 
   const day = (n: number) => { const d = new Date(); d.setDate(d.getDate() + n); d.setHours(9 + (Math.abs(n) % 4) * 2, 0, 0, 0); return d.toISOString(); };
-  const rows = POSTS.map((p) => ({
+  const rows = POSTS.map((p, i) => ({
     client_id: clientId, platform: p.platform, content_type: p.content_type, approval_status: p.status,
     objective: "Drive early-access requests", audience: "B2B marketing leaders", campaign_pillar: p.pillar,
     draft_copy: p.copy, hashtags: p.hashtags, suggested_asset_description: p.asset, rationale: p.rationale,
-    source_references: ["NuDaze 2026 launch brief", "Q3 content operations report"],
+    source_references: [...(mediaIds[i] ? [mediaIds[i]] : []), "NuDaze 2026 launch brief", "Q3 content operations report"],
     brief_id: brief!.id, master_content_id: master!.id, voice_profile_id: p.platform === "linkedin" ? voice?.id ?? null : null,
     scheduled_for: day(p.dayOffset), posted_at: p.status === "posted" ? day(p.dayOffset) : null,
     publishing_status: p.status === "posted" ? "published" : "idle",

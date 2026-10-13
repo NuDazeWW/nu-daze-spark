@@ -6,7 +6,8 @@ import { isPreviewMedia } from "@/lib/nativePreview";
 export interface PreviewMedia { id: string; title: string; asset_type: string; url: string | null }
 
 export function usePreviewMedia(card: PostCard, enabled: boolean) {
-  const refs = card.source_references ?? [];
+  // Only asset IDs resolve to media; free-text source labels are provenance notes.
+  const refs = (card.source_references ?? []).filter((r) => /^[0-9a-f-]{36}$/i.test(r));
   return useQuery({
     queryKey: ["native_preview_media", card.client_id, refs.join(",")],
     enabled: enabled && refs.length > 0,
