@@ -120,6 +120,13 @@
       "when": 1791861578340,
       "tag": "0016_scope_reads_to_workspace_members",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1791862446107,
+      "tag": "0017_restrict_is_workspace_member_execute",
+      "breakpoints": true
     }
   ]
 }
