@@ -26,6 +26,9 @@ const GATE_META: Record<GateState, { label: string; cls: string; Icon: typeof Sh
 /** Plain-language titles for each check. */
 const CHECK_TITLE: Record<string, string> = {
   banned_phrase: "Uses a banned phrase",
+  guardrail_profanity: "Profanity or explicit language",
+  guardrail_risky_claims: "Risky claim or trigger word",
+  guardrail_cliches: "Overused cliché",
   required_language: "Missing required wording",
   char_limit: "Too long for this platform",
   hashtag_count: "Too many hashtags",
