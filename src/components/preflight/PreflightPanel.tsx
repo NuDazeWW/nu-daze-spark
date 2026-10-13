@@ -136,6 +136,9 @@ export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin:
             {" "}· grades the wording; improves only when the text is edited and checked again
           </p>
         )}
+        {review?.motive_score != null && (
+          <MotiveScore score={review.motive_score} breakdown={review.motive_breakdown as any} />
+        )}
         {review && findings.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-1">
             {fixable && (
