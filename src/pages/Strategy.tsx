@@ -36,7 +36,7 @@ export default function Strategy() {
           </div>
         )}
       </PageHeader>
-      <Tabs defaultValue={params.get("tab") ?? "voice"} className="w-full">
+      <Tabs defaultValue={params.get("tab") ?? "voice"} key={params.get("tab") ?? "voice"} className="w-full">
         <TabsList className="flex flex-wrap h-auto gap-1 bg-secondary/50 p-1">
           <TabsTrigger value="voice" className="text-xs">Brand Voice</TabsTrigger>
           <TabsTrigger value="voices" className="text-xs">Voices</TabsTrigger>

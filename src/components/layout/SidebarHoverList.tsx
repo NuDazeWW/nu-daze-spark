@@ -326,7 +326,7 @@ export function NavHoverWrapper({
   };
 
   return (
-    <div ref={ref} className="w-full" onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide}>
+    <div ref={ref} className="w-full" onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide} onClick={ctx.closeNow}>
       {children}
     </div>
   );
