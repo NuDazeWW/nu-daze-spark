@@ -113,6 +113,13 @@
       "when": 1791856980967,
       "tag": "0015_voice_profiles_and_motive_score",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1791861578340,
+      "tag": "0016_scope_reads_to_workspace_members",
+      "breakpoints": true
     }
   ]
 }
