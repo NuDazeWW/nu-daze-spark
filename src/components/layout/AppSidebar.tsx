@@ -63,6 +63,8 @@ const contentNav = [
   { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
   { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
   { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
+  { title: "AI Media Studio", icon: ImagePlus, href: "/media-studio" },
+  { title: "Brand Kit Studio", icon: Palette, href: "/settings/brand-kit" },
 ];
 
 const adminSettingsNav = [

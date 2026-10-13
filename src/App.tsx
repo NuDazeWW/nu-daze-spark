@@ -29,6 +29,8 @@ import Usage from "./pages/settings/Usage";
 import Notifications from "./pages/settings/Notifications";
 import EmailProvider from "./pages/settings/EmailProvider";
 import Connections from "./pages/settings/Connections";
+import BrandKitPage from "./pages/settings/BrandKit";
+import MediaStudioPage from "./pages/MediaStudioPage";
 import Setup from "./pages/Setup";
 import WhatsNew from "./pages/WhatsNew";
 import Help from "./pages/Help";
@@ -70,6 +72,8 @@ const App = () => (
               <Route path="/settings/usage" element={<Usage />} />
               <Route path="/settings/notifications" element={<Notifications />} />
               <Route path="/settings/connections" element={<Connections />} />
+              <Route path="/settings/brand-kit" element={<BrandKitPage />} />
+              <Route path="/media-studio" element={<MediaStudioPage />} />
               <Route path="/settings/email-provider" element={<EmailProvider />} />
               <Route path="/setup" element={<Setup />} />
               <Route path="/whats-new" element={<WhatsNew />} />
