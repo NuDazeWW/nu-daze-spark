@@ -64,8 +64,8 @@ export function ReadinessPanel() {
       !["approved", "exported", "posted", "archived"].includes(c.approval_status) &&
       (lowScores[c.id] ?? 100) < 60 && !risks.some((r) => r.id === c.id));
     const commentsWaiting = (comments ?? []).filter((c: any) => c.approval_status === "draft" || c.approval_status === "in_review").length;
-    return { decisions, ready, risks, commentsWaiting };
-  }, [cards, comments]);
+    return { decisions, ready, risks, lowScore, commentsWaiting };
+  }, [cards, comments, lowScores]);
 
   if (isLoading) return null;
 
@@ -105,13 +105,18 @@ export function ReadinessPanel() {
           ))}
         </Column>
 
-        <Column icon={AlertTriangle} title="At risk · next 7 days" count={risks.length} tone="risk" empty="Every scheduled post this week is approved.">
+        <Column icon={AlertTriangle} title="At risk · next 7 days" count={risks.length + lowScore.length} tone="risk" empty="Every scheduled post this week is approved.">
           {risks.slice(0, 6).map((c) => (
             <Row key={c.id} card={c} sub={`${when(c.scheduled_for!)} · not approved yet`}>
               <Button size="sm" variant="outline" onClick={() => navigate(`/queue?post=${c.id}`)}>Fix</Button>
             </Row>
           ))}
-          {risks.length > 6 && <More n={risks.length - 6} onClick={() => navigate("/queue")} />}
+          {lowScore.slice(0, Math.max(0, 6 - risks.length)).map((c) => (
+            <Row key={c.id} card={c} sub={`Motive Score ${lowScores[c.id]}/100 — needs stronger copy`}>
+              <Button size="sm" variant="outline" onClick={() => navigate(`/queue?post=${c.id}`)}>Fix</Button>
+            </Row>
+          ))}
+          {risks.length + lowScore.length > 6 && <More n={risks.length + lowScore.length - 6} onClick={() => navigate("/queue")} />}
         </Column>
       </div>
     </section>
