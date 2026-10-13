@@ -15,5 +15,11 @@
 - [x] Add and verify account photo/logo resizing before upload in Native Preview.
 # Notifications & domains
 - [x] Apple Mail / iCloud email provider; global pause; pause/resume all recipients
-- [ ] Rename this instance's web address to socialmotive.nudaze.com (blocked: DNS record at NuDaze's domain host)
+- [x] socialmotive.nudaze.com is live; set it as Primary domain in Project Settings → Domains
 - [ ] Own web address per sold copy (each copy's operator connects its domain at handover)
+# Strategy setup & guardrails
+- [x] Out-of-the-box guardrail word lists (3 tiers) wired into Preflight
+- [x] Brand voice generator from website/social/pasted copy
+- [x] Brand guide importer (PDF/Word/text)
+- [x] Industry starter kits (Strategy + Setup)
+- [x] Email links point to socialmotive.nudaze.com (make it Primary in Domains settings)
