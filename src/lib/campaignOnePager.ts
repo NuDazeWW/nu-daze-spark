@@ -1,4 +1,4 @@
-import { formatPostId } from "@/components/tracking/PostTracking";
+import { postLabel } from "@/components/tracking/PostTracking";
 
 const ANGLES = ["Data-Driven Insight", "Founder Story", "Bold Contrarian Take"];
 
@@ -27,7 +27,7 @@ export function printOnePager(brief: any, masters: any[]) {
   const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
   const rows = posts.map((p: any) => {
     const s = latestScore(p);
-    const id = (() => { try { return p.post_number ? formatPostId(p.post_number) : ""; } catch { return ""; } })();
+    const id = p.post_number ? postLabel(p) : "";
     return `<tr><td>${p.scheduled_for ? new Date(p.scheduled_for).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "—"}</td>
       <td>${esc(p.platform)} · ${esc(p.content_type)}${id ? ` <span class="m">${id}</span>` : ""}</td>
       <td>${esc(angleOf(p) ?? "")}</td>
