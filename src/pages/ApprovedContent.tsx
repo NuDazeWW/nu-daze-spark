@@ -16,6 +16,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PostingPackageDrawer } from "@/components/queue/PostingPackageDrawer";
+import { BulkExportDialog } from "@/components/export/BulkExportDialog";
 import {
   CheckCircle2, Search, AlertCircle, Copy, Hash, AtSign, Users,
   ArrowRight, Linkedin, Instagram, Download, Check, Package,
@@ -52,6 +53,8 @@ export default function ApprovedContent() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [packageId, setPackageId] = useState<string | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportPicked, setExportPicked] = useState<string[] | undefined>();
   const packageCard = cards.find((c) => c.id === packageId) ?? null;
 
   // Only approved, exported, posted cards
@@ -184,9 +187,23 @@ export default function ApprovedContent() {
             <SelectItem value="all">All Platforms</SelectItem>
             <SelectItem value="linkedin">LinkedIn</SelectItem>
             <SelectItem value="instagram">Instagram</SelectItem>
+            <SelectItem value="facebook">Facebook</SelectItem>
           </SelectContent>
         </Select>
+        <div className="flex-1" />
+        <Button onClick={() => { setExportPicked(undefined); setExportOpen(true); }}>
+          <Package className="h-4 w-4 mr-1" /> Bulk export
+        </Button>
       </div>
+      <BulkExportDialog
+        key={exportOpen ? "open" : "closed"}
+        open={exportOpen}
+        onOpenChange={setExportOpen}
+        cards={cards.filter((c) => VISIBLE_STATUSES.includes(c.approval_status))}
+        preselected={exportPicked}
+        canMarkExported={isAdmin}
+        onMarkExported={async (ids) => { for (const id of ids) await updateStatus.mutateAsync({ id, status: "exported", itemType: "post" }); setSelected(new Set()); }}
+      />
 
       {/* Bulk actions bar */}
       {selected.size > 0 && (
@@ -201,6 +218,9 @@ export default function ApprovedContent() {
           )}
           <Button size="sm" variant="outline" onClick={handleBulkDownload}>
             <Download className="h-3.5 w-3.5 mr-1" /> Download .txt
+          </Button>
+          <Button size="sm" onClick={() => { setExportPicked(Array.from(selected)); setExportOpen(true); }}>
+            <Package className="h-3.5 w-3.5 mr-1" /> Export package
           </Button>
           <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>Clear</Button>
         </div>
