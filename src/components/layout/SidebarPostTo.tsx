@@ -1,13 +1,13 @@
-import { Linkedin, Instagram, Facebook, Globe, Plus } from "lucide-react";
+import { PlatformIcon } from "./PlatformIcon";
+import { CollapsibleNavGroup } from "./CollapsibleNavGroup";
 import { Link } from "react-router-dom";
 import {
-  SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useActiveClient } from "@/contexts/ClientContext";
 import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { useAuth } from "@/hooks/useAuth";
 
-const ICONS: Record<string, typeof Globe> = { linkedin: Linkedin, instagram: Instagram, facebook: Facebook };
 
 export function SidebarPostTo() {
   const { activeClientId } = useActiveClient();
@@ -16,8 +16,7 @@ export function SidebarPostTo() {
   if (!activeClientId) return null;
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Post to</SidebarGroupLabel>
+    <CollapsibleNavGroup id="postto" label="Post to">
       <SidebarMenu>
         {accounts.length === 0 && (
           <SidebarMenuItem>
@@ -25,27 +24,26 @@ export function SidebarPostTo() {
           </SidebarMenuItem>
         )}
         {accounts.map((a) => {
-          const Icon = ICONS[a.platform] ?? Globe;
           const label = a.handle ? `${PLATFORM_LABEL[a.platform] ?? a.platform} · ${a.handle}` : a.account_name;
           return (
             <SidebarMenuItem key={a.id}>
               {a.profile_url ? (
                 <SidebarMenuButton asChild tooltip={label}>
                   <a href={a.profile_url} target="_blank" rel="noopener noreferrer">
-                    <Icon className="size-4" />
+                    <PlatformIcon platform={a.platform} className="size-4" />
                     <span className="truncate">{label}</span>
                   </a>
                 </SidebarMenuButton>
               ) : isAdmin ? (
                 <SidebarMenuButton asChild tooltip={`Add a profile link for ${label}`}>
                   <Link to={`/settings/clients?accounts=${activeClientId}`}>
-                    <Plus className="size-4" />
-                    <span className="truncate">{label} — add link</span>
+                    <PlatformIcon platform={a.platform} className="size-4" />
+                    <span className="truncate">{label} — <span className="underline">add link</span></span>
                   </Link>
                 </SidebarMenuButton>
               ) : (
                 <SidebarMenuButton disabled className="opacity-60">
-                  <Icon className="size-4" />
+                  <PlatformIcon platform={a.platform} className="size-4" />
                   <span className="truncate">{label} — no link</span>
                 </SidebarMenuButton>
               )}
@@ -53,7 +51,7 @@ export function SidebarPostTo() {
           );
         })}
       </SidebarMenu>
-      <p className="px-2 pt-1 text-[10px] text-sidebar-foreground/50">Profile links are set in Settings › Clients › Accounts.</p>
-    </SidebarGroup>
+      <p className="px-2 pt-1 text-[10px] text-sidebar-foreground/50">Profile links are set in Settings › Your Brand Profiles › Accounts.</p>
+    </CollapsibleNavGroup>
   );
 }

@@ -40,7 +40,7 @@ export function AccountPhotoControl({ account, clientId, hasPhoto }: { account: 
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  if (!account) return <p className="text-xs text-muted-foreground">No saved account for this platform — add one in Settings › Clients › Accounts to show its real name and photo.</p>;
+  if (!account) return <p className="text-xs text-muted-foreground">No saved account for this platform — add one in Settings › Your Brand Profiles › Accounts to show its real name and photo.</p>;
   if (!isAdmin) return hasPhoto ? null : <p className="text-xs text-muted-foreground">No account photo saved — ask an admin to add one.</p>;
 
   const upload = async (file: File) => {

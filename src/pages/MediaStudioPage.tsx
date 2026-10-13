@@ -13,7 +13,7 @@ export default function MediaStudioPage() {
   useEffect(() => { if (!clientId && clients[0]) setClientId(clients[0].id); }, [clients, clientId]);
   return (
     <div className="space-y-6 max-w-3xl">
-      <PageHeader title="AI Media Studio" description="Generate on-brand images with each client's colors, tone and logo watermark.">
+      <PageHeader title="Motive Media Studio" description="Generate on-brand images with each client's colors, tone and logo watermark.">
         <Select value={clientId ?? ""} onValueChange={setClientId}>
           <SelectTrigger className="w-56"><SelectValue placeholder="Choose client" /></SelectTrigger>
           <SelectContent>{clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>

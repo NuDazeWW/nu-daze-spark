@@ -133,7 +133,7 @@ export default function PostGenerator() {
   return (
     <div className="animate-fade-in">
       <PageHeader
-        title="AI Post Generator"
+        title="Social Post Generator"
         description="Select source assets and generate structured post cards with AI."
       />
 
