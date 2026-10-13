@@ -265,7 +265,7 @@ export default function Connections() {
   const [params] = useSearchParams();
   return (
     <div className="space-y-6">
-      <PageHeader title="Social Connections" description={`Connect each ${ws.entitySingular.toLowerCase()}'s social accounts manage platform developer apps, and connect your own AI image and video tools.`} />
+      <PageHeader title="Social Connections" description={`Connect each ${ws.entitySingular.toLowerCase()}'s social accounts, manage platform developer apps, and connect your own AI image and video tools.`} />
       <AdminOnly>
         <Tabs defaultValue={params.get("tab") ?? "channels"}>
           <TabsList>
