@@ -106,8 +106,10 @@ export function usePreflight(card: PostCard | null) {
 
   // AI proposes a full rewrite; nothing is saved until the user keeps it.
   const proposeRewrite = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke("preflight-rewrite", { body: { post_card_id: card!.id } });
+    mutationFn: async (focus?: { key: string; hint?: string }) => {
+      const { data, error } = await supabase.functions.invoke("preflight-rewrite", {
+        body: { post_card_id: card!.id, ...(focus ? { focus_area: focus.key, focus_hint: focus.hint ?? "" } : {}) },
+      });
       if (error) {
         let msg = error.message;
         try { const body = await (error as any).context?.json(); msg = body?.error ?? msg; } catch { /* ignore */ }

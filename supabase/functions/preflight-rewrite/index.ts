@@ -7,7 +7,18 @@ import { z } from "npm:zod@3";
 const MODEL = "openai/gpt-6-astra";
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-const Body = z.object({ post_card_id: z.string().uuid() });
+const Body = z.object({
+  post_card_id: z.string().uuid(),
+  focus_area: z.enum(["hook_strength", "strategic_fit", "voice_fit", "platform_fit", "originality"]).optional(),
+  focus_hint: z.string().max(500).optional(),
+});
+const FOCUS_GUIDE: Record<string, string> = {
+  hook_strength: "Rewrite ONLY the opening line(s) so the hook is specific, concrete and audience-relevant (a sharp insight, tension, or question). Keep the rest nearly identical.",
+  strategic_fit: "Tie the post more clearly to the brief's core message, audience and CTA. End with the approved CTA if one exists.",
+  voice_fit: "Adjust word choice and tone to match the BRAND VOICE rules closely. Remove generic or off-brand phrasing.",
+  platform_fit: "Restructure for this platform: proper length, line breaks, pacing and format conventions. Keep the message.",
+  originality: "Replace clichés, generic AI phrasing, and repeated hooks/CTAs with fresh, specific wording.",
+};
 
 const SCHEMA = {
   type: "object", additionalProperties: false, required: ["draft_copy", "changes"],
@@ -37,7 +48,8 @@ Deno.serve(async (req) => {
     const { data: review } = await sb.from("preflight_reviews").select("findings")
       .eq("post_card_id", card.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
     const findings = ((review?.findings ?? []) as any[]).filter((f) => !["media", "weak_source"].includes(f.check));
-    if (!findings.length) return json({ error: "Nothing the AI can fix in the text. Run preflight first." }, 400);
+    const focus = parsed.data.focus_area;
+    if (!findings.length && !focus) return json({ error: "Nothing the AI can fix in the text. Run preflight first." }, 400);
 
     const scope = (q: any) => (card.client_id ? q.eq("client_id", card.client_id) : q);
     const [voiceRes, platformRes, briefRes, assetsRes] = await Promise.all([
