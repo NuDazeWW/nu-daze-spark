@@ -200,14 +200,16 @@ export function NavHoverProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (!open) return;
     const close = () => setOpen(null);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(null);
+    };
     window.addEventListener("scroll", close, true);
     window.addEventListener("resize", close);
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") setOpen(null);
-    });
+    window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("scroll", close, true);
       window.removeEventListener("resize", close);
+      window.removeEventListener("keydown", onKey);
     };
   }, [open]);
 
