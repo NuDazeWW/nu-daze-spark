@@ -14,6 +14,7 @@ import { CtaBanksTab } from "@/components/strategy/CtaBanksTab";
 import { CadenceTargetsTab } from "@/components/strategy/CadenceTargetsTab";
 import { EngagementTargetsTab } from "@/components/strategy/EngagementTargetsTab";
 import { GuardrailsTab } from "@/components/strategy/GuardrailsTab";
+import { VoicesTab } from "@/components/strategy/VoicesTab";
 import { StrategyBuilderDialog, type BuilderMode } from "@/components/strategy/StrategyBuilderDialog";
 
 export default function Strategy() {
@@ -38,6 +39,7 @@ export default function Strategy() {
       <Tabs defaultValue={params.get("tab") ?? "voice"} className="w-full">
         <TabsList className="flex flex-wrap h-auto gap-1 bg-secondary/50 p-1">
           <TabsTrigger value="voice" className="text-xs">Brand Voice</TabsTrigger>
+          <TabsTrigger value="voices" className="text-xs">Voices</TabsTrigger>
           <TabsTrigger value="guardrails" className="text-xs">Guardrails</TabsTrigger>
           <TabsTrigger value="platform" className="text-xs">Platform Rules</TabsTrigger>
           <TabsTrigger value="audiences" className="text-xs">Audiences</TabsTrigger>
@@ -48,6 +50,7 @@ export default function Strategy() {
           <TabsTrigger value="engagement" className="text-xs">Engagement</TabsTrigger>
         </TabsList>
         <TabsContent value="voice"><BrandVoiceTab /></TabsContent>
+        <TabsContent value="voices"><VoicesTab /></TabsContent>
         <TabsContent value="guardrails"><GuardrailsTab /></TabsContent>
         <TabsContent value="platform"><PlatformRulesTab /></TabsContent>
         <TabsContent value="audiences"><AudiencesTab /></TabsContent>
