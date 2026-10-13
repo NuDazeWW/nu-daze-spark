@@ -99,6 +99,7 @@ function SetupInner() {
       const { error } = await supabase.from("workspace_invites").insert({ email: inviteEmail.trim().toLowerCase(), role: inviteRole, client_ids: activeClient ? [activeClient.id] : [], invited_by: user!.id } as never);
       if (error) throw error;
     },
+    ai_tools: async () => {},
     email: async () => {
       const { data } = await supabase.from("email_provider_settings").select("provider").maybeSingle();
       if (!data || data.provider === "none") throw new Error("Connect an email provider first, or choose Skip for now.");
@@ -178,6 +179,16 @@ function SetupInner() {
               </div>
               <p className="text-xs text-muted-foreground">Manage everyone later on the <Link className="underline" to="/settings/team">Team</Link> page.</p>
             </>)}
+
+            {step === "ai_tools" && (
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <p>SocialMotive includes built-in AI for images and short videos — no setup needed. If your team already pays for tools like OpenAI, Runway or Luma, connect them so Motive Media Studio can use them.</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="outline" asChild><Link to="/settings/connections?tab=ai">Connect AI tools</Link></Button>
+                  <Button size="sm" variant="outline" asChild><Link to="/media-studio">Try Motive Media Studio</Link></Button>
+                </div>
+              </div>
+            )}
 
             {step === "email" && (
               <p className="text-sm text-muted-foreground">Connect the email account (SendGrid, Gmail, Outlook, Yahoo or your own mail server) used for team notifications on the <Link className="underline" to="/settings/email-provider">Email Provider</Link> page, then choose who gets notified on <Link className="underline" to="/settings/notifications">Notifications</Link>.</p>
