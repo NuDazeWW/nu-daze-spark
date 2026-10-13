@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { AuthorDetails } from "@/components/comments/AuthorDetails";
 import { authorContextSearch } from "@/lib/authorContext";
+import { useWorkspace } from "@/hooks/useWorkspace";
 
 const RISK_ICON = {
   safe: Shield,
@@ -144,6 +145,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
 type SortKey = "recent" | "relevance" | "engagement";
 
 export default function CommentGenerator() {
+  const { canCreate } = useWorkspace();
   const {
     posts, isLoading, error,
     addPost, generateComments, scrapePosts, updateAuthorContext,
@@ -302,9 +304,11 @@ export default function CommentGenerator() {
         <Button variant="outline" onClick={() => setScrapeOpen(true)}>
           <Radar className="mr-2 h-4 w-4" />Find Posts
         </Button>
-        <Button variant="outline" onClick={() => setFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />Add Post
-        </Button>
+        {canCreate && (
+          <Button variant="outline" onClick={() => setFormOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />Add Post
+          </Button>
+        )}
         <div className="flex items-center gap-2 ml-auto">
           <Switch checked={showCommented} onCheckedChange={setShowCommented} id="show-commented" />
           <label htmlFor="show-commented" className="text-xs text-muted-foreground cursor-pointer">
@@ -383,9 +387,11 @@ export default function CommentGenerator() {
                 <Button onClick={() => setScrapeOpen(true)}>
                   <Radar className="mr-2 h-4 w-4" />Find Posts
                 </Button>
-                <Button variant="outline" onClick={() => setFormOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />Add Manually
-                </Button>
+                {canCreate && (
+                  <Button variant="outline" onClick={() => setFormOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />Add Manually
+                  </Button>
+                )}
               </div>
             ) : undefined
           }
