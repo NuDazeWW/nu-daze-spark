@@ -36,6 +36,9 @@ import PortfolioInsights from "./pages/PortfolioInsights";
 import Setup from "./pages/Setup";
 import WhatsNew from "./pages/WhatsNew";
 import Help from "./pages/Help";
+import Pricing from "./pages/Pricing";
+import Billing from "./pages/settings/Billing";
+import { CreditGateProvider } from "@/components/billing/CreditGate";
 
 const queryClient = new QueryClient();
 
@@ -46,8 +49,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+        <CreditGateProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               element={
@@ -72,6 +77,7 @@ const App = () => (
               <Route path="/settings/workspace" element={<WorkspaceSettings />} />
               <Route path="/settings/team" element={<Team />} />
               <Route path="/settings/usage" element={<Usage />} />
+              <Route path="/settings/billing" element={<Billing />} />
               <Route path="/settings/notifications" element={<Notifications />} />
               <Route path="/settings/connections" element={<Connections />} />
               <Route path="/settings/brand-kit" element={<BrandKitPage />} />
@@ -85,6 +91,7 @@ const App = () => (
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+        </CreditGateProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

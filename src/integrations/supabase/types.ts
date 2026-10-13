@@ -754,6 +754,36 @@ export type Database = {
           },
         ]
       }
+      credit_weight_definitions: {
+        Row: {
+          capability: string
+          credits: number
+          label: string
+          sort_order: number
+          unit_cost_cents: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          capability: string
+          credits: number
+          label: string
+          sort_order?: number
+          unit_cost_cents?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          capability?: string
+          credits?: number
+          label?: string
+          sort_order?: number
+          unit_cost_cents?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       cta_banks: {
         Row: {
           bank_name: string
@@ -1082,6 +1112,51 @@ export type Database = {
           },
         ]
       }
+      guardrail_alerts: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: string
+          projected_month_end_cents: number
+          requires_owner: boolean
+          resumed_at: string | null
+          resumed_by: string | null
+          spend_cents: number
+          status: string
+          threshold_label: string
+          threshold_type: string
+          trip_number: number
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: string
+          projected_month_end_cents?: number
+          requires_owner?: boolean
+          resumed_at?: string | null
+          resumed_by?: string | null
+          spend_cents?: number
+          status?: string
+          threshold_label: string
+          threshold_type: string
+          trip_number?: number
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: string
+          projected_month_end_cents?: number
+          requires_owner?: boolean
+          resumed_at?: string | null
+          resumed_by?: string | null
+          spend_cents?: number
+          status?: string
+          threshold_label?: string
+          threshold_type?: string
+          trip_number?: number
+        }
+        Relationships: []
+      }
       guardrail_settings: {
         Row: {
           client_id: string | null
@@ -1244,6 +1319,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      nonprofit_applications: {
+        Row: {
+          contact_email: string
+          contact_name: string
+          created_at: string
+          decided_at: string | null
+          ein: string
+          id: string
+          intended_tier: string | null
+          legal_name: string
+          letter_path: string
+          reverification_due: string | null
+          review_notes: string | null
+          reviewer_id: string | null
+          status: string
+          submitted_by: string
+          verification_method: string
+        }
+        Insert: {
+          contact_email: string
+          contact_name: string
+          created_at?: string
+          decided_at?: string | null
+          ein: string
+          id?: string
+          intended_tier?: string | null
+          legal_name: string
+          letter_path: string
+          reverification_due?: string | null
+          review_notes?: string | null
+          reviewer_id?: string | null
+          status?: string
+          submitted_by: string
+          verification_method?: string
+        }
+        Update: {
+          contact_email?: string
+          contact_name?: string
+          created_at?: string
+          decided_at?: string | null
+          ein?: string
+          id?: string
+          intended_tier?: string | null
+          legal_name?: string
+          letter_path?: string
+          reverification_due?: string | null
+          review_notes?: string | null
+          reviewer_id?: string | null
+          status?: string
+          submitted_by?: string
+          verification_method?: string
+        }
+        Relationships: []
       }
       notification_log: {
         Row: {
@@ -1745,6 +1874,36 @@ export type Database = {
           },
         ]
       }
+      pricing_config_audit: {
+        Row: {
+          after: Json | null
+          before: Json | null
+          changed_by: string | null
+          created_at: string
+          entity: string
+          entity_key: string
+          id: string
+        }
+        Insert: {
+          after?: Json | null
+          before?: Json | null
+          changed_by?: string | null
+          created_at?: string
+          entity: string
+          entity_key: string
+          id?: string
+        }
+        Update: {
+          after?: Json | null
+          before?: Json | null
+          changed_by?: string | null
+          created_at?: string
+          entity?: string
+          entity_key?: string
+          id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2162,6 +2321,111 @@ export type Database = {
           },
         ]
       }
+      stripe_processed_events: {
+        Row: {
+          event_id: string
+          event_type: string
+          processed_at: string
+        }
+        Insert: {
+          event_id: string
+          event_type: string
+          processed_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string
+          processed_at?: string
+        }
+        Relationships: []
+      }
+      subscription_tier_definitions: {
+        Row: {
+          allowances: Json
+          annual_price_cents: number
+          created_at: string
+          created_by: string | null
+          id: string
+          implementation_fee_cents: number
+          is_current: boolean
+          monthly_price_cents: number
+          name: string
+          nonprofit_annual_price_cents: number
+          nonprofit_implementation_fee_cents: number
+          sort_order: number
+          tier_slug: string
+          version: number
+        }
+        Insert: {
+          allowances?: Json
+          annual_price_cents: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          implementation_fee_cents: number
+          is_current?: boolean
+          monthly_price_cents: number
+          name: string
+          nonprofit_annual_price_cents: number
+          nonprofit_implementation_fee_cents: number
+          sort_order?: number
+          tier_slug: string
+          version?: number
+        }
+        Update: {
+          allowances?: Json
+          annual_price_cents?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          implementation_fee_cents?: number
+          is_current?: boolean
+          monthly_price_cents?: number
+          name?: string
+          nonprofit_annual_price_cents?: number
+          nonprofit_implementation_fee_cents?: number
+          sort_order?: number
+          tier_slug?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      usage_events: {
+        Row: {
+          actor_id: string | null
+          bucket: string
+          capability: string | null
+          client_id: string | null
+          cost_cents: number
+          created_at: string
+          credits: number
+          id: string
+          quantity: number
+        }
+        Insert: {
+          actor_id?: string | null
+          bucket: string
+          capability?: string | null
+          client_id?: string | null
+          cost_cents?: number
+          created_at?: string
+          credits?: number
+          id?: string
+          quantity?: number
+        }
+        Update: {
+          actor_id?: string | null
+          bucket?: string
+          capability?: string | null
+          client_id?: string | null
+          cost_cents?: number
+          created_at?: string
+          credits?: number
+          id?: string
+          quantity?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -2241,6 +2505,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      workspace_billing: {
+        Row: {
+          anomaly_counters: Json
+          billing_cycle: string
+          billing_mode: string
+          billing_status: string
+          bonus_credits: number
+          cycle_end: string
+          cycle_start: string
+          id: boolean
+          level2_degraded: boolean
+          media_credits_used: number
+          nonprofit_status: string
+          paused_buckets: string[]
+          payment_method_status: string
+          price_override_cents: number | null
+          resume_delegate_user_id: string | null
+          storage_bytes: number
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          text_drafts_used: number
+          tier_definition_version: number
+          tier_slug: string
+          updated_at: string
+          x_spend_cents: number
+        }
+        Insert: {
+          anomaly_counters?: Json
+          billing_cycle?: string
+          billing_mode?: string
+          billing_status?: string
+          bonus_credits?: number
+          cycle_end?: string
+          cycle_start?: string
+          id?: boolean
+          level2_degraded?: boolean
+          media_credits_used?: number
+          nonprofit_status?: string
+          paused_buckets?: string[]
+          payment_method_status?: string
+          price_override_cents?: number | null
+          resume_delegate_user_id?: string | null
+          storage_bytes?: number
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          text_drafts_used?: number
+          tier_definition_version?: number
+          tier_slug?: string
+          updated_at?: string
+          x_spend_cents?: number
+        }
+        Update: {
+          anomaly_counters?: Json
+          billing_cycle?: string
+          billing_mode?: string
+          billing_status?: string
+          bonus_credits?: number
+          cycle_end?: string
+          cycle_start?: string
+          id?: boolean
+          level2_degraded?: boolean
+          media_credits_used?: number
+          nonprofit_status?: string
+          paused_buckets?: string[]
+          payment_method_status?: string
+          price_override_cents?: number | null
+          resume_delegate_user_id?: string | null
+          storage_bytes?: number
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          text_drafts_used?: number
+          tier_definition_version?: number
+          tier_slug?: string
+          updated_at?: string
+          x_spend_cents?: number
+        }
+        Relationships: []
       }
       workspace_invites: {
         Row: {
@@ -2354,8 +2696,26 @@ export type Database = {
           updated_at: string
         }[]
       }
+      billing_snapshot: { Args: never; Returns: Json }
+      can_control_spend: { Args: { _user_id: string }; Returns: boolean }
       can_create_content: { Args: { _user_id: string }; Returns: boolean }
       can_edit_content: { Args: { _user_id: string }; Returns: boolean }
+      clear_demo_content: {
+        Args: { _confirm: string; _purge_media?: boolean }
+        Returns: Json
+      }
+      consume_usage: {
+        Args: {
+          _bucket: string
+          _capability: string
+          _client_id?: string
+          _dry_run?: boolean
+          _quantity?: number
+        }
+        Returns: Json
+      }
+      demo_content_counts: { Args: never; Returns: Json }
+      evaluate_anomalies: { Args: { _bucket: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2389,10 +2749,21 @@ export type Database = {
         }[]
       }
       remove_workspace_user: { Args: { _user_id: string }; Returns: undefined }
+      reset_demo_allowances: { Args: never; Returns: undefined }
       reset_workspace_content: {
         Args: { _confirm: string }
         Returns: undefined
       }
+      resume_guardrail_bucket: {
+        Args: { _alert_id: string }
+        Returns: undefined
+      }
+      review_nonprofit_application: {
+        Args: { _decision: string; _id: string; _notes: string }
+        Returns: undefined
+      }
+      set_billing_mode: { Args: { _mode: string }; Returns: undefined }
+      set_resume_delegate: { Args: { _user_id: string }; Returns: undefined }
       set_workspace_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2401,6 +2772,14 @@ export type Database = {
         Returns: undefined
       }
       transfer_ownership: { Args: { _new_owner: string }; Returns: undefined }
+      update_credit_weight: {
+        Args: { _capability: string; _credits: number }
+        Returns: undefined
+      }
+      update_tier_definition: {
+        Args: { _changes: Json; _slug: string }
+        Returns: number
+      }
       user_can_access_client: {
         Args: { _client_id: string; _user_id: string }
         Returns: boolean

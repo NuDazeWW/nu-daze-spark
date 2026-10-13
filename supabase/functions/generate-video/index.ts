@@ -40,6 +40,7 @@ Deno.serve(async (req) => {
       const r = await fetch(`${GW}/${id}`, { headers: { Authorization: `Bearer ${key}` } });
       if (!r.ok) return json({ error: await gwError(r) }, r.status);
       const job = await r.json();
+    await sb.rpc("consume_usage", { _bucket: "credits", _capability: capability, _quantity: 1, _client_id: clientId, _dry_run: false });
       if (job.status === "failed") return json({ status: "failed", error: job.error?.message ?? "Video generation failed" });
       if (job.status !== "completed") return json({ status: job.status, progress: job.progress ?? null });
       const path = `${user.id}/generated/${id}.mp4`;
@@ -60,6 +61,11 @@ Deno.serve(async (req) => {
     const brand = body.apply_brand !== false && (colors.length || kit?.tone)
       ? ` Brand direction: ${colors.length ? `accent colors ${colors.join(", ")}.` : ""} ${kit?.tone ? `Mood: ${kit.tone}.` : ""}` : "";
     const input = `Vertical-friendly social media clip for a Reel or Story. ${prompt}.${brand} Strong visual hook in the first second. Consider micro-detail, expression and timing. No logos, no watermarks, no brand names. No dialogue. Upbeat, tasteful background music.`;
+
+    const capability = dur === 8 ? "video_8s_premium" : "video_6s_draft";
+    const { data: pre, error: preErr } = await sb.rpc("consume_usage", { _bucket: "credits", _capability: capability, _quantity: 1, _client_id: clientId, _dry_run: true });
+    if (preErr) return json({ error: preErr.message }, 403);
+    if (!(pre as { ok: boolean }).ok) return json({ error: "Not enough credits", code: "CREDITS_BLOCKED", detail: { ...(pre as object), capability } }, 402);
 
     const r = await fetch(GW, {
       method: "POST",
