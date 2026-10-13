@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import type { GateState, PreflightReview } from "@/hooks/usePreflight";
 import type { usePreflight } from "@/hooks/usePreflight";
 import type { PreflightFinding } from "@/lib/preflightRules";
+import { MotiveScore, MotiveScoreChip } from "./MotiveScore";
 
 type Preflight = ReturnType<typeof usePreflight>;
 
@@ -49,12 +50,15 @@ const NON_TEXT = new Set(["media", "weak_source"]);
 export function PreflightBadge({ state, review, onClick }: { state: GateState; review?: PreflightReview | null; onClick?: () => void }) {
   const m = GATE_META[state];
   return (
-    <button type="button" onClick={onClick} className="inline-flex">
-      <Badge variant="outline" className={`text-[10px] gap-1 ${m.cls}`}>
-        <m.Icon className="h-3 w-3" />{m.label}
-        {review && state !== "none" && <span className="text-muted-foreground font-normal">· {format(new Date(review.created_at), "MMM d")}</span>}
-      </Badge>
-    </button>
+    <span className="inline-flex items-center gap-1">
+      <button type="button" onClick={onClick} className="inline-flex">
+        <Badge variant="outline" className={`text-[10px] gap-1 ${m.cls}`}>
+          <m.Icon className="h-3 w-3" />{m.label}
+          {review && state !== "none" && <span className="text-muted-foreground font-normal">· {format(new Date(review.created_at), "MMM d")}</span>}
+        </Badge>
+      </button>
+      {review?.motive_score != null && state !== "none" && <MotiveScoreChip score={review.motive_score} />}
+    </span>
   );
 }
 
