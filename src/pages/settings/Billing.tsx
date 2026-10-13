@@ -220,6 +220,13 @@ function DemoControls({ onDone }: { onDone: () => void }) {
     if (error) return toast.error(error.message);
     toast.success("Allowances restored. Posts were not touched."); onDone();
   };
+  const cameraReady = async () => {
+    if (!user) return;
+    setBusy(true);
+    try { const r = await resetDemoToCameraReady(user.id); toast.success(`Camera-ready: ${r.posts} demo posts loaded`); onDone(); }
+    catch (e) { toast.error((e as Error).message); }
+    finally { setBusy(false); }
+  };
   const clear = async () => {
     setBusy(true);
     const { error } = await supabase.rpc("clear_demo_content", { _confirm: confirm, _purge_media: purge });
@@ -235,8 +242,9 @@ function DemoControls({ onDone }: { onDone: () => void }) {
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
         <Button onClick={reset} disabled={busy}><RotateCcw className="mr-2 h-4 w-4" />Reset demo allowances</Button>
+        <Button variant="secondary" onClick={cameraReady} disabled={busy}><Clapperboard className="mr-2 h-4 w-4" />Reset to camera-ready demo</Button>
         <Button variant="outline" onClick={() => setOpen(true)}><Trash2 className="mr-2 h-4 w-4" />Clear demo content…</Button>
-        <p className="w-full text-xs text-muted-foreground">Reset restores media credits, AI drafts and X spend, recounts storage from real files, unpauses every bucket and clears alert counters. It never deletes posts.</p>
+        <p className="w-full text-xs text-muted-foreground">Reset restores media credits, AI drafts and X spend, recounts storage from real files, unpauses every bucket and clears alert counters. It never deletes posts. Camera-ready replaces all posts with the curated NuDaze launch set (briefs, scored posts, calendar, comment targets, repurpose ideas) — ideal between video takes.</p>
       </CardContent>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
