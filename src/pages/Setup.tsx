@@ -99,6 +99,7 @@ function SetupInner() {
       const { error } = await supabase.from("workspace_invites").insert({ email: inviteEmail.trim().toLowerCase(), role: inviteRole, client_ids: activeClient ? [activeClient.id] : [], invited_by: user!.id } as never);
       if (error) throw error;
     },
+    ai_tools: async () => {},
     email: async () => {
       const { data } = await supabase.from("email_provider_settings").select("provider").maybeSingle();
       if (!data || data.provider === "none") throw new Error("Connect an email provider first, or choose Skip for now.");
