@@ -221,7 +221,6 @@ export function NavHoverProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-const REPEAT: Record<string, boolean> = { "/assets": true };
 
 function NavHoverPanel() {
   const { open, scheduleClose, cancelClose, closeNow } = useNavHover();
