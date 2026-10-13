@@ -61,7 +61,7 @@ export function SidebarPostTo() {
           );
         })}
       </SidebarMenu>
-      <p className="px-2 pt-1 text-[10px] text-sidebar-foreground/50">Profile links are set in Settings › Your Brand Profiles › Accounts.</p>
+      <p className="px-2 pt-1 text-[10px] text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden">Profile links are set in Settings › Your Brand Profiles › Accounts.</p>
     </CollapsibleNavGroup>
   );
 }
