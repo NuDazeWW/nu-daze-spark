@@ -24,7 +24,7 @@ import {
   CalendarRange,
   Bell,
   Mail,
-  ImagePlus, Palette, Send,
+  ImagePlus, Palette, Send, PieChart,
 } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { APP_VERSION } from "@/lib/appVersion";
@@ -52,6 +52,7 @@ import { CollapsibleNavGroup } from "./CollapsibleNavGroup";
 
 const mainNav = [
   { title: "Dashboard", icon: LayoutDashboard, href: "/" },
+  { title: "Portfolio Insights", icon: PieChart, href: "/insights" },
   { title: "Asset Library", icon: FolderOpen, href: "/assets" },
   { title: "Connected Sources", icon: Link2, href: "/sources" },
   { title: "Strategy & Rules", icon: Settings2, href: "/strategy" },
