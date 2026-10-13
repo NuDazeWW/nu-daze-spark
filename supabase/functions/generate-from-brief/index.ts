@@ -69,6 +69,13 @@ async function callAI(key: string, prompt: string, tool: any) {
   return JSON.parse(call.function.arguments);
 }
 
+const ANGLES = [
+  { key: "data_insight", label: "Data-Driven Insight", guide: "Lead with a specific proof point or number from the brief; analytical, substantive, no hype." },
+  { key: "founder_story", label: "Founder Story", guide: "First-person narrative or behind-the-scenes moment that makes the message personal and human." },
+  { key: "contrarian", label: "Bold Contrarian Take", guide: "Challenge a common belief in the audience's world, then resolve it with the approved message. Confident, never rude." },
+] as const;
+const ANGLE_LABEL: Record<string, string> = Object.fromEntries(ANGLES.map((a) => [a.key, a.label]));
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   try {
@@ -82,7 +89,8 @@ serve(async (req) => {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) return json({ error: "Invalid session" }, 401);
 
-    const { brief_id, mode, voice_profile_id } = await req.json();
+    const { brief_id, mode, voice_profile_id, angles } = await req.json();
+    const useAngles = angles === true;
     const { data: brief } = await sb.from("campaign_briefs").select("*").eq("id", brief_id).maybeSingle();
     if (!brief) return json({ error: "Brief not found" }, 404);
 
@@ -129,7 +137,7 @@ Constraints: ${brief.constraints ?? "(none)"}`;
     if (!channels.length) return json({ error: "No target channels selected" }, 400);
 
     // Text draft metering: pre-check before spending AI, deduct only after drafts are saved.
-    const meter = (dry: boolean) => sb.rpc("consume_usage", { _bucket: "text_drafts", _capability: "text_draft", _quantity: channels.length, _client_id: brief.client_id, _dry_run: dry });
+    const meter = (dry: boolean) => sb.rpc("consume_usage", { _bucket: "text_drafts", _capability: "text_draft", _quantity: channels.length * (useAngles ? ANGLES.length : 1), _client_id: brief.client_id, _dry_run: dry });
     const { data: pre, error: preErr } = await meter(true);
     if (preErr) return json({ error: preErr.message }, 403);
     if (!(pre as { ok: boolean }).ok) return json({ error: "Not enough text drafts left this cycle", code: "CREDITS_BLOCKED", detail: pre }, 402);
@@ -153,7 +161,10 @@ Point of view: ${execVoice.pov_statement ?? "(none)"}
 Never use these phrases/styles: ${(execVoice.banned_phrases ?? []).join("; ") || "(none)"}` : ""}
 
 CHANNELS
-${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}`, {
+${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}${useAngles ? `
+
+STRATEGIC ANGLES — produce exactly one variant per channel PER angle (${channels.length * ANGLES.length} variants total). Each angle must open with a genuinely different hook; never reuse a hook across angles:
+${ANGLES.map((a) => `- ${a.key} (${a.label}): ${a.guide}`).join("\n")}` : ""}`, {
       name: "create_content_set",
       description: "Master content object with platform variants",
       parameters: {
@@ -176,12 +187,13 @@ ${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}`, {
               type: "object",
               properties: {
                 channel: { type: "string", enum: channels },
+                ...(useAngles ? { angle: { type: "string", enum: ANGLES.map((a) => a.key) } } : {}),
                 draft_copy: { type: "string", description: "Complete channel-native deliverable. For Stories and Reels this must include the full production outline, all on-screen text, and final spoken/voiceover script—not only a caption." },
                 hashtags: { type: "array", items: { type: "string" } },
                 suggested_asset_description: { type: "string" },
                 rationale: { type: "string", description: "Which brief fields drove this output and why" },
               },
-              required: ["channel", "draft_copy", "hashtags", "suggested_asset_description", "rationale"],
+              required: [...["channel", "draft_copy", "hashtags", "suggested_asset_description", "rationale"], ...(useAngles ? ["angle"] : [])],
               additionalProperties: false,
             },
           },
@@ -214,11 +226,11 @@ ${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}`, {
       content_type: CHANNELS[v.channel].content_type,
       objective: brief.objective,
       audience: brief.target_audience,
-      campaign_pillar: brief.title,
+      campaign_pillar: useAngles && ANGLE_LABEL[v.angle] ? `${brief.title} · ${ANGLE_LABEL[v.angle]}` : brief.title,
       draft_copy: v.draft_copy,
       hashtags: v.hashtags,
       suggested_asset_description: v.suggested_asset_description,
-      rationale: `Source: brief "${brief.title}" v${brief.version}. ${v.rationale}`,
+      rationale: `Source: brief "${brief.title}" v${brief.version}.${useAngles && ANGLE_LABEL[v.angle] ? ` Angle: ${ANGLE_LABEL[v.angle]}.` : ""} ${v.rationale}`,
       approval_status: "draft",
       created_by: user.id,
       import_source: "brief",
