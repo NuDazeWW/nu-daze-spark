@@ -28,6 +28,7 @@ import Team from "./pages/settings/Team";
 import Usage from "./pages/settings/Usage";
 import Notifications from "./pages/settings/Notifications";
 import EmailProvider from "./pages/settings/EmailProvider";
+import Connections from "./pages/settings/Connections";
 import Setup from "./pages/Setup";
 import WhatsNew from "./pages/WhatsNew";
 import Help from "./pages/Help";
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="/settings/team" element={<Team />} />
               <Route path="/settings/usage" element={<Usage />} />
               <Route path="/settings/notifications" element={<Notifications />} />
+              <Route path="/settings/connections" element={<Connections />} />
               <Route path="/settings/email-provider" element={<EmailProvider />} />
               <Route path="/setup" element={<Setup />} />
               <Route path="/whats-new" element={<WhatsNew />} />

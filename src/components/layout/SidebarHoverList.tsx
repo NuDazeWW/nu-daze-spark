@@ -147,6 +147,10 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
     { icon: Bell, label: "Digest & went-out emails", description: "Daily digest and post notifications" },
     { icon: Users, label: "Recipients", description: "Who gets notified, and for which client" },
   ],
+  "/settings/connections": [
+    { icon: Users, label: "Client channels", description: "Connect LinkedIn, Instagram, Facebook, X, YouTube" },
+    { icon: ShieldCheck, label: "Developer apps & keys", description: "Your own platform app credentials" },
+  ],
   "/settings/email-provider": [
     { icon: Mail, label: "Email provider", description: "SendGrid, Gmail, Outlook, Apple Mail, SMTP" },
     { icon: Pause, label: "Global pause", description: "Stop all email with one switch" },
