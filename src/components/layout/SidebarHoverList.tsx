@@ -329,5 +329,3 @@ export function NavHoverWrapper({
   );
 }
 
-// Silence unused import warning placeholder for Video handled in data above.
-void REPEAT;
