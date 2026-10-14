@@ -658,6 +658,65 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   .sm-strategy .sm-page-actions > div { gap: 6px; }
   .sm-strategy .sm-page-actions button { font-size: 11px; padding-left: 10px; padding-right: 10px; }
 }
+/* Notifications reference: pale canvas, luminous email panels, unchanged controls. */
+.sm-page:has(.sm-notifications) { position: relative; isolation: isolate; }
+.sm-notifications {
+  --notification-surface: 0 0% 100%;
+  --notification-ink: 254 65% 12%;
+  --notification-muted: 258 22% 51%;
+  --notification-line: 263 65% 88%;
+  --notification-cyan: 183 100% 45%;
+  --notification-violet: 267 100% 58%;
+  --notification-pink: 320 100% 79%;
+  --notification-gold: 39 100% 80%;
+  --notification-action: 185 100% 20%;
+  position: relative; width: 100%; max-width: 1240px; margin-inline: auto;
+  color: hsl(var(--notification-ink));
+}
+.sm-notifications-background { position: fixed; inset: 56px 0 0; width: 100%; height: calc(100vh - 56px); object-fit: cover; pointer-events: none; z-index: -1; }
+.sm-notifications .sm-page-header { padding-bottom: 28px; margin-bottom: 28px; border-color: hsl(var(--notification-line) / .65); }
+.sm-notifications .sm-page-links { margin-bottom: 22px; }
+.sm-notifications .sm-page-links a { background: hsl(var(--notification-surface) / .8); color: hsl(var(--notification-ink)); border-color: hsl(var(--notification-line)); box-shadow: 0 4px 12px hsl(var(--brand-plum) / .07); }
+.sm-notifications .sm-page-title-row { display: block; padding-right: 510px; min-height: 105px; }
+.sm-notifications .sm-page-header h1 { color: hsl(var(--notification-ink)); background: none; }
+.sm-notifications .sm-page-header h1 + p { color: hsl(var(--notification-muted)); font-size: 14px; line-height: 1.5; max-width: 560px; }
+.sm-notifications .sm-header-art { position: absolute; right: 0; top: 40px; }
+.sm-notifications .sm-header-bird { width: 260px; height: 145px; object-fit: contain; }
+.sm-notifications .sm-dash-tagline { color: hsl(var(--notification-ink)); border-color: hsl(var(--notification-violet) / .6); }
+.sm-notifications .sm-card { border-radius: 17px; color: hsl(var(--notification-ink)); background: linear-gradient(115deg, hsl(var(--notification-surface) / .98), hsl(var(--notification-surface) / .86)); border-color: hsl(var(--notification-line) / .55); }
+.sm-notifications .sm-notifications-self { border-color: hsl(var(--notification-cyan) / .25); box-shadow: -5px 0 20px hsl(var(--notification-cyan) / .16), 0 8px 20px hsl(var(--notification-violet) / .1), 5px 0 22px hsl(var(--notification-cyan) / .08); }
+.sm-notifications .sm-notifications-self > div { min-height: 100px; padding: 22px 26px; gap: 28px; }
+.sm-notifications-icon { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; border-radius: 11px; color: hsl(var(--notification-ink)); background: hsl(var(--notification-surface)); border: 1px solid hsl(var(--notification-cyan) / .17); box-shadow: 0 0 20px hsl(var(--notification-cyan) / .27); }
+.sm-notifications-icon svg { width: 25px; height: 25px; stroke-width: 1.8; }
+.sm-notifications .sm-notifications-enable { height: 48px; padding: 0 24px; gap: 14px; color: hsl(var(--notification-surface)); background: linear-gradient(145deg, hsl(var(--notification-action)), hsl(var(--brand-midnight))); border: 1px solid hsl(var(--notification-cyan)); box-shadow: inset 0 0 12px hsl(var(--notification-cyan) / .4), 0 0 22px hsl(var(--notification-cyan) / .4); }
+.sm-notifications .sm-notifications-enable:hover { background: hsl(var(--notification-action)); }
+.sm-notifications .sm-notifications-add { position: relative; padding: 0 0 0 100px; border-color: hsl(var(--notification-pink) / .35); box-shadow: -5px 5px 20px hsl(var(--notification-cyan) / .14), 0 -3px 22px hsl(var(--notification-pink) / .12), 6px 8px 18px hsl(var(--notification-gold) / .18); }
+.sm-notifications .sm-notifications-add > .sm-notifications-icon-recipient { position: absolute; left: 26px; top: 22px; color: hsl(var(--notification-violet)); border-color: hsl(var(--notification-violet) / .12); box-shadow: 0 0 18px hsl(var(--notification-violet) / .14); }
+.sm-notifications .sm-notifications-add > div { padding-left: 0; padding-right: 26px; }
+.sm-notifications .sm-notifications-add > div:first-of-type { padding-top: 24px; padding-bottom: 18px; }
+.sm-notifications .sm-notifications-add > div:last-child { padding-bottom: 22px; gap: 14px; align-items: center; }
+.sm-notifications .text-muted-foreground { color: hsl(var(--notification-muted)); }
+.sm-notifications-email { position: relative; flex: 0 1 445px; max-width: 100%; }
+.sm-notifications-email > svg { position: absolute; left: 14px; top: 15px; color: hsl(var(--notification-violet)); }
+.sm-notifications .sm-notifications-email input { max-width: none; padding-left: 44px; height: 46px; background: hsl(var(--notification-surface) / .7); border-color: hsl(var(--notification-violet) / .3); color: hsl(var(--notification-ink)); box-shadow: 0 3px 10px hsl(var(--notification-violet) / .06); }
+.sm-notifications input::placeholder { color: hsl(var(--notification-muted)); }
+.sm-notifications .sm-notifications-add button { height: 46px; padding: 0 20px; background: hsl(var(--notification-surface) / .75); border-color: hsl(var(--notification-violet) / .2); color: hsl(var(--notification-ink)); box-shadow: 0 5px 15px hsl(var(--notification-violet) / .12); }
+.sm-notifications .sm-notifications-preference { box-shadow: 0 5px 20px hsl(var(--notification-violet) / .08); }
+@media (max-width: 1199px) {
+  .sm-notifications .sm-page-title-row { padding-right: 0; }
+  .sm-notifications .sm-header-art { display: none; }
+}
+@media (max-width: 640px) {
+  .sm-notifications .sm-page-header { padding-bottom: 18px; }
+  .sm-notifications .sm-notifications-self > div { gap: 14px; padding: 20px; }
+  .sm-notifications .sm-notifications-self p { flex-basis: calc(100% - 70px); overflow-wrap: anywhere; }
+  .sm-notifications .sm-notifications-enable { margin-left: 62px; font-size: 12px; padding: 0 16px; }
+  .sm-notifications .sm-notifications-add { padding-left: 20px; }
+  .sm-notifications .sm-notifications-add > .sm-notifications-icon-recipient { left: 20px; top: 20px; }
+  .sm-notifications .sm-notifications-add > div:first-of-type { padding-left: 62px; }
+  .sm-notifications .sm-notifications-add > div { padding-right: 20px; }
+  .sm-notifications-email { flex-basis: 100%; }
+}
 .sm-setup-layout { grid-template-columns: 250px minmax(0, 1fr); }
 .sm-setup-steps { position: sticky; top: 16px; }
 .sm-setup-step { position: relative; }
