@@ -13,7 +13,7 @@ import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { postLabel } from "@/components/tracking/PostTracking";
 import { PostingPackageDrawer } from "@/components/queue/PostingPackageDrawer";
-import { CheckCircle2, Clock, AlertTriangle, Loader2, Send, Bell } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, Loader2, Send, Bell, Coins, CalendarDays, ArrowRight } from "lucide-react";
 
 type Acc = { id: string; platform: string; account_name: string; connection_status: string };
 type View = "upcoming" | "published" | "failed";
@@ -96,103 +96,121 @@ export default function PublishingStatus() {
   const list = groups[view];
   const openCard = (cards ?? []).find((c) => c.id === openId) ?? null;
 
+  const Bars = ({ h }: { h: number[] }) => <span className="pub-bars" aria-hidden>{h.map((v, i) => <i key={i} style={{ height: v }} />)}</span>;
+  const SUMMARY = [
+    { k: "upcoming" as View, label: "Upcoming", n: groups.upcoming.length, Icon: Clock, a: "265 85% 68%", hint: "Scheduled posts waiting to be sent", bars: [14, 24, 30, 40, 34, 48] },
+    { k: "published" as View, label: "Published", n: groups.published.length, Icon: CheckCircle2, a: "172 80% 50%", hint: "Successfully sent posts across all channels", bars: [16, 28, 40, 26, 34, 44] },
+    { k: "failed" as View, label: "Failed", n: groups.failed.length, Icon: AlertTriangle, a: "350 85% 62%", hint: "Posts that failed to publish", bars: [18, 28, 20, 34, 42, 50] },
+  ];
+  const SOON_STYLE: Record<string, { b: string; mark: JSX.Element }> = {
+    tiktok: { b: "330 85% 58%", mark: <span className="font-display text-2xl font-bold" style={{ color: "hsl(178 90% 60%)", textShadow: "2px 1px hsl(340 90% 60%)" }}>♪</span> },
+    pinterest: { b: "355 80% 55%", mark: <span className="grid h-10 w-10 place-items-center rounded-full font-display text-2xl font-bold" style={{ background: "hsl(355 85% 48%)", color: "hsl(0 0% 100%)" }}>P</span> },
+    threads: { b: "275 70% 60%", mark: <span className="font-display text-3xl font-bold" style={{ color: "hsl(0 0% 100%)" }}>@</span> },
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="pub-stage -m-4 md:-m-6 lg:-m-8 space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Publishing Status</h1>
-        <p className="text-sm text-muted-foreground">Every scheduled and sent post, with results for each channel. Demo mode: sending is simulated.</p>
+        <h1 className="pub-title">Publishing Status</h1>
+        <p className="pub-sub">Every scheduled and sent post, with results for each channel. Demo mode: sending is simulated.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-4">
-        {([
-          ["upcoming", "Upcoming", groups.upcoming.length, Clock],
-          ["published", "Published", groups.published.length, CheckCircle2],
-          ["failed", "Failed", groups.failed.length, AlertTriangle],
-        ] as const).map(([k, label, n, Icon]) => (
-          <Card key={k} className={`cursor-pointer ${view === k ? "ring-2 ring-primary" : ""}`} onClick={() => setView(k)}>
-            <CardContent className="p-4 flex items-center gap-3">
-              <Icon className="h-5 w-5 text-muted-foreground" />
-              <div><p className="text-2xl font-semibold">{n}</p><p className="text-xs text-muted-foreground">{label}</p></div>
-            </CardContent>
-          </Card>
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        {SUMMARY.map(({ k, label, n, Icon, a, hint, bars }) => (
+          <button key={k} type="button" className="pub-card" style={{ ["--a" as string]: a }} onClick={() => setView(k)} aria-pressed={view === k}>
+            <span className="pub-well"><Icon className="h-7 w-7" /></span>
+            <span className="min-w-0 pr-12"><span className="pub-val block">{n}</span><span className="pub-lbl block">{label}</span><span className="pub-hint block">{hint}</span></span>
+            <Bars h={bars} />
+          </button>
         ))}
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">X spend this month</p>
-            <p className="text-2xl font-semibold font-mono">${(spentCents / 100).toFixed(2)}</p>
-            <p className="text-[11px] text-muted-foreground">{capCents ? `of $${(capCents / 100).toFixed(2)} cap` : "No cap set"} · {xThisMonth} post{xThisMonth === 1 ? "" : "s"}</p>
-          </CardContent>
-        </Card>
+        <div className="pub-card" style={{ ["--a" as string]: "40 90% 60%" }}>
+          <span className="pub-well"><Coins className="h-7 w-7" /></span>
+          <span className="min-w-0 pr-12">
+            <span className="block text-sm" style={{ color: "hsl(230 20% 85%)" }}>X spend this month</span>
+            <span className="pub-val block mt-1">${(spentCents / 100).toFixed(2)}</span>
+            <span className="pub-hint block">{capCents ? `of $${(capCents / 100).toFixed(2)} cap` : "No cap set"} · {xThisMonth} post{xThisMonth === 1 ? "" : "s"}</span>
+          </span>
+          <Bars h={[16, 26, 34, 42, 50]} />
+        </div>
       </div>
 
-      <Tabs value={view} onValueChange={(v) => setView(v as View)}>
-        <TabsList>
-          <TabsTrigger value="upcoming">Upcoming ({groups.upcoming.length})</TabsTrigger>
-          <TabsTrigger value="published">Published ({groups.published.length})</TabsTrigger>
-          <TabsTrigger value="failed">Failed ({groups.failed.length})</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div role="tablist" aria-label="Publishing status" className="pub-seg">
+        {([["upcoming", "Upcoming", CalendarDays], ["published", "Published", CheckCircle2], ["failed", "Failed", AlertTriangle]] as const).map(([k, label, Icon]) => (
+          <button key={k} role="tab" type="button" aria-selected={view === k} onClick={() => setView(k)}>
+            <Icon className="h-4 w-4" />{label} ({groups[k].length})
+          </button>
+        ))}
+      </div>
 
-      {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : list.length === 0 ? (
-        <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">
-          <Send className="h-6 w-6 mx-auto mb-2" />
-          Nothing here yet. Open an approved post, go to the <b>Publish</b> tab, and schedule or publish it.
-        </CardContent></Card>
+      {isLoading ? <div className="pub-panel p-8 text-sm" style={{ color: "hsl(230 20% 78%)" }}>Loading…</div> : list.length === 0 ? (
+        <div className="pub-panel pub-panel-empty">
+          <div className="relative z-10">
+            <div className="pub-rings"><Send className="h-9 w-9" /></div>
+            <p className="font-display text-2xl font-semibold">Nothing here yet.</p>
+            <p className="mt-2 text-[15px]" style={{ color: "hsl(230 20% 78%)" }}>Open an approved post, go to the <b style={{ color: "hsl(0 0% 100%)" }}>Publish</b> tab, and schedule or publish it.</p>
+          </div>
+        </div>
       ) : (
-        <div className="space-y-3">
+        <div className="pub-panel p-4 space-y-3">
           {list.map((c) => {
             const s = pub(c); const meta = STATUS_META[s];
             const tgs = targets(c).map((id) => accMap.get(id)).filter(Boolean) as Acc[];
             return (
-              <Card key={c.id}>
-                <CardContent className="p-4 space-y-3">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono text-xs text-muted-foreground">{postLabel(c)}</span>
-                        {meta && <Badge variant="outline" className={meta.cls}><meta.icon className={`h-3 w-3 mr-1 ${s === "publishing" ? "animate-spin" : ""}`} />{meta.label}</Badge>}
-                        {c.scheduled_for && <span className="text-xs text-muted-foreground">{new Date(c.scheduled_for).toLocaleString()}</span>}
-                      </div>
-                      <p className="text-sm line-clamp-2">{c.draft_copy}</p>
+              <div key={c.id} className="pub-row space-y-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-mono text-xs" style={{ color: "hsl(230 20% 72%)" }}>{postLabel(c)}</span>
+                      {meta && <Badge variant="outline" className={meta.cls}><meta.icon className={`h-3 w-3 mr-1 ${s === "publishing" ? "animate-spin" : ""}`} />{meta.label}</Badge>}
+                      {c.scheduled_for && <span className="text-xs" style={{ color: "hsl(230 20% 72%)" }}>{new Date(c.scheduled_for).toLocaleString()}</span>}
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => setOpenId(c.id)}>Open package</Button>
+                    <p className="text-sm line-clamp-2">{c.draft_copy}</p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {tgs.length === 0 && <span className="text-xs text-muted-foreground">No channels selected</span>}
-                    {tgs.map((a) => {
-                      const ok = s === "published" && a.connection_status === "connected";
-                      const failed = s === "failed" || (s === "published" && a.connection_status !== "connected");
-                      return (
-                        <div key={a.id} className="flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs">
-                          <PlatformIcon platform={a.platform} className="h-3.5 w-3.5" />
-                          <span>{PLATFORM_LABEL[a.platform] ?? a.platform}</span>
-                          <span className={ok ? "text-success" : failed ? "text-destructive" : "text-muted-foreground"}>
-                            {ok ? "✓ Sent" : failed ? "Account not connected" : s === "publishing" ? "Sending…" : "Queued"}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+                  <button type="button" className="pub-notify !py-2 !text-sm" onClick={() => setOpenId(c.id)}>Open package</button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {tgs.length === 0 && <span className="text-xs" style={{ color: "hsl(230 20% 72%)" }}>No channels selected</span>}
+                  {tgs.map((a) => {
+                    const ok = s === "published" && a.connection_status === "connected";
+                    const failed = s === "failed" || (s === "published" && a.connection_status !== "connected");
+                    return (
+                      <div key={a.id} className="pub-chip">
+                        <PlatformIcon platform={a.platform} className="h-3.5 w-3.5" />
+                        <span>{PLATFORM_LABEL[a.platform] ?? a.platform}</span>
+                        <span className={ok ? "text-success" : failed ? "text-destructive" : ""}>
+                          {ok ? "✓ Sent" : failed ? "Account not connected" : s === "publishing" ? "Sending…" : "Queued"}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </div>
       )}
 
       <div>
-        <h2 className="font-display text-lg font-semibold mb-3">Coming soon</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <h2 className="pub-h2">Coming soon</h2>
+        <p className="mb-5 text-[15px]" style={{ color: "hsl(230 20% 78%)" }}>More channels are on the way. Be the first to know when they're available.</p>
+        <div className="grid gap-5 md:grid-cols-3">
           {COMING_SOON.map((f) => {
             const joined = (notify.data ?? []).some((n) => n.feature_key === f.key);
+            const st = SOON_STYLE[f.key];
             return (
-              <Card key={f.key}><CardContent className="p-4 space-y-2">
-                <p className="font-medium">{f.name}</p>
-                <p className="text-xs text-muted-foreground">{f.note}</p>
-                <Button size="sm" variant="outline" disabled={joined} onClick={() => joinWaitlist(f.key)}>
-                  <Bell className="h-3.5 w-3.5 mr-1" />{joined ? "You'll be notified" : "Notify me"}
-                </Button>
-              </CardContent></Card>
+              <div key={f.key} className="pub-soon" style={{ ["--b" as string]: st.b }}>
+                <span className="pub-device" aria-hidden>{st.mark}</span>
+                <div className="relative z-10 flex gap-5 pr-24">
+                  <span className="pub-tile flex-none">{st.mark}</span>
+                  <div>
+                    <p className="font-display text-xl font-semibold">{f.name}</p>
+                    <p className="text-[15px]" style={{ color: "hsl(230 20% 80%)" }}>{f.note}</p>
+                  </div>
+                </div>
+                <button type="button" className="pub-notify relative z-10 mt-8" disabled={joined} onClick={() => joinWaitlist(f.key)}>
+                  <Bell className="h-4 w-4" />{joined ? "You'll be notified" : "Notify me"}<ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
             );
           })}
         </div>
