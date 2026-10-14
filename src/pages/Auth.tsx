@@ -148,7 +148,7 @@ export default function Auth() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <div className="relative"><Mail className="pointer-events-none absolute left-3.5 bottom-4 z-10 h-4 w-4 text-[hsl(var(--sm-auth-muted))]" aria-hidden /></div>
+              <div className="relative"><Mail className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 h-4 w-4 text-[hsl(var(--sm-auth-muted))]" aria-hidden />
               <Input
                 className="pl-10"
                 id="email"
@@ -158,10 +158,11 @@ export default function Auth() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <div className="relative"><Lock className="pointer-events-none absolute left-3.5 bottom-4 z-10 h-4 w-4 text-[hsl(var(--sm-auth-muted))]" aria-hidden /></div>
+              <div className="relative"><Lock className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 h-4 w-4 text-[hsl(var(--sm-auth-muted))]" aria-hidden />
               <Input
                 className="pl-10"
                 id="password"
@@ -172,6 +173,7 @@ export default function Auth() {
                 required
                 minLength={6}
               />
+              </div>
             </div>
             <Button type="submit" className="sm-auth-primary w-full" disabled={loading}>
               {loading ? "Loading..." : isLogin ? "Sign in" : "Create account"}
