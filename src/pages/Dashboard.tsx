@@ -1,5 +1,5 @@
 import { STATUS_META } from "@/hooks/usePostCards";
-import headerBird from "@/assets/brand/socialmotive-header-bird.png.asset.json";
+import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { useMemo } from "react";
 import { useDdiHandoff } from "@/hooks/useDdiHandoff";
 import { useNavigate } from "react-router-dom";
@@ -122,7 +122,7 @@ export default function Dashboard() {
         description="Your content operations at a glance."
       />
       <div className="sm-dash-art" aria-hidden="true">
-        <img src={headerBird.url} alt="" className="sm-dash-bird" />
+        <img src={headerBirdUrl} alt="" className="sm-dash-bird" />
         <p className="sm-dash-tagline">Turn strategy<br />into <span className="sm-dash-em-cyan">social</span> <span className="sm-dash-em-lime">momentum.</span></p>
       </div>
       </div>
