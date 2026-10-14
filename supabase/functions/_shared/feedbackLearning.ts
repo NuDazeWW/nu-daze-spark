@@ -4,8 +4,9 @@
 // deno-lint-ignore no-explicit-any
 export async function buildLearningBlock(sb: any, clientId: string | null): Promise<string> {
   const since = new Date(Date.now() - 90 * 86400000).toISOString();
-  let rev = sb.from("approval_log").select("notes, post_card_id, created_at").eq("action", "needs_revision")
+  let rev = sb.from("approval_log").select("notes, post_card_id, created_at, post_cards!inner(client_id)").eq("action", "needs_revision")
     .not("notes", "is", null).gte("created_at", since).order("created_at", { ascending: false }).limit(12);
+  if (clientId) rev = rev.eq("post_cards.client_id", clientId);
   const { data: notes } = await rev;
   let res = sb.from("post_results").select("post_card_id, impressions, reactions, comments, shares, clicks, saves")
     .gte("recorded_at", since).order("recorded_at", { ascending: false }).limit(200);
