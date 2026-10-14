@@ -21,5 +21,3 @@
 - Metered actions go through `consume_usage` (dry-run pre-check, then deduct) in both UI (`useCreditGate`) and edge functions; anomalies pause only that bucket, and entitlements are granted only by the idempotent `stripe-webhook`, so redirects can't grant access.
 - Subdirectories (e.g. `src/`, `supabase/functions/`) have their own `AGENTS.md`; read it before changing files there.
 
-- Post results are logged manually in `post_results` (latest row per post) and, with reviewer revision notes, feed `_shared/feedbackLearning.ts` into generation prompts, so the AI learns only from real stored outcomes.
-- Email links use `workspace_settings.app_domain` when set, so each sold copy points to its own address.
