@@ -516,3 +516,4 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 .sm-dashboard .sm-dashboard-panels .space-y-4 { row-gap: 0; }
 .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 + .space-y-1\.5 { margin-top: 12px; }
 @media (max-width: 767px) { .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 { grid-template-columns: 1fr auto; } .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 > [role="progressbar"] { grid-column: 1 / -1; grid-row: 2; margin-top: 6px !important; } .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 > div:first-child > span:last-child { grid-column: 2; } }
+.sm-dash-bird { clip-path: inset(0 0 5% 0); }
