@@ -5,13 +5,16 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Lock, Mail } from "lucide-react";
 import { AuthShell } from "@/components/auth/AuthShell";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
+  const REMEMBER_KEY = "socialmotive_remembered_email";
+  const [email, setEmail] = useState(() => localStorage.getItem(REMEMBER_KEY) ?? "");
+  const [remember, setRemember] = useState(() => !!localStorage.getItem(REMEMBER_KEY));
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -51,6 +54,8 @@ export default function Auth() {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (remember) localStorage.setItem(REMEMBER_KEY, email);
+        else localStorage.removeItem(REMEMBER_KEY);
         navigate("/");
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
@@ -175,6 +180,12 @@ export default function Auth() {
               />
               </div>
             </div>
+            {isLogin && (
+              <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                <Checkbox id="remember" checked={remember} onCheckedChange={(c) => setRemember(!!c)} />
+                Remember me
+              </label>
+            )}
             <Button type="submit" className="sm-auth-primary w-full" disabled={loading}>
               {loading ? "Loading..." : isLogin ? "Sign in" : "Create account"}
               <ArrowRight className="absolute right-5 h-5 w-5" aria-hidden />
