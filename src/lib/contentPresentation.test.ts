@@ -7,12 +7,12 @@ describe("content presentation", () => {
     expect(commentLabel({ author_name: " Alex ", topic: "Strategy" })).toBe("Comment — Alex — Strategy");
     expect(commentLabel({ topic: "Strategy" })).toBe("Comment — Strategy");
   });
-  it("keeps forms light and reference command pages dark", () => {
-    for (const path of ["/queue", "/approved", "/briefs", "/setup", "/sources", "/strategy", "/comments", "/repurpose", "/settings/tags", "/settings/clients"]) {
+  it("keeps focused settings forms light and operational workspaces dark", () => {
+    for (const path of ["/setup", "/strategy", "/settings/workspace", "/settings/team", "/settings/notifications", "/settings/connections", "/settings/email-provider"]) {
       expect(pageSurface(path)).toBe("reading");
     }
-    expect(pageSurface("/")).toBe("dark");
-    for (const path of ["/insights", "/assets", "/generator"]) expect(pageSurface(path)).toBe("dark");
-    expect(pageSurface("/auth")).toBe("dark");
+    for (const path of ["/", "/insights", "/assets", "/generator", "/queue", "/approved", "/briefs", "/sources", "/comments", "/repurpose", "/settings/tags", "/settings/clients", "/auth"]) {
+      expect(pageSurface(path)).toBe("dark");
+    }
   });
 });
