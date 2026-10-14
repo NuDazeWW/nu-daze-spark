@@ -88,10 +88,10 @@ export default function Pricing() {
         </div>
         <div className="mt-4 flex items-center justify-center gap-2 text-sm">
           <HeartHandshake className="h-4 w-4 text-primary" />
-          <label htmlFor="np" className="cursor-pointer">Nonprofit program — 40% off annual plans</label>
+          <label htmlFor="np" className="cursor-pointer">Non-profit program — 40% off annual plans</label>
           <Switch id="np" checked={nonprofit} onCheckedChange={(v) => setParam("nonprofit", v ? "true" : null)} />
         </div>
-        {nonprofit && <p className="mt-2 text-xs text-muted-foreground">The nonprofit program is annual only, so monthly billing is turned off. Prices apply once your 501(c)(3) is verified.</p>}
+        {nonprofit && <p className="mt-2 text-xs text-muted-foreground">The non-profit program is annual only, so monthly billing is turned off. Prices apply once your 501(c)(3) is verified.</p>}
       </section>
 
       <section className="mx-auto grid max-w-7xl items-stretch gap-4 px-6 md:grid-cols-2 lg:grid-cols-4">
@@ -151,7 +151,7 @@ export default function Pricing() {
 
       {nonprofit && (
         <section className="mx-auto mt-10 max-w-3xl rounded-xl border bg-card p-6 text-center">
-          <h3 className="font-display text-lg font-semibold">Apply for nonprofit pricing</h3>
+          <h3 className="font-display text-lg font-semibold">Apply for non-profit pricing</h3>
           <p className="mt-1 text-sm text-muted-foreground">Upload your IRS determination letter and EIN. Invoice and grant-funded billing is available once verified.</p>
           <Button className="mt-4" onClick={() => setIntake(true)}>Start verification</Button>
         </section>
