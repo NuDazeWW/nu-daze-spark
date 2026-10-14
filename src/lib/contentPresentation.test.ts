@@ -8,10 +8,10 @@ describe("content presentation", () => {
     expect(commentLabel({ topic: "Strategy" })).toBe("Comment — Strategy");
   });
   it("keeps focused settings forms light and operational workspaces dark", () => {
-    for (const path of ["/setup", "/strategy", "/settings/workspace", "/settings/team", "/settings/notifications", "/settings/connections", "/settings/email-provider"]) {
+    for (const path of ["/setup", "/strategy", "/settings/workspace", "/settings/team", "/settings/notifications", "/settings/connections", "/settings/email-provider", "/sources"]) {
       expect(pageSurface(path)).toBe("reading");
     }
-    for (const path of ["/", "/insights", "/assets", "/generator", "/queue", "/approved", "/briefs", "/sources", "/comments", "/repurpose", "/settings/tags", "/settings/clients", "/auth"]) {
+    for (const path of ["/", "/insights", "/assets", "/generator", "/queue", "/approved", "/briefs", "/comments", "/repurpose", "/settings/tags", "/settings/clients", "/auth"]) {
       expect(pageSurface(path)).toBe("dark");
     }
   });
