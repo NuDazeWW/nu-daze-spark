@@ -5,9 +5,9 @@ Pass 1 (2026-10-14): shared foundations only. Per the plan, shared styling does 
 
 | Route / view | File | Pattern | Surface | Impl | Visual | Interaction | Evidence | Remaining |
 |---|---|---|---|---|---|---|---|---|
-| `/` | pages/Dashboard.tsx | Dashboard (reference 1) | Dark | Shared | — | — | — | Match reference composition |
+| `/` | pages/Dashboard.tsx | Dashboard (reference 1) | Dark | Shared | Shell only | — | /tmp/browser/rd/dash.png | Match reference composition |
 | `/insights` | pages/PortfolioInsights.tsx | Dashboard (reference 2) | Light | Shared | — | — | — | Match reference |
-| `/assets` | pages/AssetLibrary.tsx | List (reference 3) | Light | Shared | — | — | — | Match reference |
+| `/assets` | pages/AssetLibrary.tsx | List (reference 3) | Light | Shared | Shell only | — | /tmp/browser/rd/assets.png | Match reference |
 | `/setup` | pages/Setup.tsx | Onboarding (reference 4) | Light | Shared | — | — | — | Match reference |
 | `/generator` | pages/PostGenerator.tsx | Editor (reference 5) | Light | Shared | — | — | — | Match reference |
 | `/sources` | pages/ConnectedSources.tsx | List | Light | Shared | — | — | — | Page pass |
