@@ -126,6 +126,10 @@ Constraints: ${brief.constraints ?? "(none)"}`;
     }
 
     if (brief.status !== "approved") return json({ error: "Brief must be approved before generating." }, 400);
+    if (brief.approval_mode_enabled) {
+      const { count } = await sb.from("brief_comments").select("id", { count: "exact", head: true }).eq("brief_id", brief.id).eq("is_resolved", false);
+      if ((count ?? 0) > 0) return json({ error: `Check off ${count} open discussion comment${count === 1 ? "" : "s"} before generating.` }, 400);
+    }
 
     const [{ data: voice }, { data: rules }, { data: execVoice }] = await Promise.all([
       sb.from("brand_voice_rules").select("rule_name, rule_content").eq("is_active", true).eq("client_id", brief.client_id).limit(15),

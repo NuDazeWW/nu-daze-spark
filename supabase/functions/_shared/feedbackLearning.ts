@@ -24,7 +24,11 @@ export async function buildLearningBlock(sb: any, clientId: string | null): Prom
     const { data } = await sb.from("post_cards").select("id, platform, content_type, draft_copy").in("id", ranked.map((r) => r.id));
     top = ranked.map((r) => ({ ...r, post: (data ?? []).find((p: any) => p.id === r.id) })).filter((r) => r.post);
   }
-  const noteLines = (notes ?? []).map((n: any) => String(n.notes).trim()).filter((n: string) => n.length > 3).slice(0, 8);
+  let briefRev = sb.from("brief_approval_log").select("notes").eq("action", "needs_revision").not("notes", "is", null)
+    .gte("created_at", since).order("created_at", { ascending: false }).limit(6);
+  if (clientId) briefRev = briefRev.eq("client_id", clientId);
+  const { data: briefNotes } = await briefRev;
+  const noteLines = [...(notes ?? []), ...(briefNotes ?? [])].map((n: any) => String(n.notes).trim()).filter((n: string) => n.length > 3).slice(0, 10);
   if (!noteLines.length && !top.length) return "";
   return `
 LEARNED FROM THIS TEAM'S FEEDBACK (apply, do not quote)
