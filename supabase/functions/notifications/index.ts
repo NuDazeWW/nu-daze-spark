@@ -28,6 +28,7 @@ const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("disconnect") }),
   z.object({ action: z.literal("test"), to: z.string().email().max(255) }),
   z.object({ action: z.literal("run") }),
+  z.object({ action: z.literal("brief_event"), brief_id: z.string().uuid(), event: z.enum(["submitted", "needs_revision", "approved"]) }),
 ]);
 
 type Provider = {
@@ -299,6 +300,41 @@ Deno.serve(async (req) => {
         if (isAdmin) await admin.from("email_provider_settings").update({ last_test_at: new Date().toISOString(), last_test_ok: false, last_test_error: msg.slice(0, 1000) }).eq("id", true);
         return json({ error: msg }, 502);
       }
+    }
+
+    if (body.action === "brief_event") {
+      // Only the three lifecycle events email anyone; recipients are derived server-side from the logged event.
+      const { data: b } = await admin.from("campaign_briefs").select("id, title, client_id, created_by, assigned_approver_id").eq("id", body.brief_id).maybeSingle();
+      if (!b) return json({ error: "Brief not found" }, 404);
+      const { data: canSee } = await admin.rpc("user_can_access_client", { _user_id: uid, _client_id: b.client_id });
+      if (!canSee) return json({ error: "Not allowed" }, 403);
+      const { data: last } = await admin.from("brief_approval_log").select("action, notes, actor_id, created_at").eq("brief_id", b.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (!last || last.action !== body.event || last.actor_id !== uid || Date.now() - new Date(last.created_at).getTime() > 10 * 60000) return json({ error: "No matching recent event" }, 400);
+      let ids: string[] = [];
+      if (body.event === "submitted") {
+        if (b.assigned_approver_id) ids = [b.assigned_approver_id];
+        else {
+          const { data: r } = await admin.from("user_roles").select("user_id").in("role", ["reviewer", "admin"]);
+          const all = [...new Set((r ?? []).map((x: any) => x.user_id))];
+          for (const id of all) { const { data: ok } = await admin.rpc("user_can_access_client", { _user_id: id, _client_id: b.client_id }); if (ok) ids.push(id); }
+        }
+      } else ids = [b.created_by];
+      ids = ids.filter((id) => id && id !== uid);
+      const prov = await loadProvider();
+      if (!prov || !ids.length) return json({ ok: true, sent: 0 });
+      await loadAppUrl();
+      const link = `${APP_URL}/campaign-briefs?brief=${b.id}`;
+      const heading = body.event === "submitted" ? `Brief ready for your approval: ${b.title}` : body.event === "approved" ? `Brief approved: ${b.title}` : `Revisions requested: ${b.title}`;
+      const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
+      const note = last.notes ? `<p><strong>Notes:</strong> ${esc(last.notes)}</p>` : "";
+      let sent = 0;
+      for (const id of ids) {
+        const { data: usr } = await admin.auth.admin.getUserById(id);
+        const to = usr?.user?.email; if (!to) continue;
+        try { await sendMail(prov.p, prov.secret, to, heading, shell(heading, `${note}<p><a href="${link}">Open the brief</a></p>`), `${heading}\n${last.notes ? `Notes: ${last.notes}\n` : ""}${link}`); sent++; }
+        catch (e) { console.error("brief email failed", (e as Error).message); }
+      }
+      return json({ ok: true, sent });
     }
 
     if (!isAdmin) return json({ error: "Admin access required" }, 403);
