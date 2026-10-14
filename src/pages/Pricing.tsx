@@ -5,7 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ArrowRight, Building2, Check, ChevronDown, Crown, HeartHandshake, Waves, Zap } from "lucide-react";
-import headerBird from "@/assets/brand/socialmotive-header-bird.png.asset.json";
+import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { cn } from "@/lib/utils";
 import { fmtUsd, useTierDefinitions, type TierDefinition } from "@/hooks/useBilling";
 import { useAuth } from "@/hooks/useAuth";
