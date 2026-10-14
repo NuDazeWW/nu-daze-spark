@@ -618,6 +618,13 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 .sm-price-card h2 { color: hsl(var(--tier-accent)); }
 .sm-price-card .lucide-check { color: hsl(var(--tier-accent)); }
 .sm-price-card-featured { box-shadow: inset 0 1px 0 hsl(0 0% 100% / .08), 0 0 0 1px hsl(var(--tier-accent) / .58), 0 0 30px -10px hsl(var(--tier-accent) / .7), 0 30px 55px -30px hsl(0 0% 0% / .95); }
+.sm-pricing-bird { filter: drop-shadow(0 0 34px hsl(var(--sm-fx-turquoise) / .38)) drop-shadow(0 0 60px hsl(var(--sm-fx-citrine) / .22)); }
+.sm-tier-icon { color: hsl(var(--tier-accent)); background: hsl(var(--tier-accent) / .14); border: 1px solid hsl(var(--tier-accent) / .45); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .08), 0 0 16px -6px hsl(var(--tier-accent) / .65); }
+.sm-tier-cta { border-color: hsl(var(--tier-accent) / .6); color: hsl(var(--tier-accent)); background: hsl(var(--tier-accent) / .1); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .07), 0 0 18px -8px hsl(var(--tier-accent) / .7); }
+.sm-tier-cta:hover { background: hsl(var(--tier-accent) / .2); border-color: hsl(var(--tier-accent) / .85); color: hsl(var(--tier-accent)); }
+.sm-price-card-featured .sm-tier-cta { background: linear-gradient(180deg, hsl(var(--tier-accent)), hsl(var(--tier-accent) / .82)); color: hsl(266 49% 8%); border-color: transparent; font-weight: 600; box-shadow: 0 0 26px -6px hsl(var(--tier-accent) / .8), inset 0 1px 0 hsl(0 0% 100% / .3); }
+.sm-price-card-featured .sm-tier-cta:hover { color: hsl(266 49% 8%); filter: brightness(1.06); }
+.sm-usage-card { border-color: hsl(var(--sm-fx-lavender) / .17); background: linear-gradient(180deg, hsl(268 39% 15% / .96), hsl(266 49% 8% / .98)); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .06), 0 24px 50px -28px hsl(0 0% 0% / .95); }
 
 /* Dialogs inherit the active visual language without changing their structure. */
 [role="dialog"][data-state="open"] { border-radius: 16px; border-color: hsl(var(--primary) / .28); }

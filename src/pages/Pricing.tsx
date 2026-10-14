@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Check, ChevronDown, HeartHandshake } from "lucide-react";
+import { ArrowRight, Building2, Check, ChevronDown, Crown, HeartHandshake, Waves, Zap } from "lucide-react";
+import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { cn } from "@/lib/utils";
 import { fmtUsd, useTierDefinitions, type TierDefinition } from "@/hooks/useBilling";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +29,7 @@ const EXTRAS: Record<string, string[]> = {
   pro: ["Everything in Team", "Executive voice profiles", "Portfolio insights and bulk export", "AI video clips"],
   enterprise: ["Everything in Pro", "Executive review mode", "Your own email sender and domain", "Invoice billing"],
 };
+const TIER_ICON: Record<string, typeof Zap> = { starter: Zap, team: Waves, pro: Crown, enterprise: Building2 };
 const SCOPE: Record<string, string[]> = {
   starter: ["Dedicated instance and DNS", "1 brand profile, 1 voice", "25 assets + 1 import", "LinkedIn and IG Feed setup", "45-minute handoff"],
   team: ["Dedicated instance and DNS", "3 brand profiles, 1 voice", "60 assets + 1 import", "Meta, LinkedIn, X and IG setup", "60-minute session + 7-day hypercare"],
@@ -68,7 +70,8 @@ export default function Pricing() {
         </div>
       </header>
 
-      <section className="sm-pricing-intro mx-auto max-w-7xl px-6 pb-10 pt-14 text-center">
+      <section className="sm-pricing-intro relative mx-auto max-w-7xl px-6 pb-10 pt-14 text-center">
+        <img src={headerBirdUrl} alt="" aria-hidden className="sm-pricing-bird pointer-events-none absolute -right-2 -top-6 hidden w-52 select-none lg:block" />
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Pricing</p>
         <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">Plans that grow with your content team</h1>
         <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">Every plan includes your own private workspace, human review on every post, and a live usage meter so there are never surprise charges.</p>
@@ -101,7 +104,12 @@ export default function Pricing() {
             <article key={t.id} data-tier={t.tier_slug} className={cn("sm-price-card flex flex-col rounded-xl border bg-card p-6 text-card-foreground",
               hero && "sm-price-card-featured border-2 border-primary shadow-lg lg:-my-3 lg:py-9")}>
               <div className="flex items-center justify-between">
-                <h2 className="font-display text-xl font-semibold">{t.name}</h2>
+                <div className="flex items-center gap-3">
+                  <span className="sm-tier-icon flex h-10 w-10 items-center justify-center rounded-lg">
+                    {(() => { const Icon = TIER_ICON[t.tier_slug] ?? Zap; return <Icon className="h-5 w-5" />; })()}
+                  </span>
+                  <h2 className="font-display text-xl font-semibold">{t.name}</h2>
+                </div>
                 {hero && <Badge>Most popular</Badge>}
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{AUDIENCE[t.tier_slug]}</p>
@@ -131,8 +139,9 @@ export default function Pricing() {
                     <p className="mt-2 text-[11px] text-muted-foreground">Extra scope: {fmtUsd(a.overage_hourly_cents)} / hour</p>
                   </CollapsibleContent>
                 </Collapsible>
-                <Button className="mt-4 w-full" size="lg" variant={hero ? "default" : "outline"} onClick={() => choose(t)}>
+                <Button className="sm-tier-cta mt-4 w-full" size="lg" variant="outline" onClick={() => choose(t)}>
                   {t.tier_slug === "enterprise" ? "Talk to us" : `Start with ${t.name}`}
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </article>
@@ -148,9 +157,12 @@ export default function Pricing() {
         </section>
       )}
 
-      <section className="mx-auto max-w-4xl px-6 py-14 text-sm text-muted-foreground">
-        <h3 className="font-display text-lg font-semibold text-foreground">How usage works</h3>
-        <ul className="mt-3 space-y-2">
+      <section className="sm-usage-card mx-auto my-14 grid max-w-7xl gap-6 rounded-xl border bg-card p-6 text-sm text-muted-foreground md:grid-cols-[240px_1fr] md:items-center lg:mx-6 xl:mx-auto">
+        <div>
+          <h3 className="font-display text-lg font-semibold text-foreground">How usage works</h3>
+          <p className="mt-1 text-xs">Simple, transparent usage so you always know what to expect.</p>
+        </div>
+        <ul className="space-y-2">
           <li>• Posting to LinkedIn, Facebook, Instagram and YouTube never pauses because of AI or X limits.</li>
           <li>• Media credits cover AI images (3–12 credits) and AI video (40–250 credits). Top up anytime: 500 credits for $25.</li>
           <li>• X charges per post; posts with a link cost more. You see the cost before you publish.</li>
