@@ -94,7 +94,7 @@ export default function UserGuide() {
   ];
 
   return (
-    <div className="animate-fade-in max-w-3xl space-y-6 print:max-w-none">
+    <div className="animate-fade-in mx-auto max-w-4xl space-y-6 print:max-w-none">
       <div className="flex items-center justify-between gap-3 print:hidden">
         <Button variant="ghost" size="sm" asChild>
           <Link to="/help"><ArrowLeft className="mr-1.5 h-4 w-4" />Back to Help</Link>
