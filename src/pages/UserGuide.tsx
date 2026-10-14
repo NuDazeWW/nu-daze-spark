@@ -15,7 +15,7 @@ export default function UserGuide() {
   const { entityPlural, entitySingular, settings } = useWorkspace() as ReturnType<typeof useWorkspace> & {
     settings: { company_name?: string; company_logo_url?: string | null; org_type?: string } | null;
   };
-  const { snapshot, meters, daysLeft, hasFeature } = useBilling();
+  const { snapshot, meters, daysLeft } = useBilling();
   const weights = useCreditWeights();
   const [params] = useSearchParams();
   const printMode = params.get("print") === "1";
@@ -37,9 +37,6 @@ export default function UserGuide() {
       return () => clearTimeout(t);
     }
   }, [printMode]);
-
-  const featureNote = (f: string, name: string) =>
-    a && !hasFeature(f) ? `${name} is not included in ${planName}. Upgrade from Settings → Billing to unlock it.` : null;
 
   const sections: Section[] = [
     {
@@ -253,10 +250,7 @@ export default function UserGuide() {
       intro: "Search the Help page for quick answers; What's New lists recent changes.",
       subs: [{ heading: "Reporting a problem", paragraphs: ["Note the post's SM-NNNN number and the page you were on, then contact your workspace admin."] }],
     },
-  ].map((s) => {
-    const note = s.title === "Media Studio" ? featureNote("media_studio", "Media Studio") : null;
-    return note ? { ...s, subs: [...s.subs, { heading: "Plan note", paragraphs: [note] }] } : s;
-  });
+  ];
 
   return (
     <div className="sm-user-guide animate-fade-in mx-auto max-w-4xl space-y-6 print:max-w-none">
