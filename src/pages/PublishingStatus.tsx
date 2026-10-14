@@ -18,7 +18,8 @@ import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { postLabel } from "@/components/tracking/PostTracking";
 import { PostingPackageDrawer } from "@/components/queue/PostingPackageDrawer";
-import { CheckCircle2, Clock, AlertTriangle, Loader2, Send, Bell, Coins, CalendarDays, ArrowRight } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, Loader2, Send, Bell, Coins, CalendarDays, ArrowRight, FileDown } from "lucide-react";
+import { PublishingReportDialog } from "@/components/publishing/PublishingReportDialog";
 
 type Acc = { id: string; platform: string; account_name: string; connection_status: string };
 type View = "upcoming" | "published" | "failed";
@@ -44,6 +45,11 @@ export default function PublishingStatus() {
   const qc = useQueryClient();
   const [view, setView] = useState<View>("upcoming");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
+  const company = useQuery({
+    queryKey: ["ws_company_name"],
+    queryFn: async () => (await supabase.from("workspace_settings").select("company_name").maybeSingle()).data,
+  });
 
   const accounts = useQuery({
     queryKey: ["status_accounts", activeClientId],
@@ -115,10 +121,14 @@ export default function PublishingStatus() {
 
   return (
     <div className="pub-stage -m-4 md:-m-6 lg:-m-8 space-y-6">
-      <div>
-        <h1 className="pub-title">Publishing Status</h1>
-        <p className="pub-sub">Every scheduled and sent post, with results for each channel. Demo mode: sending is simulated.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="pub-title">Publishing Status</h1>
+          <p className="pub-sub">Every scheduled and sent post, with results for each channel. Demo mode: sending is simulated.</p>
+        </div>
+        <button type="button" className="pub-notify !py-2 !text-sm" onClick={() => setReportOpen(true)}><FileDown className="h-4 w-4" />Export report</button>
       </div>
+      <PublishingReportDialog open={reportOpen} onOpenChange={setReportOpen} cards={cards ?? []} companyName={company.data?.company_name} />
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {SUMMARY.map(({ k, label, n, Icon, a, hint, bars }) => (

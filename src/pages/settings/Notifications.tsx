@@ -64,6 +64,19 @@ function PrefCard({ pref, canDelete, onChange }: { pref: Pref; canDelete: boolea
             <Switch checked={!!(pref as { weekly_summary?: boolean }).weekly_summary} onCheckedChange={(v) => patch({ weekly_summary: v } as never)} />
             <span><span className="block text-sm font-medium">Weekly summary</span><span className="text-xs text-muted-foreground">Every Monday at the morning hour: last week's posts, approvals, revisions, logged results, and what's coming up.</span></span>
           </label>
+          <div className="flex items-start gap-3 rounded-md border border-border p-3">
+            <Switch checked={!!(pref as { publishing_report?: boolean }).publishing_report} onCheckedChange={(v) => patch({ publishing_report: v } as never)} aria-label="Publishing report" />
+            <span className="flex-1">
+              <span className="block text-sm font-medium">Publishing report</span>
+              <span className="text-xs text-muted-foreground">Published and failed posts by channel with logged results, at the morning hour.</span>
+              <select className="mt-2 block h-8 rounded-md border border-input bg-background px-2 text-xs" aria-label="Report frequency"
+                value={(pref as { report_frequency?: string }).report_frequency ?? "weekly"}
+                onChange={(e) => patch({ report_frequency: e.target.value } as never)}>
+                <option value="weekly">Weekly (Mondays)</option>
+                <option value="monthly">Monthly (1st of the month)</option>
+              </select>
+            </span>
+          </div>
         </div>
         <div className="flex flex-wrap items-end gap-4">
           <div className="space-y-1.5"><Label className="text-xs">Morning email hour</Label><Input type="time" className="w-32" defaultValue={String(pref.send_time).slice(0, 5)} onBlur={(e) => e.target.value && patch({ send_time: e.target.value })} /></div>
