@@ -60,6 +60,10 @@ function PrefCard({ pref, canDelete, onChange }: { pref: Pref; canDelete: boolea
             <Switch checked={pref.post_went_out} onCheckedChange={(v) => patch({ post_went_out: v })} />
             <span><span className="block text-sm font-medium">Post went out</span><span className="text-xs text-muted-foreground">Sent as soon as a post is marked Posted, with the live link if saved.</span></span>
           </label>
+          <label className="flex items-start gap-3 rounded-md border border-border p-3">
+            <Switch checked={!!(pref as { weekly_summary?: boolean }).weekly_summary} onCheckedChange={(v) => patch({ weekly_summary: v } as never)} />
+            <span><span className="block text-sm font-medium">Weekly summary</span><span className="text-xs text-muted-foreground">Every Monday at the morning hour: last week's posts, approvals, revisions, logged results, and what's coming up.</span></span>
+          </label>
         </div>
         <div className="flex flex-wrap items-end gap-4">
           <div className="space-y-1.5"><Label className="text-xs">Morning email hour</Label><Input type="time" className="w-32" defaultValue={String(pref.send_time).slice(0, 5)} onBlur={(e) => e.target.value && patch({ send_time: e.target.value })} /></div>

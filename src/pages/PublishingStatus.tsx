@@ -1,4 +1,5 @@
 import { TikTokMark, PinterestMark, ThreadsMark } from "@/components/publishing/PlatformMarks";
+import { PostResultsButton } from "@/components/publishing/PostResultsButton";
 import phoneTiktok from "@/assets/pub-phone-tiktok.jpg";
 import phonePinterest from "@/assets/pub-phone-pinterest.jpg";
 import phoneThreads from "@/assets/pub-phone-threads.jpg";
@@ -170,7 +171,10 @@ export default function PublishingStatus() {
                     </div>
                     <p className="text-sm line-clamp-2">{c.draft_copy}</p>
                   </div>
-                  <button type="button" className="pub-notify !py-2 !text-sm" onClick={() => setOpenId(c.id)}>Open package</button>
+                  <div className="flex flex-wrap gap-2">
+                    {(s === "published" || c.approval_status === "posted") && <PostResultsButton postId={c.id} clientId={c.client_id} className="pub-notify !py-2 !text-sm" />}
+                    <button type="button" className="pub-notify !py-2 !text-sm" onClick={() => setOpenId(c.id)}>Open package</button>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {tgs.length === 0 && <span className="text-xs" style={{ color: "hsl(230 20% 72%)" }}>No channels selected</span>}
