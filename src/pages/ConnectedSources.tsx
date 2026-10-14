@@ -5,6 +5,7 @@ import { useConnectedSources, type ConnectedSource } from "@/hooks/useConnectedS
 import { SourceFormDialog, defaultSourceForm, type SourceFormData } from "@/components/sources/SourceFormDialog";
 import { BulkUrlImportDialog } from "@/components/sources/BulkUrlImportDialog";
 import { OneDriveBrowserDialog } from "@/components/sources/OneDriveBrowserDialog";
+import { ReportingConnectors } from "@/components/sources/ReportingConnectors";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -362,6 +363,8 @@ export default function ConnectedSources() {
           </Card>
         </div>
       </div>
+
+      <ReportingConnectors isAdmin={isAdmin} />
 
       <SourceFormDialog
         open={formOpen}
