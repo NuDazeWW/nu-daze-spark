@@ -977,3 +977,11 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 
 .pub-art{position:absolute;right:0;top:0;height:100%;width:52%;object-fit:cover;object-position:center;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 35%);mask-image:linear-gradient(90deg,transparent,#000 35%)}
 .pub-tile{width:60px;height:60px}
+
+/* Narrow screens: control labels shrink instead of breaking or clipping. */
+@media (max-width: 480px) {
+  button.text-sm, [role="button"].text-sm, .sm-control.text-sm { font-size: 13px; }
+}
+@media (max-width: 360px) {
+  button.text-sm, [role="button"].text-sm, .sm-control.text-sm { font-size: 12px; }
+}
