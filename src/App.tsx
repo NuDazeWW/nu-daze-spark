@@ -36,6 +36,7 @@ import PortfolioInsights from "./pages/PortfolioInsights";
 import Setup from "./pages/Setup";
 import WhatsNew from "./pages/WhatsNew";
 import Help from "./pages/Help";
+import UserGuide from "./pages/UserGuide";
 import Pricing from "./pages/Pricing";
 import Billing from "./pages/settings/Billing";
 import ExecutiveReview from "./pages/ExecutiveReview";
@@ -90,6 +91,7 @@ const App = () => (
               <Route path="/setup" element={<Setup />} />
               <Route path="/whats-new" element={<WhatsNew />} />
               <Route path="/help" element={<Help />} />
+              <Route path="/help/guide" element={<UserGuide />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
