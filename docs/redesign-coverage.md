@@ -57,3 +57,8 @@ Full adoption pass (2026-10-14): the approved SocialMotive shell, surfaces, cont
 - Operational pages now use the dark command surface; focused setup and settings forms retain the light reading surface. Shared page headers, navigation buttons, cards, tabs, filters and dialogs carry the treatment across every remaining route.
 - All 29 routes opened successfully at 1280px with no runtime page errors or horizontal overflow. The six key views were also checked at 1440px and 390px; mobile-wide navigation and option rows are contained and horizontally swipeable.
 - 11 focused tests passed and the preview build reports build OK. Evidence: `/tmp/browser/full-ui/screenshots/*-desktop.png`, `/tmp/browser/full-ui/screenshots/*-phone.png`.
+
+## Shared reference-set pass (2026-10-14, after Media Studio approval)
+- Every themed page (all except `/`, scoped via `.sm-route-themed`) now uses: shared header bird + tagline (PageHeader), near-black canvas with localized cyan/violet/magenta/citrine light (dark) or bone canvas with pastel prism light (light), three surface levels, deep-teal lit primary buttons, raised outline buttons, lit active tabs, and cyan focus halos.
+- Captured at 1448×1086 with no runtime errors or horizontal overflow: /, /briefs, /approved, /setup, /strategy, /queue, /assets, /comments, /generator, /settings/usage, /planner, /repurpose, /insights, /sources, /settings/team, /settings/billing. Evidence: /tmp/browser/studio/r_*.png.
+- Not yet individually re-composed to their references: Campaign Briefs icon-row brief detail, Approved Content lifecycle track and light-canvas/dark-card mix, Strategy client banner, dialogs/drawers, and the remaining settings pages.
