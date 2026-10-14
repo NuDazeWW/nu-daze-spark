@@ -4,6 +4,7 @@ export const commentLabel = (source?: { author_name?: string | null; topic?: str
 
 const READING_SURFACES = [
   "/planner",
+  "/sources",
   "/strategy",
   "/setup",
   "/settings/workspace",
