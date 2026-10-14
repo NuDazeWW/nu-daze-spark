@@ -4,7 +4,7 @@ Three Dashboard follow-ups from the approved-rendering comparison. All other wor
 
 ## 1. Panel descriptions
 
-Add one short description line under each panel title, in the same muted style as the page description:
+Add one short description line at the top of each pop-out menu, in the same muted style as the page description:
 
 - **Weekly Cadence** — "Progress toward this week's posting targets."
 - **Daily Comments** — "Today's progress toward engagement targets."
