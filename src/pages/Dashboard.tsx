@@ -379,7 +379,10 @@ export default function Dashboard() {
           <Card className="md:col-span-2">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Recent Activity</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2">
+                  Recent Activity
+                  <PanelInfo description="Latest post cards across all platforms." />
+                </CardTitle>
                 <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/queue")}>
                   View all <ArrowRight className="h-3 w-3 ml-1" />
                 </Button>
