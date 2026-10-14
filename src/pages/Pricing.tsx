@@ -29,6 +29,7 @@ const EXTRAS: Record<string, string[]> = {
   pro: ["Everything in Team", "Executive voice profiles", "Portfolio insights and bulk export", "AI video clips"],
   enterprise: ["Everything in Pro", "Executive review mode", "Your own email sender and domain", "Invoice billing"],
 };
+const TIER_ICON: Record<string, typeof Zap> = { starter: Zap, team: Waves, pro: Crown, enterprise: Building2 };
 const SCOPE: Record<string, string[]> = {
   starter: ["Dedicated instance and DNS", "1 brand profile, 1 voice", "25 assets + 1 import", "LinkedIn and IG Feed setup", "45-minute handoff"],
   team: ["Dedicated instance and DNS", "3 brand profiles, 1 voice", "60 assets + 1 import", "Meta, LinkedIn, X and IG setup", "60-minute session + 7-day hypercare"],
