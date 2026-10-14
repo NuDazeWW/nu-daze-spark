@@ -14,12 +14,32 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Sparkles, MessageSquare, Upload, CalendarDays,
   TrendingUp, TrendingDown, Minus, ArrowRight,
   Linkedin, Instagram, FileText, Image, FolderOpen,
-  ShieldCheck, Eye, ShieldX, Archive,
+  ShieldCheck, Eye, ShieldX, Archive, Info,
 } from "lucide-react";
+
+function PanelInfo({ description }: { description: string }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label="About this panel"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Info className="h-3.5 w-3.5" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" className="w-64 text-xs text-muted-foreground">
+        {description}
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 const PLATFORM_ICON: Record<string, React.ElementType> = {
   linkedin: Linkedin,
@@ -168,10 +188,16 @@ export default function Dashboard() {
           {/* Weekly Cadence Tracker with WoW */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                Weekly Cadence
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  Weekly Cadence
+                  <PanelInfo description="Progress toward this week's posting targets." />
+                </CardTitle>
+                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/strategy")}>
+                  Strategy <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {cadence.length === 0 ? (
@@ -211,10 +237,16 @@ export default function Dashboard() {
           {/* Daily Comment Progress */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-primary" />
-                Daily Comments
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                  Daily Comments
+                  <PanelInfo description="Today's progress toward engagement targets." />
+                </CardTitle>
+                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/strategy")}>
+                  Strategy <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {comments.length === 0 ? (
@@ -251,7 +283,10 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Content Pipeline</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2">
+                  Content Pipeline
+                  <PanelInfo description="Posts by approval stage. Click a stage to filter the queue." />
+                </CardTitle>
                 <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/queue")}>
                   View all <ArrowRight className="h-3 w-3 ml-1" />
                 </Button>
@@ -311,6 +346,7 @@ export default function Dashboard() {
                 <CardTitle className="text-base flex items-center gap-2">
                   <FolderOpen className="h-4 w-4 text-primary" />
                   Asset Health
+                  <PanelInfo description="Assets by permission state." />
                 </CardTitle>
                 <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/assets")}>
                   Library <ArrowRight className="h-3 w-3 ml-1" />
@@ -343,7 +379,10 @@ export default function Dashboard() {
           <Card className="md:col-span-2">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Recent Activity</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2">
+                  Recent Activity
+                  <PanelInfo description="Latest post cards across all platforms." />
+                </CardTitle>
                 <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/queue")}>
                   View all <ArrowRight className="h-3 w-3 ml-1" />
                 </Button>
