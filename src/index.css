@@ -1401,3 +1401,16 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 @media print {
   [data-sidebar], [data-sidebar="sidebar"], .sm-command-bar, [data-side="left"] { display: none !important; }
 }
+
+/* Header primary actions share the "+ New brief" treatment on every page, with varied brand edges per position. */
+.sm-route-themed .sm-page-actions .sm-btn-primary {
+  --edge-a: var(--sm-fx-turquoise); --edge-b: var(--sm-fx-citrine); --fill-a: 188 70% 22%; --fill-b: 195 70% 12%;
+  color: hsl(0 0% 100%); border: 1px solid transparent;
+  background: linear-gradient(180deg, hsl(var(--fill-a)), hsl(var(--fill-b))) padding-box,
+              linear-gradient(90deg, hsl(var(--edge-a)), hsl(var(--edge-a)) 65%, hsl(var(--edge-b))) border-box;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 0 22px -5px hsl(var(--edge-a) / .75);
+}
+.sm-route-themed .sm-page-actions .sm-btn-primary:hover:not(:disabled) { filter: brightness(1.15); }
+.sm-route-themed .sm-page-actions > .sm-btn-primary:nth-child(4n+2) { --edge-a: var(--sm-fx-coral); --edge-b: var(--sm-fx-turquoise); --fill-a: 330 45% 24%; --fill-b: 300 45% 12%; }
+.sm-route-themed .sm-page-actions > .sm-btn-primary:nth-child(4n+3) { --edge-a: var(--sm-fx-gold); --edge-b: var(--sm-fx-citrine); --fill-a: 35 45% 22%; --fill-b: 280 40% 12%; }
+.sm-route-themed .sm-page-actions > .sm-btn-primary:nth-child(4n+4) { --edge-a: var(--sm-fx-violet); --edge-b: var(--sm-fx-lavender); --fill-a: 265 50% 26%; --fill-b: 265 50% 12%; }
