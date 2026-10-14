@@ -297,7 +297,7 @@ export default function UserGuide() {
             </button>
           </div>
           {tocOpen && (
-            <div className="sm-ug-toc">
+            <div className="sm-ug-toc" style={{ ["--toc-rows" as string]: Math.ceil(sections.length / 2) }}>
               {sections.map((s, i) => (
                 <a key={s.title} href={`#guide-${i + 1}`}><span>{i + 1}.</span><span>{s.title}</span><ChevronRight /></a>
               ))}

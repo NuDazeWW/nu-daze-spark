@@ -1555,3 +1555,9 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
   .sm-ug-card, .sm-ug-note { background: #fff !important; border-color: #ccc !important; box-shadow: none !important; break-inside: avoid-page; }
   .sm-ug *, .sm-ug-title { color: #111 !important; }
 }
+.sm-ug-toc { grid-auto-flow: column; grid-template-rows: repeat(var(--toc-rows, 12), auto); }
+@media (max-width: 640px) { .sm-ug-toc { grid-auto-flow: row; grid-template-rows: none; } }
+.sm-src-art { width: 200px; height: 170px; right: -50px; top: -30px; opacity: .75; }
+.sm-rep-card { padding-top: 34px; }
+.sm-rep-head { grid-template-columns: 44px 1fr; }
+.sm-rep-status { position: absolute; top: 10px; right: 10px; }
