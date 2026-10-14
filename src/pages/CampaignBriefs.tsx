@@ -168,7 +168,7 @@ export default function CampaignBriefs() {
           )}
           {briefs.map((b: Brief) => (
             <button key={b.id} onClick={() => { setSelectedId(b.id); setReview(null); }}
-              className={`w-full text-left rounded-lg border p-3 transition-colors ${selected?.id === b.id ? "border-primary bg-primary/5" : "border-border hover:bg-muted/40"}`}>
+              className={`sm-brief-card w-full text-left rounded-lg border p-3 transition-colors ${selected?.id === b.id ? "border-primary bg-primary/5" : "border-border hover:bg-muted/40"}`}>
               <div className="flex items-center justify-between gap-2">
                 <span className="font-medium text-sm truncate">{b.title}</span>
                 <StatusBadge status={b.status} />

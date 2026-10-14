@@ -258,6 +258,11 @@ body[data-sm-surface="reading"] {
   .sm-control:has(> svg:only-child) { min-width: 44px; }
   .sm-input, [role="combobox"], textarea { min-height: 44px; border-radius: var(--radius); }
   .sm-page { overflow-wrap: anywhere; }
+  /* Controls never wrap: labels stay on one line and single words are never broken mid-word. */
+  button, [role="button"], [role="tab"], .sm-control, .sm-status, .sm-type, .sm-studio-tab,
+  [data-slot="button"], [data-sidebar="menu-button"] { white-space: nowrap; overflow-wrap: normal; word-break: keep-all; }
+  /* Clickable cards keep readable multi-line copy. */
+  .pub-card, .sm-brief-card, .sm-asset-row { white-space: normal; }
   .sm-page nav, [data-sidebar="menu-button"], [role="tab"], label { font-family: "Space Grotesk", Arial, sans-serif; }
   [data-sidebar="menu-button"] { min-height: 44px; }
   .sm-card { border-radius: 16px; }
@@ -972,3 +977,11 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 
 .pub-art{position:absolute;right:0;top:0;height:100%;width:52%;object-fit:cover;object-position:center;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 35%);mask-image:linear-gradient(90deg,transparent,#000 35%)}
 .pub-tile{width:60px;height:60px}
+
+/* Narrow screens: control labels shrink instead of breaking or clipping. */
+@media (max-width: 480px) {
+  button.text-sm, [role="button"].text-sm, .sm-control.text-sm { font-size: 13px; }
+}
+@media (max-width: 360px) {
+  button.text-sm, [role="button"].text-sm, .sm-control.text-sm { font-size: 12px; }
+}
