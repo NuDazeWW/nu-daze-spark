@@ -1,3 +1,4 @@
+import { buildLearningBlock } from "../_shared/feedbackLearning.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.103.0";
 
@@ -133,6 +134,7 @@ Constraints: ${brief.constraints ?? "(none)"}`;
         ? sb.from("voice_profiles").select("*").eq("id", voice_profile_id).eq("is_active", true).maybeSingle()
         : Promise.resolve({ data: null }),
     ]);
+    const learning = await buildLearningBlock(sb, brief.client_id).catch(() => "");
     const channels = (brief.target_channels ?? []).filter((c: string) => CHANNELS[c]);
     if (!channels.length) return json({ error: "No target channels selected" }, 400);
 
@@ -159,6 +161,7 @@ Voice traits: ${(execVoice.voice_traits ?? []).join("; ") || "(none)"}
 Signature topics: ${(execVoice.topics ?? []).join("; ") || "(none)"}
 Point of view: ${execVoice.pov_statement ?? "(none)"}
 Never use these phrases/styles: ${(execVoice.banned_phrases ?? []).join("; ") || "(none)"}` : ""}
+${learning}
 
 CHANNELS
 ${channels.map((c: string) => `- ${c}: ${CHANNELS[c].guide}`).join("\n")}${useAngles ? `

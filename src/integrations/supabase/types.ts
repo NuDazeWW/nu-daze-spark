@@ -1424,6 +1424,7 @@ export type Database = {
           time_zone: string
           updated_at: string
           user_id: string | null
+          weekly_summary: boolean
         }
         Insert: {
           client_ids?: string[]
@@ -1438,6 +1439,7 @@ export type Database = {
           time_zone?: string
           updated_at?: string
           user_id?: string | null
+          weekly_summary?: boolean
         }
         Update: {
           client_ids?: string[]
@@ -1452,6 +1454,7 @@ export type Database = {
           time_zone?: string
           updated_at?: string
           user_id?: string | null
+          weekly_summary?: boolean
         }
         Relationships: []
       }
@@ -1735,6 +1738,66 @@ export type Database = {
             columns: ["voice_profile_id"]
             isOneToOne: false
             referencedRelation: "voice_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_results: {
+        Row: {
+          clicks: number
+          client_id: string | null
+          comments: number
+          id: string
+          impressions: number
+          notes: string | null
+          post_card_id: string
+          reactions: number
+          recorded_at: string
+          recorded_by: string
+          saves: number
+          shares: number
+        }
+        Insert: {
+          clicks?: number
+          client_id?: string | null
+          comments?: number
+          id?: string
+          impressions?: number
+          notes?: string | null
+          post_card_id: string
+          reactions?: number
+          recorded_at?: string
+          recorded_by?: string
+          saves?: number
+          shares?: number
+        }
+        Update: {
+          clicks?: number
+          client_id?: string | null
+          comments?: number
+          id?: string
+          impressions?: number
+          notes?: string | null
+          post_card_id?: string
+          reactions?: number
+          recorded_at?: string
+          recorded_by?: string
+          saves?: number
+          shares?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_results_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_results_post_card_id_fkey"
+            columns: ["post_card_id"]
+            isOneToOne: false
+            referencedRelation: "post_cards"
             referencedColumns: ["id"]
           },
         ]
@@ -2621,6 +2684,7 @@ export type Database = {
         Row: {
           ai_image_provider: string
           ai_video_provider: string
+          app_domain: string | null
           auto_admin_domain: string | null
           client_limit: number | null
           company_logo_url: string | null
@@ -2642,6 +2706,7 @@ export type Database = {
         Insert: {
           ai_image_provider?: string
           ai_video_provider?: string
+          app_domain?: string | null
           auto_admin_domain?: string | null
           client_limit?: number | null
           company_logo_url?: string | null
@@ -2663,6 +2728,7 @@ export type Database = {
         Update: {
           ai_image_provider?: string
           ai_video_provider?: string
+          app_domain?: string | null
           auto_admin_domain?: string | null
           client_limit?: number | null
           company_logo_url?: string | null

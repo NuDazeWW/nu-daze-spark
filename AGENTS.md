@@ -20,3 +20,4 @@
 - Billing lives in versioned `subscription_tier_definitions` + `credit_weight_definitions` (owner-edited via audited RPCs) and the service-written `workspace_billing` row; subscriptions stay pinned to their tier version until renewal, so config edits never change entitlements mid-cycle.
 - Metered actions go through `consume_usage` (dry-run pre-check, then deduct) in both UI (`useCreditGate`) and edge functions; anomalies pause only that bucket, and entitlements are granted only by the idempotent `stripe-webhook`, so redirects can't grant access.
 - Subdirectories (e.g. `src/`, `supabase/functions/`) have their own `AGENTS.md`; read it before changing files there.
+
