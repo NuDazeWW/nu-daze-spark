@@ -5,7 +5,6 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "./AppSidebar";
 import { Separator } from "@/components/ui/separator";
 import { UserMenu } from "./UserMenu";
-import { AdminLinksBar } from "./AdminLinksBar";
 import { ClientSwitcher } from "./ClientSwitcher";
 import { ClientProvider } from "@/contexts/ClientContext";
 
@@ -20,7 +19,6 @@ export function AppLayout() {
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <AdminLinksBar />
           <header className="sm-dark flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background text-foreground px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
