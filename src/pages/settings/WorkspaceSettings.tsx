@@ -35,6 +35,8 @@ function WorkspaceSettingsInner() {
   const [seatLimit, setSeatLimit] = useState("");
   const [clientLimit, setClientLimit] = useState("");
   const [domain, setDomain] = useState("");
+  const [appDomain, setAppDomain] = useState("");
+  const [dnsCheck, setDnsCheck] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [confirmText, setConfirmText] = useState("");
@@ -45,6 +47,7 @@ function WorkspaceSettingsInner() {
     setOrgType(s.org_type); setSingular(s.entity_label_singular); setPlural(s.entity_label_plural);
     setPlanName(s.plan_name); setSeatLimit(s.seat_limit?.toString() ?? ""); setClientLimit(s.client_limit?.toString() ?? "");
     setDomain(s.auto_admin_domain ?? "");
+    setAppDomain((s as { app_domain?: string | null }).app_domain ?? "");
   }, [s]);
 
   function chooseOrg(v: string) {
@@ -63,6 +66,7 @@ function WorkspaceSettingsInner() {
         entity_label_singular: singular.trim() || "Client",
         entity_label_plural: plural.trim() || "Clients",
         auto_admin_domain: domain.trim().replace(/^@/, "") || null,
+        app_domain: appDomain.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "").toLowerCase() || null,
       };
       if (ws.isOwner) {
         patch.plan_name = planName.trim() || "Unlimited";
@@ -163,6 +167,31 @@ function WorkspaceSettingsInner() {
       <Card>
         <CardHeader><CardTitle className="text-base">Sign-in</CardTitle><CardDescription>Anyone who signs in with a verified email at this domain becomes an Admin automatically. Leave blank to turn off.</CardDescription></CardHeader>
         <CardContent><div className="space-y-1.5 max-w-sm"><Label>Company email domain</Label><Input placeholder="example.com" value={domain} onChange={(e) => setDomain(e.target.value)} /></div></CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base">Your web address</CardTitle><CardDescription>The address your team uses to open this workspace. Email links point here once it's saved.</CardDescription></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="space-y-1.5 max-w-sm flex-1"><Label>Web address</Label><Input placeholder="social.yourcompany.com" value={appDomain} onChange={(e) => { setAppDomain(e.target.value); setDnsCheck(null); }} /></div>
+            <Button variant="outline" disabled={!appDomain.trim()} onClick={async () => {
+              const d = appDomain.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+              setDnsCheck("Checking…");
+              try {
+                const r = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(d)}&type=A`).then((x) => x.json());
+                const ips: string[] = (r.Answer ?? []).filter((a: { type: number }) => a.type === 1).map((a: { data: string }) => a.data);
+                setDnsCheck(ips.includes("185.158.133.1") ? `${d} points to SocialMotive. It's ready once the connection shows Active.` : ips.length ? `${d} points somewhere else (${ips.join(", ")}). Update the A record to 185.158.133.1.` : `${d} isn't set up yet. Add the A record below.`);
+              } catch { setDnsCheck("Couldn't check right now. Try again in a minute."); }
+            }}>Check address</Button>
+          </div>
+          {dnsCheck && <p className="text-sm">{dnsCheck}</p>}
+          <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+            <li>Choose an address you own, for example social.yourcompany.com, and save it here.</li>
+            <li>At your domain provider, add an A record for that address pointing to 185.158.133.1, plus the TXT verification record shown when the address is connected.</li>
+            <li>Ask your SocialMotive operator to connect the address to this copy at handover. Changes can take up to 72 hours.</li>
+            <li>Press Check address to confirm it points here.</li>
+          </ol>
+        </CardContent>
       </Card>
 
       <Card>
