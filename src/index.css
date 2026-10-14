@@ -930,7 +930,7 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 }
 
 /* ===== Publishing Status stage ===== */
-.pub-stage{position:relative;isolation:isolate;margin:-1.5rem;padding:2rem 2.5rem 2.5rem;min-height:100%;color:hsl(230 30% 94%);
+.pub-stage{position:relative;isolation:isolate;padding:2rem 2.5rem 2.5rem;min-height:100%;color:hsl(230 30% 94%);
   background:radial-gradient(900px 380px at 55% -8%,hsl(225 80% 45%/.35),transparent 70%),radial-gradient(700px 420px at 0% 100%,hsl(275 70% 35%/.28),transparent 70%),radial-gradient(600px 300px at 100% 100%,hsl(320 70% 35%/.18),transparent 70%),hsl(240 45% 6%);overflow:hidden;border-radius:inherit}
 .pub-stage::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
   background:radial-gradient(1200px 500px at 115% -30%,transparent 62%,hsl(290 80% 70%/.5) 62.3%,transparent 62.8%),radial-gradient(1100px 480px at 118% -32%,transparent 62%,hsl(40 90% 65%/.35) 62.2%,transparent 62.6%),radial-gradient(1px 1px at 20% 30%,#fff8,transparent),radial-gradient(1px 1px at 78% 12%,#fff6,transparent),radial-gradient(1.5px 1.5px at 84% 9%,hsl(40 90% 70%),transparent)}
