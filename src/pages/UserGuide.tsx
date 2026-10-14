@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, ArrowRight, Printer, BookOpen, ChevronDown, ChevronUp, ChevronRight, CheckCircle2, Info, Lightbulb, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useBilling, useCreditWeights, fmtUsd } from "@/hooks/useBilling";
@@ -19,6 +19,17 @@ export default function UserGuide() {
   const weights = useCreditWeights();
   const [params] = useSearchParams();
   const printMode = params.get("print") === "1";
+  const [tocOpen, setTocOpen] = useState(true);
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>("section[id^='guide-']"));
+    const io = new IntersectionObserver((entries) => {
+      const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      if (vis) setActive(Number(vis.target.id.replace("guide-", "")) - 1);
+    }, { rootMargin: "-80px 0px -60% 0px" });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  });
 
   const company = settings?.company_name?.trim() || "Your company";
   const logo = settings?.company_logo_url || null;
@@ -252,56 +263,87 @@ export default function UserGuide() {
     },
   ];
 
+  const isTip = (h: string) => /credit|limit|billed|guardrail|reporting/i.test(h);
+
   return (
-    <div className="sm-user-guide animate-fade-in mx-auto max-w-4xl space-y-6 print:max-w-none">
-      <div className="flex items-center justify-between gap-3 print:hidden">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/help"><ArrowLeft className="mr-1.5 h-4 w-4" />Back to Help</Link>
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => window.print()}>
-          <Printer className="mr-1.5 h-4 w-4" />Print / save as PDF
-        </Button>
+    <div className="sm-user-guide sm-ug animate-fade-in">
+      <div className="min-w-0 space-y-5">
+        <Link to="/help" className="sm-ug-back print:hidden"><ArrowLeft className="h-4 w-4" />Back to Help</Link>
+        <header className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-start gap-4 min-w-0">
+            {logo && <img src={logo} alt={`${company} logo`} className="h-12 w-12 rounded object-contain" />}
+            <div className="min-w-0">
+              <h1 className="sm-ug-title">{company} User Guide</h1>
+              <p className="sm-ug-lead">Your complete guide to using {company} within SocialMotive — every module, step by step.</p>
+              <p className="sm-ug-metaline">Powered by SocialMotive · Plan: {planName}{b ? ` · Cycle ends ${new Date(b.cycle_end).toLocaleDateString()}` : ""} · {sections.length} sections</p>
+              <p className="sm-ug-metaline print:hidden">To save as PDF, choose Print and select “Save as PDF”.</p>
+            </div>
+          </div>
+          <Button variant="outline" className="sm-ug-print print:hidden" onClick={() => window.print()}>
+            <Printer className="h-4 w-4" />Print / save as PDF
+          </Button>
+        </header>
+
+        <details className="sm-ug-mobile print:hidden">
+          <summary>On this page: {active + 1}. {sections[active]?.title}</summary>
+          <nav aria-label="On this page">{sections.map((s, i) => <a key={s.title} href={`#guide-${i + 1}`}>{i + 1}. {s.title}</a>)}</nav>
+        </details>
+
+        <nav className="sm-ug-card print:break-after-page" aria-label="Table of contents">
+          <div className="sm-ug-toc-head">
+            <h2><BookOpen className="h-5 w-5" />Table of Contents</h2>
+            <button type="button" className="sm-ug-collapse" aria-expanded={tocOpen} onClick={() => setTocOpen((o) => !o)}>
+              {tocOpen ? "Collapse all" : "Expand all"}{tocOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            </button>
+          </div>
+          {tocOpen && (
+            <div className="sm-ug-toc">
+              {sections.map((s, i) => (
+                <a key={s.title} href={`#guide-${i + 1}`}><span>{i + 1}.</span><span>{s.title}</span><ChevronRight /></a>
+              ))}
+            </div>
+          )}
+        </nav>
+
+        {sections.map((s, i) => (
+          <section key={s.title} id={`guide-${i + 1}`} className="sm-ug-card scroll-mt-20">
+            <div className="sm-ug-sec-head">
+              <span className="sm-ug-num">{i + 1}</span>
+              <div>
+                <h2>{s.title}</h2>
+                <p>{s.intro}{s.route && <span className="print:hidden"> <Link to={s.route} className="sm-ug-open">Open page →</Link></span>}</p>
+              </div>
+            </div>
+            {s.subs.map((sub) => {
+              const callout = !!sub.paragraphs && !sub.steps && !sub.bullets;
+              const tip = callout && isTip(sub.heading);
+              return (
+                <div key={sub.heading} className={`sm-ug-sub ${callout ? `sm-ug-note ${tip ? "sm-ug-tip" : ""}` : ""}`}>
+                  <h3>{callout && (tip ? <Lightbulb className="h-4 w-4" /> : <Info className="h-4 w-4" />)}{sub.heading}</h3>
+                  {sub.paragraphs?.map((p, j) => <p key={j}>{p}</p>)}
+                  {sub.steps && <ol className="sm-ug-steps">{sub.steps.map((x) => <li key={x}>{x}</li>)}</ol>}
+                  {sub.bullets && <ul className="sm-ug-checks">{sub.bullets.map((x) => <li key={x}><CheckCircle2 aria-hidden="true" />{x}</li>)}</ul>}
+                </div>
+              );
+            })}
+          </section>
+        ))}
       </div>
 
-      <header className="flex items-center gap-4 border-b border-border pb-4">
-        {logo && <img src={logo} alt={`${company} logo`} className="h-12 w-12 rounded object-contain" />}
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold">{company} User Guide</h1>
-          <p className="text-sm text-muted-foreground">
-            Powered by SocialMotive · Plan: {planName}{b ? ` · Cycle ends ${new Date(b.cycle_end).toLocaleDateString()}` : ""}
-          </p>
-          <p className="text-xs text-muted-foreground print:hidden">To save as PDF, choose Print and select “Save as PDF”.</p>
-        </div>
-      </header>
-
-      <nav className="rounded-md border border-border p-4 print:break-after-page">
-        <p className="mb-2 text-sm font-medium">Contents</p>
-        <ol className="list-decimal columns-1 space-y-1 pl-5 text-sm text-muted-foreground sm:columns-2">
+      <aside className="sm-ug-aside print:hidden">
+        <p className="lbl">On this page</p>
+        <nav aria-label="On this page">
           {sections.map((s, i) => (
-            <li key={s.title}>
-              <a className="hover:text-foreground hover:underline" href={`#guide-${i + 1}`}>{s.title}</a>
-            </li>
+            <a key={s.title} href={`#guide-${i + 1}`} aria-current={active === i ? "true" : undefined}>{i + 1}. {s.title}</a>
           ))}
-        </ol>
-      </nav>
-
-      {sections.map((s, i) => (
-        <section key={s.title} id={`guide-${i + 1}`} className="space-y-3 scroll-mt-20 print:break-inside-avoid-page">
-          <h2 className="text-lg font-semibold">{i + 1}. {s.title}</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {s.intro}
-            {s.route && <span className="print:hidden"> <Link to={s.route} className="text-primary hover:underline">Open page →</Link></span>}
-          </p>
-          {s.subs.map((sub) => (
-            <div key={sub.heading} className="space-y-1.5 pl-1">
-              <h3 className="text-sm font-semibold">{sub.heading}</h3>
-              {sub.paragraphs?.map((p, j) => <p key={j} className="text-sm leading-relaxed text-muted-foreground">{p}</p>)}
-              {sub.steps && <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">{sub.steps.map((x) => <li key={x}>{x}</li>)}</ol>}
-              {sub.bullets && <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">{sub.bullets.map((x) => <li key={x}>{x}</li>)}</ul>}
-            </div>
-          ))}
-        </section>
-      ))}
+        </nav>
+        <div className="sm-ug-help">
+          <MessageSquare className="ico h-5 w-5" />
+          <b>Need help?</b>
+          <span>Search Help for quick answers, or contact your workspace admin.</span>
+          <Link to="/help" className="sm-ug-cta">Open Help <ArrowRight className="h-3.5 w-3.5" /></Link>
+        </div>
+      </aside>
     </div>
   );
 }
