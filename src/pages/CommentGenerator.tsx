@@ -251,7 +251,7 @@ export default function CommentGenerator() {
   const targetProgress = targetData ? Math.min((targetData.completed / Math.max(targetData.target, 1)) * 100, 100) : 0;
 
   return (
-    <div className="animate-fade-in">
+    <div className="sm-reference sm-comments animate-fade-in">
       <PageHeader
         title="Comment Generator"
         description={`${posts.length} external post${posts.length !== 1 ? "s" : ""} curated · Select posts and generate AI comments.`}

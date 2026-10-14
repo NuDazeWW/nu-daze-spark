@@ -60,27 +60,27 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b">
+    <div className="sm-pricing min-h-screen bg-background text-foreground">
+      <header className="sm-pricing-header border-b">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Link to="/" className="font-display text-lg font-semibold tracking-tight">SocialMotive</Link>
           <Button variant="outline" size="sm" asChild><Link to={user ? "/" : "/auth"}>{user ? "Back to workspace" : "Sign in"}</Link></Button>
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 pb-10 pt-14 text-center">
+      <section className="sm-pricing-intro mx-auto max-w-7xl px-6 pb-10 pt-14 text-center">
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Pricing</p>
         <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">Plans that grow with your content team</h1>
         <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">Every plan includes your own private workspace, human review on every post, and a live usage meter so there are never surprise charges.</p>
 
-        <div className="mt-8 inline-flex items-center gap-1 rounded-full border p-1" role="radiogroup" aria-label="Billing period">
+        <div className="sm-billing-toggle mt-8 inline-flex items-center gap-1 rounded-full border p-1" role="radiogroup" aria-label="Billing period">
           {(["monthly", "annual"] as const).map((b) => (
-            <button key={b} role="radio" aria-checked={billing === b} disabled={nonprofit && b === "monthly"}
-              onClick={() => setParam("billing", b)}
+            <Button key={b} role="radio" aria-checked={billing === b} disabled={nonprofit && b === "monthly"}
+              variant="ghost" size="sm" onClick={() => setParam("billing", b)}
               className={cn("rounded-full px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
                 billing === b ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}>
               {b === "monthly" ? "Monthly" : "Annual · save 20%"}
-            </button>
+            </Button>
           ))}
         </div>
         <div className="mt-4 flex items-center justify-center gap-2 text-sm">
@@ -98,8 +98,8 @@ export default function Pricing() {
           const fee = nonprofit ? t.nonprofit_implementation_fee_cents : t.implementation_fee_cents;
           const a = t.allowances;
           return (
-            <article key={t.id} className={cn("flex flex-col rounded-xl border bg-card p-6 text-card-foreground",
-              hero && "border-2 border-primary shadow-lg lg:-my-3 lg:py-9")}>
+            <article key={t.id} data-tier={t.tier_slug} className={cn("sm-price-card flex flex-col rounded-xl border bg-card p-6 text-card-foreground",
+              hero && "sm-price-card-featured border-2 border-primary shadow-lg lg:-my-3 lg:py-9")}>
               <div className="flex items-center justify-between">
                 <h2 className="font-display text-xl font-semibold">{t.name}</h2>
                 {hero && <Badge>Most popular</Badge>}

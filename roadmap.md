@@ -40,4 +40,5 @@
 # Visual-only redesign (checklist: docs/redesign-coverage.md)
 - [x] Shared foundations: namespaced glow treatment, shell backgrounds, buttons, focus, tabs, dialogs; Help icon → life-buoy
 - [x] Five reference pages visually adapted and compared (/, /insights, /assets, /setup, /generator); original rendered text preserved, real-source selection checked, desktop/tablet/mobile checked. Differences and remaining page work in docs/redesign-coverage.md.
+- [ ] Full UI adoption: shared shell and all remaining routes aligned to approved references without content or behavior changes
 - [ ] Page-by-page pass for every remaining route and nested view, with screenshots

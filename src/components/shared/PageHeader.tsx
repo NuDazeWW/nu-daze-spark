@@ -28,9 +28,9 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
   const isSettings = pathname.startsWith("/settings") || pathname === "/setup";
   const related = RELATED[pathname] ?? [];
   return (
-    <div className="mb-6 space-y-3">
+    <div className="sm-page-header mb-6 space-y-3">
       {pathname !== "/" && (
-        <nav aria-label="Quick navigation" className="flex flex-wrap items-center gap-2">
+        <nav aria-label="Quick navigation" className="sm-page-links flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm">
             <Link to="/" className="gap-1.5">
               <ArrowLeft className="h-3.5 w-3.5" />Back to workspace
@@ -48,12 +48,12 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
           ))}
         </nav>
       )}
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="sm-page-title-row flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="text-3xl md:text-4xl font-semibold leading-tight text-foreground break-words">{title}</h1>
           {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
         </div>
-        {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
+        {children && <div className="sm-page-actions flex flex-wrap items-center gap-2">{children}</div>}
       </div>
     </div>
   );

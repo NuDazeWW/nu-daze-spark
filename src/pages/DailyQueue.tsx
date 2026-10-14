@@ -121,7 +121,7 @@ export default function DailyQueue() {
   }
 
   return (
-    <div className="animate-fade-in">
+    <div className="sm-reference sm-queue animate-fade-in">
       <PageHeader
         title="Daily Content Queue"
         description={`${activeCount} active item${activeCount !== 1 ? "s" : ""} in the pipeline · ${typeCounts.post} post${typeCounts.post !== 1 ? "s" : ""} · ${typeCounts.comment} comment${typeCounts.comment !== 1 ? "s" : ""}`}
