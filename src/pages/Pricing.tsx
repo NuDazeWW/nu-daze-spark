@@ -139,8 +139,9 @@ export default function Pricing() {
                     <p className="mt-2 text-[11px] text-muted-foreground">Extra scope: {fmtUsd(a.overage_hourly_cents)} / hour</p>
                   </CollapsibleContent>
                 </Collapsible>
-                <Button className="mt-4 w-full" size="lg" variant={hero ? "default" : "outline"} onClick={() => choose(t)}>
+                <Button className="sm-tier-cta mt-4 w-full" size="lg" variant="outline" onClick={() => choose(t)}>
                   {t.tier_slug === "enterprise" ? "Talk to us" : `Start with ${t.name}`}
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </article>
@@ -156,9 +157,12 @@ export default function Pricing() {
         </section>
       )}
 
-      <section className="mx-auto max-w-4xl px-6 py-14 text-sm text-muted-foreground">
-        <h3 className="font-display text-lg font-semibold text-foreground">How usage works</h3>
-        <ul className="mt-3 space-y-2">
+      <section className="sm-usage-card mx-auto my-14 grid max-w-7xl gap-6 rounded-xl border bg-card p-6 text-sm text-muted-foreground md:grid-cols-[240px_1fr] md:items-center lg:mx-6 xl:mx-auto">
+        <div>
+          <h3 className="font-display text-lg font-semibold text-foreground">How usage works</h3>
+          <p className="mt-1 text-xs">Simple, transparent usage so you always know what to expect.</p>
+        </div>
+        <ul className="space-y-2">
           <li>• Posting to LinkedIn, Facebook, Instagram and YouTube never pauses because of AI or X limits.</li>
           <li>• Media credits cover AI images (3–12 credits) and AI video (40–250 credits). Top up anytime: 500 credits for $25.</li>
           <li>• X charges per post; posts with a link cost more. You see the cost before you publish.</li>
