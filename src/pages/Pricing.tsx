@@ -71,7 +71,7 @@ export default function Pricing() {
       </header>
 
       <section className="sm-pricing-intro relative mx-auto max-w-7xl px-6 pb-10 pt-14 text-center">
-        <img src={headerBirdUrl} alt="" aria-hidden className="sm-pricing-bird pointer-events-none absolute right-0 top-0 hidden w-64 select-none lg:block" />
+        <img src={headerBirdUrl} alt="" aria-hidden className="sm-pricing-bird pointer-events-none absolute -right-2 -top-6 hidden w-52 select-none lg:block" />
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Pricing</p>
         <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">Plans that grow with your content team</h1>
         <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">Every plan includes your own private workspace, human review on every post, and a live usage meter so there are never surprise charges.</p>
