@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Ban, CloudUpload, Image as ImageIcon, Loader2, Palette, Plus, Save, Sparkles, Stamp, Trash2, Type, Upload, X } from "lucide-react";
 import workspaceBackground from "@/assets/help-workspace-background.jpg";
+import watermarkBird from "@/assets/brand/nudaze-watermark-bird.png";
 
 const FONT_SUGGESTIONS = ["Space Grotesk", "Inter", "IBM Plex Mono", "Playfair Display", "Montserrat", "Lato", "Roboto", "Source Serif"];
 
@@ -47,7 +48,7 @@ export default function BrandKitPage() {
     const g = ctx.createLinearGradient(0, 0, 800, 800);
     g.addColorStop(0, colors[0]?.hex ?? "#1e293b"); g.addColorStop(1, colors[1]?.hex ?? colors[0]?.hex ?? "#475569");
     ctx.fillStyle = g; ctx.fillRect(0, 0, 800, 800);
-    composeWatermark(c.toDataURL(), q.data?.logoUrl ?? null, pos).then((b) => { if (!alive) return; url = URL.createObjectURL(b); setPreview(url); }).catch(() => {});
+    composeWatermark(c.toDataURL(), q.data?.logoUrl ?? watermarkBird, pos).then((b) => { if (!alive) return; url = URL.createObjectURL(b); setPreview(url); }).catch(() => {});
     return () => { alive = false; if (url) URL.revokeObjectURL(url); };
   }, [colors, q.data?.logoUrl, pos]);
 
