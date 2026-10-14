@@ -29,7 +29,7 @@ export default function UserGuide() {
     }, { rootMargin: "-80px 0px -60% 0px" });
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  });
+  }, []);
 
   const company = settings?.company_name?.trim() || "Your company";
   const logo = settings?.company_logo_url || null;
