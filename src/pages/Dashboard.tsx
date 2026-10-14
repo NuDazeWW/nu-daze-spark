@@ -157,7 +157,7 @@ export default function Dashboard() {
           ))}
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="sm-dashboard-panels grid md:grid-cols-2 gap-4">
           {/* Weekly Cadence Tracker with WoW */}
           <Card>
             <CardHeader className="pb-3">
