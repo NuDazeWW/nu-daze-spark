@@ -96,11 +96,11 @@ export default function Auth() {
         <div className="space-y-6">
           <div className="text-center">
             <h1 className="text-lg font-semibold text-card-foreground">
-              {isLogin ? "Sign in" : "Create account"}
+              {isLogin ? "Welcome back" : "Create account"}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {isLogin
-                ? "Enter your credentials to continue"
+                ? "Sign in to your workspace"
                 : "Set up your SocialMotive account"}
             </p>
           </div>
