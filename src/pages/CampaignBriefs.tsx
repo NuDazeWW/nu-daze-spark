@@ -193,9 +193,13 @@ export default function CampaignBriefs() {
                     {runReview.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Wand2 className="h-4 w-4 mr-1" />}AI completeness review
                   </Button>
                   {selected.status !== "approved" ? (
-                    <Button size="sm" disabled={missing.length > 0 || setStatus.isPending} onClick={() => setStatus.mutate({ id: selected.id, status: "approved" })}>
-                      <CheckCircle2 className="h-4 w-4 mr-1" />Approve brief
-                    </Button>
+                    selected.approval_mode_enabled ? (
+                      <BriefApprovalActions brief={selected} canApprove={!!canApprove} blocked={missing.length > 0} />
+                    ) : (
+                      <Button size="sm" disabled={missing.length > 0 || setStatus.isPending} onClick={() => setStatus.mutate({ id: selected.id, status: "approved" })}>
+                        <CheckCircle2 className="h-4 w-4 mr-1" />Approve brief
+                      </Button>
+                    )
                   ) : (
                     <>
                       {activeVoices.length > 0 && (
@@ -212,7 +216,7 @@ export default function CampaignBriefs() {
                       <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Data-Driven Insight, Founder Story and Bold Contrarian Take for every channel">
                         <Checkbox checked={threeAngles} onCheckedChange={(c) => setThreeAngles(!!c)} />3 angles per channel
                       </label>
-                      <Button size="sm" disabled={generate.isPending} onClick={() => generate.mutate(selected.id)}>
+                      <Button size="sm" disabled={generate.isPending || genBlocked} title={genBlocked ? "Check off every discussion comment first" : undefined} onClick={() => generate.mutate(selected.id)}>
                         {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set
                       </Button>
                     </>
@@ -227,6 +231,21 @@ export default function CampaignBriefs() {
                   <p className="text-xs text-destructive mt-2 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />Missing before approval: {missing.join(", ")}</p>
                 )}
               </div>
+
+              {selected.approval_mode_enabled && (
+                <div className="mb-5 rounded-lg border border-border p-3 text-xs space-y-1">
+                  <div className="font-medium text-sm mb-1">Ready to generate</div>
+                  <Check ok={missing.length === 0} label="Required strategy fields completed" />
+                  <Check ok={selected.status === "approved"} label={selected.status === "approved" ? `Brief approved by ${approverName}` : selected.status === "in_review" ? `Waiting for approval${selected.assigned_approver_id ? ` from ${assignedName}` : " from any Approver or Admin"}` : "Brief approved"} />
+                  <Check ok={openComments === 0} label={openComments === 0 ? `${totalComments} of ${totalComments} discussion items checked off` : `${openComments} open comment${openComments === 1 ? "" : "s"} must be checked off before generation`} />
+                  {isAdmin && (
+                    <label className="flex items-center gap-2 pt-1 text-muted-foreground"><Checkbox checked onCheckedChange={() => toggleMode.mutate(false)} />Approval mode on for this brief</label>
+                  )}
+                </div>
+              )}
+              {!selected.approval_mode_enabled && isAdmin && (
+                <label className="mb-5 flex items-center gap-2 text-xs text-muted-foreground"><Checkbox checked={false} onCheckedChange={() => toggleMode.mutate(true)} />Turn on approval mode for this brief</label>
+              )}
 
               {review && (
                 <div className="mb-5 rounded-lg border border-border bg-muted/30 p-4 text-sm space-y-2">
