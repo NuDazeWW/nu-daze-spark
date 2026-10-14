@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
+import { ArrowRight, Lock, Mail } from "lucide-react";
+import { AuthShell } from "@/components/auth/AuthShell";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -91,19 +92,8 @@ export default function Auth() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="w-full max-w-sm space-y-8 px-6">
-        <div className="space-y-3 text-center">
-          <img
-            src={socialMotiveLogo}
-            alt="SocialMotive"
-            className="mx-auto w-full max-w-[280px] rounded-md"
-          />
-          <p className="text-sm text-muted-foreground">Signals become direction.</p>
-
-        </div>
-
-        <div className="space-y-6 rounded-lg border border-border bg-card p-6 shadow-card">
+    <AuthShell>
+        <div className="space-y-6">
           <div className="text-center">
             <h1 className="text-lg font-semibold text-card-foreground">
               {isLogin ? "Sign in" : "Create account"}
@@ -118,7 +108,7 @@ export default function Auth() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="sm-auth-google w-full"
             onClick={handleGoogleSignIn}
             disabled={googleLoading || loading}
           >
@@ -143,7 +133,7 @@ export default function Auth() {
             {googleLoading ? "Connecting..." : "Continue with Google"}
           </Button>
 
-          <div className="relative">
+          <div className="sm-auth-divider relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-border" />
             </div>
@@ -158,7 +148,9 @@ export default function Auth() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
+              <div className="relative"><Mail className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 h-4 w-4 text-[hsl(var(--sm-auth-muted))]" aria-hidden />
               <Input
+                className="pl-10"
                 id="email"
                 type="email"
                 placeholder="you@company.com"
@@ -166,10 +158,13 @@ export default function Auth() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
+              <div className="relative"><Lock className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 h-4 w-4 text-[hsl(var(--sm-auth-muted))]" aria-hidden />
               <Input
+                className="pl-10"
                 id="password"
                 type="password"
                 placeholder="••••••••"
@@ -178,15 +173,17 @@ export default function Auth() {
                 required
                 minLength={6}
               />
+              </div>
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="sm-auth-primary w-full" disabled={loading}>
               {loading ? "Loading..." : isLogin ? "Sign in" : "Create account"}
+              <ArrowRight className="absolute right-5 h-5 w-5" aria-hidden />
             </Button>
             {isLogin && (
               <Button
                 type="button"
                 variant="link"
-                className="w-full"
+                className="sm-auth-link w-full"
                 onClick={handleForgotPassword}
                 disabled={resetLoading}
               >
@@ -199,13 +196,12 @@ export default function Auth() {
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:underline"
+              className="sm-auth-link text-sm hover:underline"
             >
               {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </AuthShell>
   );
 }
