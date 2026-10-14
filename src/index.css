@@ -1561,3 +1561,5 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 .sm-rep-card { padding-top: 34px; }
 .sm-rep-head { grid-template-columns: 44px 1fr; }
 .sm-rep-status { position: absolute; top: 10px; right: 10px; }
+/* Let the guide's side navigation stick to the window scroll. */
+main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible; }
