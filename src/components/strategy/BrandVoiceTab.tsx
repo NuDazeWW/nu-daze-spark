@@ -10,10 +10,19 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Plus, Pencil, Trash2 } from "lucide-react";
+import { MessageSquare, Plus, Pencil, Trash2, AudioLines, Ban, Network, FileText, Star } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type BrandVoiceRule = Tables<"brand_voice_rules">;
+
+const ruleAppearance: Record<string, { icon: typeof MessageSquare; tone: string }> = {
+  personality: { icon: AudioLines, tone: "cyan" },
+  tone: { icon: MessageSquare, tone: "violet" },
+  banned_phrases: { icon: Ban, tone: "coral" },
+  structure: { icon: Network, tone: "cyan" },
+  restrictions: { icon: FileText, tone: "gold" },
+  language: { icon: FileText, tone: "coral" },
+};
 
 export function BrandVoiceTab() {
   const { data, isLoading, error, isAdmin, insert, update, remove, isInserting, isUpdating, isDeleting } =
@@ -58,29 +67,35 @@ export function BrandVoiceTab() {
         <div className="flex justify-end mb-4">
           {isAdmin && <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Rule</Button>}
         </div>
-        <div className="grid gap-3">
-          {data.map((r) => (
-            <Card key={r.id}>
-              <CardHeader className="py-3 px-4 flex-row items-center justify-between space-y-0">
-                <div className="flex items-center gap-2">
+        <div className="sm-strategy-rules grid gap-3">
+          {data.map((r) => {
+            const appearance = ruleAppearance[r.category] ?? { icon: Star, tone: "cyan" };
+            const Icon = appearance.icon;
+            return (
+            <Card key={r.id} className="sm-strategy-rule" data-tone={appearance.tone}>
+              <div className="sm-strategy-rule-icon" aria-hidden="true"><Icon /></div>
+              <div className="sm-strategy-rule-body">
+              <CardHeader className="sm-strategy-rule-heading">
+                <div className="sm-strategy-rule-labels">
                   <CardTitle className="text-sm font-semibold">{r.rule_name}</CardTitle>
-                  <Badge variant={r.is_active ? "default" : "secondary"} className="text-xs">
+                  <Badge variant={r.is_active ? "default" : "secondary"} className="sm-strategy-rule-status text-xs">
                     {r.is_active ? "Active" : "Inactive"}
                   </Badge>
                   <Badge variant="outline" className="text-xs">{r.category}</Badge>
                 </div>
-                {isAdmin && (
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(r)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(r.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
-                  </div>
-                )}
               </CardHeader>
-              <CardContent className="px-4 pb-3 pt-0">
+              <CardContent className="sm-strategy-rule-copy">
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">{r.rule_content}</p>
               </CardContent>
+              </div>
+              {isAdmin && (
+                <div className="sm-strategy-rule-actions">
+                  <Button variant="ghost" size="icon" aria-label={`Edit ${r.rule_name}`} title={`Edit ${r.rule_name}`} onClick={() => openEdit(r)}><Pencil className="h-3.5 w-3.5" /></Button>
+                  <Button variant="ghost" size="icon" aria-label={`Delete ${r.rule_name}`} title={`Delete ${r.rule_name}`} onClick={() => setDeleteId(r.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+                </div>
+              )}
             </Card>
-          ))}
+          );})}
         </div>
       </StrategyTabShell>
 
