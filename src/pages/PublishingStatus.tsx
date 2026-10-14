@@ -1,3 +1,7 @@
+import { TikTokMark, PinterestMark, ThreadsMark } from "@/components/publishing/PlatformMarks";
+import phoneTiktok from "@/assets/pub-phone-tiktok.jpg";
+import phonePinterest from "@/assets/pub-phone-pinterest.jpg";
+import phoneThreads from "@/assets/pub-phone-threads.jpg";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -102,10 +106,10 @@ export default function PublishingStatus() {
     { k: "published" as View, label: "Published", n: groups.published.length, Icon: CheckCircle2, a: "172 80% 50%", hint: "Successfully sent posts across all channels", bars: [16, 28, 40, 26, 34, 44] },
     { k: "failed" as View, label: "Failed", n: groups.failed.length, Icon: AlertTriangle, a: "350 85% 62%", hint: "Posts that failed to publish", bars: [18, 28, 20, 34, 42, 50] },
   ];
-  const SOON_STYLE: Record<string, { b: string; mark: JSX.Element }> = {
-    tiktok: { b: "330 85% 58%", mark: <span className="font-display text-2xl font-bold" style={{ color: "hsl(178 90% 60%)", textShadow: "2px 1px hsl(340 90% 60%)" }}>♪</span> },
-    pinterest: { b: "355 80% 55%", mark: <span className="grid h-10 w-10 place-items-center rounded-full font-display text-2xl font-bold" style={{ background: "hsl(355 85% 48%)", color: "hsl(0 0% 100%)" }}>P</span> },
-    threads: { b: "275 70% 60%", mark: <span className="font-display text-3xl font-bold" style={{ color: "hsl(0 0% 100%)" }}>@</span> },
+  const SOON_STYLE: Record<string, { b: string; mark: JSX.Element; art: string; copy: string }> = {
+    tiktok: { b: "330 85% 58%", mark: <TikTokMark />, art: phoneTiktok, copy: "Reach new audiences with short-form video content." },
+    pinterest: { b: "20 85% 60%", mark: <PinterestMark />, art: phonePinterest, copy: "Automatically publish to your boards and grow your audience." },
+    threads: { b: "280 75% 62%", mark: <ThreadsMark />, art: phoneThreads, copy: "Share conversations and ideas on Threads, automatically." },
   };
 
   return (
@@ -145,7 +149,7 @@ export default function PublishingStatus() {
       {isLoading ? <div className="pub-panel p-8 text-sm" style={{ color: "hsl(230 20% 78%)" }}>Loading…</div> : list.length === 0 ? (
         <div className="pub-panel pub-panel-empty">
           <div className="relative z-10">
-            <div className="pub-rings"><Send className="h-9 w-9" /></div>
+            <div className="pub-rings"><i /><i /><Send className="h-9 w-9" /></div>
             <p className="font-display text-2xl font-semibold">Nothing here yet.</p>
             <p className="mt-2 text-[15px]" style={{ color: "hsl(230 20% 78%)" }}>Open an approved post, go to the <b style={{ color: "hsl(0 0% 100%)" }}>Publish</b> tab, and schedule or publish it.</p>
           </div>
@@ -199,15 +203,16 @@ export default function PublishingStatus() {
             const st = SOON_STYLE[f.key];
             return (
               <div key={f.key} className="pub-soon" style={{ ["--b" as string]: st.b }}>
-                <span className="pub-device" aria-hidden>{st.mark}</span>
-                <div className="relative z-10 flex gap-5 pr-24">
+                <img src={st.art} alt="" aria-hidden className="pub-art" loading="lazy" />
+                <div className="relative z-10 flex gap-5 pr-[40%]">
                   <span className="pub-tile flex-none">{st.mark}</span>
                   <div>
                     <p className="font-display text-xl font-semibold">{f.name}</p>
                     <p className="text-[15px]" style={{ color: "hsl(230 20% 80%)" }}>{f.note}</p>
+                    <p className="mt-2 text-[13px] leading-snug" style={{ color: "hsl(230 20% 72%)" }}>{st.copy}</p>
                   </div>
                 </div>
-                <button type="button" className="pub-notify relative z-10 mt-8" disabled={joined} onClick={() => joinWaitlist(f.key)}>
+                <button type="button" className="pub-notify relative z-10 mt-5" disabled={joined} onClick={() => joinWaitlist(f.key)}>
                   <Bell className="h-4 w-4" />{joined ? "You'll be notified" : "Notify me"}<ArrowRight className="h-4 w-4" />
                 </button>
               </div>
