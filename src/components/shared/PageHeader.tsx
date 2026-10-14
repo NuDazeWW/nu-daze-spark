@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface PageHeaderProps {
@@ -28,6 +29,8 @@ export function PageHeader({ title, description, children, linksMenu = false }: 
   const { pathname } = useLocation();
   const isSettings = pathname.startsWith("/settings") || pathname === "/setup";
   const related = RELATED[pathname] ?? [];
+  // Dashboard and Media Studio render their own approved header art.
+  const showArt = pathname !== "/" && pathname !== "/media-studio" && !linksMenu;
   const links = [
     ...(!isSettings ? [{ to: "/settings/workspace", label: "Workspace settings" }] : []),
     ...related,
@@ -69,6 +72,12 @@ export function PageHeader({ title, description, children, linksMenu = false }: 
           <h1 className="text-3xl md:text-4xl font-semibold leading-tight text-foreground break-words">{title}</h1>
           {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
         </div>
+        {showArt && (
+          <div className="sm-header-art" aria-hidden="true">
+            <img src={headerBirdUrl} alt="" className="sm-header-bird" />
+            <p className="sm-dash-tagline">Turn strategy<br />into <span className="sm-dash-em-cyan">social</span> <span className="sm-dash-em-lime">momentum.</span></p>
+          </div>
+        )}
         {children && <div className="sm-page-actions flex flex-wrap items-center gap-2">{children}</div>}
       </div>
     </div>
