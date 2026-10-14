@@ -304,6 +304,8 @@ export default function CampaignBriefs() {
               </dl>
             </Card>
 
+            <BriefDiscussion brief={selected} />
+
             <div>
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Layers className="h-4 w-4" />Master content objects</h3>
               {masters.length === 0 && <p className="text-sm text-muted-foreground">None yet. Approve the brief and generate a content set.</p>}
@@ -339,6 +341,14 @@ export default function CampaignBriefs() {
       </div>
 
       {editing && <BriefDialog brief={editing} onClose={() => setEditing(null)} onSave={(b) => save.mutate(b)} saving={save.isPending} />}
+    </div>
+  );
+}
+
+function Check({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <div className={`flex items-center gap-2 ${ok ? "text-foreground" : "text-destructive"}`}>
+      {ok ? <CheckCircle2 className="h-3.5 w-3.5 text-primary" /> : <AlertTriangle className="h-3.5 w-3.5" />}{label}
     </div>
   );
 }
