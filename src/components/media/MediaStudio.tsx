@@ -19,9 +19,10 @@ import { VideoStudio } from "./VideoStudio";
 type Props = {
   clientId: string | null; postCardId?: string; defaultPrompt?: string; platform?: string; canCreate: boolean;
   promptContext?: string; generateSignal?: number; onBusyChange?: (busy: boolean) => void;
+  onResult?: (dataUrl: string, prompt: string) => void;
 };
 
-export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform, canCreate, promptContext = "", generateSignal = 0, onBusyChange }: Props) {
+export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform, canCreate, promptContext = "", generateSignal = 0, onBusyChange, onResult }: Props) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const brand = useBrandKit(clientId);
@@ -72,6 +73,14 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
     finally { setBusy(false); }
   };
   useEffect(() => { if (generateSignal > 0) generate(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [generateSignal]);
+  useEffect(() => {
+    if (!final || !onResult) return;
+    let alive = true;
+    fetch(final).then((r) => r.blob()).then((b) => new Promise<string>((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result as string); fr.readAsDataURL(b); }))
+      .then((d) => { if (alive) onResult(d, prompt); }).catch(() => {});
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [final]);
 
   const save = async () => {
     if (!final || !user || !clientId) return;
@@ -110,8 +119,16 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
       </div>
 
       <div className="space-y-1.5">
-        <Label>Describe the image</Label>
-        <Textarea rows={3} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g. A leadership team reviewing a strategy board in a sunlit studio, candid, warm" />
+        <div className="flex items-center justify-between"><Label>Describe the image</Label><span className="font-mono text-[10px] text-muted-foreground">{prompt.length} / 2,000</span></div>
+        <Textarea rows={3} maxLength={2000} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g. A leadership team reviewing a strategy board in a sunlit studio, candid, warm" />
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {["Make it more bold", "Brighter and warmer", "Minimal background", "Add people", "Close-up detail"].map((r) => (
+            <button key={r} type="button" onClick={() => setPrompt((p) => (p.trim() ? `${p.trim()}. ${r}` : r).slice(0, 2000))}
+              className="rounded-full border border-border/60 px-2.5 py-1 text-[11px] text-muted-foreground hover:border-primary/60 hover:text-foreground transition-colors">
+              + {r}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="grid grid-cols-3 gap-2">
         <div className="space-y-1"><Label className="text-xs">Format</Label>
