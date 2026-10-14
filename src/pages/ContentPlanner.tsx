@@ -5,7 +5,8 @@ import {
   addDays, addMonths, endOfMonth, format, isSameMonth, isToday, startOfMonth, startOfQuarter, addQuarters, endOfQuarter,
 } from "date-fns";
 import { toast } from "sonner";
-import { AlertTriangle, CalendarRange, ChevronLeft, ChevronRight, Loader2, Undo2, Wand2, X } from "lucide-react";
+import { AlertTriangle, CalendarDays, CalendarRange, ChevronLeft, ChevronRight, Loader2, Undo2, Wand2, X } from "lucide-react";
+import plannerBackground from "@/assets/notifications-workspace-background.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { useActiveClient } from "@/contexts/ClientContext";
 import { useWorkspace } from "@/hooks/useWorkspace";
@@ -182,7 +183,8 @@ export default function ContentPlanner() {
   const loading = postsQ.isLoading || targetsQ.isLoading;
 
   return (
-    <div>
+    <div className="sm-reference sm-planner">
+      <img src={plannerBackground} alt="" aria-hidden="true" className="sm-planner-background" width={1536} height={1024} />
       <PageHeader title="Content Planner"
         description="Stock approved posts months ahead and see where your cadence has gaps. Nothing publishes automatically.">
         {undo && canEdit && (
@@ -198,9 +200,11 @@ export default function ContentPlanner() {
       </PageHeader>
 
       {/* Quarter summary strip */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5">
-        {quarters.map((q) => (
-          <Card key={q.label} className="p-3">
+      <div className="sm-planner-summaries grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5">
+        {quarters.map((q, index) => (
+          <Card key={q.label} className="sm-planner-summary p-3" data-quarter={index}>
+            <span className="sm-planner-quarter-icon" aria-hidden="true"><CalendarDays /></span>
+            <div className="sm-planner-quarter-copy">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs font-semibold">{q.label}</span>
               <span className="h-2 w-2 rounded-full" style={{ background: TONE_COLOR[!targets.length ? "none" : q.gaps.length ? "partial" : "full"] }} />
@@ -209,6 +213,7 @@ export default function ContentPlanner() {
               {!targets.length ? "No cadence targets set" : q.gaps.length ? `${q.gaps.reduce((s, g) => s + g[1], 0)} open slots` : "Fully stocked"}
             </p>
             {q.gaps.slice(0, 3).map(([k, n]) => <p key={k} className="text-xs text-muted-foreground">{n} {k} short</p>)}
+            </div>
           </Card>
         ))}
       </div>
@@ -218,9 +223,9 @@ export default function ContentPlanner() {
         </p>
       )}
 
-      <div className="flex flex-col gap-4 lg:flex-row">
+      <div className="sm-planner-workspace flex flex-col gap-4 lg:flex-row">
         <div className="min-w-0 flex-1">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div className="sm-planner-toolbar mb-3 flex flex-wrap items-center gap-2">
             <Button variant="outline" size="icon" aria-label="Previous" disabled={cursor <= minMonth}
               onClick={() => setCursor((c) => addMonths(c, view === "month" ? -1 : -3))}><ChevronLeft className="h-4 w-4" /></Button>
             <span className="min-w-40 text-center font-semibold">
@@ -275,7 +280,7 @@ export default function ContentPlanner() {
             const id = e.dataTransfer.getData("text/plain");
             if (id) dropOnTray(id);
           }}
-          className={cn("w-full shrink-0 p-3 lg:w-72 transition-colors",
+          className={cn("sm-planner-tray w-full shrink-0 p-3 lg:w-72 transition-colors",
             trayDragOver && canEdit && "border-primary ring-2 ring-primary/40 bg-primary/5")}
         >
           <div className="mb-2 flex items-center gap-2">
@@ -296,8 +301,8 @@ export default function ContentPlanner() {
               <SelectContent><SelectItem value="all">All types</SelectItem>{TYPES.map((t) => <SelectItem key={t} value={t}>{cap(t)}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <div className="max-h-[60vh] space-y-1.5 overflow-y-auto">
-            {tray.length === 0 && <p className="text-xs text-muted-foreground">Nothing waiting.</p>}
+          <div className={cn("sm-planner-tray-posts max-h-[60vh] space-y-1.5 overflow-y-auto", tray.length === 0 && "sm-planner-tray-empty")}>
+            {tray.length === 0 && <><span className="sm-planner-empty-icon" aria-hidden="true"><CalendarRange /></span><p className="text-xs text-muted-foreground">Nothing waiting.</p></>}
             {tray.map((p) => <Chip key={p.id} p={p} draggable={canEdit} />)}
           </div>
         </Card>
@@ -339,10 +344,10 @@ function MonthGrid({ month, byDay, stocked, targets, canEdit, selected, onToggle
   const weeks: Date[] = [];
   for (let w = weekStart(startOfMonth(month)); w <= endOfMonth(month); w = addDays(w, 7)) weeks.push(w);
   return (
-    <div className="overflow-x-auto">
-      <div className="grid min-w-[760px] grid-cols-[repeat(7,minmax(0,1fr))_120px] gap-1 text-xs">
+    <div className="sm-planner-month overflow-x-auto">
+      <div className="sm-planner-grid grid min-w-[760px] grid-cols-[repeat(7,minmax(0,1fr))_120px] gap-1 text-xs">
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Week coverage"].map((d) => (
-          <div key={d} className="px-1 font-mono text-muted-foreground">{d}</div>
+          <div key={d} className="sm-planner-weekday px-1 font-mono text-muted-foreground">{d}</div>
         ))}
         {weeks.map((w) => {
           const cov = weekCoverage(stocked, targets, w);
@@ -355,7 +360,7 @@ function MonthGrid({ month, byDay, stocked, targets, canEdit, selected, onToggle
                 <div key={day.toISOString()}
                   onDragOver={(e) => canEdit && e.preventDefault()}
                   onDrop={(e) => { e.preventDefault(); const id = e.dataTransfer.getData("text/plain"); if (id) onDrop(day, id); }}
-                  className={cn("min-h-24 rounded border bg-card p-1", !isSameMonth(day, month) && "opacity-50", isToday(day) && "border-primary")}>
+                  className={cn("sm-planner-day min-h-24 rounded border bg-card p-1", !isSameMonth(day, month) && "sm-planner-day-outside opacity-50", isToday(day) && "sm-planner-day-today border-primary")}>
                   <div className="mb-1 font-mono text-[10px] text-muted-foreground">{format(day, "d")}</div>
                   <div className="space-y-1">
                     {list.map((p) => (
@@ -366,7 +371,7 @@ function MonthGrid({ month, byDay, stocked, targets, canEdit, selected, onToggle
                 </div>
               );
             }),
-            <div key={`cov-${w.toISOString()}`} className="rounded border bg-card p-1.5" style={{ borderLeft: `3px solid ${TONE_COLOR[tone]}` }}>
+            <div key={`cov-${w.toISOString()}`} className="sm-planner-coverage rounded border bg-card p-1.5" style={{ borderLeft: `3px solid ${TONE_COLOR[tone]}` }}>
               {cov.length === 0 ? <span className="text-muted-foreground">No targets</span> : cov.map((c) => (
                 <div key={c.key} className="flex justify-between gap-1 text-[10px]">
                   <span className="truncate">{cap(c.platform)} {c.content_type}</span>
