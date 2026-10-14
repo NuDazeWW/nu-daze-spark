@@ -1,7 +1,7 @@
 # SocialMotive visual redesign — coverage checklist
 
 Legend: Impl = implementation (Shared = only shared shell/components applied; Page = page content area adapted). Visual / Interaction = verified (Y), not yet (—).
-Pass 1 (2026-10-14): shared foundations only. Per the plan, shared styling does NOT count as a page redesign.
+Full adoption pass (2026-10-14): the approved SocialMotive shell, surfaces, controls, cards, filters, tabs and dialog treatment now cover every route. The six supplied goal screens received dedicated page styling; all routes were checked live for runtime errors and horizontal overflow.
 
 | Route / view | File | Pattern | Surface | Impl | Visual | Interaction | Evidence | Remaining |
 |---|---|---|---|---|---|---|---|---|
@@ -51,3 +51,9 @@ Pass 1 (2026-10-14): shared foundations only. Per the plan, shared styling does 
 - 11 tests passed (contentPresentation + nativePreview); build OK and no runtime page errors in verification.
 - Local Vite does not serve Lovable CDN assets; browser verification intercepted only that image path and fetched the actual image from hosted preview. Hosted image returned 200 image/png. No production code workaround.
 - Evidence: `/tmp/browser/redesign/after-*.png`, `tablet-*.png`, `mobile-*.png`, `picker.png`, `selected.png`, `folders.png`, `setup-step.png`.
+
+## Full adoption evidence (2026-10-14)
+- Dedicated reference treatment added for Asset Library, Daily Queue, Comment Generator, Strategy & Rules, Workspace setup and Pricing; live wording, records, limits and actions were retained.
+- Operational pages now use the dark command surface; focused setup and settings forms retain the light reading surface. Shared page headers, navigation buttons, cards, tabs, filters and dialogs carry the treatment across every remaining route.
+- All 29 routes opened successfully at 1280px with no runtime page errors or horizontal overflow. The six key views were also checked at 1440px and 390px; mobile-wide navigation and option rows are contained and horizontally swipeable.
+- 11 focused tests passed and the preview build reports build OK. Evidence: `/tmp/browser/full-ui/screenshots/*-desktop.png`, `/tmp/browser/full-ui/screenshots/*-phone.png`.
