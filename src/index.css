@@ -382,7 +382,7 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 .sm-dashboard { --sm-surface: linear-gradient(180deg, hsl(var(--sm-fx-panel-top)), hsl(var(--sm-fx-panel-bottom)));
   --sm-depth: inset 0 1px 0 hsl(var(--sm-fx-lavender) / .14), 0 0 0 1px hsl(var(--sm-fx-lavender) / .16), 0 18px 36px -18px hsl(0 0% 0% / .85); }
 .sm-dashboard.space-y-6 > * + * { margin-top: 16px; }
-.sm-dashboard-heading { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; min-height: 96px; margin-top: -8px; }
+.sm-dashboard-heading { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; min-height: 88px; margin-top: -14px; }
 .sm-dashboard-heading > div:first-child { margin-bottom: 0; padding-top: 14px; flex: 0 1 auto; }
 .sm-dashboard .sm-dashboard-heading h1 { font-size: 40px; line-height: 1.1; letter-spacing: -.01em;
   background-image: linear-gradient(180deg, hsl(178 85% 82%), hsl(40 40% 92%)); }
@@ -507,3 +507,12 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   .sm-media-picker { padding: 20px; }
   .sm-media-picker [role="tablist"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.sm-dash-bird { mix-blend-mode: screen; }
+.sm-dashboard .sm-dashboard-heading { min-height: 88px; }
+.sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 { display: grid; grid-template-columns: minmax(150px, 34%) 1fr auto; align-items: center; column-gap: 18px; }
+.sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 > div:first-child { display: contents; }
+.sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 > div:first-child > span:last-child { grid-column: 3; grid-row: 1; color: hsl(var(--sm-fx-coral)); font-weight: 600; }
+.sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 > [role="progressbar"] { grid-column: 2; grid-row: 1; margin: 0 !important; }
+.sm-dashboard .sm-dashboard-panels .space-y-4 { row-gap: 0; }
+.sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 + .space-y-1\.5 { margin-top: 12px; }
+@media (max-width: 767px) { .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 { grid-template-columns: 1fr auto; } .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 > [role="progressbar"] { grid-column: 1 / -1; grid-row: 2; margin-top: 6px !important; } .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 > div:first-child > span:last-child { grid-column: 2; } }
