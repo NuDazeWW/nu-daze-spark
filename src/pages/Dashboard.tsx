@@ -1,5 +1,5 @@
 import { STATUS_META } from "@/hooks/usePostCards";
-import headerBird from "@/assets/brand/socialmotive-header-bird.png.asset.json";
+import stackedLogo from "@/assets/brand/socialmotive-stacked.png.asset.json";
 import { useMemo } from "react";
 import { useDdiHandoff } from "@/hooks/useDdiHandoff";
 import { useNavigate } from "react-router-dom";
@@ -101,10 +101,7 @@ export default function Dashboard() {
         title="Dashboard"
         description="Your content operations at a glance."
       />
-      <div className="sm-header-art" aria-hidden="true">
-        <img src={headerBird.url} alt="" className="sm-header-bird" />
-        <p className="sm-header-tagline">Turn strategy<br />into <span>social</span> <span>momentum.</span></p>
-      </div>
+      <img src={stackedLogo.url} alt="" aria-hidden="true" className="sm-reference-logo" />
       </div>
       <SetupChecklist />
       <ReadinessPanel />
