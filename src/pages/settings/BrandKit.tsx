@@ -6,14 +6,13 @@ import { useClients } from "@/hooks/useClients";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useAuth } from "@/hooks/useAuth";
 import { useBrandKit, composeWatermark, type BrandColor, type WatermarkPos } from "@/lib/brandKit";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Plus, Save, Trash2, Upload, X } from "lucide-react";
+import { Ban, CloudUpload, Image as ImageIcon, Loader2, Palette, Plus, Save, Sparkles, Stamp, Trash2, Type, Upload, X } from "lucide-react";
+import workspaceBackground from "@/assets/help-workspace-background.jpg";
 
 const FONT_SUGGESTIONS = ["Space Grotesk", "Inter", "IBM Plex Mono", "Playfair Display", "Montserrat", "Lato", "Roboto", "Source Serif"];
 
@@ -81,67 +80,86 @@ export default function BrandKitPage() {
     finally { setUploading(false); }
   };
 
+  const Head = ({ icon: Icon, title, desc }: { icon: typeof ImageIcon; title: string; desc?: string }) => (
+    <div className="sm-bk-head"><span className="sm-bk-icon"><Icon className="h-5 w-5" /></span>
+      <div><h2 className="sm-bk-title">{title}</h2>{desc && <p className="sm-bk-desc">{desc}</p>}</div></div>
+  );
+
   return (
-    <div className="space-y-6">
+    <div className="sm-bk">
+      <img src={workspaceBackground} alt="" aria-hidden="true" className="sm-help-background" width={1536} height={1024} />
       <PageHeader title="Brand Kit Studio" description="Logos, colors, fonts and tone for each client — applied to AI-generated media and watermarks.">
         <Select value={clientId ?? ""} onValueChange={setClientId}>
-          <SelectTrigger className="w-56"><SelectValue placeholder="Choose client" /></SelectTrigger>
+          <SelectTrigger className="w-56 sm-bk-field"><SelectValue placeholder="Choose client" /></SelectTrigger>
           <SelectContent>{clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
         </Select>
       </PageHeader>
 
       {q.isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
-        <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-          <div className="space-y-6">
-            <Card><CardHeader><CardTitle>Logo</CardTitle><CardDescription>PNG with transparency works best. Used as the watermark on generated images.</CardDescription></CardHeader>
-              <CardContent className="flex items-center gap-4">
-                <div className="h-20 w-20 rounded-md border border-border bg-muted/30 flex items-center justify-center overflow-hidden">
-                  {q.data?.logoUrl ? <img src={q.data.logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" /> : <span className="text-xs text-muted-foreground">None</span>}
+        <div className="grid gap-5 lg:grid-cols-[1fr_400px]">
+          <div className="space-y-4">
+            <section className="sm-bk-panel">
+              <Head icon={ImageIcon} title="Logo" desc="PNG with transparency works best. Used as the watermark on generated images." />
+              <div className="sm-bk-logo-row">
+                <label className={`sm-bk-drop ${!canCreate || uploading ? "pointer-events-none opacity-60" : "cursor-pointer"}`}>
+                  <CloudUpload className="h-9 w-9 sm-bk-cyan" />
+                  <span className="sm-bk-btn-cyan">{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Upload logo</span>
+                  <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" className="hidden" disabled={!canCreate || uploading} onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} />
+                </label>
+                <div className="sm-bk-logo-box">
+                  {q.data?.logoUrl ? <img src={q.data.logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" /> : <><Ban className="h-7 w-7" /><span>None</span></>}
                 </div>
-                <Button variant="outline" asChild disabled={!canCreate || uploading} className="gap-2">
-                  <label className="cursor-pointer">{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Upload logo
-                    <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" className="hidden" onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} /></label>
-                </Button>
-              </CardContent></Card>
+              </div>
+            </section>
 
-            <Card><CardHeader><CardTitle>Color palette</CardTitle><CardDescription>First two colors drive gradients and AI image accents.</CardDescription></CardHeader>
-              <CardContent className="space-y-3">
+            <section className="sm-bk-panel">
+              <Head icon={Palette} title="Color palette" desc="First two colors drive gradients and AI image accents." />
+              <div className="sm-bk-body space-y-3">
                 {colors.map((c, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <input type="color" value={c.hex} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, hex: e.target.value } : x))} className="h-9 w-12 rounded border border-border bg-transparent" />
-                    <Input value={c.name} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} placeholder="Name (e.g. Primary)" className="max-w-48" />
-                    <Input value={c.hex} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, hex: e.target.value } : x))} className="w-28 font-mono text-xs" />
-                    <Button size="icon" variant="ghost" onClick={() => setColors(colors.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
+                    <input type="color" value={c.hex} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, hex: e.target.value } : x))} className={`sm-bk-swatch ${i === 0 ? "is-cyan" : i === 1 ? "is-gold" : ""}`} />
+                    <Input value={c.name} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} placeholder="Name (e.g. Primary)" className="max-w-48 sm-bk-field" />
+                    <Input value={c.hex} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, hex: e.target.value } : x))} className="w-28 font-mono text-xs sm-bk-field" />
+                    <Button size="icon" variant="ghost" className="sm-bk-ghost" onClick={() => setColors(colors.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 ))}
-                <Button size="sm" variant="outline" className="gap-1" disabled={colors.length >= 8} onClick={() => setColors([...colors, { name: "", hex: "#3b82f6" }])}><Plus className="h-4 w-4" /> Add color</Button>
-              </CardContent></Card>
+                <button type="button" className="sm-bk-btn-outline" disabled={colors.length >= 8} onClick={() => setColors([...colors, { name: "", hex: "#3b82f6" }])}><Plus className="h-4 w-4 sm-bk-cyan" /> Add color</button>
+              </div>
+            </section>
 
-            <Card><CardHeader><CardTitle>Typography</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-2">{fonts.map((f) => (
-                  <span key={f} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-sm" style={{ fontFamily: f }}>{f}
-                    <button aria-label={`Remove ${f}`} onClick={() => setFonts(fonts.filter((x) => x !== f))}><X className="h-3 w-3" /></button></span>))}</div>
-                <div className="flex gap-2">
-                  <Input list="font-suggest" value={fontDraft} onChange={(e) => setFontDraft(e.target.value)} placeholder="Add a font" className="max-w-60" />
-                  <datalist id="font-suggest">{FONT_SUGGESTIONS.map((f) => <option key={f} value={f} />)}</datalist>
-                  <Button size="sm" variant="outline" onClick={() => { const f = fontDraft.trim(); if (f && !fonts.includes(f)) setFonts([...fonts, f]); setFontDraft(""); }}>Add</Button>
+            <section className="sm-bk-panel">
+              <div className="sm-bk-type-row">
+                <Head icon={Type} title="Typography" />
+                <div className="flex-1 space-y-2">
+                  {fonts.length > 0 && <div className="flex flex-wrap gap-2">{fonts.map((f) => (
+                    <span key={f} className="sm-bk-chip" style={{ fontFamily: f }}>{f}
+                      <button aria-label={`Remove ${f}`} onClick={() => setFonts(fonts.filter((x) => x !== f))}><X className="h-3 w-3" /></button></span>))}</div>}
+                  <div className="flex gap-2">
+                    <Input list="font-suggest" value={fontDraft} onChange={(e) => setFontDraft(e.target.value)} placeholder="Add a font" className="sm-bk-field" />
+                    <datalist id="font-suggest">{FONT_SUGGESTIONS.map((f) => <option key={f} value={f} />)}</datalist>
+                    <button type="button" className="sm-bk-btn-cyan" onClick={() => { const f = fontDraft.trim(); if (f && !fonts.includes(f)) setFonts([...fonts, f]); setFontDraft(""); }}>Add</button>
+                  </div>
                 </div>
-              </CardContent></Card>
+              </div>
+            </section>
 
-            <Card><CardHeader><CardTitle>Visual tone</CardTitle><CardDescription>Guides the mood of AI-generated imagery.</CardDescription></CardHeader>
-              <CardContent><Textarea rows={3} value={tone} onChange={(e) => setTone(e.target.value)} placeholder="e.g. Confident, warm, natural light, real people, no stock-photo clichés" /></CardContent></Card>
+            <section className="sm-bk-panel">
+              <Head icon={Sparkles} title="Visual tone" desc="Guides the mood of AI-generated imagery." />
+              <div className="sm-bk-body"><Textarea rows={2} value={tone} onChange={(e) => setTone(e.target.value)} placeholder="e.g. Confident, warm, natural light, real people, no stock-photo clichés" className="sm-bk-field" /></div>
+            </section>
 
-            <Button onClick={save} disabled={!canCreate || saving} className="gap-2">{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save Brand Kit</Button>
+            <button type="button" onClick={save} disabled={!canCreate || saving} className="sm-bk-save">{saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />} Save Brand Kit</button>
           </div>
 
-          <Card className="h-fit"><CardHeader><CardTitle>Watermark preview</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              {preview && <img src={preview} alt="Watermark preview" className="w-full rounded-md border border-border" />}
-              <Select value={pos} onValueChange={(v) => setPos(v as WatermarkPos)}><SelectTrigger><SelectValue /></SelectTrigger>
+          <section className="sm-bk-panel sm-bk-preview h-fit">
+            <Head icon={Stamp} title="Watermark preview" />
+            <div className="sm-bk-body space-y-3">
+              {preview && <img src={preview} alt="Watermark preview" className="sm-bk-preview-img" />}
+              <Select value={pos} onValueChange={(v) => setPos(v as WatermarkPos)}><SelectTrigger className="sm-bk-field"><SelectValue /></SelectTrigger>
                 <SelectContent>{["bottom-right", "bottom-left", "top-right", "top-left"].map((p) => <SelectItem key={p} value={p} className="capitalize">{p.replace("-", " ")}</SelectItem>)}</SelectContent></Select>
               <div className="flex flex-wrap gap-2 pt-1">{fonts.slice(0, 3).map((f) => <p key={f} className="text-lg w-full" style={{ fontFamily: f, color: colors[0]?.hex }}>{f} — Aa</p>)}</div>
-            </CardContent></Card>
+            </div>
+          </section>
         </div>
       )}
     </div>
