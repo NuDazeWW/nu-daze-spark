@@ -23,7 +23,7 @@ Match the "View all" / "Library" pattern already used on Content Pipeline and As
 
 No new routes or pages.
 
-## 3. Narrower sidebar
+## 3. Narrower sidebar that expands on hover if needed
 
 Reduce the desktop sidebar width in `src/components/ui/sidebar.tsx` from `16rem` to `13.5rem` so content pages get more room, matching the approved rendering's proportions. Mobile sidebar width (18rem sheet) and the collapsed icon width (3rem) stay unchanged.
 
