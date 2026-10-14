@@ -29,24 +29,27 @@ export function StudioSourceAssets({ selected, onToggle, canCreate }: Props) {
   };
 
   return (
-    <section className="sm-card rounded-2xl border border-border/60 bg-card p-4 flex flex-col gap-3 min-h-0" aria-label="Source assets">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-sm font-semibold">Source Assets</h2>
+    <section className="sm-studio-panel p-3.5 flex flex-col gap-3 min-h-0" aria-label="Source assets">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-display text-base font-semibold">Source Assets</h2>
+        {canCreate && <Button size="sm" variant="outline" className="sm-btn-cyan h-7 px-2.5 text-xs gap-1" onClick={() => inputRef.current?.click()}>Add assets <Plus className="h-3 w-3" /></Button>}
+      </div>
+      <p className="text-xs text-muted-foreground -mt-1.5">Use brand assets, product shots, or campaign materials to guide generation.</p>
+      <div className="flex items-center justify-between text-[11px]">
+        <Link to="/assets" className="flex items-center gap-1 text-primary hover:underline"><FolderOpen className="h-3 w-3" /> Open Asset Library</Link>
         <Badge variant="outline" className="font-mono text-[10px]">{selected.length} selected</Badge>
       </div>
-      <Button asChild variant="outline" size="sm" className="gap-1.5 justify-start"><Link to="/assets"><FolderOpen className="h-3.5 w-3.5" /> Open Asset Library</Link></Button>
-      <div className="flex-1 overflow-y-auto space-y-2 max-h-[460px] pr-1">
+      <div className="flex-1 overflow-y-auto space-y-2 max-h-[300px] pr-1">
         {isLoading ? <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
           : usable.length === 0 ? <p className="text-xs text-muted-foreground py-4 text-center">No cleared assets yet.</p>
           : usable.map((a) => {
             const on = selected.includes(a.id);
             return (
               <button key={a.id} type="button" onClick={() => onToggle(a.id, a.title)}
-                className={cn("w-full flex items-center gap-3 rounded-xl border p-2 text-left transition-colors",
-                  on ? "border-primary/70 bg-primary/10 shadow-[0_0_18px_-8px_hsl(var(--primary))]" : "border-border/50 hover:border-primary/40")}>
+                aria-pressed={on} className={cn("sm-asset-row w-full flex items-center gap-3 rounded-xl p-2 text-left", on && "is-active")}>
                 <div className="w-14 shrink-0 [&>div]:h-12"><AssetThumbnail filePath={a.file_path} assetType={a.asset_type} title={a.title} /></div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium truncate">{a.title}</p>
+                  <p className="text-[13px] font-medium truncate">{a.title}</p>
                   <p className="font-mono text-[10px] uppercase text-muted-foreground">{a.asset_type.replace("_", " ")}</p>
                 </div>
                 {on && <Check className="h-4 w-4 text-primary shrink-0" />}
@@ -60,7 +63,7 @@ export function StudioSourceAssets({ selected, onToggle, canCreate }: Props) {
           onDragLeave={() => setDrag(false)}
           onDrop={(e) => { e.preventDefault(); setDrag(false); handleFiles(e.dataTransfer.files); }}
           onClick={() => inputRef.current?.click()}
-          className={cn("cursor-pointer rounded-xl border border-dashed p-4 text-center transition-colors",
+          role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") inputRef.current?.click(); }} className={cn("cursor-pointer rounded-xl border border-dashed p-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             drag ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/50")}>
           {uploading ? <Loader2 className="mx-auto h-5 w-5 animate-spin text-primary" /> : <UploadCloud className="mx-auto h-5 w-5 text-primary" />}
           <p className="mt-1 text-xs font-medium flex items-center justify-center gap-1"><Plus className="h-3 w-3" /> Add more assets</p>
