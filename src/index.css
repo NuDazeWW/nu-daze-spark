@@ -726,6 +726,8 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   --email-line: 263 65% 88%;
   --email-cyan: 183 100% 43%;
   --email-action: 185 100% 23%;
+  --email-action-deep: 188 100% 18%;
+  --email-plane: 211 100% 50%;
   --email-success: 91 72% 24%;
   --email-success-tint: 76 100% 60%;
   --email-coral: 348 90% 53%;
@@ -750,26 +752,32 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 }
 .sm-email-provider .text-muted-foreground { color: hsl(var(--email-muted)); }
 .sm-email-connection-row { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; min-height: 112px; padding: 22px; }
-.sm-email-icon { display: grid; place-items: center; width: 54px; height: 54px; flex: 0 0 54px; border-radius: 11px; color: hsl(var(--email-action)); background: hsl(var(--email-cyan) / .1); border: 2px solid hsl(var(--email-surface)); box-shadow: 0 0 20px hsl(var(--email-cyan) / .2), inset 0 0 12px hsl(var(--email-cyan) / .08); }
-.sm-email-icon svg { width: 27px; height: 27px; stroke-width: 1.8; }
+.sm-email-icon { display: grid; place-items: center; width: 64px; height: 64px; flex: 0 0 64px; border-radius: 12px; color: hsl(var(--email-action)); background: linear-gradient(145deg, hsl(var(--email-cyan) / .17), hsl(var(--email-cyan) / .07)); border: 2px solid hsl(var(--email-surface)); box-shadow: 0 6px 18px hsl(var(--email-cyan) / .22), inset 0 0 12px hsl(var(--email-surface) / .5); }
+.sm-email-icon svg { width: 32px; height: 32px; stroke-width: 2; }
 .sm-email-account { flex: 1; min-width: 240px; }
 .sm-email-account p { overflow-wrap: anywhere; }
 .sm-email-test-status { margin-top: 10px; gap: 8px; }
 .sm-email-test-status.text-brand-success { color: hsl(var(--email-success)); }
-.sm-email-test-status.text-brand-success svg { width: 23px; height: 23px; padding: 4px; border-radius: 50%; background: hsl(var(--email-success-tint)); box-shadow: 0 0 10px hsl(var(--email-success-tint) / .35); }
+.sm-email-test-status.text-brand-success svg { flex-shrink: 0; width: 27px; height: 27px; padding: 5px; stroke-width: 3; border-radius: 50%; color: hsl(var(--email-ink)); background: hsl(var(--email-success-tint)); border: 2px solid hsl(var(--email-surface)); box-shadow: 0 0 10px hsl(var(--email-success-tint) / .35); }
 .sm-email-sending { border-left: 1px solid hsl(var(--email-line)); padding-left: 22px; margin-right: 6px; white-space: nowrap; }
 .sm-email-provider [role="switch"][data-state="checked"] { background: hsl(var(--email-action)); box-shadow: 0 0 14px hsl(var(--email-cyan) / .25); }
 .sm-email-provider [role="switch"] > span { background: hsl(var(--email-surface)); }
+.sm-email-sending [role="switch"] { height: 28px; width: 52px; }
+.sm-email-sending [role="switch"] > span { width: 24px; height: 24px; }
+.sm-email-sending [role="switch"] > span[data-state="checked"] { transform: translateX(24px); }
 .sm-light-page.sm-route-themed .sm-email-provider .sm-btn-outline { background: linear-gradient(180deg, hsl(var(--email-surface)), hsl(var(--email-line) / .22)); border-color: hsl(var(--email-line)); color: hsl(var(--email-ink)); box-shadow: 0 4px 10px hsl(var(--email-shadow) / .1); }
-.sm-light-page.sm-route-themed .sm-email-provider .sm-email-disconnect { color: hsl(var(--email-coral)); border-color: hsl(var(--email-coral) / .45); box-shadow: 0 5px 12px hsl(var(--email-coral) / .08); }
+.sm-light-page.sm-route-themed .sm-email-provider :is(.sm-email-replace, .sm-email-disconnect) { height: 46px; padding-inline: 16px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+.sm-light-page.sm-route-themed .sm-email-provider .sm-email-disconnect { color: hsl(var(--email-coral)); background: linear-gradient(180deg, hsl(var(--email-surface)), hsl(var(--email-coral) / .045)); border-color: hsl(var(--email-coral) / .45); box-shadow: 0 5px 12px hsl(var(--email-coral) / .08); }
 .sm-email-provider .sm-email-test { position: relative; padding-left: 100px; }
-.sm-email-send-icon { position: absolute; left: 22px; top: 22px; color: hsl(var(--email-cyan)); }
+.sm-email-send-icon { position: absolute; left: 22px; top: 22px; color: hsl(var(--email-plane)); background: linear-gradient(135deg, hsl(var(--email-cyan) / .2), hsl(var(--email-cyan) / .06)); }
+.sm-email-send-icon svg { transform: rotate(-7deg); filter: drop-shadow(0 2px 4px hsl(var(--email-plane) / .18)); }
 .sm-email-provider .sm-email-test > div { padding-left: 0; padding-right: 26px; }
 .sm-email-provider .sm-email-test > div:first-of-type { padding-top: 24px; padding-bottom: 20px; }
 .sm-email-test-controls { padding-bottom: 24px; gap: 16px; }
 .sm-email-test-address { flex: 1; min-width: 180px; }
 .sm-light-page.sm-route-themed .sm-email-provider input { height: 44px; color: hsl(var(--email-ink)); border-color: hsl(var(--email-line)); background: hsl(var(--email-surface) / .88); }
-.sm-light-page.sm-route-themed .sm-email-provider .sm-email-test-button { height: 44px; padding-inline: 22px; color: hsl(var(--email-surface)); border-color: hsl(var(--email-cyan)); background: linear-gradient(160deg, hsl(var(--email-action)), hsl(var(--email-action) / .95)); box-shadow: inset 0 0 12px hsl(var(--email-cyan) / .5), 0 0 18px hsl(var(--email-cyan) / .3); }
+.sm-light-page.sm-route-themed .sm-email-provider .sm-email-test-button { height: 48px; min-width: 190px; padding-inline: 22px; gap: 18px; border-radius: 10px; font-size: 13px; font-weight: 600; color: hsl(var(--email-surface)); border-color: hsl(var(--email-cyan)); background: linear-gradient(160deg, hsl(var(--email-action)), hsl(var(--email-action-deep))); box-shadow: inset 0 0 14px hsl(var(--email-cyan) / .55), inset 0 1px 0 hsl(var(--email-surface) / .3), 0 0 20px hsl(var(--email-cyan) / .35); }
+.sm-email-provider .sm-email-test-button svg { stroke-width: 1.5; }
 .sm-email-provider .sm-email-test-button:hover:not(:disabled) { filter: brightness(1.1); }
 .sm-email-form label:has([data-state="checked"]) { border-color: hsl(var(--email-cyan)); background: hsl(var(--email-cyan) / .06); }
 @media (max-width: 1200px) {
@@ -778,6 +786,7 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   .sm-email-sending { border-left: 0; padding-left: 0; }
 }
 @media (max-width: 640px) {
+  .sm-email-icon { width: 54px; height: 54px; flex-basis: 54px; }
   .sm-email-connection-row { gap: 12px; padding: 20px; }
   .sm-email-account { min-width: 0; flex-basis: calc(100% - 70px); }
   .sm-email-sending { flex-basis: 100%; margin: 8px 0; }

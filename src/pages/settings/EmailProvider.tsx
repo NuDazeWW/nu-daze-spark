@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2, Mail, Send, XCircle } from "lucide-react";
+import { Check, Loader2, Mail, Send, XCircle } from "lucide-react";
 
 import emailBackground from "@/assets/email-provider-workspace-background.jpg";
 
@@ -125,7 +125,7 @@ function Inner() {
               <p className="text-xs text-muted-foreground">{PROVIDERS.find((p) => p.key === s.provider)?.label} · key or password saved securely and never shown again</p>
               {s.last_test_at && (
                 <p className={`sm-email-test-status text-xs mt-1 flex items-center gap-1 ${s.last_test_ok ? "text-brand-success" : "text-destructive"}`}>
-                  {s.last_test_ok ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                  {s.last_test_ok ? <Check className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
                   Last test {new Date(s.last_test_at).toLocaleString()}: {s.last_test_ok ? "worked" : s.last_test_error}
                 </p>
               )}
@@ -137,7 +137,7 @@ function Inner() {
               }} />
               {s.sending_paused ? "Sending paused" : "Sending on"}
             </label>
-            <Button variant="outline" size="sm" onClick={() => setEditing((v) => !v)}>{editing ? "Cancel" : "Replace"}</Button>
+            <Button className="sm-email-replace" variant="outline" size="sm" onClick={() => setEditing((v) => !v)}>{editing ? "Cancel" : "Replace"}</Button>
             <Button className="sm-email-disconnect" variant="outline" size="sm" disabled={busy === "disconnect"} onClick={disconnect}>Disconnect</Button>
           </CardContent>
         </Card>
@@ -176,7 +176,7 @@ function Inner() {
         <CardHeader><CardTitle className="text-base">Test connection {!connected && <Badge variant="outline" className="ml-2">Connect a provider first</Badge>}</CardTitle><CardDescription>Sends a real email. If it fails, the provider's exact message appears here.</CardDescription></CardHeader>
         <CardContent className="sm-email-test-controls flex flex-wrap gap-2">
           <Input className="sm-email-test-address" type="email" value={testTo} onChange={(e) => setTestTo(e.target.value)} />
-          <Button className="sm-email-test-button" variant="outline" disabled={!connected || busy === "test"} onClick={test}>{busy === "test" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Send test email<Send className="ml-2 h-4 w-4" /></Button>
+          <Button className="sm-email-test-button" variant="outline" disabled={!connected || busy === "test"} onClick={test}>{busy === "test" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Send test email<Send className="h-4 w-4" /></Button>
         </CardContent>
       </Card>
     </div>
