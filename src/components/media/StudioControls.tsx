@@ -54,7 +54,7 @@ export function StudioControls({ clientId, value, onChange, onGenerate, busy, di
 
   return (
     <section className="sm-studio-panel sm-studio-panel-lit p-3.5 space-y-2.5" aria-label="Generation controls">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-1">
         <h2 className="font-display text-[15px] font-semibold whitespace-nowrap">Generation Controls</h2>
         <div className="flex gap-1">
           <Button variant="outline" size="sm" className="h-7 px-1.5 text-[11px] gap-1" onClick={() => { localStorage.setItem(PRESET_KEY, JSON.stringify(value)); toast.success("Preset saved"); }}><Bookmark className="h-3 w-3" /> Save preset</Button>
