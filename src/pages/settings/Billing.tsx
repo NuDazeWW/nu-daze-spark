@@ -166,7 +166,7 @@ function BillingModeCard({ mode, isOwner, eligible, onChange }: { mode: string; 
     <Card>
       <CardHeader>
         <CardTitle>How add-ons are billed</CardTitle>
-        <CardDescription>Card: credit packs, storage, seats, brands and channels charge immediately. Invoice: add-ons go on your next invoice (Enterprise and verified nonprofits).</CardDescription>
+        <CardDescription>Card: credit packs, storage, seats, brands and channels charge immediately. Invoice: add-ons go on your next invoice (Force Enterprise and verified nonprofits).</CardDescription>
       </CardHeader>
       <CardContent className="flex gap-2">
         {(["self_serve_card", "invoice"] as const).map((m) => (

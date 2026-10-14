@@ -739,7 +739,7 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 .sm-planner .sm-page-links a { min-height: 36px; font-size: 12px; background: hsl(var(--planner-surface) / .85); color: hsl(var(--planner-ink)); border-color: hsl(var(--planner-line)); box-shadow: 0 3px 12px hsl(var(--brand-plum) / .05); }
 .sm-planner .sm-page-title-row { min-height: 78px; position: relative; align-items: center; flex-wrap: nowrap; gap: 14px; }
 .sm-planner .sm-page-title-row > div:first-child { flex: 1; max-width: 530px; }
-.sm-planner .sm-page-header h1 { color: hsl(var(--planner-ink)); background: linear-gradient(90deg, hsl(var(--planner-ink)) 0 60%, hsl(var(--planner-violet)) 60%); background-clip: text; -webkit-background-clip: text; color: transparent; width: fit-content; }
+.sm-planner .sm-page-header h1 { color: hsl(var(--planner-ink)); width: fit-content; }
 .sm-planner .sm-page-header h1 + p { font-size: 13px; line-height: 1.4; color: hsl(var(--planner-muted)); }
 .sm-planner .sm-header-art { gap: 14px; flex-shrink: 0; }
 .sm-planner .sm-header-bird { width: 160px; height: 96px; object-fit: contain; }
