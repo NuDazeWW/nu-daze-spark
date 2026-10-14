@@ -752,7 +752,9 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 .sm-planner .sm-planner-summaries { gap: 12px; margin-bottom: 18px; }
 .sm-planner .sm-planner-summary { --quarter-accent: var(--planner-blue); display: flex; align-items: flex-start; gap: 14px; padding: 16px 14px; min-width: 0; }
 /* Quarter cards carry a tinted, layered background so they separate from the page canvas. */
-.sm-light-page .sm-planner .sm-planner-summary { background: radial-gradient(130% 150% at 100% 0%, hsl(var(--quarter-accent) / .2), transparent 64%), linear-gradient(163deg, hsl(var(--quarter-accent) / .13) 0%, hsl(var(--planner-surface) / .97) 55%, hsl(var(--planner-surface)) 100%); border-color: hsl(var(--quarter-accent) / .4); box-shadow: 0 10px 26px hsl(var(--quarter-accent) / .16), inset 0 1px 0 hsl(var(--planner-surface) / .95); }
+.sm-light-page .sm-planner .sm-planner-summary,
+.sm-light-page.sm-route-themed .sm-planner .sm-planner-summary { background: radial-gradient(130% 150% at 100% 0%, hsl(var(--quarter-accent) / .24), transparent 66%), linear-gradient(163deg, hsl(var(--quarter-accent) / .17) 0%, hsl(var(--planner-surface) / .97) 58%, hsl(var(--planner-surface)) 100%); border-color: hsl(var(--quarter-accent) / .42); box-shadow: 0 10px 26px hsl(var(--quarter-accent) / .18), inset 0 1px 0 hsl(var(--planner-surface) / .95); }
+
 .sm-light-page .sm-planner .sm-planner-summary .sm-planner-quarter-copy > div:first-child > span:first-child { color: hsl(var(--quarter-accent)); }
 .sm-light-page .sm-planner .sm-planner-summary .text-muted-foreground { color: hsl(250 22% 41%); }
 
