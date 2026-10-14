@@ -12,7 +12,7 @@ import { StudioControls, DEFAULT_SETTINGS, buildPromptContext, type StudioSettin
 import { StudioPreviewCanvas, type PreviewFormat } from "@/components/media/StudioPreviewCanvas";
 import { StudioVariationsDeck, type Variation } from "@/components/media/StudioVariationsDeck";
 import { StudioInsightsBar } from "@/components/media/StudioInsightsBar";
-import { Card, CardContent } from "@/components/ui/card";
+import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams } from "react-router-dom";
 import { AiProvidersPanel } from "@/components/media/AiProvidersPanel";
@@ -85,25 +85,33 @@ export default function MediaStudioPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-[1600px]">
-      <PageHeader title="Motive Media Studio" description="Generate on-brand images and video, or connect your own AI tools.">
-        <Select value={clientId ?? ""} onValueChange={(v) => { setClientId(v); setSelected([]); setVariations([]); setActiveId(null); }}>
-          <SelectTrigger className="w-56"><SelectValue placeholder="Choose client" /></SelectTrigger>
-          <SelectContent>{clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
-        </Select>
-      </PageHeader>
+    <div className="sm-studio space-y-3 max-w-[1600px]">
+      <div className="sm-studio-heading">
+        <PageHeader linksMenu title="AI Content Creation Studio" description="Create on-brand posts, imagery, captions, and video concepts from one brief." />
+        <div className="sm-dash-art" aria-hidden="true">
+          <img src={headerBirdUrl} alt="" className="sm-dash-bird" />
+          <p className="sm-dash-tagline">Turn strategy<br />into <span className="sm-dash-em-cyan">social</span> <span className="sm-dash-em-lime">momentum.</span></p>
+        </div>
+      </div>
       <Tabs defaultValue={params.get("tab") ?? "create"}>
-        <TabsList><TabsTrigger value="create">Create media</TabsTrigger><TabsTrigger value="providers">AI providers</TabsTrigger></TabsList>
-        <TabsContent value="create" className="mt-4 space-y-4">
-          <div className="grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_310px] items-start">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <TabsList className="h-8"><TabsTrigger value="create" className="text-xs">Create media</TabsTrigger><TabsTrigger value="providers" className="text-xs">AI providers</TabsTrigger></TabsList>
+          <Select value={clientId ?? ""} onValueChange={(v) => { setClientId(v); setSelected([]); setVariations([]); setActiveId(null); }}>
+            <SelectTrigger className="w-56 h-8" aria-label="Client"><SelectValue placeholder="Choose client" /></SelectTrigger>
+            <SelectContent>{clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <TabsContent value="create" className="mt-3 space-y-3">
+          <div className="grid gap-3 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[292px_minmax(0,1fr)_304px] items-start">
             <StudioSourceAssets selected={selected.map((s) => s.id)} onToggle={toggle} canCreate={canCreate} />
-            <div className="space-y-4 min-w-0">
-              <StudioPreviewCanvas image={active?.image ?? null} clientName={client?.name ?? "Your brand"} caption={caption} onCaption={setCaption} format={format} onFormat={changeFormat} />
-              <Card className="min-w-0"><CardContent className="pt-6">
-                <MediaStudio key={clientId ?? ""} clientId={clientId} canCreate={canCreate} platform={settings.platform}
+            <section className="sm-studio-panel p-3.5 space-y-3 min-w-0" aria-label="Preview and prompt">
+              <StudioPreviewCanvas image={active?.image ?? null} clientName={client?.name ?? "Your brand"} caption={caption} onCaption={setCaption}
+                format={format} onFormat={changeFormat} rail={variations} activeId={activeId} onSelect={setActiveId} busy={busy} />
+              <div className="border-t border-border/50 pt-3">
+                <MediaStudio compact key={clientId ?? ""} clientId={clientId} canCreate={canCreate} platform={settings.platform}
                   promptContext={context} generateSignal={signal} onBusyChange={onBusy} onResult={onResult} />
-              </CardContent></Card>
-            </div>
+              </div>
+            </section>
             <div className="lg:col-span-2 xl:col-span-1">
               <StudioControls clientId={clientId} value={settings} onChange={setSettings} busy={busy} disabled={!canCreate}
                 onGenerate={() => setSignal((n) => n + 1)} />
