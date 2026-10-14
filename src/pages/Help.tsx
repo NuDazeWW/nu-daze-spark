@@ -1,14 +1,23 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, BookOpen, FileDown, ArrowRight } from "lucide-react";
+import { Search, BookOpen, FileDown, ArrowRight, ChevronRight, Palette, ShieldCheck, Database, Users, MessagesSquare } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useWorkspace, ROLE_META, type WorkspaceRole } from "@/hooks/useWorkspace";
+import workspaceBackground from "@/assets/help-workspace-background.jpg";
 
 type Topic = { q: string; a: React.ReactNode; keywords: string };
 type Category = { title: string; blurb: string; topics: Topic[] };
+
+const categoryAppearance = [
+  { icon: BookOpen, tone: "blue" },
+  { icon: Palette, tone: "violet" },
+  { icon: ShieldCheck, tone: "cyan" },
+  { icon: Database, tone: "gold" },
+  { icon: Users, tone: "violet" },
+  { icon: MessagesSquare, tone: "cyan" },
+];
 
 export default function Help() {
   const { entityPlural, entitySingular } = useWorkspace();
@@ -91,50 +100,55 @@ export default function Help() {
   const totalResults = filtered.reduce((n, c) => n + c.topics.length, 0);
 
   return (
-    <div className="animate-fade-in max-w-3xl space-y-6">
+    <div className="sm-help animate-fade-in">
+      <img src={workspaceBackground} alt="" aria-hidden="true" className="sm-help-background" width={1536} height={1024} />
       <PageHeader title="Help" description="Answers, guides and reference material for SocialMotive." />
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="sm-help-search">
+        <Search className="sm-help-search-icon" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search help topics…"
-          className="pl-9"
+          className="sm-help-search-input"
           aria-label="Search help topics"
         />
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="sm-help-guides">
         <Link
           to="/help/guide"
-          className="group flex items-start gap-3 rounded-md border border-border p-4 transition-colors hover:border-primary/40 hover:bg-accent/40"
+          className="sm-help-guide sm-help-tone-cyan group"
         >
-          <BookOpen className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-          <span>
-            <span className="flex items-center gap-1 font-medium">
+          <span className="sm-help-icon"><BookOpen /></span>
+          <span className="sm-help-guide-copy">
+            <span className="sm-help-guide-title">
               Browser user guide
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </span>
-            <span className="mt-1 block text-sm text-muted-foreground">
+            <span className="sm-help-description">
               A full walkthrough of every module, read it right here in the app.
             </span>
           </span>
+          <BookOpen className="sm-help-guide-art" aria-hidden="true" />
+          <ChevronRight className="sm-help-guide-chevron" aria-hidden="true" />
         </Link>
         <Link
           to="/help/guide?print=1"
-          className="group flex items-start gap-3 rounded-md border border-border p-4 transition-colors hover:border-primary/40 hover:bg-accent/40"
+          className="sm-help-guide sm-help-tone-magenta group"
         >
-          <FileDown className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-          <span>
-            <span className="flex items-center gap-1 font-medium">
+          <span className="sm-help-icon"><FileDown /></span>
+          <span className="sm-help-guide-copy">
+            <span className="sm-help-guide-title">
               PDF user guide
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </span>
-            <span className="mt-1 block text-sm text-muted-foreground">
+            <span className="sm-help-description">
               The same guide in a print-ready layout — save it as a PDF from your browser.
             </span>
           </span>
+          <FileDown className="sm-help-guide-art" aria-hidden="true" />
+          <ChevronRight className="sm-help-guide-chevron" aria-hidden="true" />
         </Link>
       </div>
 
@@ -146,22 +160,30 @@ export default function Help() {
         </p>
       )}
 
-      {filtered.map((c) => (
-        <section key={c.title} className="space-y-2">
-          <div>
-            <h2 className="text-lg font-semibold">{c.title}</h2>
-            <p className="text-sm text-muted-foreground">{c.blurb}</p>
+      <div className="sm-help-categories">
+      {filtered.map((c) => {
+        const appearance = categoryAppearance[categories.indexOf(c)] ?? categoryAppearance[categories.findIndex((category) => category.title === c.title)] ?? categoryAppearance[0];
+        const Icon = appearance.icon;
+        return (
+        <section key={c.title} className={`sm-help-category sm-help-tone-${appearance.tone}`}>
+          <div className="sm-help-category-heading">
+            <span className="sm-help-icon"><Icon /></span>
+            <div>
+              <h2>{c.title}</h2>
+              <p className="sm-help-description">{c.blurb}</p>
+            </div>
           </div>
-          <Accordion type="single" collapsible className="rounded-md border border-border px-4">
+          <Accordion type="single" collapsible className="sm-help-topics">
             {c.topics.map((t) => (
               <AccordionItem key={t.q} value={t.q}>
-                <AccordionTrigger className="text-left">{t.q}</AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground">{t.a}</AccordionContent>
+                <AccordionTrigger className="sm-help-question text-left">{t.q}</AccordionTrigger>
+                <AccordionContent className="sm-help-answer">{t.a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </section>
-      ))}
+      );})}
+      </div>
     </div>
   );
 }
