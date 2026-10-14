@@ -402,6 +402,108 @@ export type Database = {
           },
         ]
       }
+      brief_approval_log: {
+        Row: {
+          action: string
+          actor_id: string
+          brief_id: string
+          brief_version: number
+          client_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          brief_id: string
+          brief_version: number
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          brief_id?: string
+          brief_version?: number
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_approval_log_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_approval_log_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brief_comments: {
+        Row: {
+          author_id: string
+          body: string
+          brief_id: string
+          brief_version: number
+          client_id: string | null
+          created_at: string
+          id: string
+          is_resolved: boolean
+          resolved_at: string | null
+          resolved_by: string | null
+        }
+        Insert: {
+          author_id: string
+          body: string
+          brief_id: string
+          brief_version?: number
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          is_resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          brief_id?: string
+          brief_version?: number
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          is_resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_comments_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_comments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cadence_targets: {
         Row: {
           client_id: string | null
@@ -454,8 +556,10 @@ export type Database = {
       }
       campaign_briefs: {
         Row: {
+          approval_mode_enabled: boolean
           approved_at: string | null
           approved_by: string | null
+          assigned_approver_id: string | null
           campaign_type: string
           client_id: string | null
           constraints: string | null
@@ -478,8 +582,10 @@ export type Database = {
           version: number
         }
         Insert: {
+          approval_mode_enabled?: boolean
           approved_at?: string | null
           approved_by?: string | null
+          assigned_approver_id?: string | null
           campaign_type?: string
           client_id?: string | null
           constraints?: string | null
@@ -502,8 +608,10 @@ export type Database = {
           version?: number
         }
         Update: {
+          approval_mode_enabled?: boolean
           approved_at?: string | null
           approved_by?: string | null
+          assigned_approver_id?: string | null
           campaign_type?: string
           client_id?: string | null
           constraints?: string | null
@@ -2805,6 +2913,10 @@ export type Database = {
         }[]
       }
       billing_snapshot: { Args: never; Returns: Json }
+      can_approve_brief: {
+        Args: { _brief_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_control_spend: { Args: { _user_id: string }; Returns: boolean }
       can_create_content: { Args: { _user_id: string }; Returns: boolean }
       can_edit_content: { Args: { _user_id: string }; Returns: boolean }
@@ -2823,6 +2935,10 @@ export type Database = {
         Returns: Json
       }
       create_reporting_key: { Args: { _provider: string }; Returns: string }
+      decide_brief: {
+        Args: { _brief_id: string; _decision: string; _notes: string }
+        Returns: undefined
+      }
       demo_content_counts: { Args: never; Returns: Json }
       evaluate_anomalies: { Args: { _bucket: string }; Returns: undefined }
       has_role: {
@@ -2878,6 +2994,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: undefined
+      }
+      submit_brief: {
+        Args: { _approver: string; _brief_id: string; _note: string }
         Returns: undefined
       }
       transfer_ownership: { Args: { _new_owner: string }; Returns: undefined }

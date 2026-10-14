@@ -1,4 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useWorkspace } from "@/hooks/useWorkspace";
+import { BriefApprovalActions, BriefDiscussion, useBriefComments, useWorkspaceUsers } from "@/components/briefs/BriefCollaboration";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useActiveClient } from "@/contexts/ClientContext";
@@ -152,6 +155,38 @@ export default function CampaignBriefs() {
   const missing = selected ? missingFields(selected) : [];
   const completeness = selected ? Math.round(((REQUIRED.length - missing.length) / REQUIRED.length) * 100) : 0;
 
+  const ws = useWorkspace();
+  const isAdmin = ws.canManage;
+  const wsUsers = useWorkspaceUsers();
+  const comments = useBriefComments(selected?.id);
+  const totalComments = comments.data?.length ?? 0;
+  const openComments = (comments.data ?? []).filter((c: any) => !c.is_resolved).length;
+  const genBlocked = !!selected?.approval_mode_enabled && openComments > 0;
+  const who = (id?: string | null) => { const u = wsUsers.data?.find((x) => x.user_id === id); return u?.display_name || u?.email || "a team member"; };
+  const approverName = who(selected?.approved_by);
+  const assignedName = who(selected?.assigned_approver_id);
+  const { data: canApprove } = useQuery({
+    queryKey: ["can_approve_brief", selected?.id, selected?.assigned_approver_id, user?.id],
+    enabled: !!selected?.id && !!user,
+    queryFn: async () => {
+      const { data } = await supabase.rpc("can_approve_brief", { _user_id: user!.id, _brief_id: selected!.id });
+      return !!data;
+    },
+  });
+  const toggleMode = useMutation({
+    mutationFn: async (on: boolean) => {
+      const { error } = await supabase.from("campaign_briefs").update({ approval_mode_enabled: on } as never).eq("id", selected!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["briefs"] }),
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  // Deep link: /campaign-briefs?brief=<id>
+  const [params] = useSearchParams();
+  const linked = params.get("brief");
+  useEffect(() => { if (linked && briefs.some((b: Brief) => b.id === linked)) setSelectedId(linked); }, [linked, briefs]);
+
   return (
     <div>
       <PageHeader title="Campaign Briefs" description="Define the strategy once. Generate one master message and coordinated platform variants from it.">
@@ -193,9 +228,13 @@ export default function CampaignBriefs() {
                     {runReview.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Wand2 className="h-4 w-4 mr-1" />}AI completeness review
                   </Button>
                   {selected.status !== "approved" ? (
-                    <Button size="sm" disabled={missing.length > 0 || setStatus.isPending} onClick={() => setStatus.mutate({ id: selected.id, status: "approved" })}>
-                      <CheckCircle2 className="h-4 w-4 mr-1" />Approve brief
-                    </Button>
+                    selected.approval_mode_enabled ? (
+                      <BriefApprovalActions brief={selected} canApprove={!!canApprove} blocked={missing.length > 0} />
+                    ) : (
+                      <Button size="sm" disabled={missing.length > 0 || setStatus.isPending} onClick={() => setStatus.mutate({ id: selected.id, status: "approved" })}>
+                        <CheckCircle2 className="h-4 w-4 mr-1" />Approve brief
+                      </Button>
+                    )
                   ) : (
                     <>
                       {activeVoices.length > 0 && (
@@ -212,7 +251,7 @@ export default function CampaignBriefs() {
                       <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Data-Driven Insight, Founder Story and Bold Contrarian Take for every channel">
                         <Checkbox checked={threeAngles} onCheckedChange={(c) => setThreeAngles(!!c)} />3 angles per channel
                       </label>
-                      <Button size="sm" disabled={generate.isPending} onClick={() => generate.mutate(selected.id)}>
+                      <Button size="sm" disabled={generate.isPending || genBlocked} title={genBlocked ? "Check off every discussion comment first" : undefined} onClick={() => generate.mutate(selected.id)}>
                         {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set
                       </Button>
                     </>
@@ -227,6 +266,21 @@ export default function CampaignBriefs() {
                   <p className="text-xs text-destructive mt-2 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />Missing before approval: {missing.join(", ")}</p>
                 )}
               </div>
+
+              {selected.approval_mode_enabled && (
+                <div className="mb-5 rounded-lg border border-border p-3 text-xs space-y-1">
+                  <div className="font-medium text-sm mb-1">Ready to generate</div>
+                  <Check ok={missing.length === 0} label="Required strategy fields completed" />
+                  <Check ok={selected.status === "approved"} label={selected.status === "approved" ? `Brief approved by ${approverName}` : selected.status === "in_review" ? `Waiting for approval${selected.assigned_approver_id ? ` from ${assignedName}` : " from any Approver or Admin"}` : "Brief approved"} />
+                  <Check ok={openComments === 0} label={openComments === 0 ? `${totalComments} of ${totalComments} discussion items checked off` : `${openComments} open comment${openComments === 1 ? "" : "s"} must be checked off before generation`} />
+                  {isAdmin && (
+                    <label className="flex items-center gap-2 pt-1 text-muted-foreground"><Checkbox checked onCheckedChange={() => toggleMode.mutate(false)} />Approval mode on for this brief</label>
+                  )}
+                </div>
+              )}
+              {!selected.approval_mode_enabled && isAdmin && (
+                <label className="mb-5 flex items-center gap-2 text-xs text-muted-foreground"><Checkbox checked={false} onCheckedChange={() => toggleMode.mutate(true)} />Turn on approval mode for this brief</label>
+              )}
 
               {review && (
                 <div className="mb-5 rounded-lg border border-border bg-muted/30 p-4 text-sm space-y-2">
@@ -249,6 +303,8 @@ export default function CampaignBriefs() {
                 <Field label="Channels" v={(selected.target_channels ?? []).map((c: string) => CHANNELS[c]).join(", ")} wide />
               </dl>
             </Card>
+
+            <BriefDiscussion brief={selected} />
 
             <div>
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Layers className="h-4 w-4" />Master content objects</h3>
@@ -285,6 +341,14 @@ export default function CampaignBriefs() {
       </div>
 
       {editing && <BriefDialog brief={editing} onClose={() => setEditing(null)} onSave={(b) => save.mutate(b)} saving={save.isPending} />}
+    </div>
+  );
+}
+
+function Check({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <div className={`flex items-center gap-2 ${ok ? "text-foreground" : "text-destructive"}`}>
+      {ok ? <CheckCircle2 className="h-3.5 w-3.5 text-primary" /> : <AlertTriangle className="h-3.5 w-3.5" />}{label}
     </div>
   );
 }
