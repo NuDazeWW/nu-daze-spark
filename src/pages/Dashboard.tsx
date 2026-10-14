@@ -188,10 +188,16 @@ export default function Dashboard() {
           {/* Weekly Cadence Tracker with WoW */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                Weekly Cadence
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  Weekly Cadence
+                  <PanelInfo description="Progress toward this week's posting targets." />
+                </CardTitle>
+                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/strategy")}>
+                  Strategy <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {cadence.length === 0 ? (
@@ -231,10 +237,16 @@ export default function Dashboard() {
           {/* Daily Comment Progress */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-primary" />
-                Daily Comments
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                  Daily Comments
+                  <PanelInfo description="Today's progress toward engagement targets." />
+                </CardTitle>
+                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/strategy")}>
+                  Strategy <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {comments.length === 0 ? (
