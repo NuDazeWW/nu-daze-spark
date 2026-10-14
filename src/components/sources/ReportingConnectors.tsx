@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { BarChart3, Copy, KeyRound, Loader2 } from "lucide-react";
+import { Copy, KeyRound, Loader2, Sigma } from "lucide-react";
+import tableauLogo from "@/assets/logos/tableau.svg";
+import sapLogo from "@/assets/logos/sap.svg";
+import powerBiLogo from "@/assets/logos/power-bi.svg";
+import quickSightLogo from "@/assets/logos/quicksight.svg";
+
+const LOGOS: Record<string, string> = { tableau: tableauLogo, sap: sapLogo, power_bi: powerBiLogo, quicksight: quickSightLogo };
 import { useToast } from "@/hooks/use-toast";
 
 const PROVIDERS = [
@@ -45,31 +49,31 @@ export function ReportingConnectors({ isAdmin }: { isAdmin: boolean }) {
   };
 
   return (
-    <Card>
-      <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><BarChart3 className="h-5 w-5" />Reporting connectors</CardTitle>
-        <p className="text-sm text-muted-foreground">Send publishing and results data to your reporting tools. Each tool gets its own read-only key.</p>
-      </CardHeader>
-      <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+    <section className="sm-rep mt-8">
+      <h2 className="sm-src-h2">Reporting Connectors</h2>
+      <p className="sm-src-sub">Send publishing and results data to your reporting tools. Each tool gets its own read-only key.</p>
+      <div className="sm-rep-grid">
         {PROVIDERS.map((p) => {
           const r = byKey.get(p.key);
           const on = !!r?.key_prefix && r.enabled;
           return (
-            <div key={p.key} className="rounded-lg border border-border p-4 space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-semibold whitespace-nowrap">{p.name}</p>
-                <Badge variant="outline" className={on ? "border-success text-success" : ""}>{on ? "Connected" : r?.key_prefix ? "Off" : "Not set up"}</Badge>
+            <article key={p.key} className="sm-rep-card">
+              <div className="sm-rep-head">
+                <span className="sm-rep-logo">{LOGOS[p.key] ? <img src={LOGOS[p.key]} alt={`${p.name} logo`} /> : <Sigma aria-label={`${p.name} logo unavailable`} />}</span>
+                <p className="sm-rep-name">{p.name}</p>
+                <span className={on ? "sm-rep-status sm-rep-on" : "sm-rep-status"}>{on ? "Connected" : r?.key_prefix ? "Off" : "Not set up"}</span>
               </div>
-              {r?.key_prefix && <p className="font-mono text-xs text-muted-foreground">Key {r.key_prefix}… · {r.last_used_at ? `last read ${new Date(r.last_used_at).toLocaleString()}` : "not used yet"}</p>}
+              {r?.key_prefix && <p className="font-mono text-[11px] text-muted-foreground">Key {r.key_prefix}… · {r.last_used_at ? `last read ${new Date(r.last_used_at).toLocaleString()}` : "not used yet"}</p>}
               {isAdmin ? (
-                <div className="flex flex-wrap gap-2">
-                  <Button size="sm" disabled={busy === p.key} onClick={() => createKey(p)}>{busy === p.key ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <KeyRound className="mr-2 h-3 w-3" />}{r?.key_prefix ? "New key" : "Connect"}</Button>
-                  {r?.key_prefix && <Button size="sm" variant="outline" onClick={() => toggle(p.key, !r.enabled)}>{r.enabled ? "Turn off" : "Turn on"}</Button>}
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button className="sm-src-btn" disabled={busy === p.key} onClick={() => createKey(p)}>{busy === p.key ? <Loader2 className="h-4 w-4 animate-spin" /> : r?.key_prefix ? <KeyRound className="h-4 w-4" /> : null}{r?.key_prefix ? "New key" : "Connect"}</Button>
+                  {r?.key_prefix && <Button variant="outline" className="sm-src-btn-soft" onClick={() => toggle(p.key, !r.enabled)}>{r.enabled ? "Turn off" : "Turn on"}</Button>}
                 </div>
-              ) : <p className="text-xs text-muted-foreground">An admin can connect this.</p>}
-            </div>
+              ) : <p className="text-xs text-muted-foreground text-center">An admin can connect this.</p>}
+            </article>
           );
         })}
-      </CardContent>
+      </div>
       <Dialog open={!!issued} onOpenChange={(o) => !o && setIssued(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>{issued?.name} key</DialogTitle><DialogDescription>Copy this now — it won't be shown again. Creating a new key replaces this one.</DialogDescription></DialogHeader>
@@ -85,6 +89,6 @@ export function ReportingConnectors({ isAdmin }: { isAdmin: boolean }) {
           )}
         </DialogContent>
       </Dialog>
-    </Card>
+    </section>
   );
 }
