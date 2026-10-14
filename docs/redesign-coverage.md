@@ -5,11 +5,11 @@ Pass 1 (2026-10-14): shared foundations only. Per the plan, shared styling does 
 
 | Route / view | File | Pattern | Surface | Impl | Visual | Interaction | Evidence | Remaining |
 |---|---|---|---|---|---|---|---|---|
-| `/` | pages/Dashboard.tsx | Dashboard (reference 1) | Dark | Shared | Shell only | — | /tmp/browser/rd/dash.png | Match reference composition |
-| `/insights` | pages/PortfolioInsights.tsx | Dashboard (reference 2) | Light | Shared | — | — | — | Match reference |
-| `/assets` | pages/AssetLibrary.tsx | List (reference 3) | Light | Shared | Shell only | — | /tmp/browser/rd/assets.png | Match reference |
-| `/setup` | pages/Setup.tsx | Onboarding (reference 4) | Light | Shared | — | — | — | Match reference |
-| `/generator` | pages/PostGenerator.tsx | Editor (reference 5) | Light | Shared | — | — | — | Match reference |
+| `/` | pages/Dashboard.tsx | Dashboard (reference 1) | Dark | Page | Y (desktop/tablet/mobile) | Y (navigation) | /tmp/browser/redesign/after-dashboard.png | Readiness retained above KPIs; supplied full stacked logo instead of cropped bird |
+| `/insights` | pages/PortfolioInsights.tsx | Dashboard (reference 2) | Dark | Page | Y (desktop/tablet/mobile) | Read-only page | /tmp/browser/redesign/after-insights.png | Real empty portfolio retained; no sample metrics |
+| `/assets` | pages/AssetLibrary.tsx | List (reference 3) | Dark | Page | Y (desktop/tablet/mobile) | Y (search, folders) | /tmp/browser/redesign/after-assets.png | Extra Connected Folders control retained; toolbar wraps to preserve every action |
+| `/setup` | pages/Setup.tsx | Onboarding (reference 4) | Light | Page | Y (desktop/tablet/mobile) | Y (step navigation) | /tmp/browser/redesign/after-setup.png | All eight actual steps and original forms retained; no sample completion or tagline |
+| `/generator` | pages/PostGenerator.tsx | Editor (reference 5) | Dark | Page | Y (desktop/tablet/mobile) | Y (real asset selection, enabled generation) | /tmp/browser/redesign/after-generator.png | Existing source rows retained; generation not run to avoid credit spend/data changes |
 | `/sources` | pages/ConnectedSources.tsx | List | Light | Shared | — | — | — | Page pass |
 | `/approved` | pages/ApprovedContent.tsx | List | Light | Shared | — | — | — | Page pass |
 | `/publishing` | pages/PublishingStatus.tsx | List | Light | Shared | — | — | — | Page pass |
@@ -40,5 +40,14 @@ Pass 1 (2026-10-14): shared foundations only. Per the plan, shared styling does 
 | Sidebar + hover lists, menus, selects, tooltips | components/layout/*, ui/* | Shell | Dark | Shared | — | — | — | Verify |
 
 ## Asset notes
-- Package logo is a remotely hosted sprite sheet cropped with CSS; this conflicts with the brand rule against cropping. Current approved logo file kept. No approved standalone bird mark supplied — missing asset.
+- Package logo is a remotely hosted sprite sheet cropped with CSS; not imported. Newly supplied standalone bird and horizontal mark have baked-in checkerboard pixels (RGB, not transparency), so they are reference-only until clean files are supplied. Supplied black-background stacked lockup is used whole on Dashboard and for the padded 64px favicon. Current sidebar logo retained.
 - Package sample thumbnails/metrics not imported.
+
+## Five-reference pass evidence (2026-10-14)
+- Five page content areas implemented and visually checked at 1440px, 768px and 390px. Remaining routes and nested views are still awaiting their page-level pass.
+- Exact rendered page-text comparison passed on all five routes against the pre-change signed-in workspace. No application data written.
+- Generator: selected a real cleared library asset, closed the picker, confirmed the asset in Source Assets and enabled generation. Picker now uses a light focused surface.
+- Asset Library: search empty-result state and Connected Folders opening verified. Setup: Organization type step and existing radio choices verified.
+- 11 tests passed (contentPresentation + nativePreview); build OK and no runtime page errors in verification.
+- Local Vite does not serve Lovable CDN assets; browser verification intercepted only that image path and fetched the actual image from hosted preview. Hosted image returned 200 image/png. No production code workaround.
+- Evidence: `/tmp/browser/redesign/after-*.png`, `tablet-*.png`, `mobile-*.png`, `picker.png`, `selected.png`, `folders.png`, `setup-step.png`.

@@ -167,7 +167,7 @@ export default function AssetLibrary() {
 
   if (isLoading) {
     return (
-      <div className="animate-fade-in">
+      <div className="sm-reference sm-assets animate-fade-in">
         <PageHeader title="Asset Library" description="Manage uploaded source assets, permissions, and summaries." />
         <div className="space-y-3 py-6">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full rounded-lg" />)}</div>
       </div>
@@ -176,7 +176,7 @@ export default function AssetLibrary() {
 
   if (error) {
     return (
-      <div className="animate-fade-in">
+      <div className="sm-reference sm-assets animate-fade-in">
         <PageHeader title="Asset Library" description="Manage uploaded source assets, permissions, and summaries." />
         <Alert variant="destructive" className="mt-4"><AlertCircle className="h-4 w-4" /><AlertDescription>Failed to load assets: {error.message}</AlertDescription></Alert>
       </div>
@@ -186,13 +186,13 @@ export default function AssetLibrary() {
   const isExpired = (a: SourceAsset) => a.expires_at && new Date(a.expires_at) < new Date();
 
   return (
-    <div className="animate-fade-in">
+    <div className="sm-reference sm-assets animate-fade-in">
       <PageHeader title="Asset Library" description="Manage uploaded source assets, permissions, and summaries." />
       <ExpirationAlerts />
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="relative flex-1 min-w-[200px]">
+      <div className="sm-assets-toolbar flex flex-wrap items-center gap-3 mb-6">
+        <div className="sm-assets-search relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search assets…" className="pl-9" />
         </div>
@@ -280,7 +280,7 @@ export default function AssetLibrary() {
         trashedAssets.length === 0 ? (
           <EmptyState icon={Trash} title="Trash is empty" description="Deleted assets will appear here for recovery." />
         ) : (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="sm-asset-grid grid gap-4 md:grid-cols-2 2xl:grid-cols-4 xl:grid-cols-3">
             {trashedAssets.map((asset) => {
               const Icon = ASSET_TYPE_ICON[asset.asset_type] ?? FileText;
               return (
@@ -327,7 +327,7 @@ export default function AssetLibrary() {
             action={assets.length === 0 && isAdmin ? <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button> : undefined}
           />
         ) : (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="sm-asset-grid grid gap-4 md:grid-cols-2 2xl:grid-cols-4 xl:grid-cols-3">
             {filtered.map((asset) => {
               const Icon = ASSET_TYPE_ICON[asset.asset_type] ?? FileText;
               const perm = PERMISSION_BADGE[asset.permission_state];
@@ -336,7 +336,7 @@ export default function AssetLibrary() {
               const usageCount = usageMap.get(asset.id) ?? 0;
 
               return (
-                <Card key={asset.id} className={`${expired ? "border-destructive/40 opacity-75" : ""} ${bulkMode && bulkSelected.has(asset.id) ? "ring-2 ring-primary" : ""}`}>
+                <Card key={asset.id} className={`sm-asset-card ${expired ? "border-destructive/40 opacity-75" : ""} ${bulkMode && bulkSelected.has(asset.id) ? "ring-2 ring-primary" : ""}`}>
                   <CardHeader className="py-3 px-4 flex-row items-start justify-between space-y-0 gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       {bulkMode && (

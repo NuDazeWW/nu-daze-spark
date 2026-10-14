@@ -1,4 +1,5 @@
 import { STATUS_META } from "@/hooks/usePostCards";
+import stackedLogo from "@/assets/brand/socialmotive-stacked.png.asset.json";
 import { useMemo } from "react";
 import { useDdiHandoff } from "@/hooks/useDdiHandoff";
 import { useNavigate } from "react-router-dom";
@@ -83,7 +84,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="sm-reference sm-dashboard animate-fade-in space-y-6">
       {ddiContext && (
         <Card className="border-primary/30 bg-primary/5">
           <CardContent className="flex items-center gap-3 py-3">
@@ -95,21 +96,24 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       )}
+      <div className="sm-dashboard-heading">
       <PageHeader
         title="Dashboard"
         description="Your content operations at a glance."
       />
+      <img src={stackedLogo.url} alt="" aria-hidden="true" className="sm-reference-logo" />
+      </div>
       <SetupChecklist />
       <ReadinessPanel />
 
       {/* Total Stats Header */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="sm-metric-row grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "Posts This Week", value: totalStats.postsThisWeek, icon: FileText, color: "text-primary" },
           { label: "Comments Today", value: totalStats.commentsToday, icon: MessageSquare, color: "text-accent" },
           { label: "Total Assets", value: totalStats.totalAssets, icon: Image, color: "text-brand-success" },
         ].map((s) => (
-          <Card key={s.label} className="border-border/40">
+          <Card key={s.label} className="sm-metric border-border/40">
             <CardContent className="flex items-center gap-3 py-4 px-5">
               <div className={`rounded-lg bg-secondary p-2.5 ${s.color}`}>
                 <s.icon className="h-5 w-5" />
@@ -124,7 +128,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="sm-quick-actions grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: "Generate Posts", icon: Sparkles, path: "/generator" },
           { label: "Find Comments", icon: MessageSquare, path: "/comments" },
@@ -134,11 +138,12 @@ export default function Dashboard() {
           <Button
             key={a.path}
             variant="outline"
-            className="h-auto py-4 flex flex-col gap-2 border-border/50 hover:border-primary/50 hover:bg-primary/5"
+            className="h-auto min-h-14 py-3 px-4 flex flex-row justify-start gap-3 border-border/50 hover:border-primary/50 hover:bg-primary/5"
             onClick={() => navigate(a.path)}
           >
             <a.icon className="h-5 w-5 text-primary" />
             <span className="text-sm font-medium">{a.label}</span>
+            <ArrowRight className="ml-auto h-4 w-4 shrink-0" />
           </Button>
         ))}
       </div>
@@ -146,13 +151,13 @@ export default function Dashboard() {
       <ExpirationAlerts />
 
       {isLoading ? (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="sm-dashboard-panels grid md:grid-cols-2 gap-4">
           {[1, 2, 3, 4, 5].map((i) => (
             <Skeleton key={i} className="h-48 rounded-lg" />
           ))}
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="sm-dashboard-panels grid md:grid-cols-2 gap-4">
           {/* Weekly Cadence Tracker with WoW */}
           <Card>
             <CardHeader className="pb-3">

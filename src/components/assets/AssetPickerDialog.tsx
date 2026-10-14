@@ -78,7 +78,7 @@ export function AssetPickerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh]">
+      <DialogContent className="sm-media-picker max-w-3xl max-h-[85vh]">
         <DialogHeader>
           <DialogTitle>Select Source Media</DialogTitle>
         </DialogHeader>
