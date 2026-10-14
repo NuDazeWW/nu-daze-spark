@@ -1,5 +1,5 @@
 import { STATUS_META } from "@/hooks/usePostCards";
-import stackedLogo from "@/assets/brand/socialmotive-stacked.png.asset.json";
+import headerBird from "@/assets/brand/socialmotive-header-bird.png.asset.json";
 import { useMemo } from "react";
 import { useDdiHandoff } from "@/hooks/useDdiHandoff";
 import { useNavigate } from "react-router-dom";
@@ -101,7 +101,10 @@ export default function Dashboard() {
         title="Dashboard"
         description="Your content operations at a glance."
       />
-      <img src={stackedLogo.url} alt="" aria-hidden="true" className="sm-reference-logo" />
+      <div className="sm-dash-art" aria-hidden="true">
+        <img src={headerBird.url} alt="" className="sm-dash-bird" />
+        <p className="sm-dash-tagline">Turn strategy<br />into <span className="sm-dash-em-cyan">social</span> <span className="sm-dash-em-lime">momentum.</span></p>
+      </div>
       </div>
       <SetupChecklist />
       <ReadinessPanel />
@@ -109,18 +112,21 @@ export default function Dashboard() {
       {/* Total Stats Header */}
       <div className="sm-metric-row grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Posts This Week", value: totalStats.postsThisWeek, icon: FileText, color: "text-primary" },
-          { label: "Comments Today", value: totalStats.commentsToday, icon: MessageSquare, color: "text-accent" },
-          { label: "Total Assets", value: totalStats.totalAssets, icon: Image, color: "text-brand-success" },
+          { label: "Posts This Week", value: totalStats.postsThisWeek, icon: FileText, tone: "cyan", bars: [3, 5, 2, 6, 4, 7, 5, 8, 6, 9] },
+          { label: "Comments Today", value: totalStats.commentsToday, icon: MessageSquare, tone: "coral", bars: [2, 3, 5, 4, 6, 3, 7, 5, 8, 10] },
+          { label: "Total Assets", value: totalStats.totalAssets, icon: Image, tone: "lime", bars: [4, 6, 3, 7, 5, 8, 4, 9, 6, 7] },
         ].map((s) => (
-          <Card key={s.label} className="sm-metric border-border/40">
-            <CardContent className="flex items-center gap-3 py-4 px-5">
-              <div className={`rounded-lg bg-secondary p-2.5 ${s.color}`}>
-                <s.icon className="h-5 w-5" />
+          <Card key={s.label} className={`sm-metric sm-tone-${s.tone}`}>
+            <CardContent className="flex items-center gap-4 py-4 px-5">
+              <div className="sm-icon-well">
+                <s.icon className="h-6 w-6" />
               </div>
               <div>
                 <div className="text-2xl font-bold">{isLoading ? "–" : s.value}</div>
                 <div className="text-xs text-muted-foreground">{s.label}</div>
+              </div>
+              <div className="sm-kpi-bars" aria-hidden="true">
+                {s.bars.map((h, i) => <span key={i} style={{ height: `${h * 10}%` }} />)}
               </div>
             </CardContent>
           </Card>
@@ -130,23 +136,24 @@ export default function Dashboard() {
       {/* Quick Actions */}
       <div className="sm-quick-actions grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "Generate Posts", icon: Sparkles, path: "/generator" },
-          { label: "Find Comments", icon: MessageSquare, path: "/comments" },
-          { label: "Upload Asset", icon: Upload, path: "/assets" },
-          { label: "View Queue", icon: CalendarDays, path: "/queue" },
+          { label: "Generate Posts", icon: Sparkles, path: "/generator", tone: "cyan" },
+          { label: "Find Comments", icon: MessageSquare, path: "/comments", tone: "coral" },
+          { label: "Upload Asset", icon: Upload, path: "/assets", tone: "gold" },
+          { label: "View Queue", icon: CalendarDays, path: "/queue", tone: "violet" },
         ].map((a) => (
           <Button
             key={a.path}
             variant="outline"
-            className="h-auto min-h-14 py-3 px-4 flex flex-row justify-start gap-3 border-border/50 hover:border-primary/50 hover:bg-primary/5"
+            className={`sm-qa sm-tone-${a.tone} h-auto min-h-[52px] py-3 px-5 flex flex-row justify-start gap-4`}
             onClick={() => navigate(a.path)}
           >
-            <a.icon className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">{a.label}</span>
+            <a.icon className="h-6 w-6" />
+            <span className="text-[15px] font-bold">{a.label}</span>
             <ArrowRight className="ml-auto h-4 w-4 shrink-0" />
           </Button>
         ))}
       </div>
+
 
       <ExpirationAlerts />
 
