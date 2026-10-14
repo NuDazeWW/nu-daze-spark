@@ -26,7 +26,7 @@ export function AppLayout() {
             <ClientSwitcher />
             <UserMenu />
           </header>
-          <main className={`sm-page min-w-0 max-w-full flex-1 overflow-x-hidden overflow-y-auto text-foreground ${pageSurface(pathname) === "dark" ? "sm-app-bg" : "sm-light-page"} p-4 md:p-6 lg:p-8`}>
+          <main className={`sm-page min-w-0 max-w-full flex-1 overflow-x-hidden overflow-y-auto text-foreground ${pageSurface(pathname) === "dark" ? "sm-app-bg" : "sm-light-page"} ${pathname === "/" ? "sm-route-dashboard" : "sm-route-themed"} p-4 md:p-6 lg:p-8`}>
              <div className="mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
           </main>
         </SidebarInset>
