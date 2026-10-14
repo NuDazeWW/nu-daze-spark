@@ -3,6 +3,7 @@ export const commentLabel = (source?: { author_name?: string | null; topic?: str
   ["Comment", source?.author_name?.trim(), source?.topic?.trim()].filter(Boolean).join(" — ");
 
 const READING_SURFACES = [
+  "/planner",
   "/strategy",
   "/setup",
   "/settings/workspace",
