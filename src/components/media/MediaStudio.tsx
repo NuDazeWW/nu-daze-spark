@@ -73,6 +73,14 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
     finally { setBusy(false); }
   };
   useEffect(() => { if (generateSignal > 0) generate(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [generateSignal]);
+  useEffect(() => {
+    if (!final || !onResult) return;
+    let alive = true;
+    fetch(final).then((r) => r.blob()).then((b) => new Promise<string>((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result as string); fr.readAsDataURL(b); }))
+      .then((d) => { if (alive) onResult(d, prompt); }).catch(() => {});
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [final]);
 
   const save = async () => {
     if (!final || !user || !clientId) return;
