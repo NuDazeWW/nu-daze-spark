@@ -1317,3 +1317,8 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 .sm-bk-save:disabled { opacity: .6; }
 .sm-bk-preview-img { width: 100%; border-radius: 12px; border: 1px solid hsl(var(--sm-help-line) / .4); }
 @media (max-width: 640px) { .sm-bk-logo-row, .sm-bk-type-row { flex-direction: column; align-items: stretch; } .sm-bk-logo-box { width: 100%; min-height: 90px; } .sm-bk-body { padding-left: 0; } }
+
+/* User guide PDF: hide app chrome (sidebar, command bar, user initials) */
+@media print {
+  [data-sidebar], [data-sidebar="sidebar"], .sm-command-bar, [data-side="left"] { display: none !important; }
+}
