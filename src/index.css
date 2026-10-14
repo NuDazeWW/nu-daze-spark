@@ -507,7 +507,7 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   .sm-media-picker { padding: 20px; }
   .sm-media-picker [role="tablist"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.sm-dash-bird { mix-blend-mode: screen; }
+.sm-dash-bird { -webkit-mask-image: none; mask-image: none; filter: drop-shadow(0 0 14px hsl(var(--sm-fx-turquoise) / .25)); }
 .sm-dashboard .sm-dashboard-heading { min-height: 88px; }
 .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 { display: grid; grid-template-columns: minmax(150px, 34%) 1fr auto; align-items: center; column-gap: 18px; }
 .sm-dashboard .sm-dashboard-panels .space-y-4 > .space-y-1\.5 > div:first-child { display: contents; }
