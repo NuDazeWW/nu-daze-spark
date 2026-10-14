@@ -522,3 +522,124 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 @media (min-width: 768px) {
   .group\/sidebar-wrapper:has(.peer:hover) { --sidebar-width: 16rem; }
 }
+
+/* ===== Full SocialMotive UI adoption ===== */
+.sm-command-bar {
+  background: hsl(var(--brand-midnight) / .96);
+  box-shadow: inset 0 -1px 0 hsl(var(--sm-fx-lavender) / .12), 0 10px 30px -24px hsl(0 0% 0% / .9);
+  backdrop-filter: blur(14px);
+}
+.sm-page-header { position: relative; padding-bottom: 18px; border-bottom: 1px solid hsl(var(--border) / .72); }
+.sm-page-header::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 72px; height: 2px; border-radius: 999px; background: linear-gradient(90deg, hsl(var(--sm-fx-turquoise)), hsl(var(--sm-fx-citrine))); box-shadow: 0 0 12px hsl(var(--sm-fx-turquoise) / .45); }
+.sm-page-links { margin-bottom: 14px; }
+.sm-page-links a { min-height: 36px; border-color: hsl(var(--border) / .7); background: hsl(var(--background) / .42); backdrop-filter: blur(10px); }
+.sm-page-actions > * { min-height: 40px; }
+.sm-app-bg .sm-page-header h1 { background-image: linear-gradient(180deg, hsl(var(--sm-fx-heading-top)), hsl(var(--sm-fx-heading-bottom))); background-clip: text; -webkit-background-clip: text; color: transparent; }
+.sm-app-bg .sm-page-header { border-bottom-color: hsl(var(--sm-fx-lavender) / .13); }
+.sm-app-bg .sm-page-header::after { width: 96px; }
+.sm-app-bg .sm-page-links a { border-color: hsl(var(--sm-fx-lavender) / .16); background: hsl(var(--brand-plum-light) / .62); }
+.sm-light-page .sm-page-header::after { box-shadow: none; }
+
+/* Consistent toolbars, filters and command strips across routes. */
+.sm-app-bg .sm-page > div > .flex.flex-wrap.items-center,
+.sm-app-bg .sm-reference > .flex.flex-wrap.items-center {
+  border-color: hsl(var(--sm-fx-lavender) / .14);
+}
+.sm-app-bg input,
+.sm-app-bg textarea,
+.sm-app-bg [role="combobox"] { background: hsl(var(--brand-midnight) / .58); border-color: hsl(var(--sm-fx-lavender) / .18); }
+.sm-app-bg [role="tablist"] { background: hsl(var(--brand-midnight) / .62); border: 1px solid hsl(var(--sm-fx-lavender) / .12); }
+.sm-app-bg [role="tab"] { color: hsl(var(--muted-foreground)); }
+.sm-app-bg [role="tab"][data-state="active"] { color: hsl(var(--foreground)); background: hsl(var(--sm-fx-turquoise) / .12); border-color: hsl(var(--sm-fx-turquoise) / .42); }
+.sm-app-bg .sm-content-card,
+.sm-app-bg .sm-asset-card,
+.sm-app-bg .sm-comments .sm-card,
+.sm-app-bg .sm-queue .sm-card { box-shadow: inset 0 1px 0 hsl(0 0% 100% / .045), 0 16px 34px -24px hsl(0 0% 0% / .92); }
+.sm-app-bg .sm-content-card:hover,
+.sm-app-bg .sm-asset-card:hover,
+.sm-app-bg .sm-comments .sm-card:hover { border-color: hsl(var(--sm-fx-turquoise) / .38); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .06), 0 0 22px -12px hsl(var(--sm-fx-turquoise) / .55), 0 20px 38px -26px hsl(0 0% 0% / .95); }
+
+/* Asset Library — visual media catalog. */
+.sm-assets .sm-assets-toolbar { position: sticky; top: -32px; z-index: 10; margin-left: -8px; margin-right: -8px; padding: 16px 8px; background: hsl(var(--brand-midnight) / .84); border-bottom-color: hsl(var(--sm-fx-lavender) / .14); backdrop-filter: blur(18px); }
+.sm-assets .sm-asset-grid { gap: 18px; }
+.sm-assets .sm-asset-card { border-radius: 14px; background: linear-gradient(180deg, hsl(268 42% 15% / .96), hsl(266 48% 8% / .98)); }
+.sm-assets .sm-asset-card > div:first-child { order: 2; padding-top: 14px; }
+.sm-assets .sm-asset-card > div:last-child { display: flex; flex-direction: column; }
+.sm-assets .sm-asset-card > div:last-child > .group { order: -1; margin: 0 -16px 14px; width: calc(100% + 32px); border-width: 0 0 1px; border-radius: 0; }
+.sm-assets .sm-asset-card:hover { transform: translateY(-2px); }
+.sm-assets .sm-asset-card { transition: transform 180ms var(--sm-fx-ease), border-color 180ms var(--sm-fx-ease), box-shadow 180ms var(--sm-fx-ease); }
+.sm-assets .sm-asset-card .sm-control { min-height: 36px; }
+
+/* Queue — dense operational board with high-signal filters. */
+.sm-queue > .flex.flex-wrap.items-center { padding: 10px; border: 1px solid hsl(var(--sm-fx-lavender) / .13); border-radius: 12px; background: hsl(var(--brand-midnight) / .45); }
+.sm-queue > .flex.flex-wrap.items-center + .flex.flex-wrap.items-center { margin-top: 8px; }
+.sm-queue .sm-content-card { border-top: 1px solid hsl(var(--sm-fx-lavender) / .14); border-right: 1px solid hsl(var(--sm-fx-lavender) / .14); border-bottom: 1px solid hsl(var(--sm-fx-lavender) / .14); border-radius: 12px; }
+.sm-queue .sm-content-card [class*="line-clamp"] { line-height: 1.55; }
+.sm-queue .sm-content-card > div:first-child { background: hsl(var(--brand-midnight) / .22); border-bottom: 1px solid hsl(var(--sm-fx-lavender) / .08); }
+.sm-queue [role="group"][aria-label="Platform"] { border-color: hsl(var(--sm-fx-lavender) / .16); background: hsl(var(--brand-midnight) / .55); }
+
+/* Comment Generator — triage workspace. */
+.sm-comments > .rounded-lg.border,
+.sm-comments > .flex.flex-wrap.items-center { border-color: hsl(var(--sm-fx-lavender) / .14); background: hsl(var(--brand-midnight) / .5); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .04); }
+.sm-comments > .rounded-lg.border { border-radius: 12px; }
+.sm-comments .grid > .sm-card { position: relative; overflow: hidden; border-radius: 12px; }
+.sm-comments .grid > .sm-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(180deg, hsl(var(--sm-fx-coral)), hsl(var(--sm-fx-magenta))); opacity: .72; }
+.sm-comments .grid > .sm-card.ring-1::before { background: linear-gradient(180deg, hsl(var(--sm-fx-turquoise)), hsl(var(--sm-fx-citrine))); }
+.sm-comments textarea { background: hsl(var(--brand-midnight) / .62); }
+
+/* Strategy and setup use focused pale surfaces with dark command tabs. */
+.sm-strategy > [data-orientation="horizontal"] > [role="tablist"] { width: 100%; justify-content: flex-start; gap: 4px; padding: 6px; border: 1px solid hsl(var(--brand-plum) / .1); border-radius: 12px; background: hsl(var(--brand-plum)); color: hsl(var(--brand-bone)); box-shadow: 0 12px 30px -24px hsl(var(--brand-midnight) / .8); }
+.sm-strategy > [data-orientation="horizontal"] > [role="tablist"] [role="tab"] { min-height: 40px; color: hsl(var(--brand-bone) / .68); }
+.sm-strategy > [data-orientation="horizontal"] > [role="tablist"] [role="tab"][data-state="active"] { color: hsl(var(--brand-midnight)); background: linear-gradient(135deg, hsl(var(--brand-turquoise)), hsl(var(--brand-citrine))); }
+.sm-strategy [role="tabpanel"] { margin-top: 18px; }
+.sm-strategy [role="tabpanel"] .sm-card { border-color: hsl(var(--brand-plum) / .1); }
+.sm-setup-layout { grid-template-columns: 250px minmax(0, 1fr); }
+.sm-setup-steps { position: sticky; top: 16px; }
+.sm-setup-step { position: relative; }
+.sm-setup-step::after { content: ""; position: absolute; left: 27px; top: calc(100% + 1px); width: 1px; height: 9px; background: hsl(var(--border)); }
+.sm-setup-steps li:last-child .sm-setup-step::after { display: none; }
+.sm-setup-step-active { color: hsl(var(--primary)); }
+.sm-setup-focus { overflow: hidden; }
+.sm-setup-focus > div:first-child { background: linear-gradient(135deg, hsl(var(--primary) / .08), transparent 52%); border-bottom: 1px solid hsl(var(--border)); }
+
+/* Public pricing — luminous four-tier presentation, using live pricing and limits. */
+.sm-pricing { --background: var(--brand-midnight); --foreground: var(--brand-bone); --card: 268 39% 13%; --card-foreground: var(--brand-bone); --muted-foreground: 269 12% 68%; --border: 262 42% 25%; --input: 262 42% 25%; --secondary: 268 28% 19%; --secondary-foreground: var(--brand-bone); position: relative; overflow: hidden; background-color: hsl(var(--brand-midnight)); background-image: radial-gradient(760px 500px at 50% 16%, hsl(var(--sm-fx-violet) / .14), transparent 70%), radial-gradient(500px 380px at 10% 52%, hsl(var(--sm-fx-turquoise) / .09), transparent 70%), radial-gradient(520px 420px at 92% 62%, hsl(var(--sm-fx-magenta) / .09), transparent 72%); }
+.sm-pricing::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .25; background-image: linear-gradient(120deg, transparent 15%, hsl(var(--sm-fx-lavender) / .08) 15.2%, transparent 15.5%), linear-gradient(60deg, transparent 76%, hsl(var(--sm-fx-turquoise) / .06) 76.2%, transparent 76.6%); }
+.sm-pricing > * { position: relative; }
+.sm-pricing-header { border-color: hsl(var(--sm-fx-lavender) / .12); background: hsl(var(--brand-midnight) / .72); backdrop-filter: blur(16px); }
+.sm-pricing-intro h1 { background: linear-gradient(180deg, hsl(var(--sm-fx-heading-top)), hsl(var(--sm-fx-heading-bottom))); background-clip: text; -webkit-background-clip: text; color: transparent; }
+.sm-billing-toggle { border-color: hsl(var(--sm-fx-lavender) / .18); background: hsl(var(--brand-plum) / .76); }
+.sm-price-card { border-color: hsl(var(--sm-fx-lavender) / .17); background: linear-gradient(180deg, hsl(268 39% 15% / .96), hsl(266 49% 8% / .98)); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .06), 0 24px 50px -28px hsl(0 0% 0% / .95); }
+.sm-price-card[data-tier="starter"] { --tier-accent: var(--sm-fx-turquoise); }
+.sm-price-card[data-tier="team"] { --tier-accent: var(--sm-fx-coral); }
+.sm-price-card[data-tier="pro"] { --tier-accent: var(--sm-fx-citrine); }
+.sm-price-card[data-tier="enterprise"] { --tier-accent: var(--sm-fx-gold); }
+.sm-price-card { border-top: 2px solid hsl(var(--tier-accent) / .72); }
+.sm-price-card h2 { color: hsl(var(--tier-accent)); }
+.sm-price-card .lucide-check { color: hsl(var(--tier-accent)); }
+.sm-price-card-featured { box-shadow: inset 0 1px 0 hsl(0 0% 100% / .08), 0 0 0 1px hsl(var(--tier-accent) / .58), 0 0 30px -10px hsl(var(--tier-accent) / .7), 0 30px 55px -30px hsl(0 0% 0% / .95); }
+
+/* Dialogs inherit the active visual language without changing their structure. */
+[role="dialog"][data-state="open"] { border-radius: 16px; border-color: hsl(var(--primary) / .28); }
+body[data-sm-surface="reading"] [role="dialog"][data-state="open"] { background: linear-gradient(180deg, hsl(40 100% 99%), hsl(40 45% 96%)); }
+body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: linear-gradient(180deg, hsl(268 42% 15%), hsl(266 48% 8%)); }
+
+@media (max-width: 1023px) {
+  .sm-setup-layout { grid-template-columns: 1fr; }
+  .sm-setup-steps { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sm-setup-step::after { display: none; }
+  .sm-price-card-featured { margin-top: 0; margin-bottom: 0; }
+}
+@media (max-width: 767px) {
+  .sm-page-header { padding-bottom: 14px; }
+  .sm-page-links { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .sm-page-links a { flex: 0 0 auto; }
+  .sm-page-title-row { gap: 12px; }
+  .sm-page-actions { width: 100%; }
+  .sm-assets .sm-assets-toolbar { position: static; margin: 0; padding-left: 0; padding-right: 0; background: transparent; backdrop-filter: none; }
+  .sm-queue > .flex.flex-wrap.items-center { padding: 8px; }
+  .sm-setup-steps { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sm-assets .sm-asset-card:hover { transform: none; }
+}
