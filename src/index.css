@@ -631,14 +631,24 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
   .sm-price-card-featured { margin-top: 0; margin-bottom: 0; }
 }
 @media (max-width: 767px) {
-  .sm-page-header { padding-bottom: 14px; }
-  .sm-page-links { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .sm-page-header { max-width: 100%; padding-bottom: 14px; overflow: hidden; }
+  .sm-page-links { width: 100%; max-width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
   .sm-page-links a { flex: 0 0 auto; }
-  .sm-page-title-row { gap: 12px; }
+  .sm-page-title-row { min-width: 0; max-width: 100%; gap: 12px; }
+  .sm-page-title-row > div:first-child { min-width: 0; max-width: 100%; }
+  .sm-page-title-row h1, .sm-page-title-row p { max-width: 100%; }
   .sm-page-actions { width: 100%; }
-  .sm-assets .sm-assets-toolbar { position: static; margin: 0; padding-left: 0; padding-right: 0; background: transparent; backdrop-filter: none; }
-  .sm-queue > .flex.flex-wrap.items-center { padding: 8px; }
-  .sm-setup-steps { grid-template-columns: 1fr; }
+  .sm-assets .sm-assets-toolbar { position: static; max-width: 100%; margin: 0; padding-left: 0; padding-right: 0; background: transparent; backdrop-filter: none; }
+  .sm-assets .sm-assets-toolbar > * { max-width: 100%; }
+  .sm-queue > .flex.flex-wrap.items-center { min-width: 0; max-width: 100%; padding: 8px; overflow: hidden; }
+  .sm-queue > .flex.flex-wrap.items-center > [role="group"],
+  .sm-queue > .flex.flex-wrap.items-center > [role="tablist"] { max-width: 100%; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; }
+  .sm-queue .sm-content-card { min-width: 0; max-width: 100%; }
+  .sm-queue .sm-content-card * { min-width: 0; }
+  .sm-strategy > [data-orientation="horizontal"] { min-width: 0; max-width: 100%; overflow: hidden; }
+  .sm-strategy > [data-orientation="horizontal"] > [role="tablist"] { max-width: 100%; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; }
+  .sm-setup-layout { min-width: 0; max-width: 100%; }
+  .sm-setup-steps { grid-template-columns: 1fr; min-width: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sm-assets .sm-asset-card:hover { transform: none; }
