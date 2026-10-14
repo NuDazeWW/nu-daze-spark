@@ -96,10 +96,10 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
 
   return (
     <div className="mt-3 space-y-1.5 border-t border-border/40 pt-3" onClick={(e) => e.stopPropagation()}>
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-medium text-primary/70 flex items-center gap-1">
-          <Sparkles className="h-3 w-3" /> Auto-generated comment
-          {comment.tone && <Badge variant="secondary" className="text-[9px] h-4 ml-1">{comment.tone}</Badge>}
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+        <span className="text-[10px] font-medium text-primary/70 flex items-center gap-1 whitespace-nowrap shrink-0">
+          <Sparkles className="h-3 w-3 shrink-0" /> Auto-generated comment
+          {comment.tone && <Badge variant="secondary" className="text-[9px] h-4 ml-1 whitespace-nowrap">{comment.tone}</Badge>}
         </span>
         <div className="flex items-center gap-1">
           {dirty && (
@@ -309,9 +309,9 @@ export default function CommentGenerator() {
             <Plus className="mr-2 h-4 w-4" />Add Post
           </Button>
         )}
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-2 ml-auto shrink-0">
           <Switch checked={showCommented} onCheckedChange={setShowCommented} id="show-commented" />
-          <label htmlFor="show-commented" className="text-xs text-muted-foreground cursor-pointer">
+          <label htmlFor="show-commented" className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
             Show commented ({commentedCount})
           </label>
         </div>
