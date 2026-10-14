@@ -23,7 +23,7 @@ export default function Strategy() {
   const initial = params.get("builder") as BuilderMode | null;
   const [builder, setBuilder] = useState<BuilderMode | null>(initial && ["website", "document", "preset"].includes(initial) ? initial : null);
   return (
-    <div className="animate-fade-in">
+    <div className="sm-reference sm-strategy animate-fade-in">
       <PageHeader
         title="Strategy & Rules"
         description="Brand voice, guardrails, platform rules, audiences, campaigns, hashtags, CTAs, and targets."
