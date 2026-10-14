@@ -723,7 +723,7 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 .sm-auth-divider .border-t { border-color: hsl(var(--sm-auth-line)) !important; }
 @media (max-width: 1023px) {
   .sm-auth { grid-template-columns: 1fr; background: hsl(40 40% 97%); }
-  .sm-auth-art { padding: 1.5rem; border-radius: 0 0 2rem 2rem; background: url("./assets/brand/auth-hero-background.jpg") 20% 30% / cover no-repeat; }
+  .sm-auth-art { padding: 1.5rem; border-radius: 0 0 2rem 2rem; background: linear-gradient(90deg, hsl(265 50% 8% / .85), hsl(265 50% 8% / .35)), url("./assets/brand/auth-hero-background.jpg") 0% 50% / auto 260% no-repeat, hsl(265 50% 8%); }
   .sm-auth-bird, .sm-auth-copy { display: none; }
   .sm-auth-wordmark { font-size: 1.8rem; }
   .sm-auth-card-logo { display: none; }
