@@ -131,17 +131,17 @@ export default function PostGenerator() {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="sm-reference sm-generator animate-fade-in">
       <PageHeader
         title="Social Post Generator"
         description="Select source assets and generate structured post cards with AI."
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Main area */}
         <div className="space-y-6">
           {/* Source assets selection */}
-          <Card>
+          <Card className="sm-generator-sources">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center justify-between">
                 Source Assets
@@ -153,12 +153,12 @@ export default function PostGenerator() {
             </CardHeader>
             <CardContent>
               {selectedAssets.length === 0 ? (
-                <div className="text-center py-8 text-sm text-muted-foreground">
+                <div className="sm-source-empty text-center py-16 text-sm text-muted-foreground">
                   <FolderOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>No assets selected. Browse the library to pick source content.</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="sm-source-list space-y-3">
                   {selectedAssets.map((asset) => {
                     const Icon = ICON_MAP[asset.asset_type] ?? FileText;
                     return (
@@ -275,7 +275,7 @@ export default function PostGenerator() {
         </div>
 
         {/* Sidebar config */}
-        <div className="space-y-4">
+        <div className="sm-generation-settings space-y-4">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Generation Settings</CardTitle>

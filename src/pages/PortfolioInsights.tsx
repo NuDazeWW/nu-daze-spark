@@ -67,26 +67,26 @@ export default function PortfolioInsights() {
   const max = (rows: [string, number][]) => Math.max(1, ...rows.map((r) => r[1]));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-semibold flex items-center gap-2"><PieChart className="h-6 w-6 text-primary" /> Portfolio Insights</h1>
+    <div className="sm-reference sm-insights space-y-6">
+      <div className="sm-insights-heading">
+        <h1 className="text-4xl font-display font-semibold flex items-center gap-4"><PieChart className="h-12 w-12 p-3 rounded-xl border border-primary/30 bg-primary/10 text-primary shrink-0" /> Portfolio Insights</h1>
         <p className="text-sm text-muted-foreground">How your content is balanced across pillars, platforms and formats over the last 30 days — and where you're falling short this week.</p>
       </div>
       {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : (
         <>
-          <div className="grid gap-4 sm:grid-cols-4">
+          <div className="sm-metric-row grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[["Posts (30 days)", s.total], ["Pillars in use", s.pillars.filter(([k]) => k !== "Unassigned").length], ["Platforms active", s.platforms.length], ["Weekly gaps", s.gaps.filter((g) => g.short > 0).length]].map(([l, v]) => (
-              <Card key={l as string}><CardContent className="pt-5"><div className="text-xs text-muted-foreground">{l}</div><div className="text-2xl font-semibold font-display">{v}</div></CardContent></Card>
+              <Card key={l as string} className="sm-metric"><CardContent className="py-5"><div className="text-xs text-muted-foreground">{l}</div><div className="text-3xl font-semibold font-display tabular-nums mt-2">{v}</div></CardContent></Card>
             ))}
           </div>
-          <Card>
+          <Card className="sm-insights-action">
             <CardHeader><CardTitle className="text-base">What to act on</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {s.insights.length ? s.insights.map((i) => <p key={i} className="flex gap-2 text-sm"><AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />{i}</p>)
                 : <p className="flex gap-2 text-sm"><CheckCircle2 className="h-4 w-4 text-success" /> Your portfolio looks balanced.</p>}
             </CardContent>
           </Card>
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="sm-breakdowns grid gap-4 lg:grid-cols-3">
             <Card><CardHeader><CardTitle className="text-base">Content pillars</CardTitle></CardHeader>
               <CardContent className="space-y-3">{s.pillars.length ? s.pillars.map(([k, v]) => <Bar key={k} label={k} value={v} max={max(s.pillars)} />) : <p className="text-sm text-muted-foreground">No posts yet.</p>}</CardContent></Card>
             <Card><CardHeader><CardTitle className="text-base">Platforms</CardTitle></CardHeader>

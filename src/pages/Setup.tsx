@@ -16,7 +16,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Eye } from "lucide-react";
+import { CheckCircle2, Circle, Eye, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const PLATFORMS = ["linkedin", "instagram", "facebook"] as const;
@@ -109,27 +109,27 @@ function SetupInner() {
   const current = SETUP_STEPS[idx];
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="sm-reference sm-setup animate-fade-in space-y-6">
       <PageHeader title="Workspace setup" description={preview ? "Previewing the setup a new organization sees. Nothing you enter is saved." : `${ws.setupCompleted} of ${ws.setupTotal} steps complete. Reopen any step to change it.`}>
         <Button variant="outline" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
       </PageHeader>
       {preview && <Alert><AlertDescription>Preview mode: this is what a brand-new workspace looks like. Changes are not saved.</AlertDescription></Alert>}
 
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <ol className="space-y-1">
+      <div className="sm-setup-layout grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
+        <ol className="sm-setup-steps space-y-2">
           {SETUP_STEPS.map((s, i) => (
             <li key={s.key}>
-              <button onClick={() => setStep(s.key)} className={cn("flex w-full items-start gap-2 rounded-md px-3 py-2 text-left text-sm", s.key === step ? "bg-muted font-semibold" : "hover:bg-muted/60")}>
+              <Button variant="ghost" onClick={() => setStep(s.key)} className={cn("sm-setup-step flex h-auto min-h-14 w-full items-start justify-start gap-3 rounded-xl px-4 py-3 text-left text-sm whitespace-normal", s.key === step ? "sm-setup-step-active bg-muted font-semibold" : "hover:bg-muted/60")}>
                 {progress[s.key] ? <CheckCircle2 className="mt-0.5 h-4 w-4 text-brand-success shrink-0" /> : <Circle className="mt-0.5 h-4 w-4 text-muted-foreground shrink-0" />}
                 <span><span className="font-mono text-xs text-muted-foreground mr-1">{i + 1}.</span>{s.title}</span>
-              </button>
+              </Button>
             </li>
           ))}
         </ol>
 
-        <Card>
-          <CardHeader><CardTitle className="text-base">{current.title}</CardTitle><CardDescription>{current.description}</CardDescription></CardHeader>
-          <CardContent className="space-y-4">
+        <Card className="sm-setup-focus">
+          <CardHeader className="flex flex-row items-start gap-4 space-y-0"><Building2 className="h-16 w-16 shrink-0 rounded-2xl p-4 border border-primary/25 bg-primary/10 text-primary" /><div><CardTitle className="text-2xl">{current.title}</CardTitle><CardDescription className="mt-2">{current.description}</CardDescription></div></CardHeader>
+          <CardContent className="space-y-6">
             {step === "company" && (<>
               <div className="space-y-1.5"><Label>Company name</Label><Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Acme Inc." /></div>
               <div className="space-y-1.5"><Label>Company logo link (optional)</Label><Input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" /></div>
@@ -194,7 +194,7 @@ function SetupInner() {
               <p className="text-sm text-muted-foreground">Connect the email account (SendGrid, Gmail, Outlook, Yahoo or your own mail server) used for team notifications on the <Link className="underline" to="/settings/email-provider">Email Provider</Link> page, then choose who gets notified on <Link className="underline" to="/settings/notifications">Notifications</Link>.</p>
             )}
 
-            <div className="flex justify-between pt-2">
+            <div className="sm-setup-footer flex flex-wrap gap-3 justify-between pt-6">
               <Button variant="ghost" disabled={idx === 0} onClick={() => setStep(SETUP_STEPS[idx - 1].key)}>Back</Button>
               <div className="flex gap-2">
                 {idx < SETUP_STEPS.length - 1 && <Button variant="outline" onClick={next}>Skip for now</Button>}

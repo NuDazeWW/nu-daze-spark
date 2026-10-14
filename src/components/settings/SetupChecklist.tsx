@@ -10,7 +10,7 @@ export function SetupChecklist() {
   if (!ws.canManage || !ws.settings) return null;
   const done = ws.setupCompleted === ws.setupTotal;
   return (
-    <Card>
+    <Card className="sm-setup-banner">
       <CardContent className="py-4 space-y-3">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex-1 min-w-[200px]">

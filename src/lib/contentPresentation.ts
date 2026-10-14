@@ -3,4 +3,4 @@ export const commentLabel = (source?: { author_name?: string | null; topic?: str
   ["Comment", source?.author_name?.trim(), source?.topic?.trim()].filter(Boolean).join(" — ");
 
 export const pageSurface = (pathname: string): "dark" | "reading" =>
-  ["/", "/auth", "/reset-password"].includes(pathname) ? "dark" : "reading";
+  ["/", "/insights", "/assets", "/generator", "/auth", "/reset-password"].includes(pathname) ? "dark" : "reading";
