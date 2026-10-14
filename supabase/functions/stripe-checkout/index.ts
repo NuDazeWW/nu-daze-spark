@@ -82,8 +82,9 @@ Deno.serve(async (req) => {
     }
 
     // subscribe
-    if (b.nonprofit && bill?.nonprofit_status !== "verified") return json({ error: "Nonprofit pricing applies once your 501(c)(3) is verified." }, 409);
-    if (b.nonprofit && b.cycle !== "annual") return json({ error: "The nonprofit program is annual only." }, 400);
+    if (b.nonprofit && bill?.nonprofit_status !== "verified") return json({ error: "Non-profit pricing applies once your 501(c)(3) is verified." }, 409);
+    if (b.nonprofit && b.cycle !== "annual") return json({ error: "The non-profit program is annual only." }, 400);
+
     const { data: tier } = await admin.from("subscription_tier_definitions").select("*").eq("tier_slug", b.tier).eq("is_current", true).order("version", { ascending: false }).limit(1).maybeSingle();
     if (!tier) return json({ error: "Unknown plan" }, 400);
 
@@ -98,7 +99,7 @@ Deno.serve(async (req) => {
             currency: "usd",
             unit_amount: b.cycle === "annual" ? perMonth * 12 : perMonth,
             recurring: { interval: b.cycle === "annual" ? "year" : "month" },
-            product_data: { name: `SocialMotive ${tier.name}${b.nonprofit ? " (Nonprofit)" : ""}` },
+            product_data: { name: `SocialMotive ${tier.name}${b.nonprofit ? " (Non-Profit)" : ""}` },
           },
         };
     const fee = b.nonprofit ? tier.nonprofit_implementation_fee_cents : tier.implementation_fee_cents;

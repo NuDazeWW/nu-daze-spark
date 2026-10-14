@@ -124,9 +124,10 @@ function NonprofitCard({ onApply, status, highlight, cycle }: { onApply: () => v
     <Card className={cn(highlight && "border-primary")}>
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle>Nonprofit program</CardTitle>
+          <CardTitle>Non-profit program</CardTitle>
           <CardDescription>40% off annual plans, 25% off setup. Status: <b>{status === "none" ? "not applied" : status === "pending" ? "verification pending" : status}</b>
-            {status === "verified" && cycle !== "annual" && " — switch to annual billing to receive the nonprofit rate."}</CardDescription>
+            {status === "verified" && cycle !== "annual" && " — switch to annual billing to receive the non-profit rate."}</CardDescription>
+
         </div>
         {status !== "verified" && <Button variant="outline" onClick={onApply}>{status === "pending" ? "Submit another" : "Apply"}</Button>}
       </CardHeader>
@@ -166,7 +167,7 @@ function BillingModeCard({ mode, isOwner, eligible, onChange }: { mode: string; 
     <Card>
       <CardHeader>
         <CardTitle>How add-ons are billed</CardTitle>
-        <CardDescription>Card: credit packs, storage, seats, brands and channels charge immediately. Invoice: add-ons go on your next invoice (Force Enterprise and verified nonprofits).</CardDescription>
+        <CardDescription>Card: credit packs, storage, seats, brands and channels charge immediately. Invoice: add-ons go on your next invoice (Force Enterprise and verified non-profits).</CardDescription>
       </CardHeader>
       <CardContent className="flex gap-2">
         {(["self_serve_card", "invoice"] as const).map((m) => (
@@ -287,7 +288,7 @@ function PricingEngineCard() {
   const [draft, setDraft] = useState<Record<string, string>>({});
   const FIELDS: [string, string, boolean][] = [
     ["monthly_price_cents", "Monthly price (cents)", false], ["annual_price_cents", "Annual price per month (cents)", false],
-    ["nonprofit_annual_price_cents", "Nonprofit annual per month (cents)", false], ["implementation_fee_cents", "Setup fee (cents)", false],
+    ["nonprofit_annual_price_cents", "Non-profit annual per month (cents)", false], ["implementation_fee_cents", "Setup fee (cents)", false],
     ["media_credits", "Media credits", true], ["text_drafts", "AI drafts", true], ["x_cap_cents", "X cap (cents)", true],
     ["storage_gb", "Storage (GB)", true], ["seats", "Seats", true], ["brands", "Brands", true], ["dispatches", "Direct posts", true],
   ];
@@ -366,7 +367,7 @@ function PricingEngineCard() {
 export default function Billing() {
   return (
     <div className="animate-fade-in space-y-6">
-      <PageHeader title="Plan & billing" description="Your plan, payments, nonprofit status and spend controls." />
+      <PageHeader title="Plan & billing" description="Your plan, payments, non-profit status and spend controls." />
       <AdminOnly><BillingInner /></AdminOnly>
     </div>
   );

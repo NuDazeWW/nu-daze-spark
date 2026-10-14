@@ -48,7 +48,7 @@ export function NonprofitIntakeDialog({ open, onOpenChange, intendedTier, onSubm
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Verify your 501(c)(3) status</DialogTitle>
-          <DialogDescription>Verified nonprofits get 40% off annual plans and 25% off implementation. We check every application against the IRS Tax Exempt Organization Search.</DialogDescription>
+          <DialogDescription>Verified non-profits get 40% off annual plans and 25% off implementation. We check every application against the IRS Tax Exempt Organization Search.</DialogDescription>
         </DialogHeader>
         {!user ? (
           <p className="text-sm">Please <Link to="/auth" className="font-medium text-primary underline">sign in or create an account</Link> to upload your determination letter securely.</p>
@@ -61,7 +61,7 @@ export function NonprofitIntakeDialog({ open, onOpenChange, intendedTier, onSubm
               <div><Label>Contact email</Label><Input type="email" value={f.contact_email} onChange={set("contact_email")} maxLength={200} /></div>
             </div>
             <div><Label>IRS determination letter (PDF, JPG or PNG)</Label><Input type="file" accept="application/pdf,image/jpeg,image/png" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></div>
-            <p className="text-xs text-muted-foreground">The nonprofit program is annual only. Your letter is stored privately and seen only by workspace admins.</p>
+            <p className="text-xs text-muted-foreground">The non-profit program is annual only. Your letter is stored privately and seen only by workspace admins.</p>
           </div>
         )}
         <DialogFooter>
