@@ -1419,7 +1419,9 @@ export type Database = {
           id: string
           is_active: boolean
           post_went_out: boolean
+          publishing_report: boolean
           recipient_email: string
+          report_frequency: string
           send_time: string
           time_zone: string
           updated_at: string
@@ -1434,7 +1436,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           post_went_out?: boolean
+          publishing_report?: boolean
           recipient_email: string
+          report_frequency?: string
           send_time?: string
           time_zone?: string
           updated_at?: string
@@ -1449,7 +1453,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           post_went_out?: boolean
+          publishing_report?: boolean
           recipient_email?: string
+          report_frequency?: string
           send_time?: string
           time_zone?: string
           updated_at?: string
@@ -2085,6 +2091,42 @@ export type Database = {
           provider?: string
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      reporting_connectors: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          key_created_at: string | null
+          key_hash: string | null
+          key_prefix: string | null
+          last_used_at: string | null
+          provider: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          key_created_at?: string | null
+          key_hash?: string | null
+          key_prefix?: string | null
+          last_used_at?: string | null
+          provider: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          key_created_at?: string | null
+          key_hash?: string | null
+          key_prefix?: string | null
+          last_used_at?: string | null
+          provider?: string
         }
         Relationships: []
       }
@@ -2780,6 +2822,7 @@ export type Database = {
         }
         Returns: Json
       }
+      create_reporting_key: { Args: { _provider: string }; Returns: string }
       demo_content_counts: { Args: never; Returns: Json }
       evaluate_anomalies: { Args: { _bucket: string }; Returns: undefined }
       has_role: {
