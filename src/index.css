@@ -1001,7 +1001,7 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 }
 .sm-page:has(.sm-help) { position: relative; isolation: isolate; padding-top: 0; }
 .sm-help { position: relative; max-width: 1024px; margin: 0 auto; color: hsl(var(--sm-help-ink)); }
-.sm-help-background { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; pointer-events: none; }
+.sm-help-background { position: fixed; inset: 56px 0 0; width: 100%; height: calc(100% - 56px); object-fit: cover; z-index: -1; pointer-events: none; }
 .sm-help .sm-page-header { padding-bottom: 0; margin-bottom: 22px; border: 0; }
 .sm-help .sm-page-header::after { display: none; }
 .sm-help .sm-page-links { margin-bottom: 12px; }
@@ -1025,10 +1025,10 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
 .sm-help-tone-gold { --help-tone: var(--sm-help-gold); }
 .sm-help-guides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
 .sm-help-guide, .sm-help-category { position: relative; min-width: 0; border: 1px solid transparent; border-radius: 10px;
-  background: linear-gradient(100deg, hsl(var(--help-tone) / .1), hsl(var(--sm-help-surface) / .97) 36%, hsl(var(--sm-help-surface) / .94)) padding-box, linear-gradient(120deg, hsl(var(--help-tone) / .85), hsl(var(--sm-help-line) / .22) 55%, hsl(var(--help-tone) / .4)) border-box;
+  background: linear-gradient(100deg, hsl(var(--help-tone) / .1), transparent 36%) padding-box, linear-gradient(hsl(var(--sm-help-surface)), hsl(var(--sm-help-surface))) padding-box, linear-gradient(120deg, hsl(var(--help-tone) / .85), hsl(var(--sm-help-line) / .22) 55%, hsl(var(--help-tone) / .4)) border-box;
   box-shadow: inset 0 1px 10px hsl(var(--help-tone) / .12), 0 0 20px -12px hsl(var(--help-tone) / .55), var(--sm-help-depth); }
 .sm-help-guide { display: flex; align-items: center; gap: 18px; padding: 13px 20px; min-height: 90px; overflow: hidden;
-  background: linear-gradient(110deg, hsl(var(--help-tone) / .2), hsl(var(--sm-help-surface) / .96) 36%, hsl(var(--help-tone) / .22)) padding-box, linear-gradient(110deg, hsl(var(--help-tone)), hsl(var(--help-tone) / .65)) border-box;
+  background: linear-gradient(110deg, hsl(var(--help-tone) / .2), transparent 36%, hsl(var(--help-tone) / .22)) padding-box, linear-gradient(hsl(var(--sm-help-surface)), hsl(var(--sm-help-surface))) padding-box, linear-gradient(110deg, hsl(var(--help-tone)), hsl(var(--help-tone) / .65)) border-box;
   box-shadow: inset 0 1px 16px hsl(var(--help-tone) / .2), 0 0 20px -8px hsl(var(--help-tone) / .65); }
 .sm-help-guide:hover { box-shadow: inset 0 1px 20px hsl(var(--help-tone) / .25), 0 0 24px -4px hsl(var(--help-tone) / .6); }
 .sm-help-icon { display: grid; place-items: center; flex: 0 0 56px; width: 56px; height: 56px; border-radius: 9px; color: hsl(var(--help-tone)); border: 1px solid hsl(var(--help-tone) / .4);
