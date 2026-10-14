@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Ban, CloudUpload, Image as ImageIcon, Loader2, Palette, Plus, Save, Sparkles, Stamp, Trash2, Type, Upload, X } from "lucide-react";
 import workspaceBackground from "@/assets/help-workspace-background.jpg";
-import watermarkBird from "@/assets/brand/nudaze-watermark-bird.png.asset.json";
+import watermarkBird from "@/assets/brand/nudaze-watermark-bird.png";
 
 const FONT_SUGGESTIONS = ["Space Grotesk", "Inter", "IBM Plex Mono", "Playfair Display", "Montserrat", "Lato", "Roboto", "Source Serif"];
 
