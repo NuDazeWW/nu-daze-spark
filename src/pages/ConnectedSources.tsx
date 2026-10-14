@@ -8,19 +8,22 @@ import { OneDriveBrowserDialog } from "@/components/sources/OneDriveBrowserDialo
 import { ReportingConnectors } from "@/components/sources/ReportingConnectors";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Link2, Plus, Pencil, Trash2, AlertCircle,
   HardDrive, Globe, Cloud, FolderSync, BookOpen, Database,
-  Download, Loader2, Link, CheckCircle2,
+  Download, Loader2, Link, MoreVertical, RefreshCw, FolderOpen, CalendarDays, Clock, FileText,
 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import oneDriveLogo from "@/assets/logos/onedrive.svg";
+import sharePointLogo from "@/assets/logos/sharepoint.svg";
+import googleDriveLogo from "@/assets/logos/google-drive.svg";
+
+const SOURCE_LOGO: Record<string, string> = { onedrive: oneDriveLogo, sharepoint: sharePointLogo, google_drive: googleDriveLogo };
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -177,191 +180,141 @@ export default function ConnectedSources() {
     );
   }
 
+  const cloudTypes = ["onedrive", "sharepoint"];
+  const findCloud = (t: string) => data.find((s) => s.source_type === t);
+  const CLOUD = [
+    { type: "onedrive", name: "OneDrive", logo: oneDriveLogo, tone: "blue", ready: true },
+    { type: "sharepoint", name: "SharePoint", logo: sharePointLogo, tone: "teal", ready: true },
+    { type: "google_drive", name: "Google Drive", logo: googleDriveLogo, tone: "gold", ready: false },
+  ] as const;
+
   return (
-    <div className="animate-fade-in">
-      <PageHeader title="Connected Sources" description="Link external document libraries and web sources." />
+    <div className="sm-src animate-fade-in">
+      <PageHeader title="Connected Sources" description="Link external document libraries and web sources to power your content, insights, and reporting." />
 
       {/* Quick Import Bar */}
-      <Card className="mb-6 border-primary/20 bg-primary/5">
-        <CardContent className="py-4 px-5">
-          <div className="flex items-center gap-3">
-            <Link className="h-5 w-5 text-primary shrink-0" />
-            <div className="flex-1">
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  value={quickUrl}
-                  onChange={(e) => setQuickUrl(e.target.value)}
-                  placeholder="Paste a URL to scrape & import into Asset Library…"
-                  className="flex-1 bg-background border border-border rounded-md px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  onKeyDown={(e) => e.key === "Enter" && handleQuickImport()}
-                  disabled={quickScraping}
-                />
-                <Button onClick={handleQuickImport} disabled={!quickUrl.trim() || quickScraping} size="sm">
-                  {quickScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                  <span className="ml-1.5">Import</span>
-                </Button>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => setBulkOpen(true)}>
-              Bulk Import
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="sm-src-import">
+        <div className="sm-src-url">
+          <Link className="sm-src-url-icon" aria-hidden="true" />
+          <input
+            type="url"
+            value={quickUrl}
+            onChange={(e) => setQuickUrl(e.target.value)}
+            placeholder="Paste a URL to scrape & import into Asset Library…"
+            aria-label="URL to import"
+            onKeyDown={(e) => e.key === "Enter" && handleQuickImport()}
+            disabled={quickScraping}
+          />
+        </div>
+        <Button onClick={handleQuickImport} disabled={!quickUrl.trim() || quickScraping} className="sm-src-btn">
+          {quickScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          Import
+        </Button>
+        <Button variant="outline" onClick={() => setBulkOpen(true)} className="sm-src-btn-soft">
+          <FileText className="h-4 w-4" />Bulk Import
+        </Button>
+      </div>
+      <p className="sm-src-hint">Supported: webpages, PDFs, Google Drive, SharePoint, OneDrive and more.</p>
 
       {/* Source Actions */}
-      <div className="flex justify-end gap-2 mb-4">
-        <Button variant="outline" size="sm" asChild>
+      <div className="flex flex-wrap justify-end gap-3 mb-2">
+        <Button variant="outline" asChild className="sm-src-btn-soft">
           <a href="/settings/connectors" target="_blank" rel="noopener noreferrer">
-            <Link2 className="mr-2 h-4 w-4" />
-            Manage Connectors
+            <Link2 className="h-4 w-4" />Manage Connectors
           </a>
         </Button>
-        <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Source</Button>
+        <Button onClick={openCreate} className="sm-src-btn"><Plus className="h-4 w-4" />Add Source</Button>
       </div>
 
-      {(() => {
-        const cloudTypes = ["onedrive", "sharepoint"];
-        const cloudSources = data.filter((s) => cloudTypes.includes(s.source_type));
-        const otherSources = data.filter((s) => !cloudTypes.includes(s.source_type));
-
-        return otherSources.length === 0 && cloudSources.length === 0 ? (
+      <h2 className="sm-src-h2">Your Sources</h2>
+      <p className="sm-src-sub">Manage your connected accounts and data sources.</p>
+      {data.length === 0 ? (
+        <div className="sm-src-empty">
           <EmptyState
             icon={Link2}
             title="No sources connected"
             description="Connect Google Drive, SharePoint, or add webpage links for content sourcing."
-            action={<Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Source</Button>}
+            action={<Button onClick={openCreate} className="sm-src-btn"><Plus className="h-4 w-4" />Add Source</Button>}
           />
-        ) : otherSources.length === 0 ? null : (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {otherSources.map((source) => {
-              const meta = SOURCE_TYPE_META[source.source_type] ?? { icon: Globe, label: source.source_type };
-              const Icon = meta.icon;
-              const isWebpage = source.source_type === "webpage";
-              const isScraping = scrapingId === source.id;
-              const config = source.connection_config as Record<string, unknown> | null;
-              const hasUrl = !!(config?.url);
-
-              return (
-                <Card key={source.id} className="group">
-                  <CardHeader className="py-3 px-4 flex-row items-center justify-between space-y-0">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <CardTitle className="text-sm font-semibold truncate">{source.source_name}</CardTitle>
-                    </div>
-                    <div className="flex gap-1 shrink-0">
-                      {isWebpage && hasUrl && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleScrapeSource(source)}
-                              disabled={isScraping}
-                            >
-                              {isScraping ? (
-                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                              ) : (
-                                <Download className="h-3.5 w-3.5 text-primary" />
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="text-xs">Scrape & import to Asset Library</TooltipContent>
-                        </Tooltip>
-                      )}
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(source)}><Pencil className="h-3.5 w-3.5" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(source.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="px-4 pb-3 pt-0 space-y-2">
-                    <div className="flex gap-1.5 flex-wrap">
-                      <Badge variant="outline" className="text-xs">{meta.label}</Badge>
-                      <Badge variant={source.is_connected ? "default" : "secondary"} className="text-xs">
-                        {source.is_connected ? "Connected" : "Disconnected"}
-                      </Badge>
-                      {isWebpage && !hasUrl && (
-                        <Badge variant="outline" className="text-xs text-muted-foreground">No URL set</Badge>
-                      )}
-                    </div>
-                    {hasUrl && (
-                      <p className="text-[10px] text-muted-foreground/60 truncate">
-                        {config?.url as string}
-                      </p>
-                    )}
-                    {source.last_synced_at && (
-                      <p className="text-[10px] text-muted-foreground/60 flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-brand-success" />
-                        Last synced {format(new Date(source.last_synced_at), "MMM d, yyyy 'at' h:mm a")}
-                      </p>
-                    )}
-                    <p className="text-[10px] text-muted-foreground/60">
-                      Created {format(new Date(source.created_at), "MMM d, yyyy")}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        );
-      })()}
-      {/* Cloud Storage Integrations */}
-      <div className="mt-8">
-        <h3 className="text-sm font-medium text-muted-foreground mb-3">Cloud Storage Integrations</h3>
-        <div className="grid gap-3 md:grid-cols-3">
-          {/* Dynamic OneDrive / SharePoint sources */}
-          {data
-            .filter((s) => s.source_type === "onedrive" || s.source_type === "sharepoint")
-            .map((source) => {
-              const meta = SOURCE_TYPE_META[source.source_type] ?? { icon: FolderSync, label: source.source_type };
-              const Icon = meta.icon;
-              return (
-                <Card
-                  key={source.id}
-                  className="border-primary/20 cursor-pointer hover:border-primary/40 transition-colors group"
-                  onClick={() => setOneDriveOpen(true)}
-                >
-                  <CardContent className="py-6 px-4 text-center space-y-2 relative">
-                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEdit(source); }}><Pencil className="h-3 w-3" /></Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); setDeleteId(source.id); }}><Trash2 className="h-3 w-3 text-destructive" /></Button>
-                    </div>
-                    <Icon className="h-8 w-8 mx-auto text-primary" />
-                    <p className="text-sm font-medium">{source.source_name}</p>
-                    <p className="text-xs text-muted-foreground">Browse and import files from {meta.label}</p>
-                    <Badge variant={source.is_connected ? "default" : "secondary"} className="text-[10px]">
-                      {source.is_connected ? "Connected" : "Disconnected"}
-                    </Badge>
-                    {source.last_synced_at && (
-                      <p className="text-[10px] text-muted-foreground/60">
-                        Last synced {format(new Date(source.last_synced_at), "MMM d, yyyy 'at' h:mm a")}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
-          {/* Fallback if no OneDrive sources exist yet */}
-          {!data.some((s) => s.source_type === "onedrive" || s.source_type === "sharepoint") && (
-            <Card className="border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors" onClick={() => setOneDriveOpen(true)}>
-              <CardContent className="py-6 px-4 text-center space-y-2">
-                <FolderSync className="h-8 w-8 mx-auto text-primary" />
-                <p className="text-sm font-medium">OneDrive / SharePoint</p>
-                <p className="text-xs text-muted-foreground">Browse and import files from OneDrive & SharePoint</p>
-                <Badge variant="outline" className="text-[10px]">Click to browse</Badge>
-              </CardContent>
-            </Card>
-          )}
-          {/* Google Drive — coming soon */}
-          <Card className="border-dashed border-border/50 opacity-60">
-            <CardContent className="py-6 px-4 text-center space-y-2">
-              <HardDrive className="h-8 w-8 mx-auto text-muted-foreground" />
-              <p className="text-sm font-medium">Google Drive</p>
-              <p className="text-xs text-muted-foreground">Browse and import files from Google Drive</p>
-              <Badge variant="outline" className="text-[10px]">Coming Soon</Badge>
-            </CardContent>
-          </Card>
         </div>
+      ) : (
+        <div className="sm-src-grid">
+          {data.map((source) => {
+            const meta = SOURCE_TYPE_META[source.source_type] ?? { icon: Globe, label: source.source_type };
+            const Icon = meta.icon;
+            const logo = SOURCE_LOGO[source.source_type];
+            const isWebpage = source.source_type === "webpage";
+            const isCloud = cloudTypes.includes(source.source_type);
+            const isScraping = scrapingId === source.id;
+            const config = source.connection_config as Record<string, unknown> | null;
+            const hasUrl = !!(config?.url);
+            return (
+              <article key={source.id} className="sm-src-card">
+                <span className="sm-src-art" aria-hidden="true" />
+                <div className="sm-src-card-top">
+                  <span className="sm-src-logo">{logo ? <img src={logo} alt={`${meta.label} logo`} /> : <span className="sm-src-globe"><Icon /></span>}</span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="sm-src-name">{source.source_name}</h3>
+                    <div className="sm-src-meta-line">
+                      <span>{meta.label}</span><span aria-hidden="true">•</span>
+                      <span className={source.is_connected ? "sm-src-pill sm-src-pill-on" : "sm-src-pill"}><span className="sm-src-dot" />{source.is_connected ? "Connected" : "Disconnected"}</span>
+                    </div>
+                    {source.last_synced_at && <p className="sm-src-meta">Last synced {format(new Date(source.last_synced_at), "MMM d, yyyy 'at' h:mm a")}</p>}
+                    <p className="sm-src-meta">Created {format(new Date(source.created_at), "MMM d, yyyy")}</p>
+                    {isWebpage && (hasUrl ? <p className="sm-src-meta truncate">{config?.url as string}</p> : <p className="sm-src-meta">No URL set</p>)}
+                  </div>
+                  <div className="sm-src-card-actions">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="sm-src-more" aria-label={`More actions for ${source.source_name}`}><MoreVertical className="h-4 w-4" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => openEdit(source)}><Pencil className="mr-2 h-3.5 w-3.5" />Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={() => setDeleteId(source.id)}><Trash2 className="mr-2 h-3.5 w-3.5" />Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    {isWebpage && hasUrl && (
+                      <Button variant="outline" className="sm-src-btn-soft" onClick={() => handleScrapeSource(source)} disabled={isScraping}>
+                        {isScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}Import now
+                      </Button>
+                    )}
+                    {isWebpage && !hasUrl && <Button className="sm-src-btn" onClick={() => openEdit(source)}>Add URL</Button>}
+                    {isCloud && <Button variant="outline" className="sm-src-btn-soft" onClick={() => setOneDriveOpen(true)}><FolderOpen className="h-4 w-4" />Browse</Button>}
+                  </div>
+                </div>
+                <div className="sm-src-stats">
+                  <div><Icon aria-hidden="true" /><span><b>{meta.label}</b><small>Type</small></span></div>
+                  <div><CalendarDays aria-hidden="true" /><span><b>{format(new Date(source.created_at), "MMM d, yyyy")}</b><small>Created</small></span></div>
+                  <div><Clock aria-hidden="true" /><span><b>{source.last_synced_at ? format(new Date(source.last_synced_at), "MMM d, yyyy") : "Not synced"}</b><small>Last sync</small></span></div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Cloud Storage Integrations */}
+      <h2 className="sm-src-h2 mt-8">Cloud Storage Integrations</h2>
+      <p className="sm-src-sub">Connect your cloud storage to browse and import files.</p>
+      <div className="sm-src-cloud-grid">
+        {CLOUD.map((c) => {
+          const src = findCloud(c.type);
+          return (
+            <article key={c.type} className={`sm-src-cloud sm-src-tone-${c.tone}`}>
+              <span className="sm-src-ribbon" aria-hidden="true"><i /><i /><i /></span>
+              <img src={c.logo} alt={`${c.name} logo`} className="sm-src-cloud-logo" />
+              <div className="min-w-0">
+                <h3 className="sm-src-name">{c.name}</h3>
+                <p className="sm-src-meta">Browse and import files from {c.name}</p>
+                {c.ready ? (
+                  <Button className="sm-src-btn mt-3" onClick={() => setOneDriveOpen(true)}>{src?.is_connected ? "Browse files" : "Connect"}</Button>
+                ) : (
+                  <Button className="sm-src-btn mt-3" disabled>Coming soon</Button>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
 
       <ReportingConnectors isAdmin={isAdmin} />
