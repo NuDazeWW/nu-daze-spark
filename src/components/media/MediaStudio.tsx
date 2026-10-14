@@ -16,9 +16,12 @@ import { Download, ImagePlus, Loader2, Palette, Save, Sparkles, Video } from "lu
 import { Link } from "react-router-dom";
 import { VideoStudio } from "./VideoStudio";
 
-type Props = { clientId: string | null; postCardId?: string; defaultPrompt?: string; platform?: string; canCreate: boolean };
+type Props = {
+  clientId: string | null; postCardId?: string; defaultPrompt?: string; platform?: string; canCreate: boolean;
+  promptContext?: string; generateSignal?: number; onBusyChange?: (busy: boolean) => void;
+};
 
-export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform, canCreate }: Props) {
+export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform, canCreate, promptContext = "", generateSignal = 0, onBusyChange }: Props) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const brand = useBrandKit(clientId);
@@ -36,6 +39,11 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
   const logoUrl = brand.data?.logoUrl ?? null;
   const kit = brand.data?.kit;
 
+  useEffect(() => { onBusyChange?.(busy); }, [busy, onBusyChange]);
+  useEffect(() => {
+    if (platform) setAspect(platform === "linkedin" || platform === "facebook" || platform === "x" ? "landscape" : platform === "instagram" || platform === "youtube" ? "portrait" : "square");
+  }, [platform]);
+
   useEffect(() => {
     let alive = true; let made: string | null = null;
     if (!raw) { setFinal(null); return; }
@@ -48,10 +56,12 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
   const { ensure } = useCreditGate();
   const generate = async () => {
     if (!clientId) return toast.error("Pick a client first");
+    if (prompt.trim().length < 5) return toast.error("Describe the image first");
     if (!(await ensure({ bucket: "credits", capability: "image_standard", clientId, label: "Standard AI image (5 credits)" }))) return;
     setBusy(true); setRaw(null);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-media", { body: { client_id: clientId, prompt, aspect, style, apply_brand: applyBrand } });
+      const fullPrompt = promptContext ? `${prompt}\n\nContext: ${promptContext}` : prompt;
+      const { data, error } = await supabase.functions.invoke("generate-media", { body: { client_id: clientId, prompt: fullPrompt, aspect, style, apply_brand: applyBrand } });
       if (error) {
         let msg = error.message;
         if (error instanceof FunctionsHttpError) { try { msg = (await error.context.json()).error ?? msg; } catch { /* keep */ } }
@@ -61,6 +71,7 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
     } catch (e) { toast.error(e instanceof Error ? e.message : "Generation failed"); }
     finally { setBusy(false); }
   };
+  useEffect(() => { if (generateSignal > 0) generate(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [generateSignal]);
 
   const save = async () => {
     if (!final || !user || !clientId) return;
