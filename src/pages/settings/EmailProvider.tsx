@@ -112,7 +112,7 @@ function Inner() {
   const showForm = !connected || editing;
 
   return (
-    <div className="sm-email-provider animate-fade-in space-y-6">
+    <div className="sm-email-provider space-y-6">
       <img src={emailBackground} width={1536} height={1024} alt="" aria-hidden="true" className="sm-email-background" />
       <PageHeader title="Email Provider" description="The email account SocialMotive uses to send team notifications. Each workspace connects its own." />
 
