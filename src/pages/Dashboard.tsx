@@ -14,12 +14,32 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Sparkles, MessageSquare, Upload, CalendarDays,
   TrendingUp, TrendingDown, Minus, ArrowRight,
   Linkedin, Instagram, FileText, Image, FolderOpen,
-  ShieldCheck, Eye, ShieldX, Archive,
+  ShieldCheck, Eye, ShieldX, Archive, Info,
 } from "lucide-react";
+
+function PanelInfo({ description }: { description: string }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label="About this panel"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Info className="h-3.5 w-3.5" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" className="w-64 text-xs text-muted-foreground">
+        {description}
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 const PLATFORM_ICON: Record<string, React.ElementType> = {
   linkedin: Linkedin,
