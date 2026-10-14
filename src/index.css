@@ -751,10 +751,15 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 .sm-light-page .sm-planner .sm-planner-toolbar [role="tab"][data-state="active"] { color: hsl(var(--planner-surface)); background: linear-gradient(145deg, hsl(var(--planner-action)), hsl(var(--brand-midnight))); border: 1px solid hsl(var(--planner-cyan) / .65); box-shadow: 0 0 12px hsl(var(--planner-cyan) / .2); }
 .sm-planner .sm-planner-summaries { gap: 12px; margin-bottom: 18px; }
 .sm-planner .sm-planner-summary { --quarter-accent: var(--planner-blue); display: flex; align-items: flex-start; gap: 14px; padding: 16px 14px; min-width: 0; }
+/* Quarter cards carry a tinted, layered background so they separate from the page canvas. */
+.sm-light-page .sm-planner .sm-planner-summary { background: radial-gradient(130% 150% at 100% 0%, hsl(var(--quarter-accent) / .2), transparent 64%), linear-gradient(163deg, hsl(var(--quarter-accent) / .13) 0%, hsl(var(--planner-surface) / .97) 55%, hsl(var(--planner-surface)) 100%); border-color: hsl(var(--quarter-accent) / .4); box-shadow: 0 10px 26px hsl(var(--quarter-accent) / .16), inset 0 1px 0 hsl(var(--planner-surface) / .95); }
+.sm-light-page .sm-planner .sm-planner-summary .sm-planner-quarter-copy > div:first-child > span:first-child { color: hsl(var(--quarter-accent)); }
+.sm-light-page .sm-planner .sm-planner-summary .text-muted-foreground { color: hsl(250 22% 41%); }
+
 .sm-planner-summary[data-quarter="1"] { --quarter-accent: var(--planner-violet); }
 .sm-planner-summary[data-quarter="2"] { --quarter-accent: var(--planner-coral); }
 .sm-planner-summary[data-quarter="3"] { --quarter-accent: var(--planner-green); }
-.sm-planner-quarter-icon { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; border-radius: 12px; color: hsl(var(--quarter-accent)); background: hsl(var(--quarter-accent) / .08); }
+.sm-planner-quarter-icon { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; border-radius: 12px; color: hsl(var(--quarter-accent)); background: linear-gradient(150deg, hsl(var(--quarter-accent) / .22), hsl(var(--quarter-accent) / .08)); box-shadow: inset 0 0 0 1px hsl(var(--quarter-accent) / .3), 0 3px 9px hsl(var(--quarter-accent) / .14); }
 .sm-planner-quarter-icon svg { width: 20px; height: 20px; }
 .sm-planner-quarter-copy { flex: 1; min-width: 0; }
 .sm-planner-quarter-copy > div:first-child { padding: 0; }
