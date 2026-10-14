@@ -15,7 +15,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, AlertTriangle } from "lucide-react";
+import { Loader2, Plus, Trash2, AlertTriangle, Mail, UserPlus, ArrowRight } from "lucide-react";
+import notificationsBackground from "@/assets/notifications-workspace-background.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Pref = Tables<"notification_preferences">;
@@ -42,7 +43,7 @@ function PrefCard({ pref, canDelete, onChange }: { pref: Pref; canDelete: boolea
   const ids = pref.client_ids ?? [];
   const canTest = ws.canManage || pref.recipient_email.toLowerCase() === (user?.email ?? "").toLowerCase();
   return (
-    <Card>
+    <Card className="sm-notifications-preference">
       <CardContent className="py-4 space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-semibold flex-1 min-w-[200px]">{pref.recipient_email} {pref.user_id === user?.id && <Badge variant="outline" className="ml-1">You</Badge>}</p>
@@ -108,15 +109,17 @@ export default function NotificationsPage() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
 
   async function add(recipient: string, forSelf: boolean) {
+    if (!user) return;
     const { error } = await supabase.from("notification_preferences").insert({
-      recipient_email: recipient.trim().toLowerCase(), user_id: forSelf ? user!.id : null, created_by: user!.id, time_zone: tz,
+      recipient_email: recipient.trim().toLowerCase(), user_id: forSelf ? user.id : null, created_by: user.id, time_zone: tz,
     });
     if (error) toast.error(error.message.includes("duplicate") ? "That address is already a recipient" : error.message);
     else { setEmail(""); refresh(); }
   }
 
   return (
-    <div className="animate-fade-in space-y-6 max-w-4xl">
+    <div className="sm-reference sm-notifications animate-fade-in space-y-6">
+      <img src={notificationsBackground} alt="" aria-hidden="true" className="sm-notifications-background" width={1536} height={1024} />
       <PageHeader title="Notifications" description="Email reminders for the day's scheduled posts and when a post goes out. Nothing is ever published automatically." />
 
       {ws.canManage && providerQ.data?.provider === "none" && (
@@ -128,9 +131,10 @@ export default function NotificationsPage() {
 
       {prefsQ.isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (<>
         {!mine && user?.email && (
-          <Card><CardContent className="py-4 flex flex-wrap items-center gap-3">
+          <Card className="sm-notifications-self"><CardContent className="py-4 flex flex-wrap items-center gap-3">
+            <span className="sm-notifications-icon" aria-hidden="true"><Mail /></span>
             <p className="text-sm flex-1">Get notifications at <strong>{user.email}</strong>.</p>
-            <Button onClick={() => add(user.email!, true)}>Turn on for me</Button>
+            <Button className="sm-notifications-enable" onClick={() => user.email && add(user.email, true)}>Turn on for me<ArrowRight className="h-4 w-4" /></Button>
           </CardContent></Card>
         )}
         {ws.canManage && prefs.length > 1 && (
@@ -143,10 +147,11 @@ export default function NotificationsPage() {
       </>)}
 
       {ws.canManage && (
-        <Card>
+        <Card className="sm-notifications-add">
+          <span className="sm-notifications-icon sm-notifications-icon-recipient" aria-hidden="true"><UserPlus /></span>
           <CardHeader><CardTitle className="text-base">Add another recipient</CardTitle><CardDescription>For example another admin or a shared team inbox. Only add people who expect these emails.</CardDescription></CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Input className="max-w-sm" type="email" placeholder="name@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <div className="sm-notifications-email"><Mail className="h-4 w-4" aria-hidden="true" /><Input className="max-w-sm" type="email" placeholder="name@company.com" aria-label="Recipient email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
             <Button variant="outline" disabled={!/^\S+@\S+\.\S+$/.test(email)} onClick={() => add(email, false)}><Plus className="mr-2 h-4 w-4" />Add recipient</Button>
           </CardContent>
         </Card>
