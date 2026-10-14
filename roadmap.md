@@ -16,7 +16,7 @@
 # Notifications & domains
 - [x] Apple Mail / iCloud email provider; global pause; pause/resume all recipients
 - [x] socialmotive.nudaze.com is live; set it as Primary domain in Project Settings → Domains
-- [ ] Own web address per sold copy (each copy's operator connects its domain at handover)
+- [x] Own web address per sold copy: saved address, DNS check, handover steps; email links follow it
 # Strategy setup & guardrails
 - [x] Out-of-the-box guardrail word lists (3 tiers) wired into Preflight
 - [x] Brand voice generator from website/social/pasted copy
@@ -35,8 +35,9 @@
 ## Checkpoint (after Phase 3 + 6)
 - [x] Phase 3 Brand Kit Studio (/settings/brand-kit)
 - [x] Phase 6 AI media (images) — /media-studio + Posting Package "AI media" tab; video = coming soon
-- [ ] Reserved for checkpoint review: Phase 5 dispatcher/retries, real OAuth, AI video, approval diff, portfolio intelligence, performance logging, feedback learning, executive review mode
-- [ ] Cross-check the publishing build document against the previous remaining list; produce a consolidated status + next-up plan
+- [x] Results tracking (manual log), feedback learning in drafts, weekly summary email
+- [ ] Still blocked on external accounts: Phase 5 dispatcher/retries, real OAuth, AI video, approval diff, portfolio intelligence, performance logging, feedback learning, executive review mode
+- [x] Cross-check the publishing build document against the previous remaining list; produce a consolidated status + next-up plan
 # Visual-only redesign (checklist: docs/redesign-coverage.md)
 - [x] Shared foundations: namespaced glow treatment, shell backgrounds, buttons, focus, tabs, dialogs; Help icon → life-buoy
 - [x] Five reference pages visually adapted and compared (/, /insights, /assets, /setup, /generator); original rendered text preserved, real-source selection checked, desktop/tablet/mobile checked. Differences and remaining page work in docs/redesign-coverage.md.
