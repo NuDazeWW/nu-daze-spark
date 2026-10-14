@@ -119,13 +119,13 @@ export default function PublishingStatus() {
         {SUMMARY.map(({ k, label, n, Icon, a, hint, bars }) => (
           <button key={k} type="button" className="pub-card" style={{ ["--a" as string]: a }} onClick={() => setView(k)} aria-pressed={view === k}>
             <span className="pub-well"><Icon className="h-7 w-7" /></span>
-            <span className="min-w-0 pr-16"><span className="pub-val block">{n}</span><span className="pub-lbl block">{label}</span><span className="pub-hint block">{hint}</span></span>
+            <span className="min-w-0 pr-12"><span className="pub-val block">{n}</span><span className="pub-lbl block">{label}</span><span className="pub-hint block">{hint}</span></span>
             <Bars h={bars} />
           </button>
         ))}
         <div className="pub-card" style={{ ["--a" as string]: "40 90% 60%" }}>
           <span className="pub-well"><Coins className="h-7 w-7" /></span>
-          <span className="min-w-0 pr-16">
+          <span className="min-w-0 pr-12">
             <span className="block text-sm" style={{ color: "hsl(230 20% 85%)" }}>X spend this month</span>
             <span className="pub-val block mt-1">${(spentCents / 100).toFixed(2)}</span>
             <span className="pub-hint block">{capCents ? `of $${(capCents / 100).toFixed(2)} cap` : "No cap set"} · {xThisMonth} post{xThisMonth === 1 ? "" : "s"}</span>
