@@ -283,7 +283,10 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Content Pipeline</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2">
+                  Content Pipeline
+                  <PanelInfo description="Posts by approval stage. Click a stage to filter the queue." />
+                </CardTitle>
                 <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/queue")}>
                   View all <ArrowRight className="h-3 w-3 ml-1" />
                 </Button>
@@ -343,6 +346,7 @@ export default function Dashboard() {
                 <CardTitle className="text-base flex items-center gap-2">
                   <FolderOpen className="h-4 w-4 text-primary" />
                   Asset Health
+                  <PanelInfo description="Assets by permission state." />
                 </CardTitle>
                 <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/assets")}>
                   Library <ArrowRight className="h-3 w-3 ml-1" />
