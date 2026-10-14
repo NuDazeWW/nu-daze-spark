@@ -103,14 +103,14 @@ export default function Pricing() {
           return (
             <article key={t.id} data-tier={t.tier_slug} className={cn("sm-price-card flex flex-col rounded-xl border bg-card p-6 text-card-foreground",
               hero && "sm-price-card-featured border-2 border-primary shadow-lg lg:-my-3 lg:py-9")}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <div className="flex items-center gap-2.5">
                   <span className="sm-tier-icon flex h-10 w-10 items-center justify-center rounded-lg">
                     {(() => { const Icon = TIER_ICON[t.tier_slug] ?? Zap; return <Icon className="h-5 w-5" />; })()}
                   </span>
-                  <h2 className="font-display text-xl font-semibold">{t.name}</h2>
+                  <h2 className="font-display text-xl font-semibold whitespace-nowrap">{t.name}</h2>
                 </div>
-                {hero && <Badge>Most popular</Badge>}
+                {hero && <Badge className="shrink-0 whitespace-nowrap px-2 py-0.5 text-[11px]">Most popular</Badge>}
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{AUDIENCE[t.tier_slug]}</p>
               <p className="mt-5"><span className="font-display text-4xl font-semibold">{fmtUsd(perMonth)}</span><span className="text-sm text-muted-foreground"> / month</span></p>
