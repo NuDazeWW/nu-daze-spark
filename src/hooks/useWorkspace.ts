@@ -22,8 +22,8 @@ export const ROLE_META: Record<WorkspaceRole, { label: string; description: stri
   owner: { label: "Owner", description: "Full control, billing limits, ownership transfer and reset." },
   admin: { label: "Admin", description: "Manages settings, team, strategy, approvals and export." },
   editor: { label: "Editor", description: "Creates and edits briefs, drafts, comments and assets." },
-  reviewer: { label: "Reviewer", description: "Reviews, edits and approves content; can't create new drafts." },
-  viewer: { label: "Viewer", description: "Read-only access to assigned work." },
+  reviewer: { label: "Approver", description: "Reviews briefs and drafts, requests revisions, edits copy and grants approval; can't create new drafts." },
+  viewer: { label: "Viewer", description: "Read-only access to assigned work; can add brief comments." },
 };
 
 export function useWorkspace() {
