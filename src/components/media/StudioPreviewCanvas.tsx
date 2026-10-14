@@ -31,7 +31,7 @@ export function StudioPreviewCanvas({ image, clientName, caption, onCaption, for
           const Icon = v === "linkedin" ? Linkedin : Instagram;
           return (
             <button key={v} role="tab" aria-selected={format === v} onClick={() => onFormat(v)}
-              className={cn("sm-studio-tab flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium whitespace-nowrap",
+              className={cn("sm-studio-tab flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-medium whitespace-nowrap",
                 format === v && "is-active")}>
               <span className={cn("h-6 w-6 rounded-md flex items-center justify-center", v === "linkedin" ? "sm-ico-linkedin" : "sm-ico-instagram")}><Icon className="h-3.5 w-3.5" /></span>{l}
             </button>

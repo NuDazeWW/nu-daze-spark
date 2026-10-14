@@ -258,6 +258,11 @@ body[data-sm-surface="reading"] {
   .sm-control:has(> svg:only-child) { min-width: 44px; }
   .sm-input, [role="combobox"], textarea { min-height: 44px; border-radius: var(--radius); }
   .sm-page { overflow-wrap: anywhere; }
+  /* Controls never wrap: labels stay on one line and single words are never broken mid-word. */
+  button, [role="button"], [role="tab"], .sm-control, .sm-status, .sm-type, .sm-studio-tab,
+  [data-slot="button"], [data-sidebar="menu-button"] { white-space: nowrap; overflow-wrap: normal; word-break: keep-all; }
+  /* Clickable cards keep readable multi-line copy. */
+  .pub-card, .sm-brief-card, .sm-asset-row { white-space: normal; }
   .sm-page nav, [data-sidebar="menu-button"], [role="tab"], label { font-family: "Space Grotesk", Arial, sans-serif; }
   [data-sidebar="menu-button"] { min-height: 44px; }
   .sm-card { border-radius: 16px; }
