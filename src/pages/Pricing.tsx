@@ -25,9 +25,9 @@ const CHANNELS: Record<string, string> = {
 };
 const EXTRAS: Record<string, string[]> = {
   starter: ["Daily queue, planner and Preflight", "Comment drafting", "Asset library"],
-  team: ["Everything in Starter", "Motive Media Studio and brand kit", "Split one post across platforms"],
-  pro: ["Everything in Team", "Executive voice profiles", "Portfolio insights and bulk export", "AI video clips"],
-  enterprise: ["Everything in Pro", "Executive review mode", "Your own email sender and domain", "Invoice billing"],
+  team: ["Everything in Spark Start", "Motive Media Studio and brand kit", "Split one post across platforms"],
+  pro: ["Everything in Team Flow", "Executive voice profiles", "Portfolio insights and bulk export", "AI video clips"],
+  enterprise: ["Everything in Surge Pro", "Executive review mode", "Your own email sender and domain", "Invoice billing"],
 };
 const TIER_ICON: Record<string, typeof Zap> = { starter: Zap, team: Waves, pro: Crown, enterprise: Building2 };
 const SCOPE: Record<string, string[]> = {
@@ -57,7 +57,7 @@ export default function Pricing() {
 
   const choose = (t: TierDefinition) => {
     const q = `tier=${t.tier_slug}&billing=${billing}${nonprofit ? "&nonprofit=true" : ""}`;
-    if (t.tier_slug === "enterprise") return (window.location.href = "mailto:sales@nudaze.com?subject=SocialMotive%20Enterprise");
+    if (t.tier_slug === "enterprise") return (window.location.href = "mailto:sales@nudaze.com?subject=SocialMotive%20Force%20Enterprise");
     nav(user ? `/settings/billing?${q}` : `/auth?next=${encodeURIComponent(`/settings/billing?${q}`)}`);
   };
 
