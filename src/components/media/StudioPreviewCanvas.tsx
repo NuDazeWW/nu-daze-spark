@@ -31,7 +31,7 @@ export function StudioPreviewCanvas({ image, clientName, caption, onCaption, for
           const Icon = v === "linkedin" ? Linkedin : Instagram;
           return (
             <button key={v} role="tab" aria-selected={format === v} onClick={() => onFormat(v)}
-              className={cn("sm-studio-tab flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-medium",
+              className={cn("sm-studio-tab flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium whitespace-nowrap",
                 format === v && "is-active")}>
               <span className={cn("h-6 w-6 rounded-md flex items-center justify-center", v === "linkedin" ? "sm-ico-linkedin" : "sm-ico-instagram")}><Icon className="h-3.5 w-3.5" /></span>{l}
             </button>
@@ -51,14 +51,14 @@ export function StudioPreviewCanvas({ image, clientName, caption, onCaption, for
               <p className="absolute bottom-3 left-3 right-3 text-[11px] text-brand-bone line-clamp-3 drop-shadow">{caption}</p>
             </div>
           ) : (
-            <div className="sm-native-card w-full max-w-[420px] rounded-lg overflow-hidden">
+            <div className="sm-native-card w-full max-w-[380px] rounded-lg overflow-hidden">
               <div className="flex items-center gap-2 p-3">
                 <span className="h-10 w-10 rounded-full bg-[hsl(222_47%_11%)] flex items-center justify-center text-xs font-semibold text-[hsl(0_0%_100%)]">{initials}</span>
                 <div className="flex-1"><p className="text-sm font-semibold leading-tight">{clientName}</p><p className="text-[11px] opacity-60">Preview · not published</p></div>
                 <MoreHorizontal className="h-4 w-4 opacity-60" />
               </div>
               {format === "linkedin" && <p className="px-3 pb-2 text-[13px] whitespace-pre-wrap line-clamp-4">{captionText}</p>}
-              {media(format === "instagram" ? "aspect-square" : "aspect-[16/10]")}
+              {media(format === "instagram" ? "aspect-square" : "aspect-[16/9]")}
               <div className="flex gap-5 px-3 py-2.5 opacity-70">
                 {format === "linkedin" ? <><ThumbsUp className="h-4 w-4" /><MessageCircle className="h-4 w-4" /><Repeat2 className="h-4 w-4" /><Send className="h-4 w-4" /></>
                   : <><Heart className="h-4 w-4" /><MessageCircle className="h-4 w-4" /><Send className="h-4 w-4" /></>}

@@ -55,9 +55,9 @@ export function StudioControls({ clientId, value, onChange, onGenerate, busy, di
   return (
     <section className="sm-studio-panel sm-studio-panel-lit p-3.5 space-y-2.5" aria-label="Generation controls">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="font-display text-base font-semibold">Generation Controls</h2>
+        <h2 className="font-display text-[15px] font-semibold whitespace-nowrap">Generation Controls</h2>
         <div className="flex gap-1">
-          <Button variant="outline" size="sm" className="h-7 px-2 text-xs gap-1" onClick={() => { localStorage.setItem(PRESET_KEY, JSON.stringify(value)); toast.success("Preset saved"); }}><Bookmark className="h-3 w-3" /> Save preset</Button>
+          <Button variant="outline" size="sm" className="h-7 px-1.5 text-[11px] gap-1" onClick={() => { localStorage.setItem(PRESET_KEY, JSON.stringify(value)); toast.success("Preset saved"); }}><Bookmark className="h-3 w-3" /> Save preset</Button>
           <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => { const p = localStorage.getItem(PRESET_KEY); if (p) onChange({ ...DEFAULT_SETTINGS, ...JSON.parse(p) }); else toast("No preset saved yet"); }}>Load</Button>
         </div>
       </div>
