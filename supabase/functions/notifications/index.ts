@@ -36,7 +36,12 @@ type Provider = {
 };
 
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-const APP_URL = "https://socialmotive.nudaze.com";
+let APP_URL = "https://socialmotive.nudaze.com";
+async function loadAppUrl() {
+  const { data } = await admin.from("workspace_settings").select("app_domain").eq("id", true).maybeSingle();
+  const d = String(data?.app_domain ?? "").trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  if (d) APP_URL = `https://${d}`;
+}
 
 async function sendMail(p: Provider, secret: string, to: string, subject: string, html: string, text: string) {
   const fromName = p.from_name || "SocialMotive";
@@ -106,6 +111,7 @@ async function runDue() {
   const prov = await loadProvider();
   if (prov && (prov.p as Provider & { sending_paused?: boolean }).sending_paused) return { sent: 0, paused: true };
   if (!prov) return { skipped: "no provider" };
+  await loadAppUrl();
   const { data: prefs } = await admin.from("notification_preferences").select("*").eq("is_active", true);
   const { data: clients } = await admin.from("clients").select("id,name");
   const cname = new Map((clients ?? []).map((c) => [c.id, c.name]));
@@ -146,6 +152,49 @@ async function runDue() {
             }
           } else {
             await logSend({ preference_id: pref.id, recipient_email: pref.recipient_email, kind: "daily_digest", dedupe_key: key, ok: true, error: "nothing scheduled" });
+          }
+        }
+      }
+    }
+    // Weekly summary (Mondays, at the same morning hour)
+    if (pref.weekly_summary) {
+      const { date, minutes } = localParts(pref.time_zone);
+      const [h, m] = String(pref.send_time).split(":").map(Number);
+      const dow = new Date(`${date}T12:00:00Z`).getUTCDay();
+      const key = `weekly:${pref.id}:${date}`;
+      if (dow === 1 && minutes >= h * 60 + m) {
+        const { data: done } = await admin.from("notification_log").select("id").eq("dedupe_key", key).maybeSingle();
+        if (!done) {
+          const { start } = dayRangeUtc(date, pref.time_zone);
+          const wStart = new Date(new Date(start).getTime() - 7 * 86400000).toISOString();
+          const wNext = new Date(new Date(start).getTime() + 7 * 86400000).toISOString();
+          const [{ data: posted }, { data: approvals }, { data: upcoming }, { data: results }] = await Promise.all([
+            admin.from("post_cards").select("id,post_number,platform,client_id").eq("approval_status", "posted").gte("posted_at", wStart).lt("posted_at", start),
+            admin.from("approval_log").select("action,post_cards!inner(client_id)").gte("created_at", wStart).lt("created_at", start),
+            admin.from("post_cards").select("id,client_id").gte("scheduled_for", start).lt("scheduled_for", wNext).neq("approval_status", "archived"),
+            admin.from("post_results").select("post_card_id,client_id,impressions,reactions,comments,shares,clicks,saves").gte("recorded_at", wStart).lt("recorded_at", start),
+          ]);
+          const P = (posted ?? []).filter((p) => inScope(p.client_id));
+          const A = (approvals ?? []).filter((a: any) => inScope(a.post_cards?.client_id));
+          const U = (upcoming ?? []).filter((p) => inScope(p.client_id));
+          const R = (results ?? []).filter((r) => inScope(r.client_id));
+          const sum = (k: string) => R.reduce((t, r: any) => t + (r[k] ?? 0), 0);
+          const approved = A.filter((a: any) => a.action === "approved").length;
+          const revisions = A.filter((a: any) => a.action === "needs_revision").length;
+          const row = (l: string, v: string | number) => `<tr><td style="padding:6px 8px">${esc(l)}</td><td style="padding:6px 8px;font-weight:bold;text-align:right">${esc(v)}</td></tr>`;
+          const html = shell("Your week in SocialMotive", `<table style="border-collapse:collapse;font-size:14px;width:100%">${
+            row("Posts that went out", P.length) + row("Approved", approved) + row("Sent back for revision", revisions) +
+            row("Scheduled for the coming week", U.length) + row("Impressions logged", sum("impressions")) +
+            row("Reactions + comments logged", sum("reactions") + sum("comments"))}</table>
+            ${P.length ? `<p style="margin-top:16px">Posted: ${P.map((p) => `<a href="${APP_URL}/approved?post=${p.id}">${sm(p.post_number)}</a>`).join(", ")}</p>` : ""}
+            <p><a href="${APP_URL}/publishing">Open Publishing Status</a></p>`);
+          const text = `Last week: ${P.length} posted, ${approved} approved, ${revisions} sent back. ${U.length} scheduled next week. Impressions logged: ${sum("impressions")}.`;
+          try {
+            await sendMail(prov.p, prov.secret, pref.recipient_email, `Your week: ${P.length} posted, ${U.length} coming up`, html, text);
+            await logSend({ preference_id: pref.id, recipient_email: pref.recipient_email, kind: "weekly_summary", dedupe_key: key, ok: true });
+            sent++;
+          } catch (e) {
+            await logSend({ preference_id: pref.id, recipient_email: pref.recipient_email, kind: "weekly_summary", dedupe_key: key, ok: false, error: String((e as Error).message).slice(0, 1000) });
           }
         }
       }
