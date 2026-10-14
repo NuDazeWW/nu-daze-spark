@@ -685,8 +685,6 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
     radial-gradient(40% 40% at 75% 70%, hsl(320 85% 60% / .35), transparent 70%),
     radial-gradient(55% 45% at 15% 90%, hsl(265 70% 45% / .45), transparent 70%),
     linear-gradient(160deg, hsl(265 50% 10%), hsl(250 55% 7%));
-  clip-path: path('M0 0 H 100% V 0 Z'); /* replaced below */
-  clip-path: none;
   border-radius: 0 50% 50% 0 / 0 120% 30% 0;
   box-shadow: 30px 0 80px -20px hsl(320 85% 60% / .45), 8px 0 0 hsl(40 80% 85% / .35);
   margin-right: -6%;

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
+import { AuthShell } from "@/components/auth/AuthShell";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -51,10 +51,8 @@ export default function ResetPassword() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-6">
-      <div className="w-full max-w-sm space-y-8">
-        <img src={socialMotiveLogo} alt="SocialMotive" className="mx-auto w-full max-w-[280px] rounded-md" />
-        <section className="space-y-6 rounded-lg border border-border bg-card p-6 shadow-card">
+    <AuthShell>
+        <section className="space-y-6">
           <div className="text-center">
             <h1 className="text-lg font-semibold text-card-foreground">Set your password</h1>
             <p className="mt-1 text-sm text-muted-foreground">Choose a password for your SocialMotive account.</p>
@@ -63,7 +61,7 @@ export default function ResetPassword() {
           {!recoveryReady ? (
             <div className="space-y-4 text-center">
               <p className="text-sm text-muted-foreground">This recovery link is invalid or has expired.</p>
-              <Button variant="outline" className="w-full" onClick={() => navigate("/auth")}>Return to sign in</Button>
+              <Button variant="outline" className="sm-auth-google w-full" onClick={() => navigate("/auth")}>Return to sign in</Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -75,11 +73,10 @@ export default function ResetPassword() {
                 <Label htmlFor="confirm-password">Confirm password</Label>
                 <Input id="confirm-password" type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} minLength={8} required />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>{loading ? "Saving..." : "Save password"}</Button>
+              <Button type="submit" className="sm-auth-primary w-full" disabled={loading}>{loading ? "Saving..." : "Save password"}</Button>
             </form>
           )}
         </section>
-      </div>
-    </main>
+    </AuthShell>
   );
 }
