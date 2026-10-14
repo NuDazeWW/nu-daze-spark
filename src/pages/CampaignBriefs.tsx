@@ -1,4 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useWorkspace } from "@/hooks/useWorkspace";
+import { BriefApprovalActions, BriefDiscussion, useBriefComments, useWorkspaceUsers } from "@/components/briefs/BriefCollaboration";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useActiveClient } from "@/contexts/ClientContext";
@@ -151,6 +154,38 @@ export default function CampaignBriefs() {
 
   const missing = selected ? missingFields(selected) : [];
   const completeness = selected ? Math.round(((REQUIRED.length - missing.length) / REQUIRED.length) * 100) : 0;
+
+  const ws = useWorkspace();
+  const isAdmin = ws.canManage;
+  const wsUsers = useWorkspaceUsers();
+  const comments = useBriefComments(selected?.id);
+  const totalComments = comments.data?.length ?? 0;
+  const openComments = (comments.data ?? []).filter((c: any) => !c.is_resolved).length;
+  const genBlocked = !!selected?.approval_mode_enabled && openComments > 0;
+  const who = (id?: string | null) => { const u = wsUsers.data?.find((x) => x.user_id === id); return u?.display_name || u?.email || "a team member"; };
+  const approverName = who(selected?.approved_by);
+  const assignedName = who(selected?.assigned_approver_id);
+  const { data: canApprove } = useQuery({
+    queryKey: ["can_approve_brief", selected?.id, selected?.assigned_approver_id, user?.id],
+    enabled: !!selected?.id && !!user,
+    queryFn: async () => {
+      const { data } = await supabase.rpc("can_approve_brief", { _user_id: user!.id, _brief_id: selected!.id });
+      return !!data;
+    },
+  });
+  const toggleMode = useMutation({
+    mutationFn: async (on: boolean) => {
+      const { error } = await supabase.from("campaign_briefs").update({ approval_mode_enabled: on } as never).eq("id", selected!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["briefs"] }),
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  // Deep link: /campaign-briefs?brief=<id>
+  const [params] = useSearchParams();
+  const linked = params.get("brief");
+  useEffect(() => { if (linked && briefs.some((b: Brief) => b.id === linked)) setSelectedId(linked); }, [linked, briefs]);
 
   return (
     <div>
