@@ -528,3 +528,10 @@ body[data-sm-surface="reading"] [role="dialog"][data-state="open"]:not([data-sid
 /* Dashboard quick actions keep distinct hues with depth */
 .sm-quick-actions > button { box-shadow: inset 0 1px 0 hsl(0 0% 100% / .09), 0 14px 28px -18px hsl(var(--sm-reference-accent) / .9); }
 .sm-quick-actions > button:hover:not(:disabled) { border-color: hsl(var(--sm-reference-accent) / .75); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .12), 0 0 24px -8px hsl(var(--sm-reference-accent) / .7); }
+.sm-header-art { margin-top: -34px; margin-bottom: -18px; }
+.sm-header-bird { width: 230px; }
+.sm-dashboard-heading { min-height: 84px; margin-bottom: -8px; }
+.sm-app-bg .sm-quick-actions > button.sm-btn-outline {
+  background-image: linear-gradient(105deg, hsl(var(--sm-reference-accent) / .26), hsl(var(--sm-fx-panel-bottom)) 85%);
+  border-color: hsl(var(--sm-reference-accent) / .55);
+}
