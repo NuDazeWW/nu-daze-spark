@@ -20,7 +20,7 @@ import {
   Users,
   BarChart3,
   ListChecks,
-  HelpCircle,
+  LifeBuoy,
   Megaphone,
   CalendarRange,
   Bell,
@@ -93,13 +93,13 @@ export function AppSidebar() {
     { title: "Account Tags", icon: AtSign, href: "/settings/tags" },
     { title: "Notifications", icon: Bell, href: "/settings/notifications" },
     ...(ws.canManage ? adminSettingsNav : []),
-    { title: "Help", icon: HelpCircle, href: "/help" },
+    { title: "Help", icon: LifeBuoy, href: "/help" },
     { title: "What's new", icon: Megaphone, href: "/whats-new" },
   ];
 
   return (
     <NavHoverProvider>
-    <Sidebar collapsible="icon" className="sm-dark">
+    <Sidebar collapsible="icon" className="sm-dark sm-sidebar-bg">
       <SidebarHeader className="px-4 py-5">
         <Link to="/" className="block w-full">
           <img

@@ -28,7 +28,7 @@ export function AppLayout() {
             <ClientSwitcher />
             <UserMenu />
           </header>
-          <main className="sm-page flex-1 overflow-auto bg-background text-foreground p-4 md:p-6 lg:p-8">
+          <main className={`sm-page flex-1 overflow-auto text-foreground ${pageSurface(pathname) === "dark" ? "sm-app-bg" : "sm-light-page"} p-4 md:p-6 lg:p-8`}>
             <div className="mx-auto w-full max-w-[1440px]"><Outlet /></div>
           </main>
         </SidebarInset>

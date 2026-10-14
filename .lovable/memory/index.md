@@ -10,6 +10,7 @@ Edge function generate-reels is misnamed — it generates post cards. Rename def
 DDI cross-launch: sidebar link to drift-signal-engine.lovable.app. Receiver via useDdiHandoff hook (from=ddi, entityId, assessmentId, surface).
 
 ## Memories
+- [Package styling](mem://design/package-styling) — Extend package glow app-wide; visual-only redesigns
 - [Brand tokens](mem://design/brand-tokens) — Full NuDaze color palette, gradients, shadows, typography
 - [Database schema](mem://features/database-schema) — All 22 tables, enums, RLS policy summary
 - [Auth flow](mem://features/auth) — Email/password, auto-profile creation, has_role RPC

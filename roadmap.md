@@ -37,3 +37,7 @@
 - [x] Phase 6 AI media (images) — /media-studio + Posting Package "AI media" tab; video = coming soon
 - [ ] Reserved for checkpoint review: Phase 5 dispatcher/retries, real OAuth, AI video, approval diff, portfolio intelligence, performance logging, feedback learning, executive review mode
 - [ ] Cross-check the publishing build document against the previous remaining list; produce a consolidated status + next-up plan
+# Visual-only redesign (checklist: docs/redesign-coverage.md)
+- [x] Shared foundations: namespaced glow treatment, shell backgrounds, buttons, focus, tabs, dialogs; Help icon → life-buoy
+- [ ] Five reference pages matched and compared (/, /insights, /assets, /setup, /generator)
+- [ ] Page-by-page pass for every remaining route and nested view, with screenshots
