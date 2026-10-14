@@ -490,8 +490,10 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 @media (max-width: 767px) {
   .sm-reference h1 { font-size: 30px; }
   .sm-dashboard-heading > div { padding-right: 0; }
-  .sm-reference-logo { display: none; }
-  .sm-dashboard-heading { min-height: auto; }
+  .sm-dash-art { display: none; }
+  .sm-dashboard-heading { min-height: auto; margin-top: 0; }
+  .sm-kpi-bars { display: none; }
+  .sm-dashboard .sm-dashboard-heading h1 { font-size: 32px; }
   .sm-dashboard section[aria-label="Today's readiness"] > div:first-child > button { margin-left: 0; }
   .sm-quick-actions > button { padding: 12px; gap: 8px; }
   .sm-quick-actions > button > svg:last-child { display: none; }
