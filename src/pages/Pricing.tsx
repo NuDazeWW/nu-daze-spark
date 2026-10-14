@@ -70,7 +70,8 @@ export default function Pricing() {
         </div>
       </header>
 
-      <section className="sm-pricing-intro mx-auto max-w-7xl px-6 pb-10 pt-14 text-center">
+      <section className="sm-pricing-intro relative mx-auto max-w-7xl px-6 pb-10 pt-14 text-center">
+        <img src={headerBird.url} alt="" aria-hidden className="sm-pricing-bird pointer-events-none absolute right-0 top-0 hidden w-64 select-none lg:block" />
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Pricing</p>
         <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">Plans that grow with your content team</h1>
         <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">Every plan includes your own private workspace, human review on every post, and a live usage meter so there are never surprise charges.</p>
@@ -103,7 +104,12 @@ export default function Pricing() {
             <article key={t.id} data-tier={t.tier_slug} className={cn("sm-price-card flex flex-col rounded-xl border bg-card p-6 text-card-foreground",
               hero && "sm-price-card-featured border-2 border-primary shadow-lg lg:-my-3 lg:py-9")}>
               <div className="flex items-center justify-between">
-                <h2 className="font-display text-xl font-semibold">{t.name}</h2>
+                <div className="flex items-center gap-3">
+                  <span className="sm-tier-icon flex h-10 w-10 items-center justify-center rounded-lg">
+                    {(() => { const Icon = TIER_ICON[t.tier_slug] ?? Zap; return <Icon className="h-5 w-5" />; })()}
+                  </span>
+                  <h2 className="font-display text-xl font-semibold">{t.name}</h2>
+                </div>
                 {hero && <Badge>Most popular</Badge>}
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{AUDIENCE[t.tier_slug]}</p>
