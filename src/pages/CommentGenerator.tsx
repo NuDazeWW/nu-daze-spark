@@ -309,9 +309,9 @@ export default function CommentGenerator() {
             <Plus className="mr-2 h-4 w-4" />Add Post
           </Button>
         )}
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-2 ml-auto shrink-0">
           <Switch checked={showCommented} onCheckedChange={setShowCommented} id="show-commented" />
-          <label htmlFor="show-commented" className="text-xs text-muted-foreground cursor-pointer">
+          <label htmlFor="show-commented" className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
             Show commented ({commentedCount})
           </label>
         </div>
