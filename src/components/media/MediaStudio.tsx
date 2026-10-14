@@ -12,17 +12,18 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Download, ImagePlus, Loader2, Palette, Save, Sparkles, Video } from "lucide-react";
+import { Download, ImagePlus, Loader2, Palette, Save, Settings2, Sparkles, Video } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { VideoStudio } from "./VideoStudio";
 
 type Props = {
   clientId: string | null; postCardId?: string; defaultPrompt?: string; platform?: string; canCreate: boolean;
   promptContext?: string; generateSignal?: number; onBusyChange?: (busy: boolean) => void;
-  onResult?: (dataUrl: string, prompt: string) => void;
+  onResult?: (dataUrl: string, prompt: string) => void; compact?: boolean;
 };
 
-export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform, canCreate, promptContext = "", generateSignal = 0, onBusyChange, onResult }: Props) {
+export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform, canCreate, promptContext = "", generateSignal = 0, onBusyChange, onResult, compact = false }: Props) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const brand = useBrandKit(clientId);
@@ -108,28 +109,31 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
 
   if (!canCreate) return <p className="text-sm text-muted-foreground">Only owners, admins and editors can generate media.</p>;
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-muted/20 px-3 py-2 text-xs">
-        <span className="flex items-center gap-2"><Palette className="h-3.5 w-3.5 text-primary" />
-          {kit?.colors.length ? <span className="flex gap-1">{kit.colors.slice(0, 6).map((c) => <span key={c.hex} title={c.name} className="h-3.5 w-3.5 rounded-full border border-border" style={{ background: c.hex }} />)}</span> : "No brand colors yet"}
-          {logoUrl ? <Badge variant="outline" className="text-[10px]">Logo ready</Badge> : <Badge variant="outline" className="text-[10px]">No logo</Badge>}
-        </span>
-        <Link to="/settings/brand-kit" className="text-primary underline-offset-2 hover:underline">Edit Brand Kit</Link>
+  const brandStrip = (
+    <div className="flex items-center justify-between gap-2 rounded-md border border-border/50 bg-muted/20 px-3 py-2 text-xs">
+      <span className="flex items-center gap-2"><Palette className="h-3.5 w-3.5 text-primary" />
+        {kit?.colors.length ? <span className="flex gap-1">{kit.colors.slice(0, 6).map((c) => <span key={c.hex} title={c.name} className="h-3.5 w-3.5 rounded-full border border-border" style={{ background: c.hex }} />)}</span> : "No brand colors yet"}
+        {logoUrl ? <Badge variant="outline" className="text-[10px]">Logo ready</Badge> : <Badge variant="outline" className="text-[10px]">No logo</Badge>}
+      </span>
+      <Link to="/settings/brand-kit" className="text-primary underline-offset-2 hover:underline">Edit Brand Kit</Link>
+    </div>
+  );
+  const promptBlock = (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between"><Label className={compact ? "flex items-center gap-1.5 text-sm" : undefined}>{compact && <Sparkles className="h-3.5 w-3.5 text-primary" />}Describe the image</Label><span className="font-mono text-[10px] text-muted-foreground">{prompt.length} / 2,000</span></div>
+      <Textarea rows={compact ? 2 : 3} maxLength={2000} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g. A leadership team reviewing a strategy board in a sunlit studio, candid, warm" />
+      <div className="flex flex-wrap gap-1.5 pt-1">
+        {["Make it more bold", "Brighter and warmer", "Minimal background", "Add people", "Close-up detail"].map((r) => (
+          <button key={r} type="button" onClick={() => setPrompt((p) => (p.trim() ? `${p.trim()}. ${r}` : r).slice(0, 2000))}
+            className="sm-chip rounded-full border border-border/60 px-2.5 py-1 text-[11px] text-muted-foreground hover:border-primary/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors">
+            + {r}
+          </button>
+        ))}
       </div>
-
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between"><Label>Describe the image</Label><span className="font-mono text-[10px] text-muted-foreground">{prompt.length} / 2,000</span></div>
-        <Textarea rows={3} maxLength={2000} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g. A leadership team reviewing a strategy board in a sunlit studio, candid, warm" />
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          {["Make it more bold", "Brighter and warmer", "Minimal background", "Add people", "Close-up detail"].map((r) => (
-            <button key={r} type="button" onClick={() => setPrompt((p) => (p.trim() ? `${p.trim()}. ${r}` : r).slice(0, 2000))}
-              className="rounded-full border border-border/60 px-2.5 py-1 text-[11px] text-muted-foreground hover:border-primary/60 hover:text-foreground transition-colors">
-              + {r}
-            </button>
-          ))}
-        </div>
-      </div>
+    </div>
+  );
+  const imageSettings = (
+    <>
       <div className="grid grid-cols-3 gap-2">
         <div className="space-y-1"><Label className="text-xs">Format</Label>
           <Select value={aspect} onValueChange={setAspect}><SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
@@ -145,26 +149,61 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
         <label className="flex items-center gap-2"><Switch checked={applyBrand} onCheckedChange={setApplyBrand} /> Use brand colors & tone</label>
         <label className="flex items-center gap-2"><Switch checked={watermark} onCheckedChange={setWatermark} disabled={!logoUrl} /> Add logo watermark</label>
       </div>
-      <Button onClick={generate} disabled={busy || prompt.trim().length < 5} className="gap-2">
-        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} {busy ? "Creating image…" : raw ? "Generate another" : "Generate image"}
-      </Button>
+    </>
+  );
+  const genButton = (
+    <Button onClick={generate} disabled={busy || prompt.trim().length < 5} className="gap-2" size={compact ? "sm" : "default"} variant={compact ? "outline" : "default"}>
+      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} {busy ? "Creating image…" : raw ? "Generate another" : "Generate image"}
+    </Button>
+  );
+  const resultActions = final && (
+    <div className="flex flex-wrap gap-2">
+      <Button onClick={save} disabled={saving} size={compact ? "sm" : "default"} className="gap-2">{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}{postCardId ? "Save & attach to post" : "Save to Asset Library"}</Button>
+      <Button variant="outline" size={compact ? "sm" : "default"} asChild className="gap-2"><a href={final} download="socialmotive-image.png"><Download className="h-4 w-4" /> Download</a></Button>
+    </div>
+  );
+  const disclosure = <p className="text-[11px] text-muted-foreground">AI images are saved as cleared assets and marked for the AI-assisted disclosure. Nothing is published automatically.</p>;
 
+  if (compact) {
+    return (
+      <div className="space-y-3">
+        {promptBlock}
+        <div className="flex flex-wrap items-center gap-2">
+          {genButton}
+          {busy && <span className="text-xs text-muted-foreground">This takes 20–60 seconds</span>}
+          {resultActions}
+        </div>
+        <Tabs defaultValue="image" className="sm-studio-modes">
+          <TabsList className="h-8"><TabsTrigger value="image" className="text-xs gap-1.5"><Settings2 className="h-3.5 w-3.5" />Image settings</TabsTrigger><TabsTrigger value="video" className="text-xs gap-1.5"><Video className="h-3.5 w-3.5" />AI video clips</TabsTrigger><TabsTrigger value="brand" className="text-xs gap-1.5"><Palette className="h-3.5 w-3.5" />Brand Kit</TabsTrigger></TabsList>
+          <TabsContent value="image" className="mt-3 space-y-3">{imageSettings}</TabsContent>
+          <TabsContent value="video" className="mt-3 space-y-3">
+            <h3 className="flex items-center gap-2 text-sm font-semibold"><Video className="h-4 w-4 text-primary" /> AI video clips for Reels, Stories & Shorts</h3>
+            <VideoStudio clientId={clientId} postCardId={postCardId} defaultPrompt={defaultPrompt} />
+          </TabsContent>
+          <TabsContent value="brand" className="mt-3">{brandStrip}</TabsContent>
+        </Tabs>
+        {disclosure}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {brandStrip}
+      {promptBlock}
+      {imageSettings}
+      {genButton}
       <div className="rounded-lg border border-dashed border-border/60 min-h-48 flex items-center justify-center overflow-hidden bg-muted/10">
         {busy ? <div className="text-xs text-muted-foreground flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> This takes 20–60 seconds</div>
           : final ? <img src={final} alt="Generated visual" className="max-h-[28rem] w-auto" />
           : <div className="text-xs text-muted-foreground flex items-center gap-2"><ImagePlus className="h-4 w-4" /> Your image appears here</div>}
       </div>
-      {final && (
-        <div className="flex flex-wrap gap-2">
-          <Button onClick={save} disabled={saving} className="gap-2">{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}{postCardId ? "Save & attach to post" : "Save to Asset Library"}</Button>
-          <Button variant="outline" asChild className="gap-2"><a href={final} download="socialmotive-image.png"><Download className="h-4 w-4" /> Download</a></Button>
-        </div>
-      )}
+      {resultActions}
       <div className="border-t border-border/50 pt-4 space-y-3">
         <h3 className="flex items-center gap-2 text-sm font-semibold"><Video className="h-4 w-4 text-primary" /> AI video clips for Reels, Stories & Shorts</h3>
         <VideoStudio clientId={clientId} postCardId={postCardId} defaultPrompt={defaultPrompt} />
       </div>
-      <p className="text-[11px] text-muted-foreground">AI images are saved as cleared assets and marked for the AI-assisted disclosure. Nothing is published automatically.</p>
+      {disclosure}
     </div>
   );
 }

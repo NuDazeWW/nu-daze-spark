@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface PageHeaderProps {
   title: string;
@@ -23,13 +24,28 @@ const RELATED: Record<string, { to: string; label: string }[]> = {
   "/assets": [{ to: "/media-studio", label: "Create with AI" }],
 };
 
-export function PageHeader({ title, description, children }: PageHeaderProps) {
+export function PageHeader({ title, description, children, linksMenu = false }: PageHeaderProps & { linksMenu?: boolean }) {
   const { pathname } = useLocation();
   const isSettings = pathname.startsWith("/settings") || pathname === "/setup";
   const related = RELATED[pathname] ?? [];
+  const links = [
+    ...(!isSettings ? [{ to: "/settings/workspace", label: "Workspace settings" }] : []),
+    ...related,
+  ];
   return (
     <div className="sm-page-header mb-6 space-y-3">
-      {pathname !== "/" && (
+      {pathname !== "/" && linksMenu && (
+        <nav aria-label="Quick navigation" className="sm-page-links flex flex-wrap items-center gap-2">
+          <Button asChild variant="ghost" size="sm" className="h-7 px-2 text-xs"><Link to="/" className="gap-1.5"><ArrowLeft className="h-3.5 w-3.5" />Back to workspace</Link></Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">Shortcuts <ChevronDown className="h-3 w-3" /></Button></DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {links.map((r) => <DropdownMenuItem key={r.to} asChild><Link to={r.to}>{r.label}</Link></DropdownMenuItem>)}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </nav>
+      )}
+      {pathname !== "/" && !linksMenu && (
         <nav aria-label="Quick navigation" className="sm-page-links flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm">
             <Link to="/" className="gap-1.5">
