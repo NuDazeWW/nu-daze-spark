@@ -717,6 +717,76 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   .sm-notifications .sm-notifications-add > div { padding-right: 20px; }
   .sm-notifications-email { flex-basis: 100%; }
 }
+/* Email Provider: reference-only presentation, including replacement setup state. */
+.sm-page:has(.sm-email-provider) { position: relative; isolation: isolate; }
+.sm-email-provider {
+  --email-surface: 0 0% 100%;
+  --email-ink: 254 65% 12%;
+  --email-muted: 258 18% 48%;
+  --email-line: 263 65% 88%;
+  --email-cyan: 183 100% 43%;
+  --email-action: 185 100% 23%;
+  --email-success: 91 72% 24%;
+  --email-success-tint: 76 100% 60%;
+  --email-coral: 348 90% 53%;
+  --email-shadow: 250 36% 40%;
+  position: relative; width: 100%; max-width: 1240px; margin-inline: auto; color: hsl(var(--email-ink));
+}
+.sm-email-background { position: fixed; inset: 56px 0 0; width: 100%; height: calc(100vh - 56px); object-fit: cover; pointer-events: none; z-index: -1; }
+.sm-email-provider .sm-page-header { border: 0; padding-bottom: 0; margin-bottom: 24px; }
+.sm-email-provider .sm-page-header::after { display: none; }
+.sm-email-provider .sm-page-links { margin-bottom: 18px; }
+.sm-email-provider .sm-page-title-row { display: block; padding-right: 420px; min-height: 100px; }
+.sm-email-provider .sm-page-header h1 { color: hsl(var(--email-ink)); font-weight: 700; background: none; }
+.sm-email-provider .sm-page-header h1 + p { max-width: 560px; color: hsl(var(--email-muted)); line-height: 1.5; }
+.sm-email-provider .sm-header-art { position: absolute; right: 0; top: 38px; }
+.sm-email-provider .sm-header-bird { width: 220px; height: 125px; object-fit: contain; }
+.sm-email-provider .sm-dash-tagline { color: hsl(var(--email-ink)); border-color: hsl(var(--email-line)); }
+.sm-light-page.sm-route-themed .sm-email-provider .sm-card {
+  border-radius: 18px; border: 1px solid hsl(var(--email-line) / .65);
+  background: linear-gradient(125deg, hsl(var(--email-surface) / .98), hsl(var(--email-surface) / .88));
+  color: hsl(var(--email-ink));
+  box-shadow: inset 0 1px 0 hsl(var(--email-surface)), 0 14px 30px -12px hsl(var(--email-shadow) / .32), 0 3px 12px hsl(var(--email-cyan) / .08);
+}
+.sm-email-provider .text-muted-foreground { color: hsl(var(--email-muted)); }
+.sm-email-connection-row { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; min-height: 112px; padding: 22px; }
+.sm-email-icon { display: grid; place-items: center; width: 54px; height: 54px; flex: 0 0 54px; border-radius: 11px; color: hsl(var(--email-action)); background: hsl(var(--email-cyan) / .1); border: 2px solid hsl(var(--email-surface)); box-shadow: 0 0 20px hsl(var(--email-cyan) / .2), inset 0 0 12px hsl(var(--email-cyan) / .08); }
+.sm-email-icon svg { width: 27px; height: 27px; stroke-width: 1.8; }
+.sm-email-account { flex: 1; min-width: 240px; }
+.sm-email-account p { overflow-wrap: anywhere; }
+.sm-email-test-status { margin-top: 10px; gap: 8px; }
+.sm-email-test-status.text-brand-success { color: hsl(var(--email-success)); }
+.sm-email-test-status.text-brand-success svg { width: 23px; height: 23px; padding: 4px; border-radius: 50%; background: hsl(var(--email-success-tint)); box-shadow: 0 0 10px hsl(var(--email-success-tint) / .35); }
+.sm-email-sending { border-left: 1px solid hsl(var(--email-line)); padding-left: 22px; margin-right: 6px; white-space: nowrap; }
+.sm-email-provider [role="switch"][data-state="checked"] { background: hsl(var(--email-action)); box-shadow: 0 0 14px hsl(var(--email-cyan) / .25); }
+.sm-email-provider [role="switch"] > span { background: hsl(var(--email-surface)); }
+.sm-light-page.sm-route-themed .sm-email-provider .sm-btn-outline { background: linear-gradient(180deg, hsl(var(--email-surface)), hsl(var(--email-line) / .22)); border-color: hsl(var(--email-line)); color: hsl(var(--email-ink)); box-shadow: 0 4px 10px hsl(var(--email-shadow) / .1); }
+.sm-light-page.sm-route-themed .sm-email-provider .sm-email-disconnect { color: hsl(var(--email-coral)); border-color: hsl(var(--email-coral) / .45); box-shadow: 0 5px 12px hsl(var(--email-coral) / .08); }
+.sm-email-provider .sm-email-test { position: relative; padding-left: 100px; }
+.sm-email-send-icon { position: absolute; left: 22px; top: 22px; color: hsl(var(--email-cyan)); }
+.sm-email-provider .sm-email-test > div { padding-left: 0; padding-right: 26px; }
+.sm-email-provider .sm-email-test > div:first-of-type { padding-top: 24px; padding-bottom: 20px; }
+.sm-email-test-controls { padding-bottom: 24px; gap: 16px; }
+.sm-email-test-address { flex: 1; min-width: 180px; }
+.sm-light-page.sm-route-themed .sm-email-provider input { height: 44px; color: hsl(var(--email-ink)); border-color: hsl(var(--email-line)); background: hsl(var(--email-surface) / .88); }
+.sm-light-page.sm-route-themed .sm-email-provider .sm-email-test-button { height: 44px; padding-inline: 22px; color: hsl(var(--email-surface)); border-color: hsl(var(--email-cyan)); background: linear-gradient(160deg, hsl(var(--email-action)), hsl(var(--email-action) / .95)); box-shadow: inset 0 0 12px hsl(var(--email-cyan) / .5), 0 0 18px hsl(var(--email-cyan) / .3); }
+.sm-email-provider .sm-email-test-button:hover:not(:disabled) { filter: brightness(1.1); }
+.sm-email-form label:has([data-state="checked"]) { border-color: hsl(var(--email-cyan)); background: hsl(var(--email-cyan) / .06); }
+@media (max-width: 1200px) {
+  .sm-email-provider .sm-page-title-row { padding-right: 0; }
+  .sm-email-provider .sm-header-art { display: none; }
+  .sm-email-sending { border-left: 0; padding-left: 0; }
+}
+@media (max-width: 640px) {
+  .sm-email-connection-row { gap: 12px; padding: 20px; }
+  .sm-email-account { min-width: 0; flex-basis: calc(100% - 70px); }
+  .sm-email-sending { flex-basis: 100%; margin: 8px 0; }
+  .sm-email-provider .sm-email-test { padding-left: 20px; }
+  .sm-email-send-icon { left: 20px; top: 20px; }
+  .sm-email-provider .sm-email-test > div:first-of-type { padding-left: 68px; min-height: 100px; }
+  .sm-email-provider .sm-email-test > div { padding-right: 20px; }
+  .sm-email-test-address { flex-basis: 100%; }
+}
 /* Content Planner reference presentation; scheduling and coverage retain their semantics. */
 .sm-page:has(.sm-planner) { position: relative; isolation: isolate; }
 .sm-planner {

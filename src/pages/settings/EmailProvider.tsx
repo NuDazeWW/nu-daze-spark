@@ -14,7 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2, Mail, XCircle } from "lucide-react";
+import { CheckCircle2, Loader2, Mail, Send, XCircle } from "lucide-react";
+
+import emailBackground from "@/assets/email-provider-workspace-background.jpg";
 
 type ProviderKey = "sendgrid" | "gmail" | "outlook" | "yahoo" | "apple" | "smtp";
 
@@ -73,7 +75,7 @@ function Inner() {
   }, [s]);
   useEffect(() => { if (user?.email && !testTo) setTestTo(user.email); }, [user, testTo]);
 
-  const meta = PROVIDERS.find((p) => p.key === provider)!;
+  const meta = PROVIDERS.find((p) => p.key === provider) ?? PROVIDERS[0];
   const refresh = () => qc.invalidateQueries({ queryKey: ["email_provider_settings"] });
 
   async function save() {
@@ -110,38 +112,39 @@ function Inner() {
   const showForm = !connected || editing;
 
   return (
-    <div className="animate-fade-in space-y-6 max-w-3xl">
+    <div className="sm-email-provider space-y-6">
+      <img src={emailBackground} width={1536} height={1024} alt="" aria-hidden="true" className="sm-email-background" />
       <PageHeader title="Email Provider" description="The email account SocialMotive uses to send team notifications. Each workspace connects its own." />
 
-      {connected && (
-        <Card>
-          <CardContent className="py-4 flex flex-wrap items-center gap-3">
-            <Mail className="h-5 w-5 text-primary" />
-            <div className="flex-1 min-w-[220px]">
-              <p className="text-sm font-semibold">Connected as {s!.connected_as}</p>
-              <p className="text-xs text-muted-foreground">{PROVIDERS.find((p) => p.key === s!.provider)?.label} · key or password saved securely and never shown again</p>
-              {s!.last_test_at && (
-                <p className={`text-xs mt-1 flex items-center gap-1 ${s!.last_test_ok ? "text-brand-success" : "text-destructive"}`}>
-                  {s!.last_test_ok ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                  Last test {new Date(s!.last_test_at).toLocaleString()}: {s!.last_test_ok ? "worked" : s!.last_test_error}
+      {connected && s && (
+        <Card className="sm-email-connected">
+          <CardContent className="sm-email-connection-row">
+            <span className="sm-email-icon" aria-hidden="true"><Mail /></span>
+            <div className="sm-email-account">
+              <p className="text-sm font-semibold">Connected as {s.connected_as}</p>
+              <p className="text-xs text-muted-foreground">{PROVIDERS.find((p) => p.key === s.provider)?.label} · key or password saved securely and never shown again</p>
+              {s.last_test_at && (
+                <p className={`sm-email-test-status text-xs mt-1 flex items-center gap-1 ${s.last_test_ok ? "text-brand-success" : "text-destructive"}`}>
+                  {s.last_test_ok ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                  Last test {new Date(s.last_test_at).toLocaleString()}: {s.last_test_ok ? "worked" : s.last_test_error}
                 </p>
               )}
             </div>
-            <label className="flex items-center gap-2 text-xs">
-              <Switch checked={!s!.sending_paused} onCheckedChange={async (v) => {
+            <label className="sm-email-sending flex items-center gap-2 text-xs">
+              <Switch checked={!s.sending_paused} onCheckedChange={async (v) => {
                 const { error } = await supabase.from("email_provider_settings").update({ sending_paused: !v }).eq("id", true);
                 if (error) toast.error(error.message); else { refresh(); toast.success(v ? "Notification emails resumed" : "All notification emails paused — your connection is kept"); }
               }} />
-              {s!.sending_paused ? "Sending paused" : "Sending on"}
+              {s.sending_paused ? "Sending paused" : "Sending on"}
             </label>
             <Button variant="outline" size="sm" onClick={() => setEditing((v) => !v)}>{editing ? "Cancel" : "Replace"}</Button>
-            <Button variant="outline" size="sm" disabled={busy === "disconnect"} onClick={disconnect}>Disconnect</Button>
+            <Button className="sm-email-disconnect" variant="outline" size="sm" disabled={busy === "disconnect"} onClick={disconnect}>Disconnect</Button>
           </CardContent>
         </Card>
       )}
 
       {showForm && (
-        <Card>
+        <Card className="sm-email-form">
           <CardHeader><CardTitle className="text-base">Choose your provider</CardTitle><CardDescription>Use the account your team already sends email from.</CardDescription></CardHeader>
           <CardContent className="space-y-5">
             <RadioGroup value={provider} onValueChange={(v) => setProvider(v as ProviderKey)} className="grid gap-2 sm:grid-cols-2">
@@ -168,11 +171,12 @@ function Inner() {
         </Card>
       )}
 
-      <Card>
+      <Card className="sm-email-test">
+        <span className="sm-email-icon sm-email-send-icon" aria-hidden="true"><Send /></span>
         <CardHeader><CardTitle className="text-base">Test connection {!connected && <Badge variant="outline" className="ml-2">Connect a provider first</Badge>}</CardTitle><CardDescription>Sends a real email. If it fails, the provider's exact message appears here.</CardDescription></CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Input className="max-w-sm" type="email" value={testTo} onChange={(e) => setTestTo(e.target.value)} />
-          <Button variant="outline" disabled={!connected || busy === "test"} onClick={test}>{busy === "test" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Send test email</Button>
+        <CardContent className="sm-email-test-controls flex flex-wrap gap-2">
+          <Input className="sm-email-test-address" type="email" value={testTo} onChange={(e) => setTestTo(e.target.value)} />
+          <Button className="sm-email-test-button" variant="outline" disabled={!connected || busy === "test"} onClick={test}>{busy === "test" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Send test email<Send className="ml-2 h-4 w-4" /></Button>
         </CardContent>
       </Card>
     </div>
