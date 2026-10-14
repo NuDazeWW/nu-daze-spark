@@ -199,6 +199,52 @@ async function runDue() {
         }
       }
     }
+    // Publishing report (weekly on Mondays or monthly on the 1st, at the morning hour)
+    if (pref.publishing_report) {
+      const { date, minutes } = localParts(pref.time_zone);
+      const [h, m] = String(pref.send_time).split(":").map(Number);
+      const monthly = pref.report_frequency === "monthly";
+      const due = monthly ? date.endsWith("-01") : new Date(`${date}T12:00:00Z`).getUTCDay() === 1;
+      const key = `report:${pref.report_frequency}:${pref.id}:${date}`;
+      if (due && minutes >= h * 60 + m) {
+        const { data: done } = await admin.from("notification_log").select("id").eq("dedupe_key", key).maybeSingle();
+        if (!done) {
+          const { start } = dayRangeUtc(date, pref.time_zone);
+          const from = new Date(new Date(start).getTime() - (monthly ? 30 : 7) * 86400000).toISOString();
+          const [{ data: posts }, { data: results }] = await Promise.all([
+            admin.from("post_cards").select("id,post_number,platform,client_id,publishing_status,approval_status,posted_at,scheduled_for")
+              .or(`and(posted_at.gte.${from},posted_at.lt.${start}),and(scheduled_for.gte.${from},scheduled_for.lt.${start})`),
+            admin.from("post_results").select("post_card_id,client_id,impressions,reactions,comments,shares,clicks,saves,recorded_at").gte("recorded_at", from).lt("recorded_at", start).order("recorded_at", { ascending: false }),
+          ]);
+          const P = (posts ?? []).filter((p) => inScope(p.client_id));
+          const published = P.filter((p) => p.publishing_status === "published" || p.approval_status === "posted");
+          const failed = P.filter((p) => p.publishing_status === "failed");
+          const latest = new Map<string, any>();
+          for (const r of (results ?? []).filter((r) => inScope(r.client_id))) if (!latest.has(r.post_card_id)) latest.set(r.post_card_id, r);
+          const L = [...latest.values()];
+          const sum = (k: string) => L.reduce((t, r) => t + (r[k] ?? 0), 0);
+          const byPlat = new Map<string, number>();
+          for (const p of published) byPlat.set(p.platform, (byPlat.get(p.platform) ?? 0) + 1);
+          const row = (l: string, v: string | number) => `<tr><td style="padding:6px 8px">${esc(l)}</td><td style="padding:6px 8px;font-weight:bold;text-align:right">${esc(v)}</td></tr>`;
+          const label = monthly ? "last 30 days" : "last 7 days";
+          const html = shell(`Publishing report — ${label}`, `<table style="border-collapse:collapse;font-size:14px;width:100%">${
+            row("Published", published.length) + row("Failed", failed.length) +
+            [...byPlat].map(([k, v]) => row(`  ${k}`, v)).join("") +
+            row("Impressions", sum("impressions")) + row("Reactions", sum("reactions")) + row("Comments", sum("comments")) +
+            row("Shares", sum("shares")) + row("Clicks", sum("clicks")) + row("Saves", sum("saves"))}</table>
+            ${failed.length ? `<p style="margin-top:16px">Needs attention: ${failed.map((p) => `<a href="${APP_URL}/publishing?post=${p.id}">${sm(p.post_number)}</a>`).join(", ")}</p>` : ""}
+            <p><a href="${APP_URL}/publishing">Open Publishing Status to download the full PDF or CSV report</a></p>`);
+          const text = `Publishing report (${label}): ${published.length} published, ${failed.length} failed, ${sum("impressions")} impressions logged.`;
+          try {
+            await sendMail(prov.p, prov.secret, pref.recipient_email, `Publishing report: ${published.length} published (${label})`, html, text);
+            await logSend({ preference_id: pref.id, recipient_email: pref.recipient_email, kind: "publishing_report", dedupe_key: key, ok: true });
+            sent++;
+          } catch (e) {
+            await logSend({ preference_id: pref.id, recipient_email: pref.recipient_email, kind: "publishing_report", dedupe_key: key, ok: false, error: String((e as Error).message).slice(0, 1000) });
+          }
+        }
+      }
+    }
     // Post went out
     if (pref.post_went_out) {
       const since = new Date(Math.max(Date.now() - 86400000, new Date(pref.created_at).getTime())).toISOString();
