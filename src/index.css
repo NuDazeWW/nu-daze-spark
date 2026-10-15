@@ -2252,10 +2252,15 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
   position: relative; display: inline-flex; align-items: center; justify-content: center;
   width: 38px; height: 38px; border-radius: 999px;
   font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; font-weight: 700;
-  color: hsl(var(--lg-cyan));
-  background: radial-gradient(80% 80% at 30% 25%, hsl(var(--lg-violet) / .35), hsl(var(--brand-midnight, 233 60% 8%)) 75%);
-  border: 1px solid hsl(var(--lg-violet) / .45);
-  box-shadow: inset 0 0 12px -4px hsl(var(--lg-violet) / .6), 0 0 12px -4px hsl(var(--lg-violet) / .4);
+  color: hsl(var(--lg-a, var(--lg-cyan)));
+  background:
+    radial-gradient(85% 85% at 30% 22%, hsl(var(--lg-a, var(--lg-cyan)) / .45), transparent 60%),
+    radial-gradient(120% 120% at 75% 85%, hsl(var(--lg-a, var(--lg-cyan)) / .22), transparent 55%),
+    hsl(var(--brand-midnight, 233 60% 8%));
+  border: 1px solid hsl(var(--lg-a, var(--lg-cyan)) / .55);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .14), inset 0 0 14px -4px hsl(var(--lg-a, var(--lg-cyan)) / .6),
+    0 0 14px -4px hsl(var(--lg-a, var(--lg-cyan)) / .5);
+  text-shadow: 0 0 8px hsl(var(--lg-a, var(--lg-cyan)) / .8);
 }
 .sm-cg-avatar-sm { width: 32px; height: 32px; font-size: 10px; }
 .sm-cg-avatar-badge {
