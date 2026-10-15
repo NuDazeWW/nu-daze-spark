@@ -73,7 +73,7 @@ export function PostingPackageDrawer({
   onMarkExported: (id: string) => Promise<void>;
 }) {
   const { toast } = useToast();
-  const { canCreate } = useWorkspace();
+  const { canCreate, approvalRequired } = useWorkspace();
   const [splitOpen, setSplitOpen] = useState(false);
   const qc = useQueryClient();
   const [firstComment, setFirstComment] = useState("");

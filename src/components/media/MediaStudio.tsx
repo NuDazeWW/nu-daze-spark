@@ -162,7 +162,7 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
       <Button variant="outline" size={compact ? "sm" : "default"} asChild className="gap-2"><a href={final} download="socialmotive-image.png"><Download className="h-4 w-4" /> Download</a></Button>
     </div>
   );
-  const disclosure = <p className="text-[11px] text-muted-foreground">AI images are saved as cleared assets and marked for the AI-assisted disclosure. Nothing is published automatically.</p>;
+  const disclosure = <p className="text-[11px] text-muted-foreground">AI images are saved as cleared assets and marked for the AI-assisted disclosure.</p>;
 
   if (compact) {
     return (
