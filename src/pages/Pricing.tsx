@@ -104,7 +104,7 @@ export default function Pricing() {
 
   const choose = (t: TierDefinition) => {
     const q = `tier=${t.tier_slug}&billing=${billing}${nonprofit ? "&nonprofit=true" : ""}`;
-    if (t.tier_slug === "enterprise") return (window.location.href = "mailto:sales@nudaze.com?subject=SocialMotive%20Force%20Enterprise");
+    if (t.tier_slug === "enterprise") return (window.location.href = "mailto:hello@nudaze.com?subject=SocialMotive%20Force%20Enterprise");
     nav(user ? `/settings/billing?${q}` : `/auth?next=${encodeURIComponent(`/settings/billing?${q}`)}`);
   };
 
@@ -135,7 +135,7 @@ export default function Pricing() {
           ))}
         </div>
           <Button variant="outline" size="sm" className="whitespace-nowrap rounded-full" asChild>
-            <a href="mailto:sales@nudaze.com?subject=SocialMotive%20custom%20pricing">Contact us for custom pricing</a>
+            <a href="mailto:hello@nudaze.com?subject=SocialMotive%20custom%20pricing">Contact us for custom pricing</a>
           </Button>
         </div>
         <div className="mt-4 flex items-center justify-center gap-2 text-sm">
@@ -215,8 +215,8 @@ export default function Pricing() {
           <p className="mt-1">Not seeing the features you need? We build tailored plans for agencies, enterprises and multi-brand teams. Contact us for a demo or custom pricing.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" className="whitespace-nowrap" asChild><a href="mailto:sales@nudaze.com?subject=SocialMotive%20demo%20request">Book a demo</a></Button>
-          <Button className="whitespace-nowrap" asChild><a href="mailto:sales@nudaze.com?subject=SocialMotive%20custom%20pricing">Contact us for pricing <ArrowRight className="ml-2 h-4 w-4" /></a></Button>
+          <Button variant="outline" className="whitespace-nowrap" asChild><a href="mailto:hello@nudaze.com?subject=SocialMotive%20demo%20request">Book a demo</a></Button>
+          <Button className="whitespace-nowrap" asChild><a href="mailto:hello@nudaze.com?subject=SocialMotive%20custom%20pricing">Contact us for pricing <ArrowRight className="ml-2 h-4 w-4" /></a></Button>
         </div>
       </section>
       <NonprofitIntakeDialog open={intake} onOpenChange={setIntake} />
