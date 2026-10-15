@@ -134,7 +134,7 @@ export default function Auth() {
             variant="outline"
             className="sm-auth-google w-full"
             onClick={handleGoogleSignIn}
-            disabled={googleLoading || loading}
+            disabled={googleLoading || loading || (!isLogin && !allChecked)}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
               <path
