@@ -22,11 +22,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
   FolderOpen, Plus, Pencil, Trash2, Search, AlertCircle, Download, Eye,
   Image, Video, FileText, Link2, Type, Presentation, Quote, BookOpen,
   CalendarClock, Sparkles, Film, Undo2, Archive, Trash, Calendar, Users, PartyPopper,
-  Tags, BarChart3,
+  Tags, MoreVertical, Info, X,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
@@ -68,6 +69,7 @@ export default function AssetLibrary() {
   const [showTrash, setShowTrash] = useState(false);
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
   const [bulkMode, setBulkMode] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     return assets.filter((a) => {
@@ -77,6 +79,7 @@ export default function AssetLibrary() {
       return true;
     });
   }, [assets, search, filterType, filterPermission]);
+  const selected = useMemo(() => assets.find((a) => a.id === selectedId) ?? null, [assets, selectedId]);
 
   const handleSoftDelete = useCallback(async (asset: SourceAsset) => {
     await softDelete(asset.id);
@@ -191,66 +194,68 @@ export default function AssetLibrary() {
       <ExpirationAlerts />
 
       {/* Toolbar */}
-      <div className="sm-assets-toolbar flex flex-wrap items-center gap-3 mb-6">
-        <div className="sm-assets-search relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search assets…" className="pl-9" />
-        </div>
-        {!showTrash && (
-          <>
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[150px]"><SelectValue placeholder="All types" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="image">Image</SelectItem>
-                <SelectItem value="video">Video</SelectItem>
-                <SelectItem value="pdf">PDF</SelectItem>
-                <SelectItem value="link">Link</SelectItem>
-                <SelectItem value="text_snippet">Text Snippet</SelectItem>
-                <SelectItem value="deck">Deck</SelectItem>
-                <SelectItem value="testimonial">Testimonial</SelectItem>
-                <SelectItem value="case_study">Case Study</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filterPermission} onValueChange={setFilterPermission}>
-              <SelectTrigger className="w-[170px]"><SelectValue placeholder="All permissions" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Permissions</SelectItem>
-                <SelectItem value="generation_allowed">Gen Allowed</SelectItem>
-                <SelectItem value="summarization_only">Summary Only</SelectItem>
-                <SelectItem value="blocked">Blocked</SelectItem>
-                <SelectItem value="archived">Archived</SelectItem>
-              </SelectContent>
-            </Select>
-          </>
-        )}
-        <Button
-          variant={showTrash ? "default" : "outline"}
-          onClick={() => setShowTrash(!showTrash)}
-          className="relative"
-        >
-          <Trash className="mr-2 h-4 w-4" />
-          {showTrash ? "Back to Library" : "Trash"}
-          {trashedAssets.length > 0 && !showTrash && (
-            <Badge variant="destructive" className="ml-2 h-5 min-w-[20px] px-1.5 text-[10px]">
-              {trashedAssets.length}
-            </Badge>
+      <div className="sm-al-toolbar">
+        <div className="sm-al-row">
+          <div className="sm-al-search">
+            <Search aria-hidden="true" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search assets…" aria-label="Search assets" />
+          </div>
+          {!showTrash && (
+            <>
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="sm-al-select w-[150px]"><SelectValue placeholder="All types" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="image">Image</SelectItem>
+                  <SelectItem value="video">Video</SelectItem>
+                  <SelectItem value="pdf">PDF</SelectItem>
+                  <SelectItem value="link">Link</SelectItem>
+                  <SelectItem value="text_snippet">Text Snippet</SelectItem>
+                  <SelectItem value="deck">Deck</SelectItem>
+                  <SelectItem value="testimonial">Testimonial</SelectItem>
+                  <SelectItem value="case_study">Case Study</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterPermission} onValueChange={setFilterPermission}>
+                <SelectTrigger className="sm-al-select w-[170px]"><SelectValue placeholder="All permissions" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Permissions</SelectItem>
+                  <SelectItem value="generation_allowed">Gen Allowed</SelectItem>
+                  <SelectItem value="summarization_only">Summary Only</SelectItem>
+                  <SelectItem value="blocked">Blocked</SelectItem>
+                  <SelectItem value="archived">Archived</SelectItem>
+                </SelectContent>
+              </Select>
+            </>
           )}
-        </Button>
-        {!showTrash && isAdmin && (
-          <>
-            <Button
-              variant={bulkMode ? "default" : "outline"}
-              onClick={() => { setBulkMode(!bulkMode); setBulkSelected(new Set()); }}
-            >
-              <Tags className="mr-2 h-4 w-4" />{bulkMode ? "Exit Bulk" : "Bulk Actions"}
-            </Button>
-            <Button variant="outline" onClick={() => setOneDriveOpen(true)}><FolderOpen className="mr-2 h-4 w-4" />Connected Folders</Button>
-            <Button variant="outline" onClick={() => setReelCreatorOpen(true)}><Film className="mr-2 h-4 w-4" />Create Video Reel</Button>
-            <Button variant="outline" onClick={() => setBulkOpen(true)}><Sparkles className="mr-2 h-4 w-4" />AI Reel Cards</Button>
-            <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button>
-          </>
-        )}
+          {!showTrash && isAdmin && <Button onClick={openCreate} className="sm-al-primary"><Plus className="mr-2 h-4 w-4" />Add Asset</Button>}
+        </div>
+        <div className="sm-al-row sm-al-row-secondary">
+          <span className="sm-al-count">{showTrash ? trashedAssets.length : filtered.length} assets</span>
+          <Button
+            variant={showTrash ? "default" : "outline"}
+            onClick={() => { setShowTrash(!showTrash); setSelectedId(null); }}
+            className="relative sm-al-chip"
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            {showTrash ? "Back to Library" : "Trash"}
+            {trashedAssets.length > 0 && !showTrash && (
+              <Badge variant="destructive" className="ml-2 h-5 min-w-[20px] px-1.5 text-[10px]">
+                {trashedAssets.length}
+              </Badge>
+            )}
+          </Button>
+          {!showTrash && isAdmin && (
+            <>
+              <Button className="sm-al-chip" variant={bulkMode ? "default" : "outline"} onClick={() => { setBulkMode(!bulkMode); setBulkSelected(new Set()); }}>
+                <Tags className="mr-2 h-4 w-4" />{bulkMode ? "Exit Bulk" : "Bulk Actions"}
+              </Button>
+              <Button className="sm-al-chip" variant="outline" onClick={() => setOneDriveOpen(true)}><FolderOpen className="mr-2 h-4 w-4" />Connected Folders</Button>
+              <Button className="sm-al-chip" variant="outline" onClick={() => setReelCreatorOpen(true)}><Film className="mr-2 h-4 w-4" />Create Video Reel</Button>
+              <Button className="sm-al-chip" variant="outline" onClick={() => setBulkOpen(true)}><Sparkles className="mr-2 h-4 w-4" />AI Reel Cards</Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Bulk actions bar */}
@@ -327,111 +332,112 @@ export default function AssetLibrary() {
             action={assets.length === 0 && isAdmin ? <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button> : undefined}
           />
         ) : (
-          <div className="sm-asset-grid grid gap-4 md:grid-cols-2 2xl:grid-cols-4 xl:grid-cols-3">
+          <div className={selected ? "sm-al-layout has-inspector" : "sm-al-layout"}>
+          <div className="sm-al-grid">
             {filtered.map((asset) => {
-              const Icon = ASSET_TYPE_ICON[asset.asset_type] ?? FileText;
               const perm = PERMISSION_BADGE[asset.permission_state];
               const summary = summaryMap.get(asset.id);
               const expired = isExpired(asset);
-              const usageCount = usageMap.get(asset.id) ?? 0;
-
+              const isSel = selectedId === asset.id;
+              const topics = summary?.key_topics?.slice(0, 3) ?? [];
+              const dateValue = (asset as any).content_date ?? asset.created_at;
               return (
-                <Card key={asset.id} className={`sm-asset-card ${expired ? "border-destructive/40 opacity-75" : ""} ${bulkMode && bulkSelected.has(asset.id) ? "ring-2 ring-primary" : ""}`}>
-                  <CardHeader className="py-3 px-4 flex-row items-start justify-between space-y-0 gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {bulkMode && (
-                        <Checkbox
-                          checked={bulkSelected.has(asset.id)}
-                          onCheckedChange={() => toggleBulkSelect(asset.id)}
-                        />
-                      )}
-                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                      <CardTitle className="text-sm font-semibold truncate">{asset.title}</CardTitle>
-                    </div>
-                    <div className="flex gap-1 shrink-0">
-                      {asset.file_path && (
-                        <>
-                          <Button variant="ghost" size="icon" onClick={() => setViewingAsset(asset)} title="Preview"><Eye className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => downloadAsset(asset.file_path!, asset.asset_type)} title="Download"><Download className="h-3.5 w-3.5" /></Button>
-                        </>
-                      )}
-                      {isAdmin && (
-                        <>
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(asset)}><Pencil className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleSoftDelete(asset)} disabled={isDeleting}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
-                        </>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="px-4 pb-3 pt-0 space-y-2">
-                    <AssetThumbnail
-                      filePath={asset.file_path}
-                      assetType={asset.asset_type}
-                      title={asset.title}
-                      onClick={() => setViewingAsset(asset)}
-                    />
-                    {asset.description && <p className="text-xs text-muted-foreground line-clamp-2">{asset.description}</p>}
-                    <div className="flex flex-wrap gap-1.5">
-                      <Badge variant="outline" className="text-xs capitalize">{asset.asset_type.replace("_", " ")}</Badge>
-                      <Badge variant={perm.variant} className="text-xs">{perm.label}</Badge>
-                      {asset.is_nudaze_origin && <Badge variant="outline" className="text-xs border-primary/30 text-primary">NuDaze</Badge>}
-                      {expired && <Badge variant="destructive" className="text-xs">Expired</Badge>}
-                      {usageCount > 0 && (
-                        <Badge variant="outline" className="text-[10px] gap-0.5">
-                          <BarChart3 className="h-2.5 w-2.5" />{usageCount} use{usageCount !== 1 ? "s" : ""}
-                        </Badge>
-                      )}
-                    </div>
-                    {/* Metadata: date, event, contributors */}
-                    <div className="space-y-1">
-                      {(asset as any).content_date && (
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3 shrink-0" />
-                          {format(new Date((asset as any).content_date), "MMM d, yyyy")}
-                        </div>
-                      )}
-                      {(asset as any).is_event && (asset as any).event_name && (
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <PartyPopper className="h-3 w-3 shrink-0" />
-                          {(asset as any).event_name}
-                        </div>
-                      )}
-                      {(asset as any).contributors?.length > 0 && (
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <Users className="h-3 w-3 shrink-0" />
-                          <span className="truncate">{(asset as any).contributors.join(", ")}</span>
-                        </div>
-                      )}
-                    </div>
-                    {asset.expires_at && !expired && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <CalendarClock className="h-3 w-3" />
-                        Expires {format(new Date(asset.expires_at), "MMM d, yyyy")}
-                      </div>
+                <article key={asset.id} className={`sm-al-card ${isSel ? "is-selected" : ""} ${expired ? "is-expired" : ""} ${bulkMode && bulkSelected.has(asset.id) ? "is-bulk" : ""}`}>
+                  <div className="sm-al-thumb">
+                    <AssetThumbnail filePath={asset.file_path} assetType={asset.asset_type} title={asset.title} onClick={() => setSelectedId(asset.id)} />
+                    <span className="sm-al-type">{asset.asset_type.replace("_", " ")}</span>
+                    {bulkMode && (
+                      <span className="sm-al-check"><Checkbox checked={bulkSelected.has(asset.id)} onCheckedChange={() => toggleBulkSelect(asset.id)} aria-label={`Select ${asset.title}`} /></span>
                     )}
-                    {summary && (
-                      <div className="mt-2 rounded-md bg-secondary/50 p-2">
-                        <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground mb-1">
-                          <Sparkles className="h-3 w-3" /> Summary
-                        </div>
-                        <p className="text-xs text-muted-foreground line-clamp-3">{summary.summary}</p>
-                        {summary.key_topics && summary.key_topics.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {summary.key_topics.map((t) => (
-                              <Badge key={t} variant="outline" className="text-[10px] px-1.5 py-0">{t}</Badge>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    <p className="text-[10px] text-muted-foreground/60 pt-1">
-                      Created {format(new Date(asset.created_at), "MMM d, yyyy")}
-                      {asset.updated_at !== asset.created_at && ` · Updated ${format(new Date(asset.updated_at), "MMM d, yyyy")}`}
-                    </p>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="sm-al-body">
+                    <div className="sm-al-title-row">
+                      <button type="button" className="sm-al-title" title={asset.title} onClick={() => setSelectedId(asset.id)} aria-pressed={isSel}>{asset.title}</button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="sm-al-more" aria-label={`Actions for ${asset.title}`}><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setSelectedId(asset.id)}><Info className="mr-2 h-3.5 w-3.5" />Details</DropdownMenuItem>
+                          {asset.file_path && <DropdownMenuItem onClick={() => setViewingAsset(asset)}><Eye className="mr-2 h-3.5 w-3.5" />Preview</DropdownMenuItem>}
+                          {asset.file_path && <DropdownMenuItem onClick={() => downloadAsset(asset.file_path!, asset.asset_type)}><Download className="mr-2 h-3.5 w-3.5" />Download</DropdownMenuItem>}
+                          {isAdmin && <DropdownMenuItem onClick={() => openEdit(asset)}><Pencil className="mr-2 h-3.5 w-3.5" />Edit</DropdownMenuItem>}
+                          {isAdmin && <DropdownMenuItem className="text-destructive" disabled={isDeleting} onClick={() => handleSoftDelete(asset)}><Trash2 className="mr-2 h-3.5 w-3.5" />Delete</DropdownMenuItem>}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    {topics.length > 0 && <div className="sm-al-tags">{topics.map((t) => <span key={t}>{t}</span>)}</div>}
+                    <div className="sm-al-foot">
+                      <span className="sm-al-date">{asset.is_nudaze_origin && <b>NuDaze · </b>}{format(new Date(dateValue), "MMM d, yyyy")}</span>
+                      {expired ? <span className="sm-al-status" data-tone="blocked">Expired</span> : <span className="sm-al-status" data-tone={asset.permission_state}>{perm.label}</span>}
+                    </div>
+                  </div>
+                </article>
               );
             })}
+          </div>
+          {selected && (
+            <aside className="sm-al-inspector" aria-label={`Details for ${selected.title}`}>
+              {(() => {
+                const a = selected;
+                const Icon = ASSET_TYPE_ICON[a.asset_type] ?? FileText;
+                const perm = PERMISSION_BADGE[a.permission_state];
+                const summary = summaryMap.get(a.id);
+                const expired = isExpired(a);
+                const usageCount = usageMap.get(a.id) ?? 0;
+                const rows: [string, React.ReactNode][] = [
+                  ["Type", <span className="capitalize">{a.asset_type.replace("_", " ")}</span>],
+                  ["Description", a.description],
+                  ["Origin", a.is_nudaze_origin ? "NuDaze" : null],
+                  ["Content date", (a as any).content_date ? format(new Date((a as any).content_date), "MMM d, yyyy") : null],
+                  ["Event", (a as any).is_event ? (a as any).event_name : null],
+                  ["Contributors", (a as any).contributors?.length ? (a as any).contributors.join(", ") : null],
+                  ["Expires", a.expires_at ? <>{format(new Date(a.expires_at), "MMM d, yyyy")}{expired && " · Expired"}</> : null],
+                  ["Used in", usageCount > 0 ? `${usageCount} use${usageCount !== 1 ? "s" : ""}` : null],
+                  ["Created", format(new Date(a.created_at), "MMM d, yyyy")],
+                  ["Updated", a.updated_at !== a.created_at ? format(new Date(a.updated_at), "MMM d, yyyy") : null],
+                ];
+                return (
+                  <>
+                    <div className="sm-al-insp-head">
+                      <span className="sm-al-insp-icon"><Icon /></span>
+                      <div className="min-w-0 flex-1"><h2>{a.title}</h2><p className="capitalize">{a.asset_type.replace("_", " ")}</p></div>
+                      <Button variant="ghost" size="icon" onClick={() => setSelectedId(null)} aria-label="Close details"><X className="h-4 w-4" /></Button>
+                    </div>
+                    <div className="sm-al-insp-preview"><AssetThumbnail filePath={a.file_path} assetType={a.asset_type} title={a.title} onClick={() => a.file_path && setViewingAsset(a)} /></div>
+                    <section className="sm-al-insp-section">
+                      <div className="sm-al-insp-title"><span>Basic information</span>{isAdmin && <Button size="sm" variant="outline" onClick={() => openEdit(a)}><Pencil className="mr-1 h-3.5 w-3.5" />Edit</Button>}</div>
+                      <dl>{rows.filter(([, v]) => v).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+                    </section>
+                    <section className="sm-al-insp-section">
+                      <div className="sm-al-insp-title"><span>Asset status</span></div>
+                      {isAdmin ? (
+                        <Select value={a.permission_state} onValueChange={(v) => update({ id: a.id, permission_state: v } as never)}>
+                          <SelectTrigger className="sm-al-select" aria-label="Asset status"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="generation_allowed">Gen Allowed</SelectItem>
+                            <SelectItem value="summarization_only">Summary Only</SelectItem>
+                            <SelectItem value="blocked">Blocked</SelectItem>
+                            <SelectItem value="archived">Archived</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : <span className="sm-al-status" data-tone={a.permission_state}>{perm.label}</span>}
+                    </section>
+                    {summary && (
+                      <section className="sm-al-insp-section">
+                        <div className="sm-al-insp-title"><span><Sparkles className="mr-1 inline h-3.5 w-3.5" />Summary</span></div>
+                        <p className="sm-al-insp-copy">{summary.summary}</p>
+                        {summary.key_topics && summary.key_topics.length > 0 && <div className="sm-al-tags">{summary.key_topics.map((t) => <span key={t}>{t}</span>)}</div>}
+                      </section>
+                    )}
+                    <div className="sm-al-insp-actions">
+                      {a.file_path && <Button className="sm-al-primary" onClick={() => downloadAsset(a.file_path!, a.asset_type)}><Download className="mr-2 h-4 w-4" />Download</Button>}
+                      {a.file_path && <Button variant="outline" onClick={() => setViewingAsset(a)}><Eye className="mr-2 h-4 w-4" />Preview</Button>}
+                      {isAdmin && <Button variant="outline" onClick={() => handleSoftDelete(a)} disabled={isDeleting} aria-label="Delete asset"><Trash2 className="h-4 w-4 text-destructive" /></Button>}
+                    </div>
+                  </>
+                );
+              })()}
+            </aside>
+          )}
           </div>
         )
       )}
