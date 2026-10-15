@@ -128,7 +128,7 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
         {/* External post context */}
         {ext && (
           <div className="rounded-md bg-muted/30 border p-2.5 space-y-1">
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-2 flex-wrap text-[10px] text-muted-foreground">
               <span className="font-medium">Replying to:</span>
               {ext.author_name && <span>{ext.author_name}</span>}
               {ext.topic && <Badge variant="secondary" className="text-[9px] h-4">{ext.topic}</Badge>}

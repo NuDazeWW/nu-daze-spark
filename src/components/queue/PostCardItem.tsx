@@ -25,6 +25,8 @@ import { useNavigate } from "react-router-dom";
 import { Split } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { SplitPlatformsDialog } from "./SplitPlatformsDialog";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
+import { usePreviewMedia } from "@/hooks/usePreviewMedia";
 
 interface PostCardItemProps {
   card: PostCard;
@@ -53,6 +55,8 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const { profiles: voices } = useVoiceProfiles();
   const voice = card.voice_profile_id ? voices.find((v) => v.id === card.voice_profile_id) : null;
   const statusMeta = STATUS_META[card.approval_status];
+  const { data: media = [] } = usePreviewMedia(card, true);
+  const thumb = media.find((m) => m.url && m.asset_type !== "video") ?? media.find((m) => m.url);
 
   const changeStatus = (status: ApprovalStatus) => {
     if ((status === "approved" || status === "exported") && !pf.gate.clear) {
@@ -84,13 +88,14 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
       <CardHeader className="py-3 px-4 space-y-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <Tooltip><TooltipTrigger asChild>
+              <span className="sm-qplatform" data-platform={card.platform} aria-label={card.platform}><PlatformIcon platform={card.platform} className="h-3.5 w-3.5" /></span>
+            </TooltipTrigger><TooltipContent className="capitalize">{card.platform} · {card.content_type}</TooltipContent></Tooltip>
             <PostNumber card={card} />
-            <Badge variant="outline" className="sm-type sm-type-post gap-1"><BookOpen className="h-3 w-3" />Post</Badge>
-            <Badge variant="outline" className={`text-xs shrink-0 ${statusMeta.color}`}>
+            {card.scheduled_for && <span className="font-mono text-[10px] text-muted-foreground">{format(new Date(card.scheduled_for), "h:mm a")}</span>}
+            <Badge variant="outline" className={`text-[10px] shrink-0 ${statusMeta.color}`}>
               {statusMeta.label}
             </Badge>
-            <Badge variant="outline" className="text-[10px] capitalize shrink-0">{card.platform}</Badge>
-            <Badge variant="outline" className="text-[10px] capitalize shrink-0">{card.content_type}</Badge>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             {/* Advance / Revert status */}
@@ -162,12 +167,21 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
       </CardHeader>
       <CardContent className="px-4 pb-3 pt-0 space-y-2.5">
         {/* Copy snippet — click to expand */}
-        <div
-          className={`text-sm whitespace-pre-wrap cursor-pointer leading-snug ${!expanded ? "line-clamp-3" : ""}`}
-          onClick={() => setExpanded(!expanded)}
-          title={expanded ? "Click to collapse" : "Click to read full copy"}
-        >
-          {card.draft_copy}
+        <div className="flex gap-3">
+          {thumb?.url && (
+            <button type="button" onClick={() => setPreviewOpen(true)} aria-label="Open preview" className="sm-qthumb shrink-0">
+              {thumb.asset_type === "video"
+                ? <video src={thumb.url} muted className="h-full w-full object-cover" />
+                : <img src={thumb.url} alt={thumb.title} loading="lazy" className="h-full w-full object-cover" />}
+            </button>
+          )}
+          <div
+            className={`min-w-0 text-sm whitespace-pre-wrap cursor-pointer leading-snug ${!expanded ? "line-clamp-3" : ""}`}
+            onClick={() => setExpanded(!expanded)}
+            title={expanded ? "Click to collapse" : "Click to read full copy"}
+          >
+            {card.draft_copy.split(/(#[\w-]+)/g).map((part, i) => part.startsWith("#") ? <span key={i} className="sm-qtag">{part}</span> : part)}
+          </div>
         </div>
 
         {/* Compact detail icons — hover for full text */}
@@ -211,9 +225,9 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         </div>
 
         {/* Bottom action icon bar */}
-        <div className="flex items-center gap-1 border-t pt-2">
+        <div className="flex flex-wrap items-center gap-1 border-t pt-2">
           <PreflightBadge state={pf.run.isPending ? "none" : pf.gate.state} review={pf.review} onClick={() => { setGateIntent(null); setPreflightOpen(true); }} />
-          <div className="ml-auto flex items-center gap-0.5">
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-0.5">
             <Tooltip><TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Preview" onClick={() => setPreviewOpen(true)}><Eye className="h-3.5 w-3.5" /></Button>
             </TooltipTrigger><TooltipContent>Preview</TooltipContent></Tooltip>

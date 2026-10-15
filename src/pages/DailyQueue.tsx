@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WeeklyCalendarView } from "@/components/queue/WeeklyCalendarView";
+import { QueueBoard, QueueKpis, QueueTriage } from "@/components/queue/QueueBoard";
 import {
   CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid, Upload, List,
 } from "lucide-react";
@@ -62,7 +63,7 @@ export default function DailyQueue() {
   const [editingComment, setEditingComment] = useState<typeof queueItems[0] | null>(null);
   const [deletingItem, setDeletingItem] = useState<{ id: string; type: QueueItemType } | null>(null);
   const [importOpen, setImportOpen] = useState(false);
-  const [view, setView] = useState<"list" | "calendar">("list");
+  const [view, setView] = useState<"board" | "list" | "calendar">("board");
 
   const filtered = useMemo(() => {
     return queueItems.filter((item) => {
@@ -103,6 +104,37 @@ export default function DailyQueue() {
 
   const activeCount = queueItems.filter((c) => !["archived", "posted"].includes(c.approval_status)).length;
 
+  const renderItem = (item: typeof queueItems[0]) => {
+            if (item.type === "comment" && item.comment) {
+              return (
+                <CommentCardItem
+                  key={`comment-${item.id}`}
+                  comment={item.comment}
+                  isAdmin={isAdmin}
+                  onEdit={() => setEditingComment(item)}
+                  onStatusChange={(status) => updateStatus.mutate({ id: item.id, status, itemType: "comment" })}
+                  onDelete={() => setDeletingItem({ id: item.id, type: "comment" })}
+                  isUpdating={updateStatus.isPending}
+                />
+              );
+            }
+            if (item.postCard) {
+              return (
+                <PostCardItem
+                  key={`post-${item.id}`}
+                  card={item.postCard}
+                  isAdmin={isAdmin}
+                  onEdit={() => setEditingPostCard(item)}
+                  onStatusChange={(status, notes) => updateStatus.mutate({ id: item.id, status, notes, itemType: "post" })}
+                  onDelete={() => setDeletingItem({ id: item.id, type: "post" })}
+                  isUpdating={updateStatus.isPending}
+                  statusDates={statusDates[item.id]}
+                />
+              );
+            }
+            return null;
+  };
+
   if (isLoading) {
     return (
       <div className="animate-fade-in">
@@ -130,6 +162,7 @@ export default function DailyQueue() {
       <PipelineNav className="mt-4" />
 
       <ScheduleImportDialog open={importOpen} onOpenChange={setImportOpen} />
+      <QueueKpis items={queueItems} />
 
       {/* Row 1: platform selector + view/import, search top-right */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -151,9 +184,13 @@ export default function DailyQueue() {
             );
           })}
         </div>
-        <Button variant="outline" size="sm" onClick={() => setView(view === "list" ? "calendar" : "list")}>
-          {view === "list" ? <><CalendarDays className="h-4 w-4 mr-1.5" />Calendar view</> : <><List className="h-4 w-4 mr-1.5" />List view</>}
-        </Button>
+        <div role="group" aria-label="View" className="flex items-center gap-1 rounded-full border p-1">
+          {([["board", LayoutGrid, "Board"], ["list", List, "List"], ["calendar", CalendarDays, "Calendar"]] as const).map(([v, Icon, l]) => (
+            <Button key={v} size="sm" variant={view === v ? "default" : "ghost"} aria-pressed={view === v} onClick={() => setView(v)} className="rounded-full h-8 px-3 text-sm">
+              <Icon className="h-4 w-4 mr-1.5" />{l}
+            </Button>
+          ))}
+        </div>
         <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
           <Upload className="h-4 w-4 mr-1.5" />Import schedule
         </Button>
@@ -212,6 +249,8 @@ export default function DailyQueue() {
               : "Try adjusting your search or filters."
           }
         />
+      ) : view === "board" ? (
+        <QueueBoard items={filtered} renderItem={renderItem} />
       ) : view === "calendar" ? (
         <WeeklyCalendarView
           items={filtered}
@@ -237,37 +276,12 @@ export default function DailyQueue() {
         />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 items-start">
-          {filtered.map((item) => {
-            if (item.type === "comment" && item.comment) {
-              return (
-                <CommentCardItem
-                  key={`comment-${item.id}`}
-                  comment={item.comment}
-                  isAdmin={isAdmin}
-                  onEdit={() => setEditingComment(item)}
-                  onStatusChange={(status) => updateStatus.mutate({ id: item.id, status, itemType: "comment" })}
-                  onDelete={() => setDeletingItem({ id: item.id, type: "comment" })}
-                  isUpdating={updateStatus.isPending}
-                />
-              );
-            }
-            if (item.postCard) {
-              return (
-                <PostCardItem
-                  key={`post-${item.id}`}
-                  card={item.postCard}
-                  isAdmin={isAdmin}
-                  onEdit={() => setEditingPostCard(item)}
-                  onStatusChange={(status, notes) => updateStatus.mutate({ id: item.id, status, notes, itemType: "post" })}
-                  onDelete={() => setDeletingItem({ id: item.id, type: "post" })}
-                  isUpdating={updateStatus.isPending}
-                  statusDates={statusDates[item.id]}
-                />
-              );
-            }
-            return null;
-          })}
+          {filtered.map(renderItem)}
         </div>
+      )}
+
+      {queueItems.length > 0 && (
+        <QueueTriage items={queueItems} onOpen={(i) => (i.type === "comment" ? setEditingComment(i) : setEditingPostCard(i))} />
       )}
 
       {/* Post card edit dialog */}
