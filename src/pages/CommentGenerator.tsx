@@ -158,6 +158,15 @@ function authorInitials(name: string | null) {
   return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
 }
 
+// Deterministic accent per author so each avatar reads as a distinct person.
+const AVATAR_ACCENTS = ["cyan", "violet", "magenta", "gold", "lime"] as const;
+function authorAccent(name: string | null) {
+  if (!name) return AVATAR_ACCENTS[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_ACCENTS[hash % AVATAR_ACCENTS.length];
+}
+
 function timeAgo(iso: string | null) {
   if (!iso) return "";
   try {
