@@ -1737,3 +1737,6 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 .sm-al-foot { flex-wrap: wrap; }
 .sm-al-title { white-space: nowrap; }
 .sm-strategy .sm-card.sm-strategy-rule { background: linear-gradient(115deg, hsl(0 0% 100%), hsl(262 70% 96%)) !important; border-color: hsl(262 60% 88%) !important; }
+.sm-al-body { grid-template-columns: minmax(0, 1fr); }
+.sm-al-title-row, .sm-al-foot { min-width: 0; }
+.sm-al-title { flex: 1 1 0; }
