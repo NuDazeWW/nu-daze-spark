@@ -123,7 +123,8 @@ export default function Pricing() {
         <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">Plans that grow with your content team</h1>
         <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">Every plan includes your own private workspace, human review on every post, and a live usage meter so there are never surprise charges.</p>
 
-        <div className="sm-billing-toggle mt-8 inline-flex items-center gap-1 rounded-full border p-1" role="radiogroup" aria-label="Billing period">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <div className="sm-billing-toggle inline-flex items-center gap-1 rounded-full border p-1" role="radiogroup" aria-label="Billing period">
           {(["monthly", "annual"] as const).map((b) => (
             <Button key={b} role="radio" aria-checked={billing === b} disabled={nonprofit && b === "monthly"}
               variant="ghost" size="sm" onClick={() => setParam("billing", b)}
@@ -132,6 +133,10 @@ export default function Pricing() {
               {b === "monthly" ? "Monthly" : "Annual · save 20%"}
             </Button>
           ))}
+        </div>
+          <Button variant="outline" size="sm" className="whitespace-nowrap rounded-full" asChild>
+            <a href="mailto:sales@nudaze.com?subject=SocialMotive%20custom%20pricing">Contact us for custom pricing</a>
+          </Button>
         </div>
         <div className="mt-4 flex items-center justify-center gap-2 text-sm">
           <HeartHandshake className="h-4 w-4 text-primary" />
@@ -204,17 +209,15 @@ export default function Pricing() {
         </section>
       )}
 
-      <section className="sm-usage-card mx-auto my-14 grid max-w-7xl gap-6 rounded-xl border bg-card p-6 text-sm text-muted-foreground md:grid-cols-[240px_1fr] md:items-center lg:mx-6 xl:mx-auto">
+      <section className="sm-usage-card mx-auto my-14 grid max-w-7xl gap-6 rounded-xl border bg-card p-6 text-sm text-muted-foreground md:grid-cols-[1fr_auto] md:items-center lg:mx-6 xl:mx-auto">
         <div>
-          <h3 className="font-display text-lg font-semibold text-foreground">How usage works</h3>
-          <p className="mt-1 text-xs">Simple, transparent usage so you always know what to expect.</p>
+          <h3 className="font-display text-lg font-semibold text-foreground">Custom pricing</h3>
+          <p className="mt-1">Not seeing the features you need? We build tailored plans for agencies, enterprises and multi-brand teams. Contact us for a demo or custom pricing.</p>
         </div>
-        <ul className="space-y-2">
-          <li>• Posting to LinkedIn, Facebook, Instagram and YouTube never pauses because of AI or X limits.</li>
-          <li>• Media credits cover AI images (3–12 credits) and AI video (40–250 credits). Top up anytime: 500 credits for $25.</li>
-          <li>• X charges per post; posts with a link cost more. You see the cost before you publish.</li>
-          <li>• Alerts reach you at 80%, and only an owner or admin can approve unusual spend.</li>
-        </ul>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="whitespace-nowrap" asChild><a href="mailto:sales@nudaze.com?subject=SocialMotive%20demo%20request">Book a demo</a></Button>
+          <Button className="whitespace-nowrap" asChild><a href="mailto:sales@nudaze.com?subject=SocialMotive%20custom%20pricing">Contact us for pricing <ArrowRight className="ml-2 h-4 w-4" /></a></Button>
+        </div>
       </section>
       <NonprofitIntakeDialog open={intake} onOpenChange={setIntake} />
     </div>
