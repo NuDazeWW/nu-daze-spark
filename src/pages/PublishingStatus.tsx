@@ -1,3 +1,4 @@
+import { PipelineNav } from "@/components/queue/PipelineNav";
 import { TikTokMark, PinterestMark, ThreadsMark } from "@/components/publishing/PlatformMarks";
 import { PostResultsButton } from "@/components/publishing/PostResultsButton";
 import phoneTiktok from "@/assets/pub-phone-tiktok.jpg";
@@ -121,10 +122,11 @@ export default function PublishingStatus() {
 
   return (
     <div className="pub-stage -m-4 md:-m-6 lg:-m-8 space-y-6">
+      <PipelineNav />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="pub-title">Publishing Status</h1>
-          <p className="pub-sub">Every scheduled and sent post, with results for each channel. Demo mode: sending is simulated.</p>
+          <p className="pub-sub">Every scheduled and sent post, with results for each channel.</p>
         </div>
         <button type="button" className="pub-notify !py-2 !text-sm" onClick={() => setReportOpen(true)}><FileDown className="h-4 w-4" />Export report</button>
       </div>

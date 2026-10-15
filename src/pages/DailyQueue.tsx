@@ -1,3 +1,4 @@
+import { PipelineNav } from "@/components/queue/PipelineNav";
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useStatusDates, postLabel, matchesPostNumber } from "@/components/tracking/PostTracking";
@@ -126,6 +127,7 @@ export default function DailyQueue() {
         title="Daily Content Queue"
         description={`${activeCount} active item${activeCount !== 1 ? "s" : ""} in the pipeline · ${typeCounts.post} post${typeCounts.post !== 1 ? "s" : ""} · ${typeCounts.comment} comment${typeCounts.comment !== 1 ? "s" : ""}`}
       />
+      <PipelineNav className="mt-4" />
 
       <ScheduleImportDialog open={importOpen} onOpenChange={setImportOpen} />
 
