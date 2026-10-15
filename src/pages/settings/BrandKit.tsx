@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Ban, CloudUpload, Image as ImageIcon, Loader2, Palette, Plus, Save, Sparkles, Stamp, Trash2, Type, Upload, X } from "lucide-react";
 import workspaceBackground from "@/assets/help-workspace-background.jpg";
 import watermarkBird from "@/assets/brand/nudaze-watermark-bird.png";
+import watermarkScenic from "@/assets/watermark-scenic.jpg";
 import type { BuilderMode } from "@/components/strategy/StrategyBuilderDialog";
 import { FileText, LayoutTemplate } from "lucide-react";
 
@@ -42,17 +43,12 @@ export default function BrandKitPage({ center, navigation, onBuilder }: { center
     setColors(q.data.kit.colors); setFonts(q.data.kit.fonts); setTone(q.data.kit.tone ?? "");
   }, [q.data]);
 
-  // watermark preview on a brand-colored sample canvas
+  // watermark preview on a neutral scenic sample photo
   useEffect(() => {
     let url: string | null = null; let alive = true;
-    const c = document.createElement("canvas"); c.width = 800; c.height = 800;
-    const ctx = c.getContext("2d")!;
-    const g = ctx.createLinearGradient(0, 0, 800, 800);
-    g.addColorStop(0, colors[0]?.hex ?? "#1e293b"); g.addColorStop(1, colors[1]?.hex ?? colors[0]?.hex ?? "#475569");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, 800, 800);
-    composeWatermark(c.toDataURL(), q.data?.logoUrl ?? watermarkBird, pos).then((b) => { if (!alive) return; url = URL.createObjectURL(b); setPreview(url); }).catch(() => {});
+    composeWatermark(watermarkScenic, q.data?.logoUrl ?? watermarkBird, pos).then((b) => { if (!alive) return; url = URL.createObjectURL(b); setPreview(url); }).catch(() => {});
     return () => { alive = false; if (url) URL.revokeObjectURL(url); };
-  }, [colors, q.data?.logoUrl, pos]);
+  }, [q.data?.logoUrl, pos]);
 
   const save = async () => {
     if (!clientId) return;
