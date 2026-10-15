@@ -134,14 +134,14 @@ export function MediaStudio({ clientId, postCardId, defaultPrompt = "", platform
   );
   const imageSettings = (
     <>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1"><Label className="text-xs">Format</Label>
           <Select value={aspect} onValueChange={setAspect}><SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
             <SelectContent><SelectItem value="square">Square 1:1</SelectItem><SelectItem value="portrait">Portrait 2:3</SelectItem><SelectItem value="landscape">Landscape 3:2</SelectItem></SelectContent></Select></div>
         <div className="space-y-1"><Label className="text-xs">Style</Label>
           <Select value={style} onValueChange={setStyle}><SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
             <SelectContent>{["photographic", "editorial illustration", "minimal flat graphic", "3D render", "cinematic"].map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}</SelectContent></Select></div>
-        <div className="space-y-1"><Label className="text-xs">Logo position</Label>
+        <div className="space-y-1 col-span-2"><Label className="text-xs">Logo position</Label>
           <Select value={pos} onValueChange={(v) => setPos(v as WatermarkPos)}><SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
             <SelectContent>{["bottom-right", "bottom-left", "top-right", "top-left"].map((p) => <SelectItem key={p} value={p} className="capitalize">{p.replace("-", " ")}</SelectItem>)}</SelectContent></Select></div>
       </div>

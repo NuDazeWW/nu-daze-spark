@@ -322,7 +322,7 @@ function SetupHub() {
   return (
     <section className="space-y-3">
       <h2 className="font-display text-lg font-semibold">Workspace settings</h2>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         <PostToCard />
         {ws.canManage && <GovernanceCard />}
         {items.map((h) => (
