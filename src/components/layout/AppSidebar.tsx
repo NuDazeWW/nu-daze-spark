@@ -114,13 +114,15 @@ export function AppSidebar() {
             className="w-full h-auto rounded-md object-contain"
           />
         </Link>
-        {ws.settings?.company_name && (
-          <div className="mt-2 flex items-center gap-2 text-xs text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
-            <span>for</span>
-            {ws.settings.company_logo_url && <img src={ws.settings.company_logo_url} alt="" className="h-5 max-w-[80px] object-contain" />}
-            <span className="font-semibold text-sidebar-foreground">{ws.settings.company_name}</span>
+        {ws.settings?.company_logo_url ? (
+          <div className="mt-3 flex justify-center group-data-[collapsible=icon]:hidden">
+            <img src={ws.settings.company_logo_url} alt={ws.settings.company_name ?? "Organization logo"} className="max-h-9 max-w-[70%] object-contain rounded-sm" />
           </div>
-        )}
+        ) : ws.settings?.company_name ? (
+          <div className="mt-3 flex justify-center group-data-[collapsible=icon]:hidden">
+            <span className="rounded-md border border-sidebar-border bg-sidebar-accent/40 px-3 py-1 text-xs font-semibold tracking-wide text-sidebar-foreground">{ws.settings.company_name}</span>
+          </div>
+        ) : null}
       </SidebarHeader>
 
 
