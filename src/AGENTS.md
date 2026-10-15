@@ -1,4 +1,5 @@
 # src rules
+- Brand & Strategy Studio owns a shared Tabs context above its three columns, so tab changes preserve brand edits and watermark state.
 
 - Account photos are cropped client-side to a 512px PNG in private storage, so large transparent logos fit without uploading originals.
 - External social links use shared `openInNewTab` since social sites refuse framing.
