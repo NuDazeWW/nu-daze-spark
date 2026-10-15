@@ -43,6 +43,17 @@ const PERMISSION_BADGE: Record<string, { label: string; variant: "default" | "se
   archived: { label: "Archived", variant: "outline" },
 };
 
+type TypeGroup = "all" | "images" | "videos" | "documents" | "other";
+const groupOf = (t: string): TypeGroup =>
+  t === "image" ? "images" : t === "video" ? "videos" : ["pdf", "deck", "case_study"].includes(t) ? "documents" : "other";
+const TYPE_GROUPS: { value: TypeGroup; label: string; icon: React.ElementType }[] = [
+  { value: "all", label: "All", icon: FolderOpen },
+  { value: "images", label: "Images", icon: Image },
+  { value: "videos", label: "Videos", icon: Video },
+  { value: "documents", label: "Documents", icon: FileText },
+  { value: "other", label: "Other", icon: Link2 },
+];
+
 export default function AssetLibrary() {
   const {
     assets, trashedAssets, summaryMap, isLoading, error, isAdmin,
@@ -70,16 +81,22 @@ export default function AssetLibrary() {
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
   const [bulkMode, setBulkMode] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [typeGroup, setTypeGroup] = useState<TypeGroup>("all");
 
   const filtered = useMemo(() => {
     return assets.filter((a) => {
       if (search && !a.title.toLowerCase().includes(search.toLowerCase()) && !a.description?.toLowerCase().includes(search.toLowerCase())) return false;
       if (filterType !== "all" && a.asset_type !== filterType) return false;
       if (filterPermission !== "all" && a.permission_state !== filterPermission) return false;
+      if (typeGroup !== "all" && groupOf(a.asset_type) !== typeGroup) return false;
       return true;
     });
-  }, [assets, search, filterType, filterPermission]);
-  const selected = useMemo(() => assets.find((a) => a.id === selectedId) ?? null, [assets, selectedId]);
+  }, [assets, search, filterType, filterPermission, typeGroup]);
+  // Inspector follows the selection; default to the first visible asset so the detail panel is always populated.
+  const selected = useMemo(() => {
+    if (selectedId === "none") return null;
+    return filtered.find((a) => a.id === selectedId) ?? filtered[0] ?? null;
+  }, [filtered, selectedId]);
 
   const handleSoftDelete = useCallback(async (asset: SourceAsset) => {
     await softDelete(asset.id);
@@ -258,6 +275,19 @@ export default function AssetLibrary() {
         </div>
       </div>
 
+      {!showTrash && (
+        <div className="sm-al-types" role="group" aria-label="Asset type">
+          {TYPE_GROUPS.map(({ value, label, icon: GIcon }) => {
+            const n = value === "all" ? assets.length : assets.filter((a) => groupOf(a.asset_type) === value).length;
+            return (
+              <button key={value} type="button" className="sm-al-type-chip" aria-pressed={typeGroup === value} onClick={() => setTypeGroup(value)}>
+                <GIcon aria-hidden="true" />{label}<span>{n}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Bulk actions bar */}
       {bulkMode && bulkSelected.size > 0 && (
         <div className="flex items-center gap-3 mb-4 p-3 rounded-lg border bg-muted/30">
@@ -338,7 +368,7 @@ export default function AssetLibrary() {
               const perm = PERMISSION_BADGE[asset.permission_state];
               const summary = summaryMap.get(asset.id);
               const expired = isExpired(asset);
-              const isSel = selectedId === asset.id;
+              const isSel = selected?.id === asset.id;
               const topics = summary?.key_topics?.slice(0, 3) ?? [];
               const dateValue = (asset as any).content_date ?? asset.created_at;
               return (
@@ -375,7 +405,7 @@ export default function AssetLibrary() {
             })}
           </div>
           {selected && (
-            <aside className="sm-al-inspector" aria-label={`Details for ${selected.title}`}>
+            <aside className={`sm-al-inspector ${selectedId && selectedId !== "none" ? "is-explicit" : ""}`} aria-label={`Details for ${selected.title}`}>
               {(() => {
                 const a = selected;
                 const Icon = ASSET_TYPE_ICON[a.asset_type] ?? FileText;
@@ -400,7 +430,7 @@ export default function AssetLibrary() {
                     <div className="sm-al-insp-head">
                       <span className="sm-al-insp-icon"><Icon /></span>
                       <div className="min-w-0 flex-1"><h2>{a.title}</h2><p className="capitalize">{a.asset_type.replace("_", " ")}</p></div>
-                      <Button variant="ghost" size="icon" onClick={() => setSelectedId(null)} aria-label="Close details"><X className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => setSelectedId("none")} aria-label="Close details"><X className="h-4 w-4" /></Button>
                     </div>
                     <div className="sm-al-insp-preview"><AssetThumbnail filePath={a.file_path} assetType={a.asset_type} title={a.title} onClick={() => a.file_path && setViewingAsset(a)} /></div>
                     <section className="sm-al-insp-section">
