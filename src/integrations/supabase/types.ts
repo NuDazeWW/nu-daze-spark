@@ -2847,6 +2847,8 @@ export type Database = {
           is_demo_master: boolean
           org_type: string
           plan_name: string
+          post_approval_required: boolean
+          preflight_mode: string
           seat_limit: number | null
           setup_progress: Json
           updated_at: string
@@ -2869,6 +2871,8 @@ export type Database = {
           is_demo_master?: boolean
           org_type?: string
           plan_name?: string
+          post_approval_required?: boolean
+          preflight_mode?: string
           seat_limit?: number | null
           setup_progress?: Json
           updated_at?: string
@@ -2891,6 +2895,8 @@ export type Database = {
           is_demo_master?: boolean
           org_type?: string
           plan_name?: string
+          post_approval_required?: boolean
+          preflight_mode?: string
           seat_limit?: number | null
           setup_progress?: Json
           updated_at?: string

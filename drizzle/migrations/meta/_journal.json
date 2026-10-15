@@ -169,6 +169,13 @@
       "when": 1792032166658,
       "tag": "0023_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792040231075,
+      "tag": "0024_governance_toggles",
+      "breakpoints": true
     }
   ]
 }
