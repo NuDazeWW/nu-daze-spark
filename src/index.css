@@ -2154,7 +2154,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-dashboard .sm-metric:hover { transform: translateY(-2px); border-color: hsl(var(--tone) / .55) !important; }
 
 /* GlowStatusIndicator — luminous dot/pill driven by the existing status color. */
-.sm-status::before, .lg-status::before {
+.lg-status::before {
   content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 999px; margin-right: 6px;
   background: hsl(var(--status-color, var(--lg-cyan)));
   box-shadow: 0 0 8px -1px hsl(var(--status-color, var(--lg-cyan)) / .9);
