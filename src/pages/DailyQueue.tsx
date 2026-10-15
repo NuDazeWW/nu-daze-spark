@@ -236,7 +236,7 @@ export default function DailyQueue() {
           }}
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 items-start">
           {filtered.map((item) => {
             if (item.type === "comment" && item.comment) {
               return (

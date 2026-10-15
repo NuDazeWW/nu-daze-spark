@@ -10,6 +10,7 @@ import {
 import {
   Copy, Pencil, Trash2, ChevronRight, ChevronLeft, MoreVertical,
   Check, Users, Hash, Building2, Target, Megaphone, BookOpen, Eye, ShieldCheck,
+  Mic, Lightbulb, AlertTriangle, Route,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -159,101 +160,79 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
           </div>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4 pt-0 space-y-3">
-        <StatusProgress card={card} dates={statusDates} />
-        <WhereIsIt card={card} here="queue" />
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setPreviewOpen(true)}>
-            <Eye className="h-3.5 w-3.5" />Preview
-          </Button>
-          <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => { setGateIntent(null); setPreflightOpen(true); }}>
-            <ShieldCheck className="h-3.5 w-3.5" />Preflight
-          </Button>
-          <PostHistoryButton card={card} />
-          {["approved", "exported"].includes(card.approval_status) && (
-            <OpenPlatformButton clientId={card.client_id} platform={card.platform}
-              copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")} />
-          )}
-          <PreflightBadge state={pf.run.isPending ? "none" : pf.gate.state} review={pf.review} onClick={() => { setGateIntent(null); setPreflightOpen(true); }} />
-          {voice && (
-            <Badge variant="secondary" className="text-[10px]" title={`Written in ${voice.name}'s voice`}>
-              as {voice.name}{voice.role_title ? ` · ${voice.role_title}` : ""}
-            </Badge>
-          )}
-        </div>
-        {/* Draft copy */}
+      <CardContent className="px-4 pb-3 pt-0 space-y-2.5">
+        {/* Copy snippet — click to expand */}
         <div
-          className={`text-sm whitespace-pre-wrap cursor-pointer ${!expanded ? "line-clamp-4" : ""}`}
+          className={`text-sm whitespace-pre-wrap cursor-pointer leading-snug ${!expanded ? "line-clamp-3" : ""}`}
           onClick={() => setExpanded(!expanded)}
+          title={expanded ? "Click to collapse" : "Click to read full copy"}
         >
           {card.draft_copy}
         </div>
-        {card.draft_copy.length > 200 && (
-          <Button variant="link" size="sm"
-            className="px-0 text-xs"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? "Show less" : "Show more"}
-          </Button>
-        )}
 
-        {/* Revision notes */}
-        {card.revision_notes && (
-          <div className="rounded-md bg-brand-attention/5 border border-brand-attention/20 p-2">
-            <p className="text-xs font-medium text-brand-attention mb-0.5">Revision Notes</p>
-            <p className="text-xs text-muted-foreground">{card.revision_notes}</p>
+        {/* Compact detail icons — hover for full text */}
+        <div className="flex items-center gap-1.5 flex-wrap text-muted-foreground">
+          {[
+            { show: !!card.objective, icon: Target, label: "Objective", text: card.objective },
+            { show: !!card.audience, icon: Megaphone, label: "Audience", text: card.audience },
+            { show: !!card.campaign_pillar, icon: BookOpen, label: "Pillar", text: card.campaign_pillar },
+            { show: (card.hashtags ?? []).length > 0, icon: Hash, label: `Hashtags (${(card.hashtags ?? []).length})`, text: hashtagString },
+            { show: (card.people_tags ?? []).length > 0, icon: Users, label: `People tags (${(card.people_tags ?? []).length})`, text: peopleString },
+            { show: (card.org_tags ?? []).length > 0, icon: Building2, label: `Organization tags (${(card.org_tags ?? []).length})`, text: orgString },
+            { show: !!voice, icon: Mic, label: "Executive voice", text: voice ? `Written in ${voice.name}'s voice${voice.role_title ? ` · ${voice.role_title}` : ""}` : "" },
+            { show: !!card.rationale, icon: Lightbulb, label: "Rationale", text: card.rationale },
+            { show: !!card.revision_notes, icon: AlertTriangle, label: "Revision notes", text: card.revision_notes, warn: true },
+          ].filter((d) => d.show).map((d) => (
+            <Tooltip key={d.label}>
+              <TooltipTrigger asChild>
+                <span tabIndex={0} aria-label={d.label}
+                  className={`inline-flex h-6 w-6 items-center justify-center rounded-md border bg-muted/40 hover:text-primary hover:border-primary/40 transition-colors ${d.warn ? "text-brand-attention border-brand-attention/40" : ""}`}>
+                  <d.icon className="h-3 w-3" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="text-[10px] font-semibold uppercase tracking-wide mb-0.5">{d.label}</p>
+                <p className="text-xs whitespace-pre-wrap">{d.text}</p>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span tabIndex={0} aria-label="Progress" className="inline-flex h-6 w-6 items-center justify-center rounded-md border bg-muted/40 hover:text-primary hover:border-primary/40">
+                <Route className="h-3 w-3" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent className="w-72 p-3 space-y-2">
+              <StatusProgress card={card} dates={statusDates} />
+              <WhereIsIt card={card} here="queue" />
+            </TooltipContent>
+          </Tooltip>
+          <span className="ml-auto text-[10px] text-muted-foreground/70 font-mono">{format(new Date(card.created_at), "MMM d")}</span>
+        </div>
+
+        {/* Bottom action icon bar */}
+        <div className="flex items-center gap-1 border-t pt-2">
+          <PreflightBadge state={pf.run.isPending ? "none" : pf.gate.state} review={pf.review} onClick={() => { setGateIntent(null); setPreflightOpen(true); }} />
+          <div className="ml-auto flex items-center gap-0.5">
+            <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Preview" onClick={() => setPreviewOpen(true)}><Eye className="h-3.5 w-3.5" /></Button>
+            </TooltipTrigger><TooltipContent>Preview</TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Preflight" onClick={() => { setGateIntent(null); setPreflightOpen(true); }}><ShieldCheck className="h-3.5 w-3.5" /></Button>
+            </TooltipTrigger><TooltipContent>Preflight</TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Edit" onClick={onEdit}><Pencil className="h-3.5 w-3.5" /></Button>
+            </TooltipTrigger><TooltipContent>Edit</TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Copy post" onClick={() => copyToClipboard(card.draft_copy, "Post copy")}><Copy className="h-3.5 w-3.5" /></Button>
+            </TooltipTrigger><TooltipContent>Copy post</TooltipContent></Tooltip>
+            <PostHistoryButton card={card} />
+            {["approved", "exported"].includes(card.approval_status) && (
+              <OpenPlatformButton clientId={card.client_id} platform={card.platform}
+                copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")} />
+            )}
           </div>
-        )}
-
-        {/* Tags section */}
-        <div className="space-y-1.5">
-          {(card.people_tags ?? []).length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <Users className="h-3 w-3 text-muted-foreground shrink-0" />
-               {(card.people_tags ?? []).map((t) => (
-                <Badge key={t} variant="secondary" className="text-[10px]">{t}</Badge>
-              ))}
-            </div>
-          )}
-          {(card.org_tags ?? []).length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <Building2 className="h-3 w-3 text-muted-foreground shrink-0" />
-               {(card.org_tags ?? []).map((t) => (
-                <Badge key={t} variant="outline" className="text-[10px]">{t}</Badge>
-              ))}
-            </div>
-          )}
-          {(card.hashtags ?? []).length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <Hash className="h-3 w-3 text-muted-foreground shrink-0" />
-              <p className="text-[10px] text-muted-foreground">{hashtagString}</p>
-            </div>
-          )}
         </div>
-
-        {/* Meta row */}
-        <div className="flex items-center gap-3 text-[10px] text-muted-foreground/60 pt-1 flex-wrap">
-          {card.objective && (
-            <span className="flex items-center gap-1"><Target className="h-2.5 w-2.5" />{card.objective}</span>
-          )}
-          {card.audience && (
-            <span className="flex items-center gap-1"><Megaphone className="h-2.5 w-2.5" />{card.audience}</span>
-          )}
-          {card.campaign_pillar && (
-            <span className="flex items-center gap-1"><BookOpen className="h-2.5 w-2.5" />{card.campaign_pillar}</span>
-          )}
-          <span>Created {format(new Date(card.created_at), "MMM d, yyyy")}</span>
-        </div>
-
-        {/* Rationale */}
-        {card.rationale && (
-          <details className="group/details">
-            <summary className="text-[10px] text-muted-foreground cursor-pointer hover:text-primary">
-              View rationale
-            </summary>
-            <p className="text-xs text-muted-foreground mt-1 pl-2 border-l-2 border-muted">{card.rationale}</p>
-          </details>
-        )}
       </CardContent>
       <NativePreviewDialog card={card} open={previewOpen} onOpenChange={setPreviewOpen} />
       <PreflightDialog open={preflightOpen} onOpenChange={setPreflightOpen} pf={pf} isAdmin={isAdmin} intent={gateIntent} draft={card.draft_copy} />
