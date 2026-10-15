@@ -152,7 +152,7 @@ Generate a JSON response with exactly these fields:
 - objective: Strategic objective (1 sentence)
 - audience: Target audience segment (1-2 words)
 - campaign_pillar: Relevant content pillar (1-2 words)
-- hashtags: Array of ${platform === "instagram" ? "10-15" : "3-6"} relevant hashtags (without #). Prioritize hashtag bank entries when relevant.${hashtagBankContext}
+- hashtags: Array of ${platform === "instagram" ? "10-15" : platform === "x" ? "1-2" : "3-6"} relevant hashtags (without #). Prioritize hashtag bank entries when relevant.${hashtagBankContext}
 - people_tags: Array of handles. MUST include contributors: ${assetContributors.length > 0 ? assetContributors.join(", ") : "use placeholders if none"}. Add 1-2 more if appropriate.
 - org_tags: Array of 1-2 relevant organizations
 - rationale: Brief rationale (1-2 sentences)${visualImages.length > 0 ? ", referencing what's visible in the media" : ""}
@@ -244,7 +244,7 @@ Generate a JSON response with exactly these fields:
         .insert({
           platform,
           content_type,
-          client_id: asset.client_id,
+          client_id: asset.client_id ?? clientId,
           draft_copy: cardData.draft_copy,
           objective: cardData.objective || null,
           audience: cardData.audience || null,
@@ -254,7 +254,7 @@ Generate a JSON response with exactly these fields:
           org_tags: cardData.org_tags || [],
           rationale: cardData.rationale || null,
           suggested_asset_description: cardData.suggested_asset_description || null,
-          source_references: [asset.id],
+          source_references: asset.id ? [asset.id] : [],
           approval_status: "draft",
           created_by: user.id,
         } as never)
