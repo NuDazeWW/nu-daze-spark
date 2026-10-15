@@ -11,6 +11,11 @@ const itemDate = (i: Item) => {
   const s = i.postCard?.scheduled_for;
   return s ? new Date(s) : null;
 };
+// Board placement: scheduled time, otherwise the day the item was created.
+const boardDate = (i: Item) => {
+  const s = i.postCard?.scheduled_for ?? (i as { created_at?: string }).created_at;
+  return s ? new Date(s) : null;
+};
 
 export function QueueKpis({ items }: { items: Item[] }) {
   const today = startOfDay(new Date());
@@ -50,16 +55,16 @@ export function QueueBoard({ items, renderItem }: { items: Item[]; renderItem: (
   const cols = useMemo(() => {
     const buckets: Item[][] = [[], [], [], [], []];
     for (const i of items) {
-      const d = itemDate(i);
+      const d = boardDate(i);
       const idx = d ? days.findIndex((day) => isSameDay(d, day)) : -1;
       buckets[idx >= 0 ? idx : 4].push(i);
     }
     return buckets;
   }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
-  const titles = [...days.map((d, n) => (n === 0 ? "Today" : format(d, "EEE"))), "Later & unscheduled"];
-  const subs = [...days.map((d) => format(d, "MMM d")), "No date in the next 4 days"];
+  const titles = [...days.map((d, n) => (n === 0 ? "Today" : format(d, "EEE"))), "Other dates"];
+  const subs = [...days.map((d) => format(d, "MMM d")), "Earlier or later"];
   return (
-    <div className="sm-qboard grid gap-3 md:grid-cols-2 xl:grid-cols-5 items-start">
+    <div className="sm-qboard grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 items-start">
       {cols.map((list, idx) => (
         <section key={idx} className="sm-qcol" data-today={idx === 0 || undefined} aria-label={titles[idx]}>
           <header className="flex items-baseline justify-between px-1 pb-2">
