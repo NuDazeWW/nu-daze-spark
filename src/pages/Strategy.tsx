@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Sparkles, FileText, LayoutTemplate, AudioLines, ShieldCheck, PanelsTopLeft, Users, Megaphone, Hash, MousePointerClick, Clock3, MessagesSquare } from "lucide-react";
-import strategyBackground from "@/assets/strategy-workspace-background.jpg";
+import strategyBackground from "@/assets/help-workspace-background.jpg";
 import { useAuth } from "@/hooks/useAuth";
 import { BrandVoiceTab } from "@/components/strategy/BrandVoiceTab";
 import { PlatformRulesTab } from "@/components/strategy/PlatformRulesTab";
@@ -24,9 +24,8 @@ export default function Strategy() {
   const [params] = useSearchParams();
   const initial = params.get("builder") as BuilderMode | null;
   const [builder, setBuilder] = useState<BuilderMode | null>(initial && ["website", "document", "preset"].includes(initial) ? initial : null);
-  const tabs = (
-      <Tabs defaultValue={params.get("tab") ?? "voice"} key={params.get("tab") ?? "voice"} className="w-full">
-        <TabsList className="flex flex-wrap h-auto gap-1 bg-secondary/50 p-1">
+  const navigation = (
+        <TabsList className="sm-studio-tabs">
           <TabsTrigger value="voice" className="text-xs"><Users aria-hidden="true" />Brand Voice</TabsTrigger>
           <TabsTrigger value="voices" className="text-xs"><AudioLines aria-hidden="true" />Voices</TabsTrigger>
           <TabsTrigger value="guardrails" className="text-xs"><ShieldCheck aria-hidden="true" />Guardrails</TabsTrigger>
@@ -38,6 +37,10 @@ export default function Strategy() {
           <TabsTrigger value="cadence" className="text-xs"><Clock3 aria-hidden="true" />Cadence</TabsTrigger>
           <TabsTrigger value="engagement" className="text-xs"><MessagesSquare aria-hidden="true" />Engagement</TabsTrigger>
         </TabsList>
+  );
+  const tabs = (
+      <div className="sm-studio-rules">
+        <div className="sm-studio-rules-heading"><ShieldCheck aria-hidden="true" /><div><h2>Strategy & Rules</h2></div></div>
         <TabsContent value="voice"><BrandVoiceTab /></TabsContent>
         <TabsContent value="voices"><VoicesTab /></TabsContent>
         <TabsContent value="guardrails"><GuardrailsTab /></TabsContent>
@@ -48,7 +51,7 @@ export default function Strategy() {
         <TabsContent value="ctas"><CtaBanksTab /></TabsContent>
         <TabsContent value="cadence"><CadenceTargetsTab /></TabsContent>
         <TabsContent value="engagement"><EngagementTargetsTab /></TabsContent>
-      </Tabs>
+      </div>
   );
   return (
     <div className="sm-reference sm-strategy animate-fade-in">
@@ -65,7 +68,9 @@ export default function Strategy() {
           </div>
         )}
       </PageHeader>
-      <BrandKitPage center={tabs} />
+      <Tabs defaultValue={params.get("tab") ?? "voice"} key={params.get("tab") ?? "voice"} className="sm-studio-workspace">
+        <BrandKitPage center={tabs} navigation={navigation} onBuilder={setBuilder} />
+      </Tabs>
       {builder && <StrategyBuilderDialog mode={builder} open onOpenChange={(o) => !o && setBuilder(null)} />}
     </div>
   );

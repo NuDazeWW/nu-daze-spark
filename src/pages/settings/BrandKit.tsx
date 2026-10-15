@@ -14,10 +14,12 @@ import { toast } from "sonner";
 import { Ban, CloudUpload, Image as ImageIcon, Loader2, Palette, Plus, Save, Sparkles, Stamp, Trash2, Type, Upload, X } from "lucide-react";
 import workspaceBackground from "@/assets/help-workspace-background.jpg";
 import watermarkBird from "@/assets/brand/nudaze-watermark-bird.png";
+import type { BuilderMode } from "@/components/strategy/StrategyBuilderDialog";
+import { FileText, LayoutTemplate } from "lucide-react";
 
 const FONT_SUGGESTIONS = ["Space Grotesk", "Inter", "IBM Plex Mono", "Playfair Display", "Montserrat", "Lato", "Roboto", "Source Serif"];
 
-export default function BrandKitPage({ center }: { center?: import("react").ReactNode } = {}) {
+export default function BrandKitPage({ center, navigation, onBuilder }: { center?: import("react").ReactNode; navigation?: import("react").ReactNode; onBuilder?: (mode: BuilderMode) => void } = {}) {
   const { clients } = useClients();
   const { canCreate } = useWorkspace();
   const { user } = useAuth();
@@ -102,10 +104,11 @@ export default function BrandKitPage({ center }: { center?: import("react").Reac
         </PageHeader>
       )}
 
+      {navigation}
       {q.isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
-        <div className={center ? "grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)_320px] items-start" : "grid gap-5 lg:grid-cols-[1fr_400px]"}>
-          <div className="space-y-4 min-w-0">
-            {center && <div className="sm-bk-panel"><div className="sm-bk-body space-y-2"><p className="text-xs font-mono uppercase tracking-wide opacity-70">Brand Kit · client</p>{clientSelect}</div></div>}
+        <div className={center ? "sm-studio-columns" : "grid gap-5 lg:grid-cols-[1fr_400px]"}>
+          <div className={center ? "sm-studio-brand min-w-0" : "space-y-4 min-w-0"}>
+            {center && <div className="sm-bk-panel"><Head icon={Palette} title="Brand Kit" /><div className="sm-bk-body space-y-2"><p className="text-xs font-mono uppercase tracking-wide opacity-70">Brand Kit · client</p>{clientSelect}</div></div>}
             <section className="sm-bk-panel">
               <Head icon={ImageIcon} title="Logo" desc="PNG with transparency works best. Used as the watermark on generated images." />
               <div className="sm-bk-logo-row">
@@ -124,14 +127,14 @@ export default function BrandKitPage({ center }: { center?: import("react").Reac
               <Head icon={Palette} title="Color palette" desc="First two colors drive gradients and AI image accents." />
               <div className="sm-bk-body space-y-3">
                 {colors.map((c, i) => (
-                  <div key={i} className="flex items-center gap-2">
+                  <div key={i} className="sm-studio-color-row flex items-center gap-2">
                     <input type="color" value={c.hex} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, hex: e.target.value } : x))} className={`sm-bk-swatch ${i === 0 ? "is-cyan" : i === 1 ? "is-gold" : ""}`} />
                     <Input value={c.name} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} placeholder="Name (e.g. Primary)" className="max-w-48 sm-bk-field" />
                     <Input value={c.hex} onChange={(e) => setColors(colors.map((x, j) => j === i ? { ...x, hex: e.target.value } : x))} className="w-28 font-mono text-xs sm-bk-field" />
                     <Button size="icon" variant="ghost" className="sm-bk-ghost" onClick={() => setColors(colors.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 ))}
-                <button type="button" className="sm-bk-btn-outline" disabled={colors.length >= 8} onClick={() => setColors([...colors, { name: "", hex: "#3b82f6" }])}><Plus className="h-4 w-4 sm-bk-cyan" /> Add color</button>
+                <Button type="button" variant="outline" className="sm-bk-btn-outline" disabled={colors.length >= 8} onClick={() => setColors([...colors, { name: "", hex: "#3b82f6" }])}><Plus className="h-4 w-4 sm-bk-cyan" /> Add color</Button>
               </div>
             </section>
 
@@ -141,11 +144,11 @@ export default function BrandKitPage({ center }: { center?: import("react").Reac
                 <div className="flex-1 space-y-2">
                   {fonts.length > 0 && <div className="flex flex-wrap gap-2">{fonts.map((f) => (
                     <span key={f} className="sm-bk-chip" style={{ fontFamily: f }}>{f}
-                      <button aria-label={`Remove ${f}`} onClick={() => setFonts(fonts.filter((x) => x !== f))}><X className="h-3 w-3" /></button></span>))}</div>}
+                      <Button size="icon" variant="ghost" className="h-5 w-5" aria-label={`Remove ${f}`} onClick={() => setFonts(fonts.filter((x) => x !== f))}><X className="h-3 w-3" /></Button></span>))}</div>}
                   <div className="flex gap-2">
                     <Input list="font-suggest" value={fontDraft} onChange={(e) => setFontDraft(e.target.value)} placeholder="Add a font" className="sm-bk-field" />
                     <datalist id="font-suggest">{FONT_SUGGESTIONS.map((f) => <option key={f} value={f} />)}</datalist>
-                    <button type="button" className="sm-bk-btn-cyan" onClick={() => { const f = fontDraft.trim(); if (f && !fonts.includes(f)) setFonts([...fonts, f]); setFontDraft(""); }}>Add</button>
+                    <Button type="button" variant="outline" className="sm-bk-btn-cyan" onClick={() => { const f = fontDraft.trim(); if (f && !fonts.includes(f)) setFonts([...fonts, f]); setFontDraft(""); }}>Add</Button>
                   </div>
                 </div>
               </div>
@@ -156,12 +159,13 @@ export default function BrandKitPage({ center }: { center?: import("react").Reac
               <div className="sm-bk-body"><Textarea rows={2} value={tone} onChange={(e) => setTone(e.target.value)} placeholder="e.g. Confident, warm, natural light, real people, no stock-photo clichés" className="sm-bk-field" /></div>
             </section>
 
-            <button type="button" onClick={save} disabled={!canCreate || saving} className="sm-bk-save">{saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />} Save Brand Kit</button>
+            <Button type="button" variant="outline" onClick={save} disabled={!canCreate || saving} className="sm-bk-save">{saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />} Save Brand Kit</Button>
           </div>
 
           {center && <div className="min-w-0">{center}</div>}
 
-          <section className={`sm-bk-panel sm-bk-preview h-fit ${center ? "xl:sticky xl:top-4" : ""}`}>
+          <div className={center ? "sm-studio-aside" : ""}>
+          <section className="sm-bk-panel sm-bk-preview h-fit">
             <Head icon={Stamp} title="Watermark preview" />
             <div className="sm-bk-body space-y-3">
               {preview && <img src={preview} alt="Watermark preview" className="sm-bk-preview-img" />}
@@ -170,6 +174,13 @@ export default function BrandKitPage({ center }: { center?: import("react").Reac
               <div className="flex flex-wrap gap-2 pt-1">{fonts.slice(0, 3).map((f) => <p key={f} className="text-lg w-full" style={{ fontFamily: f, color: colors[0]?.hex }}>{f} — Aa</p>)}</div>
             </div>
           </section>
+          {center && onBuilder && canCreate && <section className="sm-bk-panel sm-studio-quick-links">
+            <Head icon={Sparkles} title="Quick links" />
+            <Button variant="outline" onClick={() => onBuilder("website")}><Sparkles />Generate brand voice</Button>
+            <Button variant="outline" onClick={() => onBuilder("document")}><FileText />Import brand guide</Button>
+            <Button variant="outline" onClick={() => onBuilder("preset")}><LayoutTemplate />Starter kits</Button>
+          </section>}
+          </div>
         </div>
       )}
     </div>
