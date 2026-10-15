@@ -565,7 +565,7 @@ export default function CommentGenerator() {
                           className="shrink-0 mt-1"
                         />
                       )}
-                      <span className="sm-cg-avatar shrink-0">
+                      <span className="sm-cg-avatar shrink-0" data-accent={authorAccent(post.author_name)}>
                         {authorInitials(post.author_name)}
                         <span className="sm-cg-avatar-badge">
                           <PlatformIcon platform={post.platform} className="h-2.5 w-2.5" />
@@ -625,7 +625,7 @@ export default function CommentGenerator() {
               <div className="sm-cg-detail-post">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="sm-cg-avatar sm-cg-avatar-sm shrink-0">
+                    <span className="sm-cg-avatar sm-cg-avatar-sm shrink-0" data-accent={authorAccent(activePost.author_name)}>
                       {authorInitials(activePost.author_name)}
                       <span className="sm-cg-avatar-badge">
                         <PlatformIcon platform={activePost.platform} className="h-2.5 w-2.5" />
