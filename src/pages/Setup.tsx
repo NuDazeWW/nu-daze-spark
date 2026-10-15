@@ -16,8 +16,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Eye, Building2 } from "lucide-react";
+import { CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, Briefcase, AtSign, Bell, Send, ExternalLink, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
+import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
+import { openInNewTab } from "@/lib/openInNewTab";
 
 const PLATFORMS = ["linkedin", "instagram", "facebook"] as const;
 const PL: Record<string, string> = { linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook" };
@@ -208,6 +211,63 @@ function SetupInner() {
   );
 }
 
+const HUB: { title: string; desc: string; href: string; icon: typeof Users; admin?: boolean }[] = [
+  { title: "Team", desc: "Invite people and choose Admin, Editor, Approver or Viewer.", href: "/settings/team", icon: Users, admin: true },
+  { title: "Social Connections", desc: "Connect posting accounts and AI tools.", href: "/settings/connections", icon: Link2, admin: true },
+  { title: "Email Provider", desc: "The email account used to send team alerts.", href: "/settings/email-provider", icon: Mail, admin: true },
+  { title: "Workspace", desc: "Company name, logo and your web address.", href: "/settings/workspace", icon: Briefcase, admin: true },
+  { title: "Your Brand Profiles", desc: "Brands, their social accounts and profile links.", href: "/settings/clients", icon: Building2 },
+  { title: "Account Tags", desc: "People and organizations you tag in posts.", href: "/settings/tags", icon: AtSign },
+  { title: "Notifications", desc: "Which emails you get, and when.", href: "/settings/notifications", icon: Bell },
+];
+
+function PostToCard() {
+  const { activeClientId, activeClient } = useActiveClient();
+  const { data: accounts = [] } = useClientSocialAccounts(activeClientId);
+  return (
+    <Card className="sm-setup-hub-card">
+      <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><Send className="h-4 w-4 text-primary" />Post to</CardTitle>
+        <CardDescription>Quick links to post for {activeClient?.name ?? "the selected brand"}.</CardDescription></CardHeader>
+      <CardContent className="space-y-2">
+        {accounts.length === 0 && <p className="text-sm text-muted-foreground">No social accounts saved yet.</p>}
+        {accounts.map((a) => (
+          <div key={a.id} className="flex items-center gap-2 text-sm">
+            <PlatformIcon platform={a.platform} className="h-4 w-4" />
+            <span className="flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
+            {a.profile_url
+              ? <Button size="sm" variant="outline" className="whitespace-nowrap" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
+              : <Button size="sm" variant="ghost" className="whitespace-nowrap" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function SetupHub() {
+  const ws = useWorkspace();
+  const items = HUB.filter((h) => !h.admin || ws.canManage);
+  return (
+    <section className="space-y-3">
+      <h2 className="font-display text-lg font-semibold">Workspace settings</h2>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <PostToCard />
+        {items.map((h) => (
+          <Link key={h.href} to={h.href} className="group">
+            <Card className="sm-setup-hub-card h-full transition-colors group-hover:border-primary/50">
+              <CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-base"><h.icon className="h-4 w-4 text-primary" />{h.title}<ArrowRight className="ml-auto h-4 w-4 opacity-50 group-hover:opacity-100" /></CardTitle></CardHeader>
+              <CardContent><p className="text-sm text-muted-foreground">{h.desc}</p></CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function Setup() {
-  return <AdminOnly><SetupInner /></AdminOnly>;
+  const ws = useWorkspace();
+  if (ws.loading) return null;
+  if (!ws.canManage) return <div className="sm-reference sm-setup animate-fade-in space-y-6"><PageHeader title="Setup" description="Your settings in one place." /><SetupHub /></div>;
+  return <div className="space-y-8"><SetupInner /><SetupHub /></div>;
 }
