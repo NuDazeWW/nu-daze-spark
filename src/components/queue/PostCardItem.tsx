@@ -225,9 +225,9 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         </div>
 
         {/* Bottom action icon bar */}
-        <div className="flex items-center gap-1 border-t pt-2">
+        <div className="flex flex-wrap items-center gap-1 border-t pt-2">
           <PreflightBadge state={pf.run.isPending ? "none" : pf.gate.state} review={pf.review} onClick={() => { setGateIntent(null); setPreflightOpen(true); }} />
-          <div className="ml-auto flex items-center gap-0.5">
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-0.5">
             <Tooltip><TooltipTrigger asChild>
               <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Preview" onClick={() => setPreviewOpen(true)}><Eye className="h-3.5 w-3.5" /></Button>
             </TooltipTrigger><TooltipContent>Preview</TooltipContent></Tooltip>
