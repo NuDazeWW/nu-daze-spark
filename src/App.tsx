@@ -83,7 +83,7 @@ const App = () => (
               <Route path="/settings/billing" element={<Billing />} />
               <Route path="/settings/notifications" element={<Notifications />} />
               <Route path="/settings/connections" element={<Connections />} />
-              <Route path="/settings/brand-kit" element={<BrandKitPage />} />
+              <Route path="/settings/brand-kit" element={<Navigate to="/strategy" replace />} />
               <Route path="/media-studio" element={<MediaStudioPage />} />
               <Route path="/publishing" element={<PublishingStatus />} />
               <Route path="/insights" element={<PortfolioInsights />} />

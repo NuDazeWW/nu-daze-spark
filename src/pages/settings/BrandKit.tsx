@@ -17,7 +17,7 @@ import watermarkBird from "@/assets/brand/nudaze-watermark-bird.png";
 
 const FONT_SUGGESTIONS = ["Space Grotesk", "Inter", "IBM Plex Mono", "Playfair Display", "Montserrat", "Lato", "Roboto", "Source Serif"];
 
-export default function BrandKitPage() {
+export default function BrandKitPage({ center }: { center?: import("react").ReactNode } = {}) {
   const { clients } = useClients();
   const { canCreate } = useWorkspace();
   const { user } = useAuth();
@@ -86,19 +86,26 @@ export default function BrandKitPage() {
       <div><h2 className="sm-bk-title">{title}</h2>{desc && <p className="sm-bk-desc">{desc}</p>}</div></div>
   );
 
+  const clientSelect = (
+    <Select value={clientId ?? ""} onValueChange={setClientId}>
+      <SelectTrigger className="w-56 sm-bk-field"><SelectValue placeholder="Choose client" /></SelectTrigger>
+      <SelectContent>{clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+    </Select>
+  );
+
   return (
-    <div className="sm-bk">
-      <img src={workspaceBackground} alt="" aria-hidden="true" className="sm-help-background" width={1536} height={1024} />
-      <PageHeader title="Brand Kit Studio" description="Logos, colors, fonts and tone for each client — applied to AI-generated media and watermarks.">
-        <Select value={clientId ?? ""} onValueChange={setClientId}>
-          <SelectTrigger className="w-56 sm-bk-field"><SelectValue placeholder="Choose client" /></SelectTrigger>
-          <SelectContent>{clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
-        </Select>
-      </PageHeader>
+    <div className={center ? "sm-bk sm-bk-studio" : "sm-bk"}>
+      {!center && <img src={workspaceBackground} alt="" aria-hidden="true" className="sm-help-background" width={1536} height={1024} />}
+      {!center && (
+        <PageHeader title="Brand Kit Studio" description="Logos, colors, fonts and tone for each client — applied to AI-generated media and watermarks.">
+          {clientSelect}
+        </PageHeader>
+      )}
 
       {q.isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
-        <div className="grid gap-5 lg:grid-cols-[1fr_400px]">
-          <div className="space-y-4">
+        <div className={center ? "grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)_320px] items-start" : "grid gap-5 lg:grid-cols-[1fr_400px]"}>
+          <div className="space-y-4 min-w-0">
+            {center && <div className="sm-bk-panel"><div className="sm-bk-body space-y-2"><p className="text-xs font-mono uppercase tracking-wide opacity-70">Brand Kit · client</p>{clientSelect}</div></div>}
             <section className="sm-bk-panel">
               <Head icon={ImageIcon} title="Logo" desc="PNG with transparency works best. Used as the watermark on generated images." />
               <div className="sm-bk-logo-row">
@@ -152,7 +159,9 @@ export default function BrandKitPage() {
             <button type="button" onClick={save} disabled={!canCreate || saving} className="sm-bk-save">{saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />} Save Brand Kit</button>
           </div>
 
-          <section className="sm-bk-panel sm-bk-preview h-fit">
+          {center && <div className="min-w-0">{center}</div>}
+
+          <section className={`sm-bk-panel sm-bk-preview h-fit ${center ? "xl:sticky xl:top-4" : ""}`}>
             <Head icon={Stamp} title="Watermark preview" />
             <div className="sm-bk-body space-y-3">
               {preview && <img src={preview} alt="Watermark preview" className="sm-bk-preview-img" />}
