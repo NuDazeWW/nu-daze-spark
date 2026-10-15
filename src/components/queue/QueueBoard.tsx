@@ -64,7 +64,7 @@ export function QueueBoard({ items, renderItem }: { items: Item[]; renderItem: (
   const titles = [...days.map((d, n) => (n === 0 ? "Today" : format(d, "EEE"))), "Other dates"];
   const subs = [...days.map((d) => format(d, "MMM d")), "Earlier or later"];
   return (
-    <div className="sm-qboard grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 items-start">
+    <div className="sm-qboard grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-start">
       {cols.map((list, idx) => (
         <section key={idx} className="sm-qcol" data-today={idx === 0 || undefined} aria-label={titles[idx]}>
           <header className="flex items-baseline justify-between px-1 pb-2">
