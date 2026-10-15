@@ -140,6 +140,7 @@ export function PostingPackageDrawer({
     if (blocked.length) c.push({ level: "warn", label: `${blocked.length} asset(s) not cleared for use (${blocked.map((b) => b.permission_state).join(", ")})`, fix: [{ label: "Review in Asset Library", to: "/assets" }] });
     if (card.approval_status === "approved" || card.approval_status === "exported" || card.approval_status === "posted")
       c.push({ level: "pass", label: "Approved through review" });
+    else if (!approvalRequired) c.push({ level: "pass", label: "Approval optional in this workspace" });
     else c.push({ level: "fail", label: "Not yet approved", fix: [{ label: "Review in Daily Queue", to: `/queue?post=${card.id}` }] });
     if (!card.scheduled_for) c.push({ level: "warn", label: "No scheduled time set", fix: [{ label: "Schedule", to: `/queue?post=${card.id}&edit=1` }] });
     return c;
@@ -150,7 +151,7 @@ export function PostingPackageDrawer({
   const failCount = checks.filter((c) => c.level === "fail").length + preflightFail;
 
   if (!card) return null;
-  const postReason = !["approved", "exported", "posted"].includes(card.approval_status)
+  const postReason = approvalRequired && !["approved", "exported", "posted"].includes(card.approval_status)
     ? "Approve first"
     : failCount > 0 ? `Fix ${failCount} blocking issue${failCount === 1 ? "" : "s"} first` : null;
 
