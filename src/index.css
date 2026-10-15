@@ -1998,7 +1998,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-al-layout.has-inspector { grid-template-columns: minmax(0, 1fr) 360px; }
 .sm-al-card { background: linear-gradient(180deg, hsl(var(--ds-surface)), hsl(233 52% 12%)); border-color: hsl(var(--ds-line)) !important; box-shadow: var(--ds-inset), var(--ds-shadow-soft); }
 .sm-al-thumb > .group, .sm-al-thumb > div:first-child { aspect-ratio: 4 / 3; }
-@media (max-width: 1500px) { .sm-al-layout.has-inspector .sm-al-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
+@media (max-width: 1360px) { .sm-al-layout.has-inspector .sm-al-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
 @media (max-width: 1200px) {
   .sm-al-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   .sm-al-layout.has-inspector { grid-template-columns: minmax(0, 1fr); }
