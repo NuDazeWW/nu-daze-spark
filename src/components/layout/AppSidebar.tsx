@@ -57,7 +57,7 @@ const mainNav = [
   { title: "Portfolio Insights", icon: PieChart, href: "/insights" },
   { title: "Asset Library", icon: FolderOpen, href: "/assets" },
   { title: "Connected Sources", icon: Link2, href: "/sources" },
-  { title: "Strategy & Rules", icon: Settings2, href: "/strategy" },
+  { title: "Brand & Strategy Studio", icon: Settings2, href: "/strategy" },
 ];
 
 const contentNav = [
@@ -71,7 +71,6 @@ const contentNav = [
   { title: "Publishing Status", icon: Send, href: "/publishing" },
   { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
   { title: "Motive Media Studio", icon: ImagePlus, href: "/media-studio" },
-  { title: "Brand Kit Studio", icon: Palette, href: "/settings/brand-kit" },
 ];
 
 const adminSettingsNav = [

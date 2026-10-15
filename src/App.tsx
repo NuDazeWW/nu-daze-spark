@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,7 +29,6 @@ import Usage from "./pages/settings/Usage";
 import Notifications from "./pages/settings/Notifications";
 import EmailProvider from "./pages/settings/EmailProvider";
 import Connections from "./pages/settings/Connections";
-import BrandKitPage from "./pages/settings/BrandKit";
 import MediaStudioPage from "./pages/MediaStudioPage";
 import PublishingStatus from "./pages/PublishingStatus";
 import PortfolioInsights from "./pages/PortfolioInsights";
@@ -83,7 +82,7 @@ const App = () => (
               <Route path="/settings/billing" element={<Billing />} />
               <Route path="/settings/notifications" element={<Notifications />} />
               <Route path="/settings/connections" element={<Connections />} />
-              <Route path="/settings/brand-kit" element={<BrandKitPage />} />
+              <Route path="/settings/brand-kit" element={<Navigate to="/strategy" replace />} />
               <Route path="/media-studio" element={<MediaStudioPage />} />
               <Route path="/publishing" element={<PublishingStatus />} />
               <Route path="/insights" element={<PortfolioInsights />} />
