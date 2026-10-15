@@ -176,6 +176,13 @@
       "when": 1792040231075,
       "tag": "0024_governance_toggles",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792043484219,
+      "tag": "0025_review_revision_chips",
+      "breakpoints": true
     }
   ]
 }

@@ -2849,6 +2849,7 @@ export type Database = {
           plan_name: string
           post_approval_required: boolean
           preflight_mode: string
+          review_chips: Json
           seat_limit: number | null
           setup_progress: Json
           updated_at: string
@@ -2873,6 +2874,7 @@ export type Database = {
           plan_name?: string
           post_approval_required?: boolean
           preflight_mode?: string
+          review_chips?: Json
           seat_limit?: number | null
           setup_progress?: Json
           updated_at?: string
@@ -2897,6 +2899,7 @@ export type Database = {
           plan_name?: string
           post_approval_required?: boolean
           preflight_mode?: string
+          review_chips?: Json
           seat_limit?: number | null
           setup_progress?: Json
           updated_at?: string
