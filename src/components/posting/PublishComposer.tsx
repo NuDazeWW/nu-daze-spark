@@ -138,7 +138,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         }
       }
       await save({ publishing_status: "published" });
-      toast({ title: "Published", description: `Sent to ${selected.length} channel(s).` });
+      toast({ title: "Published", description: `Recorded for ${selected.length} channel(s). Live sending turns on once platform apps are connected.` });
     } catch (e) {
       toast({ title: "Couldn't save", description: (e as Error).message, variant: "destructive" });
     } finally {
