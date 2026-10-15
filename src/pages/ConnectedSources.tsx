@@ -22,6 +22,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import oneDriveLogo from "@/assets/logos/onedrive.svg";
 import sharePointLogo from "@/assets/logos/sharepoint.svg";
 import googleDriveLogo from "@/assets/logos/google-drive.svg";
+import cardFolds from "@/assets/sources-card-folds.png";
+import headerWaves from "@/assets/sources-header-waves.jpg";
 
 const SOURCE_LOGO: Record<string, string> = { onedrive: oneDriveLogo, sharepoint: sharePointLogo, google_drive: googleDriveLogo };
 import { format } from "date-fns";
@@ -190,6 +192,7 @@ export default function ConnectedSources() {
 
   return (
     <div className="sm-src animate-fade-in">
+      <img src={headerWaves} alt="" aria-hidden="true" className="sm-src-waves" width={1920} height={1088} />
       <PageHeader title="Connected Sources" description="Link external document libraries and web sources to power your content, insights, and reporting." />
 
       {/* Quick Import Bar */}
@@ -250,7 +253,7 @@ export default function ConnectedSources() {
             const hasUrl = !!(config?.url);
             return (
               <article key={source.id} className="sm-src-card">
-                <span className="sm-src-art" aria-hidden="true" />
+                <img src={cardFolds} alt="" aria-hidden="true" className="sm-src-art" width={992} height={672} loading="lazy" />
                 <div className="sm-src-card-top">
                   <span className="sm-src-logo">{logo ? <img src={logo} alt={`${meta.label} logo`} /> : <span className="sm-src-globe"><Icon /></span>}</span>
                   <div className="min-w-0 flex-1">
@@ -301,7 +304,7 @@ export default function ConnectedSources() {
           const src = findCloud(c.type);
           return (
             <article key={c.type} className={`sm-src-cloud sm-src-tone-${c.tone}`}>
-              <span className="sm-src-ribbon" aria-hidden="true"><i /><i /><i /></span>
+              <img src={cardFolds} alt="" aria-hidden="true" className="sm-src-ribbon" width={992} height={672} loading="lazy" />
               <img src={c.logo} alt={`${c.name} logo`} className="sm-src-cloud-logo" />
               <div className="min-w-0">
                 <h3 className="sm-src-name">{c.name}</h3>
