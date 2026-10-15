@@ -14,6 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useActiveClient } from "@/contexts/ClientContext";
+import { PenLine } from "lucide-react";
 import { prepareAssetMedia } from "@/lib/prepareAssetMedia";
 import {
   Sparkles, FolderOpen, Image, Video, FileText, X, Loader2, Info, ExternalLink, AtSign, Users, Eye,
@@ -44,8 +47,16 @@ export default function PostGenerator() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [platform, setPlatform] = useState<"instagram" | "linkedin" | "facebook">("instagram");
+  const [platform, setPlatform] = useState<"instagram" | "linkedin" | "facebook" | "x">("instagram");
   const [contentType, setContentType] = useState<string>("reel");
+  const [mode, setMode] = useState<"media" | "text">("media");
+  const [topic, setTopic] = useState("");
+  const [variants, setVariants] = useState(2);
+  const { activeClientId } = useActiveClient();
+  const switchMode = (m: "media" | "text") => {
+    setMode(m);
+    if (m === "text") { setPlatform("linkedin"); setContentType("post"); }
+  };
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCount, setGeneratedCount] = useState<number | null>(null);
   const [generatedCards, setGeneratedCards] = useState<GeneratedCard[]>([]);
@@ -62,12 +73,14 @@ export default function PostGenerator() {
   }, [searchParams, assets]);
 
   const selectedAssets = assets.filter((a) => selectedAssetIds.includes(a.id));
+  const textLed = mode === "text";
+  const canGenerate = textLed ? topic.trim().length >= 10 : selectedAssetIds.length > 0;
 
   // Collect all contributors from selected assets for display
-  const allContributors = [...new Set(selectedAssets.flatMap((a) => a.contributors || []))];
+  const allContributors = textLed ? [] : [...new Set(selectedAssets.flatMap((a) => a.contributors || []))];
 
   const handleGenerate = async () => {
-    if (!user || selectedAssetIds.length === 0) return;
+    if (!user || !canGenerate) return;
     setIsGenerating(true);
     setGeneratedCount(null);
     setGeneratedCards([]);
@@ -75,20 +88,23 @@ export default function PostGenerator() {
 
     try {
       let media: { asset_id: string; images: string[] }[] = [];
-      if (analyzeVisually) {
+      if (!textLed && analyzeVisually) {
         setPrepStage("Preparing media for visual analysis…");
         media = await prepareAssetMedia(selectedAssets, { videoFrames: 3 });
       }
 
       setPrepStage("Generating with AI…");
       const { data, error } = await supabase.functions.invoke("generate-reels", {
-        body: {
-          asset_ids: selectedAssetIds,
-          platform,
-          content_type: contentType,
-          analyze_visually: analyzeVisually,
-          media,
-        },
+        body: textLed
+          ? { topic: topic.trim(), count: variants, client_id: activeClientId, platform, content_type: contentType }
+          : {
+              asset_ids: selectedAssetIds,
+              platform,
+              content_type: contentType,
+              analyze_visually: analyzeVisually,
+              media,
+              topic: topic.trim() || undefined,
+            },
       });
 
       if (error) throw error;
