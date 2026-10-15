@@ -45,3 +45,7 @@
 - [x] Five reference pages visually adapted and compared (/, /insights, /assets, /setup, /generator); original rendered text preserved, real-source selection checked, desktop/tablet/mobile checked. Differences and remaining page work in docs/redesign-coverage.md.
 - [x] Full UI adoption: shared shell and all remaining routes aligned to approved references without content or behavior changes
 - [x] Page-by-page pass completed across every route; key reference screens verified with desktop and phone screenshots
+
+- [x] Setup hub: settings folded into /setup cards, sidebar trimmed
+- [x] Pricing: updated features + per-line explainers
+- [ ] Personal per-user Post to links (needs per-user storage)

@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ArrowRight, Building2, Check, ChevronDown, Crown, HeartHandshake, Waves, Zap } from "lucide-react";
+import { ArrowRight, Building2, Check, ChevronDown, Crown, HeartHandshake, Info, Waves, Zap } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { cn } from "@/lib/utils";
 import { fmtUsd, useTierDefinitions, type TierDefinition } from "@/hooks/useBilling";
@@ -24,11 +25,57 @@ const CHANNELS: Record<string, string> = {
   enterprise: "Every channel, plus YouTube and TikTok (when available)",
 };
 const EXTRAS: Record<string, string[]> = {
-  starter: ["Daily queue, planner and Preflight", "Comment drafting", "Asset library"],
-  team: ["Everything in Spark Start", "Motive Media Studio and brand kit", "Split one post across platforms"],
-  pro: ["Everything in Team Flow", "Executive voice profiles", "Portfolio insights and bulk export", "AI video clips"],
-  enterprise: ["Everything in Surge Pro", "Executive review mode", "Your own email sender and domain", "Invoice billing"],
+  starter: ["Daily queue, planner and Preflight", "Comment drafting", "Asset library", "Brand & Strategy Studio", "Post to quick links"],
+  team: ["Everything in Spark Start", "Motive Media Studio and brand kit", "Split one post across platforms", "Campaign brief approvals", "OneDrive and SharePoint folders", "Post results tracking"],
+  pro: ["Everything in Team Flow", "Executive voice profiles", "Content Motive Score™", "Learns from your feedback", "Portfolio insights and bulk export", "Downloadable publishing reports", "AI video clips"],
+  enterprise: ["Everything in Surge Pro", "Executive review mode", "Reporting tool connectors", "Your own email sender and domain", "Scheduled email summaries", "Invoice billing"],
 };
+const EXPLAIN: Record<string, string> = {
+  "Daily queue, planner and Preflight": "Plan posts on a calendar, work through today's list, and get an automatic check for banned words, weak openings and length limits before anything is approved.",
+  "Comment drafting": "Drafts thoughtful comments on other people's industry posts, using who wrote them and what they're about.",
+  "Asset library": "One home for your photos, videos and documents, with clear rules on what the AI may use.",
+  "Brand & Strategy Studio": "Your logo, colors, fonts, tone of voice and posting rules in one place, so every draft stays on brand.",
+  "Post to quick links": "One click opens the right LinkedIn, Instagram or other page so you can paste the finished post.",
+  "Motive Media Studio and brand kit": "Create on-brand images inside the app, with your logo added as a watermark.",
+  "Split one post across platforms": "Turn one strong post into versions written for LinkedIn, Instagram, Facebook and X.",
+  "Campaign brief approvals": "Send a brief to a named approver, discuss it in one comment thread, and only create posts once it's approved.",
+  "OneDrive and SharePoint folders": "Browse your existing company folders so drafts can quote real documents, with the source shown.",
+  "Post results tracking": "Log views, reactions, comments and clicks for each post to see what works.",
+  "Executive voice profiles": "Learns how a specific leader writes from real samples, so their posts sound like them.",
+  "Content Motive Score™": "A 0–100 score for each draft covering its opening, strategy, platform fit and originality.",
+  "Learns from your feedback": "Reviewer notes and your best-performing posts shape future drafts automatically.",
+  "Portfolio insights and bulk export": "Compare brands side by side and download approved posts and media in one package.",
+  "Downloadable publishing reports": "A PDF or spreadsheet of what was posted, where, and how it performed.",
+  "AI video clips": "Generate short video clips for Reels and Stories.",
+  "Executive review mode": "A clean view for leaders to review and approve a week of content at once.",
+  "Reporting tool connectors": "Send your posting numbers to Tableau, Power BI, SAP, Sigma or QuickSight.",
+  "Your own email sender and domain": "Alerts come from your own email account, and the app lives at your own web address.",
+  "Scheduled email summaries": "Weekly or monthly summary emails of what was approved, posted and how it did.",
+  "Invoice billing": "Pay by invoice instead of card.",
+  "media credits": "Credits used when creating AI images and videos. Bigger jobs use more credits.",
+  "AI drafts": "How many AI-written post drafts your team can save each month.",
+  "direct posts": "Posts sent straight to a social account from the app, once accounts are connected.",
+};
+const explainFor = (x: string) => EXPLAIN[x] ?? Object.entries(EXPLAIN).find(([k]) => x.includes(k))?.[1];
+
+function FeatureLine({ text }: { text: string }) {
+  const tip = explainFor(text);
+  if (!tip) return <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{text}</li>;
+  return (
+    <li>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button" className="group flex w-full gap-2 rounded text-left hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={`More about ${text}`}>
+            <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span className="flex-1">{text}</span>
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-primary" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="right" className="w-64 text-sm"><p className="font-semibold">{text}</p><p className="mt-1 text-muted-foreground">{tip}</p></PopoverContent>
+      </Popover>
+    </li>
+  );
+}
 const TIER_ICON: Record<string, typeof Zap> = { starter: Zap, team: Waves, pro: Crown, enterprise: Building2 };
 const SCOPE: Record<string, string[]> = {
   starter: ["Dedicated instance and DNS", "1 brand profile, 1 voice", "25 assets + 1 import", "LinkedIn and IG Feed setup", "45-minute handoff"],
@@ -124,7 +171,7 @@ export default function Pricing() {
                 {[`${a.brands} brand${a.brands > 1 ? "s" : ""} · ${a.seats} seat${a.seats > 1 ? "s" : ""}`, `${a.dispatches.toLocaleString()} direct posts / month`,
                   `${a.media_credits.toLocaleString()} media credits`, `${a.text_drafts.toLocaleString()} AI drafts / month`,
                   a.x_cap_cents ? `X posting up to ${fmtUsd(a.x_cap_cents)} / month` : "X not included", `${a.storage_gb} GB storage`, CHANNELS[t.tier_slug], ...EXTRAS[t.tier_slug]]
-                  .map((x) => <li key={x} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{x}</li>)}
+                  .map((x) => <FeatureLine key={x} text={x} />)}
               </ul>
 
               <div className="mt-auto pt-6">
