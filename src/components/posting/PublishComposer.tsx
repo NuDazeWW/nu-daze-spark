@@ -187,7 +187,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
             {[...new Set(justPublished)].map((p) => (
               <OpenPlatformButton key={p} clientId={card.client_id} platform={p} label={`View on ${LIMITS[p]?.label ?? p}`} />
             ))}
-            <PostResultsButton card={card} />
+            <PostResultsButton postId={card.id} clientId={card.client_id ?? null} />
           </div>
         </div>
       )}
