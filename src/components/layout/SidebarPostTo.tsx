@@ -13,14 +13,14 @@ const ADD_LINK_PILL =
   "text-[10px] font-semibold uppercase tracking-wide text-sidebar-foreground/80 " +
   "transition-colors group-data-[collapsible=icon]:hidden";
 
-export function SidebarPostTo() {
+export function SidebarPostTo({ embedded = false }: { embedded?: boolean } = {}) {
   const { activeClientId } = useActiveClient();
   const { isAdmin } = useAuth();
   const { data: accounts = [] } = useClientSocialAccounts(activeClientId);
   if (!activeClientId) return null;
 
-  return (
-    <CollapsibleNavGroup id="postto" label="Post to">
+  const body = (
+    <>
       <SidebarMenu>
         {accounts.length === 0 && (
           <SidebarMenuItem>
@@ -62,6 +62,8 @@ export function SidebarPostTo() {
         })}
       </SidebarMenu>
       <p className="px-2 pt-1 text-[10px] text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden">Profile links are set in Settings › Your Brand Profiles › Accounts.</p>
-    </CollapsibleNavGroup>
+    </>
   );
+  if (embedded) return <div className="pt-1"><p className="px-2 pb-1 text-[11px] font-medium text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">Post to</p>{body}</div>;
+  return <CollapsibleNavGroup id="postto" label="Post to">{body}</CollapsibleNavGroup>;
 }
