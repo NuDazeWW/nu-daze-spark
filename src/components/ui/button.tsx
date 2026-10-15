@@ -10,10 +10,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "sm-btn-primary bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        destructive: "sm-btn-destructive bg-destructive text-destructive-foreground",
+        ai: "sm-btn-ai bg-accent text-accent-foreground",
+        success: "sm-btn-success bg-brand-success",
+        warning: "sm-btn-warning bg-brand-warning",
         outline: "sm-btn-outline border border-input bg-background hover:bg-secondary hover:text-secondary-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-secondary hover:text-secondary-foreground",
+        secondary: "sm-btn-secondary bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "sm-btn-ghost hover:bg-secondary hover:text-secondary-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
