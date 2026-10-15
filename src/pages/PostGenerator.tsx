@@ -159,7 +159,7 @@ export default function PostGenerator() {
           <div role="tablist" aria-label="Generation mode" className="grid grid-cols-2 gap-1 rounded-lg border bg-card p-1">
             {([["media", "Media-led", FolderOpen], ["text", "Text-led / thought leadership", PenLine]] as const).map(([k, label, Icon]) => (
               <button key={k} role="tab" aria-selected={mode === k} onClick={() => switchMode(k)}
-                className={`flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors ${mode === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
+                className={`flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors ${mode === k ? "bg-primary/15 text-foreground ring-1 ring-primary" : "text-muted-foreground hover:bg-muted"}`}>
                 <Icon className="h-4 w-4" />{label}
               </button>
             ))}
