@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { XLinkMeter } from "@/components/billing/XLinkMeter";
 import { precheckUsage, URL_RE } from "@/hooks/useBilling";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -91,7 +92,8 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
   const selected = useMemo(() => (accounts.data ?? []).filter((a) => targets.includes(a.id)), [accounts.data, targets]);
   const copy = card.draft_copy + (disclosure ? "\n\n#AIassisted" : "");
   const tagCount = (card.hashtags ?? []).length;
-  const isApproved = ["approved", "exported", "posted"].includes(card.approval_status);
+  const { approvalRequired } = useWorkspace();
+  const isApproved = !approvalRequired || ["approved", "exported", "posted"].includes(card.approval_status);
 
   const checks = selected.map((a) => {
     const lim = LIMITS[a.platform] ?? LIMITS.linkedin;
@@ -136,7 +138,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         }
       }
       await save({ publishing_status: "published" });
-      toast({ title: "Published (demo)", description: `Simulated on ${selected.length} channel(s). Nothing was sent to the platforms.` });
+      toast({ title: "Published", description: `Recorded for ${selected.length} channel(s). Live sending turns on once platform apps are connected.` });
     } catch (e) {
       toast({ title: "Couldn't save", description: (e as Error).message, variant: "destructive" });
     } finally {
@@ -276,7 +278,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
               {status === "scheduled" ? "Cancel schedule" : "Reset publishing status"}
             </button>
           )}
-          <p className="text-xs text-muted-foreground">Demo instance: publishing is simulated. Nothing is sent to the platforms.</p>
+          <p className="text-xs text-muted-foreground">Live sending activates once each platform app is connected in Setup → Social connections.</p>
         </>
       )}
 

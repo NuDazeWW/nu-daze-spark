@@ -78,7 +78,7 @@ export function BulkExportDialog({ open, onOpenChange, cards, preselected, canMa
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><PackageOpen className="h-5 w-5 text-primary" /> Bulk export</DialogTitle>
-          <DialogDescription>Download approved posts as a ready-to-post package or a scheduler spreadsheet. Nothing is published.</DialogDescription>
+          <DialogDescription>Download approved posts as a ready-to-post package or a scheduler spreadsheet.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

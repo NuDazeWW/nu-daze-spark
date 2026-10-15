@@ -137,7 +137,7 @@ export default function NotificationsPage() {
   return (
     <div className="sm-reference sm-notifications animate-fade-in space-y-6">
       <img src={notificationsBackground} alt="" aria-hidden="true" className="sm-notifications-background" width={1536} height={1024} />
-      <PageHeader title="Notifications" description="Email reminders for the day's scheduled posts and when a post goes out. Nothing is ever published automatically." />
+      <PageHeader title="Notifications" description="Email reminders for the day's scheduled posts and when a post goes out." />
 
       {ws.canManage && providerQ.data?.provider === "none" && (
         <Card className="border-brand-warning/50"><CardContent className="py-3 flex items-center gap-3 text-sm">

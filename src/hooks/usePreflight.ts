@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import { toast } from "sonner";
 import type { PostCard } from "@/hooks/usePostCards";
 import type { Tables } from "@/integrations/supabase/types";
@@ -24,6 +25,7 @@ export function usePreflight(card: PostCard | null) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const key = ["preflight", card?.id];
+  const { preflightMode } = useWorkspace();
 
   const { data: review, isLoading } = useQuery({
     queryKey: key,
@@ -143,6 +145,8 @@ export function usePreflight(card: PostCard | null) {
     onError: (e: Error) => toast.error("Could not save", { description: e.message }),
   });
 
-  const gate = card ? preflightGate(review, card) : { state: "none" as GateState, clear: false };
+  const raw = card ? preflightGate(review, card) : { state: "none" as GateState, clear: false };
+  // Only "strict" mode blocks; "advisory" and "off" show findings but never block.
+  const gate = preflightMode === "strict" ? raw : { ...raw, clear: true };
   return { review, isLoading, gate, run, acknowledge, override, apply, canApply, proposeRewrite, keepRewrite };
 }

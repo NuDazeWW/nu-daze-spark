@@ -16,7 +16,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, Briefcase, AtSign, Bell, Send, ExternalLink, ArrowRight } from "lucide-react";
+import { CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, Briefcase, AtSign, Bell, Send, ExternalLink, ArrowRight, ShieldCheck } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
@@ -244,6 +245,38 @@ function PostToCard() {
   );
 }
 
+function GovernanceCard() {
+  const ws = useWorkspace();
+  const save = async (patch: Record<string, unknown>) => {
+    try { await updateWorkspaceSettings(patch as never); ws.refresh(); toast.success("Governance updated"); }
+    catch (e) { toast.error("Couldn't save", { description: (e as Error).message }); }
+  };
+  return (
+    <Card className="sm-setup-hub-card">
+      <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><ShieldCheck className="h-4 w-4 text-primary" />Governance</CardTitle>
+        <CardDescription>Optional guardrails. Turn on only what your team needs.</CardDescription></CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <div><Label className="text-sm">Require approval to publish</Label>
+            <p className="text-xs text-muted-foreground">{ws.approvalRequired ? "Posts need sign-off first." : "Publish, schedule or export straight from draft."}</p></div>
+          <Switch checked={ws.approvalRequired} onCheckedChange={(v) => save({ post_approval_required: v })} />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-sm">Preflight checks</Label>
+          <Select value={ws.preflightMode} onValueChange={(v) => save({ preflight_mode: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="advisory">Advisory — show issues, never block</SelectItem>
+              <SelectItem value="strict">Strict — block until cleared</SelectItem>
+              <SelectItem value="off">Off</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function SetupHub() {
   const ws = useWorkspace();
   const items = HUB.filter((h) => !h.admin || ws.canManage);
@@ -252,6 +285,7 @@ function SetupHub() {
       <h2 className="font-display text-lg font-semibold">Workspace settings</h2>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <PostToCard />
+        {ws.canManage && <GovernanceCard />}
         {items.map((h) => (
           <Link key={h.href} to={h.href} className="group">
             <Card className="sm-setup-hub-card h-full transition-colors group-hover:border-primary/50">

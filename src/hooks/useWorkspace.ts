@@ -65,6 +65,8 @@ export function useWorkspace() {
     entitySingular: settings?.entity_label_singular ?? "Client",
     entityPlural: settings?.entity_label_plural ?? "Clients",
     progress,
+    approvalRequired: settings?.post_approval_required ?? false,
+    preflightMode: (settings?.preflight_mode ?? "advisory") as "off" | "advisory" | "strict",
     setupCompleted: completed,
     setupTotal: SETUP_STEPS.length,
     refresh: () => {
