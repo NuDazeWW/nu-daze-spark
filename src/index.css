@@ -2181,7 +2181,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 
 /* ===== Comment Generator — three-column luminous workspace (final layer) ===== */
 .sm-cg-kpi {
-  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  position: relative; display: flex; flex-direction: row; align-items: center; gap: 12px;
   border-radius: 16px; padding: 14px 16px; text-align: left; cursor: pointer;
   border: 1px solid hsl(var(--lg-a, var(--lg-cyan)) / .35);
   background:
@@ -2196,7 +2196,9 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
   box-shadow: inset 0 1px 0 hsl(0 0% 100% / .08), 0 0 24px -8px hsl(var(--lg-a, var(--lg-cyan)) / .5), 0 14px 30px -14px hsl(233 70% 3% / .9); }
 .sm-cg-kpi.is-active { border-color: hsl(var(--lg-a, var(--lg-cyan)) / .8);
   box-shadow: inset 0 0 26px -12px hsl(var(--lg-a, var(--lg-cyan)) / .5), 0 0 28px -8px hsl(var(--lg-a, var(--lg-cyan)) / .55); }
-.sm-cg-kpi-icon { width: 34px; height: 34px; }
+.sm-cg-kpi-icon { width: 44px; height: 44px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sm-cg-kpi-icon svg { width: 20px; height: 20px; }
+.sm-cg-kpi-text { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
 .sm-cg-kpi-value { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 1.75rem; font-weight: 700; line-height: 1; }
 .sm-cg-kpi-label { font-size: 11px; font-weight: 500; color: hsl(var(--muted-foreground)); }
 

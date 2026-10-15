@@ -340,10 +340,12 @@ export default function CommentGenerator() {
             onClick={() => setInboxFilter(k.filter)}
           >
             <span className="sm-cg-kpi-icon lg-icon-well" data-accent={k.accent}>
-              <k.icon className="h-4 w-4" />
+              <k.icon />
             </span>
-            <span className="sm-cg-kpi-value">{k.value}</span>
-            <span className="sm-cg-kpi-label">{k.label}</span>
+            <span className="sm-cg-kpi-text">
+              <span className="sm-cg-kpi-value">{k.value}</span>
+              <span className="sm-cg-kpi-label">{k.label}</span>
+            </span>
           </button>
         ))}
       </div>
