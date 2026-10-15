@@ -2029,3 +2029,139 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-qtag{color:hsl(186 85% 42%);font-weight:500}
 .sm-qtriage{border-radius:16px;padding:14px;border:1px solid hsl(var(--qk) / .45);background:linear-gradient(160deg,hsl(var(--qk) / .10),hsl(var(--card)) 55%);box-shadow:0 8px 26px -14px hsl(var(--qk) / .6)}
 @media (prefers-reduced-motion:reduce){.sm-qboard .sm-content-card:hover{transform:none}}
+
+/* ===== Luminous Glass UI treatment (final shared layer) =====
+   Approved dashboard is the source of truth: dark precision-cut glass with
+   light embedded in the edges. Scoped to dark surfaces; light pages unchanged. */
+:root, .sm-dark {
+  --lg-cyan: 186 100% 50%;    /* #00E5FF — primary actions, active nav, AI */
+  --lg-magenta: 336 100% 62%; /* #FF3D8D — comments, engagement */
+  --lg-violet: 262 100% 68%;  /* #9B5CFF — scheduling, queues, secondary */
+  --lg-lime: 84 100% 61%;     /* #B6FF37 — success, assets, readiness */
+  --lg-gold: 48 100% 62%;     /* #FFD43B — uploads, approvals, featured */
+}
+[data-accent="cyan"] { --lg-a: var(--lg-cyan); }
+[data-accent="magenta"] { --lg-a: var(--lg-magenta); }
+[data-accent="violet"] { --lg-a: var(--lg-violet); }
+[data-accent="lime"] { --lg-a: var(--lg-lime); }
+[data-accent="gold"] { --lg-a: var(--lg-gold); }
+
+/* LuminousCard — interior diffusion + sharp top edge + exterior bloom.
+   Default glow is restrained; hover and selected states carry the energy. */
+.sm-app-bg .sm-card, .sm-dark .sm-card, .lg-card {
+  background:
+    radial-gradient(140% 100% at 0% 0%, hsl(var(--lg-violet) / .10), transparent 55%),
+    radial-gradient(120% 90% at 100% 100%, hsl(var(--lg-cyan) / .05), transparent 60%),
+    linear-gradient(180deg, hsl(var(--ds-surface) / .96), hsl(233 52% 11%));
+  border: 1px solid hsl(252 45% 60% / .32);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / .09),
+    inset 0 0 28px -14px hsl(var(--lg-violet) / .4),
+    0 12px 30px -14px hsl(233 70% 3% / .85);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+.sm-app-bg .sm-card:hover, .sm-dark .sm-card:hover, .lg-card:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--lg-violet) / .55);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / .12),
+    inset 0 0 32px -12px hsl(var(--lg-violet) / .5),
+    0 16px 36px -14px hsl(233 70% 3% / .9),
+    0 0 26px -8px hsl(var(--lg-violet) / .4);
+}
+.sm-app-bg .sm-card.is-selected, .sm-app-bg .sm-card[data-selected="true"],
+.sm-dark .sm-card.is-selected, .lg-card[data-accent] {
+  border-color: hsl(var(--lg-a, var(--lg-cyan)) / .75) !important;
+  background:
+    radial-gradient(120% 90% at 0% 0%, hsl(var(--lg-a, var(--lg-cyan)) / .14), transparent 55%),
+    linear-gradient(180deg, hsl(var(--ds-surface) / .96), hsl(233 52% 11%));
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / .12),
+    inset 0 0 30px -10px hsl(var(--lg-a, var(--lg-cyan)) / .5),
+    0 12px 30px -14px hsl(233 70% 3% / .85),
+    0 0 28px -6px hsl(var(--lg-a, var(--lg-cyan)) / .5) !important;
+}
+
+/* GlowActionButton — dark translucent foundation, accent light from the left,
+   illuminated perimeter, soft bloom, crisp white label. */
+.lg-btn, .sm-app-bg .sm-page-actions .sm-btn-primary {
+  color: hsl(0 0% 100%) !important;
+  border: 1px solid hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .65);
+  background: linear-gradient(100deg,
+    hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .34),
+    hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .10) 45%,
+    hsl(233 52% 12%) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / .16),
+    inset 24px 0 32px -24px hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .8),
+    0 0 18px -6px hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .6),
+    0 12px 24px -16px hsl(0 0% 0% / .8);
+}
+.lg-btn:hover:not(:disabled), .sm-app-bg .sm-page-actions .sm-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / .2),
+    inset 32px 0 40px -24px hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .95),
+    0 0 0 2px hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .28),
+    0 0 28px -4px hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .75);
+}
+.lg-btn:active:not(:disabled), .sm-app-bg .sm-page-actions .sm-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 0 20px -6px hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .8),
+    0 0 12px -6px hsl(var(--lg-a, var(--edge-a, var(--lg-cyan))) / .6);
+}
+
+/* GlowIconWell — illuminated instrument panel: radial inner light, accent edge, exterior glow. */
+.sm-app-bg .sm-icon-well, .sm-dark .sm-icon-well, .lg-icon-well {
+  color: hsl(var(--lg-a, var(--tone, var(--lg-cyan))));
+  background: radial-gradient(85% 85% at 30% 22%, hsl(var(--lg-a, var(--tone, var(--lg-cyan))) / .38), hsl(var(--lg-a, var(--tone, var(--lg-cyan))) / .08));
+  box-shadow:
+    inset 0 0 0 1px hsl(var(--lg-a, var(--tone, var(--lg-cyan))) / .5),
+    inset 0 1px 0 hsl(0 0% 100% / .14),
+    inset 0 0 14px -4px hsl(var(--lg-a, var(--tone, var(--lg-cyan))) / .6),
+    0 0 22px -6px hsl(var(--lg-a, var(--tone, var(--lg-cyan))) / .6);
+}
+.sm-app-bg .sm-icon-well svg, .lg-icon-well svg { filter: drop-shadow(0 0 6px hsl(var(--lg-a, var(--tone, var(--lg-cyan))) / .55)); }
+.sm-app-bg .sm-card:hover .sm-icon-well, .lg-card:hover .lg-icon-well { filter: brightness(1.15); }
+
+/* ActiveNavItem — luminous cyan selection with ambient bloom and edge illumination. */
+[data-sidebar="menu-button"][data-active="true"] {
+  background:
+    radial-gradient(120% 100% at 0% 50%, hsl(var(--lg-cyan) / .22), transparent 60%),
+    radial-gradient(120% 100% at 100% 50%, hsl(var(--lg-cyan) / .14), transparent 60%),
+    linear-gradient(90deg, hsl(var(--lg-cyan) / .18), hsl(var(--lg-cyan) / .05)) !important;
+  box-shadow:
+    inset 0 0 0 1px hsl(var(--lg-cyan) / .85),
+    inset 0 1px 0 hsl(0 0% 100% / .14),
+    0 0 20px -4px hsl(var(--lg-cyan) / .65) !important;
+}
+[data-sidebar="menu-button"][data-active="true"] svg { color: hsl(var(--lg-cyan)) !important; filter: drop-shadow(0 0 5px hsl(var(--lg-cyan) / .6)); }
+
+/* GlowMetricCard — toned interior diffusion already present; add edge + bloom lift. */
+.sm-dashboard .sm-metric {
+  border: 1px solid hsl(var(--tone) / .3) !important;
+  background:
+    radial-gradient(180px 100px at 12% 50%, hsl(var(--tone) / .16), transparent 70%),
+    linear-gradient(180deg, hsl(var(--ds-surface) / .96), hsl(233 52% 11%)) !important;
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / .08),
+    inset 0 0 24px -12px hsl(var(--tone) / .45),
+    0 10px 26px -14px hsl(233 70% 3% / .85),
+    0 0 22px -10px hsl(var(--tone) / .4);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+.sm-dashboard .sm-metric:hover { transform: translateY(-2px); border-color: hsl(var(--tone) / .55) !important; }
+
+/* GlowStatusIndicator — luminous dot/pill driven by the existing status color. */
+.lg-status::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 999px; margin-right: 6px;
+  background: hsl(var(--status-color, var(--lg-cyan)));
+  box-shadow: 0 0 8px -1px hsl(var(--status-color, var(--lg-cyan)) / .9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-app-bg .sm-card, .sm-dark .sm-card, .lg-card, .lg-btn, .sm-dashboard .sm-metric,
+  .sm-app-bg .sm-page-actions .sm-btn-primary { transition: none; }
+  .sm-app-bg .sm-card:hover, .lg-card:hover, .lg-btn:hover:not(:disabled), .sm-dashboard .sm-metric:hover { transform: none; }
+}
