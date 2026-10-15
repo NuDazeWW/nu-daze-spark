@@ -13,9 +13,12 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { NativePostPreview } from "@/components/preview/NativePostPreview";
 import { MotiveScore, type MotiveBreakdown } from "@/components/preflight/MotiveScore";
 import { postLabel } from "@/components/tracking/PostTracking";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import logo from "@/assets/socialmotive-logo.jpg";
 
-const QUICK = ["Punchier hook", "Tone too formal", "Tone too promotional", "Shorten it", "Needs a stronger proof point", "Remove hashtags", "More direct CTA"];
+type Chip = { label: string; instruction: string };
+/** Structured note stored on the post and in approval_log, which generation reads back as reviewer feedback. */
+const chipNote = (c: Chip) => `Revision requested — ${c.label}: ${c.instruction}`;
 
 /** Distraction-free sign-off view for executives and clients. */
 export default function ExecutiveReview() {
@@ -26,6 +29,7 @@ export default function ExecutiveReview() {
   const [reviseOpen, setReviseOpen] = useState(false);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+  const QUICK: Chip[] = useWorkspace().reviewChips;
 
   const { data: pending = [], isLoading } = useQuery({
     queryKey: ["exec_review_queue"],
@@ -128,9 +132,9 @@ export default function ExecutiveReview() {
                 <div className="mx-auto max-w-3xl space-y-2">
                   <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="One-tap revision requests">
                     {QUICK.map((q) => (
-                      <button key={q} disabled={busy} onClick={() => act("needs_revision", q)}
+                      <button key={q.label} title={q.instruction} disabled={busy} onClick={() => act("needs_revision", chipNote(q))}
                         className="h-9 shrink-0 whitespace-nowrap rounded-full border px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-50">
-                        {q}
+                        {q.label}
                       </button>
                     ))}
                   </div>
@@ -154,7 +158,7 @@ export default function ExecutiveReview() {
             <DialogDescription>Your note goes straight to the team with the post.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-wrap gap-2">
-            {QUICK.map((q) => <Button key={q} size="sm" variant="secondary" onClick={() => setNotes((n) => (n ? `${n}. ${q}` : q))}>{q}</Button>)}
+            {QUICK.map((q) => <Button key={q.label} size="sm" variant="secondary" title={q.instruction} onClick={() => setNotes((n) => (n ? `${n}\n${chipNote(q)}` : chipNote(q)))}>{q.label}</Button>)}
           </div>
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="What should change?" />
           <DialogFooter>
