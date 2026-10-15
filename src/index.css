@@ -991,6 +991,7 @@ body[data-sm-surface="dark"] [role="dialog"][data-state="open"] { background: li
   display: flex; flex-direction: column; color: hsl(40 30% 96%);
 }
 .sm-auth-wordmark { font-family: "Space Grotesk", sans-serif; font-size: 2.6rem; line-height: 1; letter-spacing: -.01em; }
+.sm-auth-logo { display: block; width: min(19rem, 100%); height: auto; border-radius: .6rem; }
 .sm-auth-wordmark strong { font-weight: 700; }
 .sm-auth-tagline { margin-top: .5rem; font-size: .62rem; font-weight: 600; letter-spacing: .35em; text-transform: uppercase; opacity: .9; }
 .sm-auth-bird { display: none; }
