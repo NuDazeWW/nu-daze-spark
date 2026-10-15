@@ -67,6 +67,7 @@ export function useWorkspace() {
     progress,
     approvalRequired: settings?.post_approval_required ?? false,
     preflightMode: (settings?.preflight_mode ?? "advisory") as "off" | "advisory" | "strict",
+    reviewChips: (Array.isArray((settings as { review_chips?: unknown } | null)?.review_chips) ? (settings as { review_chips: { label: string; instruction: string }[] }).review_chips : []) as { label: string; instruction: string }[],
     setupCompleted: completed,
     setupTotal: SETUP_STEPS.length,
     refresh: () => {

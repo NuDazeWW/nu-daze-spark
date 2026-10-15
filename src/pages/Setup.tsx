@@ -245,6 +245,44 @@ function PostToCard() {
   );
 }
 
+function ReviewChipsEditor() {
+  const ws = useWorkspace();
+  const [chips, setChips] = useState(ws.reviewChips);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setChips(ws.reviewChips); }, [JSON.stringify(ws.reviewChips)]); // eslint-disable-line react-hooks/exhaustive-deps
+  const set = (i: number, k: "label" | "instruction", v: string) => setChips((c) => c.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
+  const clean = chips.map((c) => ({ label: c.label.trim(), instruction: c.instruction.trim() })).filter((c) => c.label && c.instruction);
+  const dupes = new Set(clean.map((c) => c.label.toLowerCase())).size !== clean.length;
+  const save = async () => {
+    setBusy(true);
+    try { await updateWorkspaceSettings({ review_chips: clean } as never); ws.refresh(); toast.success("Revision chips saved"); }
+    catch (e) { toast.error("Couldn't save", { description: (e as Error).message }); }
+    finally { setBusy(false); }
+  };
+  return (
+    <div className="space-y-2 border-t pt-4">
+      <div>
+        <Label className="text-sm">Executive Review revision chips</Label>
+        <p className="text-xs text-muted-foreground">One-tap feedback on the review screen. The instruction is what the AI receives when revising.</p>
+      </div>
+      {chips.map((c, i) => (
+        <div key={i} className="space-y-1.5 rounded-md border p-2">
+          <div className="flex gap-2">
+            <Input value={c.label} maxLength={30} placeholder="Chip label" onChange={(e) => set(i, "label", e.target.value)} />
+            <Button size="sm" variant="ghost" onClick={() => setChips((x) => x.filter((_, j) => j !== i))}>Remove</Button>
+          </div>
+          <Textarea rows={2} value={c.instruction} maxLength={300} placeholder="Instruction for the AI" onChange={(e) => set(i, "instruction", e.target.value)} />
+        </div>
+      ))}
+      {dupes && <p className="text-xs text-destructive">Two chips have the same label.</p>}
+      <div className="flex gap-2">
+        <Button size="sm" variant="outline" disabled={chips.length >= 10} onClick={() => setChips((x) => [...x, { label: "", instruction: "" }])}>Add chip</Button>
+        <Button size="sm" disabled={busy || dupes} onClick={save}>Save chips</Button>
+      </div>
+    </div>
+  );
+}
+
 function GovernanceCard() {
   const ws = useWorkspace();
   const save = async (patch: Record<string, unknown>) => {
@@ -272,6 +310,7 @@ function GovernanceCard() {
             </SelectContent>
           </Select>
         </div>
+        <ReviewChipsEditor />
       </CardContent>
     </Card>
   );
