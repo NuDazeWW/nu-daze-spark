@@ -1,5 +1,6 @@
 # SocialMotive brand and card clarity
-- [ ] Match Brand & Strategy Studio to the supplied three-column reference; preserve content and eliminate overlap/wrapped buttons.
+- [x] Adapt Brand & Strategy Studio to the supplied three-column reference, preserving content and preventing header overlap/button wrapping; theme tests and build pass.
+- [ ] Verify the redesigned workspace visually while signed in — blocked because no browser session can be minted for the requesting user.
 - [x] Make comment author/topic labels prominent and distinguish post/comment card types.
 - [x] Apply consistent brand-based status colors to queue, calendar, and approved cards.
 - [x] Apply updated brand guide to shared styling and all pages, preserving native platform previews and client content.
