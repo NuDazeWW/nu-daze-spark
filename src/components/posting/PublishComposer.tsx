@@ -13,10 +13,12 @@ import { Progress } from "@/components/ui/progress";
 import { XLinkMeter } from "@/components/billing/XLinkMeter";
 import { precheckUsage, URL_RE } from "@/hooks/useBilling";
 import { useWorkspace } from "@/hooks/useWorkspace";
+import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
+import { PostResultsButton } from "@/components/publishing/PostResultsButton";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { CalendarClock, CheckCircle2, Clock, Loader2, Send, Sparkles, AlertTriangle, Link2 } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock, Loader2, Send, Sparkles, AlertTriangle, Link2, Copy } from "lucide-react";
 
 type Account = { id: string; platform: string; account_name: string; handle: string | null; connection_status: string };
 
@@ -64,7 +66,8 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
     },
   });
 
-  const [mode, setMode] = useState<"direct" | "manual">("direct");
+  const [mode, setMode] = useState<"now" | "schedule" | "manual">("now");
+  const [justPublished, setJustPublished] = useState<string[] | null>(null);
   const [targets, setTargets] = useState<string[]>([]);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("09:00");
@@ -138,6 +141,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         }
       }
       await save({ publishing_status: "published" });
+      setJustPublished(selected.map((a) => a.platform));
       toast({ title: "Published", description: `Recorded for ${selected.length} channel(s). Live sending turns on once platform apps are connected.` });
     } catch (e) {
       toast({ title: "Couldn't save", description: (e as Error).message, variant: "destructive" });
@@ -164,19 +168,41 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         </Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-1 rounded-lg border p-1">
-        {(["direct", "manual"] as const).map((m) => (
-          <button key={m} onClick={() => setMode(m)}
-            className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
-            {m === "direct" ? "Direct publish" : "Manual post"}
+      <div role="tablist" aria-label="How to post" className="grid grid-cols-3 gap-1 rounded-lg border p-1">
+        {([["now", "Publish now", Send], ["schedule", "Schedule", CalendarClock], ["manual", "Manual handoff", Copy]] as const).map(([m, label, Icon]) => (
+          <button key={m} role="tab" aria-selected={mode === m} onClick={() => setMode(m)}
+            className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2 py-2 text-xs font-medium transition-colors sm:text-sm ${mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
+            <Icon className="h-3.5 w-3.5" />{label}
           </button>
         ))}
       </div>
+      <p className="-mt-2 text-xs text-muted-foreground">
+        {mode === "now" ? "Sends to the selected channels right away." : mode === "schedule" ? "Queues the post for the date and time you pick." : "Copy the post and open the platform to post it yourself."}
+      </p>
+
+      {justPublished && status === "published" && (
+        <div className="space-y-2 rounded-lg border border-primary/40 bg-primary/5 p-3">
+          <p className="flex items-center gap-2 text-sm font-semibold"><CheckCircle2 className="h-4 w-4 text-primary" /> Published to {justPublished.length} channel{justPublished.length > 1 ? "s" : ""}</p>
+          <div className="flex flex-wrap gap-2">
+            {[...new Set(justPublished)].map((p) => (
+              <OpenPlatformButton key={p} clientId={card.client_id} platform={p} label={`View on ${LIMITS[p]?.label ?? p}`} />
+            ))}
+            <PostResultsButton postId={card.id} clientId={card.client_id ?? null} />
+          </div>
+        </div>
+      )}
 
       {mode === "manual" ? (
+        <div className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="default" size="default"
+            copyText={`${copy}${tagCount ? "\n\n" + (card.hashtags ?? []).map((h) => "#" + h.replace(/^#/, "")).join(" ") : ""}`}
+            label={`Copy post & open ${LIMITS[card.platform]?.label ?? card.platform}`} />
+        </div>
         <p className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
-          Manual mode: use the Posting package tab to copy the post and open the platform. Mark it Posted when it's live.
+          Copy the caption and hashtags, open the platform, paste and post. Mark it Posted when it's live.
         </p>
+        </div>
       ) : (
         <>
           <section className="space-y-2">
@@ -230,7 +256,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
             </section>
           )}
 
-          <section className="space-y-2">
+          {mode === "schedule" && <section className="space-y-2">
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">When</Label>
             <div className="grid grid-cols-3 gap-2">
               <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -245,7 +271,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
                 <button key={t} onClick={() => setTime(t)} className={`rounded border px-2 py-0.5 ${time === t ? "border-primary text-primary" : "hover:bg-muted"}`}>{t}</button>
               ))}
             </div>
-          </section>
+          </section>}
 
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div>
@@ -263,16 +289,11 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
             </p>
           )}
 
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" disabled={!canPublish || !isApproved || !selected.length || blocking || running}
-              onClick={() => setConfirm("schedule")}>
-              <CalendarClock className="h-4 w-4 mr-2" /> Schedule
-            </Button>
-            <Button className="flex-1" disabled={!canPublish || !isApproved || !selected.length || blocking || running}
-              onClick={() => setConfirm("now")}>
-              {running ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />} Publish now
-            </Button>
-          </div>
+          <Button className="w-full" disabled={!canPublish || !isApproved || !selected.length || blocking || running}
+            onClick={() => setConfirm(mode === "schedule" ? "schedule" : "now")}>
+            {running ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : mode === "schedule" ? <CalendarClock className="h-4 w-4 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+            {mode === "schedule" ? "Schedule post" : "Publish now"}
+          </Button>
           {status !== "idle" && !running && (
             <button onClick={reset} className="text-xs text-muted-foreground underline">
               {status === "scheduled" ? "Cancel schedule" : "Reset publishing status"}

@@ -1,3 +1,4 @@
+import { PipelineNav } from "@/components/queue/PipelineNav";
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { PostNumber, StatusProgress, WhereIsIt, PostHistoryButton, useStatusDates, postLabel, matchesPostNumber } from "@/components/tracking/PostTracking";
@@ -164,7 +165,8 @@ export default function ApprovedContent() {
 
   return (
     <div className="animate-fade-in">
-      <PageHeader title="Approved Content" description="Finalized post cards ready for export and manual posting." />
+      <PageHeader title="Approved Content" description="Finalized post cards ready to publish, schedule or export." />
+      <PipelineNav className="mt-4" />
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 mt-4 mb-4">

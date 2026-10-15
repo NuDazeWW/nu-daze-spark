@@ -28,7 +28,6 @@ serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
 
     if (!lovableKey) {
@@ -38,10 +37,11 @@ serve(async (req) => {
       });
     }
 
-    const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
-    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!, {
+    const anonClient = createClient(supabaseUrl, (Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY"))!, {
       global: { headers: { Authorization: authHeader } },
     });
+    // All reads/writes run as the caller so workspace permissions (RLS) apply.
+    const supabaseAdmin = anonClient;
 
     const { data: { user }, error: userError } = await anonClient.auth.getUser();
     if (userError || !user) {
@@ -52,34 +52,46 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const asset_ids: string[] = body.asset_ids ?? [];
-    const platform: "instagram" | "linkedin" = body.platform ?? "instagram";
-    const content_type: string = body.content_type ?? "reel";
+    const asset_ids: string[] = Array.isArray(body.asset_ids) ? body.asset_ids.filter((x: unknown) => typeof x === "string").slice(0, 25) : [];
+    const ALLOWED_PLATFORMS = ["instagram", "linkedin", "facebook", "x"];
+    const platform: string = ALLOWED_PLATFORMS.includes(body.platform) ? body.platform : "instagram";
+    const content_type: string = typeof body.content_type === "string" ? body.content_type.slice(0, 40) : "post";
     const analyze_visually: boolean = !!body.analyze_visually;
+    const topic: string = typeof body.topic === "string" ? body.topic.trim().slice(0, 4000) : "";
+    const variantCount = Math.min(5, Math.max(1, Number(body.count) || 1));
+    const bodyClientId: string | null = typeof body.client_id === "string" ? body.client_id : null;
     const mediaRefs: MediaRef[] = Array.isArray(body.media) ? body.media : [];
     const mediaMap = new Map(mediaRefs.map((m) => [m.asset_id, m.images ?? []]));
 
-    if (!Array.isArray(asset_ids) || asset_ids.length === 0) {
-      return new Response(JSON.stringify({ error: "asset_ids is required" }), {
+    if (asset_ids.length === 0 && topic.length < 10) {
+      return new Response(JSON.stringify({ error: "Pick at least one asset, or describe the idea (10+ characters) for a text-led post." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const { data: assets, error: assetsError } = await supabaseAdmin
-      .from("source_assets")
-      .select("*")
-      .in("id", asset_ids);
-
-    if (assetsError || !assets || assets.length === 0) {
-      return new Response(JSON.stringify({ error: "Assets not found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // deno-lint-ignore no-explicit-any
+    let assets: any[] = [];
+    if (asset_ids.length > 0) {
+      // Read with caller's session so RLS applies
+      const { data, error: assetsError } = await anonClient.from("source_assets").select("*").in("id", asset_ids);
+      if (assetsError || !data || data.length === 0) {
+        return new Response(JSON.stringify({ error: "Assets not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      assets = data;
+    } else {
+      // Text-led mode: one pseudo-source per requested variant, no media
+      assets = Array.from({ length: variantCount }, (_, i) => ({
+        id: null, client_id: bodyClientId, title: variantCount > 1 ? `Thought leadership (angle ${i + 1} of ${variantCount})` : "Thought leadership",
+        description: topic, asset_type: "text idea", contributors: [], event_name: null,
+      }));
     }
 
     // Load strategy context scoped to the asset's client
-    const clientId = assets[0].client_id ?? null;
+    const clientId = assets[0].client_id ?? bodyClientId ?? null;
     let hashtagBanks: { bank_name: string; category: string; hashtags: string[] }[] = [];
     let brandVoice: { rule_name: string; description: string | null }[] = [];
     let platformRules: { platform: string; rule_name: string; description: string | null }[] = [];
@@ -118,18 +130,29 @@ serve(async (req) => {
         ? `\n\nIMPORTANT: You have been given ${visualImages.length} image${visualImages.length !== 1 ? "s" : ""} showing the actual media${asset.asset_type === "video" ? " (sampled frames from the video)" : ""}. Base the draft copy on what is actually visible — describe scenes, subjects, mood, colors, setting, and any visible text. Do not invent details that are not present.`
         : "";
 
-      const prompt = `You are a social media strategist for NuDaze. Create a ${platform} ${content_type} post card for the following asset.
+      const textLed = !asset.id;
+      const limits: Record<string, string> = {
+        instagram: "Max 2200 chars, use line breaks and emojis.",
+        linkedin: "Max 3000 chars, professional tone, strategic hook.",
+        facebook: "Aim for 80-250 words, conversational, community-aware.",
+        x: "Max 280 chars INCLUDING hashtags, punchy, one idea.",
+      };
+      const textLedNote = textLed
+        ? `\n\nThis is a TEXT-LED thought-leadership post: no image or video is attached. Make the words carry it — a specific insight, a clear point of view, and a concrete example. Use only facts stated in the idea above; do not invent statistics, clients, or quotes.${variantCount > 1 ? ` Take a distinctly different angle and opening hook from the other ${variantCount - 1} variants (this is ${asset.title}).` : ""}`
+        : (topic ? `\n\nExtra direction from the user: ${topic}` : "");
+
+      const prompt = `You are a social media strategist for NuDaze. Create a ${platform} ${content_type} post card for the following ${textLed ? "idea" : "asset"}.
 
 Title: ${asset.title}
-Description: ${asset.description || "No description provided"}
-Type: ${asset.asset_type}${contributorsLine}${asset.event_name ? `\nEvent: ${asset.event_name}` : ""}${visualNote}${brandVoiceContext}${platformRulesContext}
+${textLed ? "Idea / key message" : "Description"}: ${asset.description || "No description provided"}
+Type: ${asset.asset_type}${contributorsLine}${asset.event_name ? `\nEvent: ${asset.event_name}` : ""}${visualNote}${textLedNote}${brandVoiceContext}${platformRulesContext}
 
 Generate a JSON response with exactly these fields:
-- draft_copy: ${platform} ${content_type} caption (engaging, platform-appropriate, with hook in first line). ${platform === "instagram" ? "Max 2200 chars, use line breaks and emojis." : "Max 3000 chars, professional tone, strategic hook."}${assetContributors.length > 0 ? ` Naturally mention or tag the contributors: ${assetContributors.join(", ")}.` : ""}
+- draft_copy: ${platform} ${content_type} caption (engaging, platform-appropriate, with hook in first line). ${limits[platform] ?? limits.linkedin}${assetContributors.length > 0 ? ` Naturally mention or tag the contributors: ${assetContributors.join(", ")}.` : ""}
 - objective: Strategic objective (1 sentence)
 - audience: Target audience segment (1-2 words)
 - campaign_pillar: Relevant content pillar (1-2 words)
-- hashtags: Array of ${platform === "instagram" ? "10-15" : "3-6"} relevant hashtags (without #). Prioritize hashtag bank entries when relevant.${hashtagBankContext}
+- hashtags: Array of ${platform === "instagram" ? "10-15" : platform === "x" ? "1-2" : "3-6"} relevant hashtags (without #). Prioritize hashtag bank entries when relevant.${hashtagBankContext}
 - people_tags: Array of handles. MUST include contributors: ${assetContributors.length > 0 ? assetContributors.join(", ") : "use placeholders if none"}. Add 1-2 more if appropriate.
 - org_tags: Array of 1-2 relevant organizations
 - rationale: Brief rationale (1-2 sentences)${visualImages.length > 0 ? ", referencing what's visible in the media" : ""}
@@ -221,7 +244,7 @@ Generate a JSON response with exactly these fields:
         .insert({
           platform,
           content_type,
-          client_id: asset.client_id,
+          client_id: asset.client_id ?? clientId,
           draft_copy: cardData.draft_copy,
           objective: cardData.objective || null,
           audience: cardData.audience || null,
@@ -231,7 +254,7 @@ Generate a JSON response with exactly these fields:
           org_tags: cardData.org_tags || [],
           rationale: cardData.rationale || null,
           suggested_asset_description: cardData.suggested_asset_description || null,
-          source_references: [asset.id],
+          source_references: asset.id ? [asset.id] : [],
           approval_status: "draft",
           created_by: user.id,
         } as never)

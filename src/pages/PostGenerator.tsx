@@ -14,6 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useActiveClient } from "@/contexts/ClientContext";
+import { PenLine } from "lucide-react";
 import { prepareAssetMedia } from "@/lib/prepareAssetMedia";
 import {
   Sparkles, FolderOpen, Image, Video, FileText, X, Loader2, Info, ExternalLink, AtSign, Users, Eye,
@@ -44,8 +47,16 @@ export default function PostGenerator() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [platform, setPlatform] = useState<"instagram" | "linkedin" | "facebook">("instagram");
+  const [platform, setPlatform] = useState<"instagram" | "linkedin" | "facebook" | "x">("instagram");
   const [contentType, setContentType] = useState<string>("reel");
+  const [mode, setMode] = useState<"media" | "text">("media");
+  const [topic, setTopic] = useState("");
+  const [variants, setVariants] = useState(2);
+  const { activeClientId } = useActiveClient();
+  const switchMode = (m: "media" | "text") => {
+    setMode(m);
+    if (m === "text") { setPlatform("linkedin"); setContentType("post"); }
+  };
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCount, setGeneratedCount] = useState<number | null>(null);
   const [generatedCards, setGeneratedCards] = useState<GeneratedCard[]>([]);
@@ -62,12 +73,14 @@ export default function PostGenerator() {
   }, [searchParams, assets]);
 
   const selectedAssets = assets.filter((a) => selectedAssetIds.includes(a.id));
+  const textLed = mode === "text";
+  const canGenerate = textLed ? topic.trim().length >= 10 : selectedAssetIds.length > 0;
 
   // Collect all contributors from selected assets for display
-  const allContributors = [...new Set(selectedAssets.flatMap((a) => a.contributors || []))];
+  const allContributors = textLed ? [] : [...new Set(selectedAssets.flatMap((a) => a.contributors || []))];
 
   const handleGenerate = async () => {
-    if (!user || selectedAssetIds.length === 0) return;
+    if (!user || !canGenerate) return;
     setIsGenerating(true);
     setGeneratedCount(null);
     setGeneratedCards([]);
@@ -75,20 +88,23 @@ export default function PostGenerator() {
 
     try {
       let media: { asset_id: string; images: string[] }[] = [];
-      if (analyzeVisually) {
+      if (!textLed && analyzeVisually) {
         setPrepStage("Preparing media for visual analysis…");
         media = await prepareAssetMedia(selectedAssets, { videoFrames: 3 });
       }
 
       setPrepStage("Generating with AI…");
       const { data, error } = await supabase.functions.invoke("generate-reels", {
-        body: {
-          asset_ids: selectedAssetIds,
-          platform,
-          content_type: contentType,
-          analyze_visually: analyzeVisually,
-          media,
-        },
+        body: textLed
+          ? { topic: topic.trim(), count: variants, client_id: activeClientId, platform, content_type: contentType }
+          : {
+              asset_ids: selectedAssetIds,
+              platform,
+              content_type: contentType,
+              analyze_visually: analyzeVisually,
+              media,
+              topic: topic.trim() || undefined,
+            },
       });
 
       if (error) throw error;
@@ -134,13 +150,33 @@ export default function PostGenerator() {
     <div className="sm-reference sm-generator animate-fade-in">
       <PageHeader
         title="Social Post Generator"
-        description="Select source assets and generate structured post cards with AI."
+        description="Start from your media, or just an idea — text-led posts need no assets."
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Main area */}
         <div className="space-y-6">
-          {/* Source assets selection */}
+          <div role="tablist" aria-label="Generation mode" className="grid grid-cols-2 gap-1 rounded-lg border bg-card p-1">
+            {([["media", "Media-led", FolderOpen], ["text", "Text-led / thought leadership", PenLine]] as const).map(([k, label, Icon]) => (
+              <button key={k} role="tab" aria-selected={mode === k} onClick={() => switchMode(k)}
+                className={`flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors ${mode === k ? "bg-primary/15 text-foreground ring-1 ring-primary" : "text-muted-foreground hover:bg-muted"}`}>
+                <Icon className="h-4 w-4" />{label}
+              </button>
+            ))}
+          </div>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">{textLed ? "Your idea or key message" : "Extra direction (optional)"}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Textarea rows={textLed ? 6 : 3} value={topic} maxLength={4000} onChange={(e) => setTopic(e.target.value)}
+                placeholder={textLed ? "e.g. Most nonprofits measure social reach, but the boards we work with care about donor retention. Share our view on what to track instead." : "e.g. Focus on the volunteers, keep it under 100 words."} />
+              {textLed && <p className="text-xs text-muted-foreground">The AI only uses what you write here plus your brand rules — it won't invent stats or quotes. {topic.trim().length < 10 && "Write at least 10 characters."}</p>}
+            </CardContent>
+          </Card>
+
+          {!textLed && (
           <Card className="sm-generator-sources">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center justify-between">
@@ -186,6 +222,7 @@ export default function PostGenerator() {
               )}
             </CardContent>
           </Card>
+          )}
 
           {/* Tag accounts preview from selected assets */}
           {allContributors.length > 0 && (
@@ -283,11 +320,11 @@ export default function PostGenerator() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-xs">Platform</Label>
-                <Select value={platform} onValueChange={(v) => setPlatform(v as "instagram" | "linkedin" | "facebook")}>
+                <Select value={platform} onValueChange={(v) => setPlatform(v as "instagram" | "linkedin" | "facebook" | "x")}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="instagram">Instagram</SelectItem>
-                    <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem><SelectItem value="x">X</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -305,6 +342,15 @@ export default function PostGenerator() {
                 </Select>
               </div>
 
+              {textLed ? (
+                <div className="space-y-2">
+                  <Label className="text-xs">Variations</Label>
+                  <Select value={String(variants)} onValueChange={(v) => setVariants(Number(v))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{[1, 2, 3, 4, 5].map((n) => <SelectItem key={n} value={String(n)}>{n} draft{n > 1 ? "s, different angles" : ""}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              ) : (
               <div className="rounded-md border p-3 space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-0.5">
@@ -322,6 +368,7 @@ export default function PostGenerator() {
                   />
                 </div>
               </div>
+              )}
 
               {/* Reminder about account tags */}
               <p className="text-[10px] text-muted-foreground flex items-center gap-1">
@@ -342,13 +389,13 @@ export default function PostGenerator() {
 
               <Button
                 onClick={handleGenerate}
-                disabled={selectedAssetIds.length === 0 || isGenerating}
+                disabled={!canGenerate || isGenerating}
                 className="w-full"
               >
                 {isGenerating ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Generating…</>
                 ) : (
-                  <><Sparkles className="mr-2 h-4 w-4" />Generate Post Cards ({selectedAssetIds.length})</>
+                  <><Sparkles className="mr-2 h-4 w-4" />{textLed ? `Generate ${variants} text post${variants > 1 ? "s" : ""}` : `Generate Post Cards (${selectedAssetIds.length})`}</>
                 )}
               </Button>
             </CardContent>
