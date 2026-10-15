@@ -222,6 +222,7 @@ export default function PostGenerator() {
               )}
             </CardContent>
           </Card>
+          )}
 
           {/* Tag accounts preview from selected assets */}
           {allContributors.length > 0 && (
