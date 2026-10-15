@@ -352,7 +352,7 @@ export default function AssetLibrary() {
                   </div>
                   <div className="sm-al-body">
                     <div className="sm-al-title-row">
-                      <button type="button" className="sm-al-title" onClick={() => setSelectedId(asset.id)} aria-pressed={isSel}>{asset.title}</button>
+                      <button type="button" className="sm-al-title" title={asset.title} onClick={() => setSelectedId(asset.id)} aria-pressed={isSel}>{asset.title}</button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="sm-al-more" aria-label={`Actions for ${asset.title}`}><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
