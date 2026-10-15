@@ -52,34 +52,46 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const asset_ids: string[] = body.asset_ids ?? [];
-    const platform: "instagram" | "linkedin" = body.platform ?? "instagram";
-    const content_type: string = body.content_type ?? "reel";
+    const asset_ids: string[] = Array.isArray(body.asset_ids) ? body.asset_ids.filter((x: unknown) => typeof x === "string").slice(0, 25) : [];
+    const ALLOWED_PLATFORMS = ["instagram", "linkedin", "facebook", "x"];
+    const platform: string = ALLOWED_PLATFORMS.includes(body.platform) ? body.platform : "instagram";
+    const content_type: string = typeof body.content_type === "string" ? body.content_type.slice(0, 40) : "post";
     const analyze_visually: boolean = !!body.analyze_visually;
+    const topic: string = typeof body.topic === "string" ? body.topic.trim().slice(0, 4000) : "";
+    const variantCount = Math.min(5, Math.max(1, Number(body.count) || 1));
+    const bodyClientId: string | null = typeof body.client_id === "string" ? body.client_id : null;
     const mediaRefs: MediaRef[] = Array.isArray(body.media) ? body.media : [];
     const mediaMap = new Map(mediaRefs.map((m) => [m.asset_id, m.images ?? []]));
 
-    if (!Array.isArray(asset_ids) || asset_ids.length === 0) {
-      return new Response(JSON.stringify({ error: "asset_ids is required" }), {
+    if (asset_ids.length === 0 && topic.length < 10) {
+      return new Response(JSON.stringify({ error: "Pick at least one asset, or describe the idea (10+ characters) for a text-led post." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const { data: assets, error: assetsError } = await supabaseAdmin
-      .from("source_assets")
-      .select("*")
-      .in("id", asset_ids);
-
-    if (assetsError || !assets || assets.length === 0) {
-      return new Response(JSON.stringify({ error: "Assets not found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // deno-lint-ignore no-explicit-any
+    let assets: any[] = [];
+    if (asset_ids.length > 0) {
+      // Read with caller's session so RLS applies
+      const { data, error: assetsError } = await anonClient.from("source_assets").select("*").in("id", asset_ids);
+      if (assetsError || !data || data.length === 0) {
+        return new Response(JSON.stringify({ error: "Assets not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      assets = data;
+    } else {
+      // Text-led mode: one pseudo-source per requested variant, no media
+      assets = Array.from({ length: variantCount }, (_, i) => ({
+        id: null, client_id: bodyClientId, title: variantCount > 1 ? `Thought leadership (angle ${i + 1} of ${variantCount})` : "Thought leadership",
+        description: topic, asset_type: "text idea", contributors: [], event_name: null,
+      }));
     }
 
     // Load strategy context scoped to the asset's client
-    const clientId = assets[0].client_id ?? null;
+    const clientId = assets[0].client_id ?? bodyClientId ?? null;
     let hashtagBanks: { bank_name: string; category: string; hashtags: string[] }[] = [];
     let brandVoice: { rule_name: string; description: string | null }[] = [];
     let platformRules: { platform: string; rule_name: string; description: string | null }[] = [];
