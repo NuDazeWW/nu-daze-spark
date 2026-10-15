@@ -130,14 +130,25 @@ serve(async (req) => {
         ? `\n\nIMPORTANT: You have been given ${visualImages.length} image${visualImages.length !== 1 ? "s" : ""} showing the actual media${asset.asset_type === "video" ? " (sampled frames from the video)" : ""}. Base the draft copy on what is actually visible — describe scenes, subjects, mood, colors, setting, and any visible text. Do not invent details that are not present.`
         : "";
 
-      const prompt = `You are a social media strategist for NuDaze. Create a ${platform} ${content_type} post card for the following asset.
+      const textLed = !asset.id;
+      const limits: Record<string, string> = {
+        instagram: "Max 2200 chars, use line breaks and emojis.",
+        linkedin: "Max 3000 chars, professional tone, strategic hook.",
+        facebook: "Aim for 80-250 words, conversational, community-aware.",
+        x: "Max 280 chars INCLUDING hashtags, punchy, one idea.",
+      };
+      const textLedNote = textLed
+        ? `\n\nThis is a TEXT-LED thought-leadership post: no image or video is attached. Make the words carry it — a specific insight, a clear point of view, and a concrete example. Use only facts stated in the idea above; do not invent statistics, clients, or quotes.${variantCount > 1 ? ` Take a distinctly different angle and opening hook from the other ${variantCount - 1} variants (this is ${asset.title}).` : ""}`
+        : (topic ? `\n\nExtra direction from the user: ${topic}` : "");
+
+      const prompt = `You are a social media strategist for NuDaze. Create a ${platform} ${content_type} post card for the following ${textLed ? "idea" : "asset"}.
 
 Title: ${asset.title}
-Description: ${asset.description || "No description provided"}
-Type: ${asset.asset_type}${contributorsLine}${asset.event_name ? `\nEvent: ${asset.event_name}` : ""}${visualNote}${brandVoiceContext}${platformRulesContext}
+${textLed ? "Idea / key message" : "Description"}: ${asset.description || "No description provided"}
+Type: ${asset.asset_type}${contributorsLine}${asset.event_name ? `\nEvent: ${asset.event_name}` : ""}${visualNote}${textLedNote}${brandVoiceContext}${platformRulesContext}
 
 Generate a JSON response with exactly these fields:
-- draft_copy: ${platform} ${content_type} caption (engaging, platform-appropriate, with hook in first line). ${platform === "instagram" ? "Max 2200 chars, use line breaks and emojis." : "Max 3000 chars, professional tone, strategic hook."}${assetContributors.length > 0 ? ` Naturally mention or tag the contributors: ${assetContributors.join(", ")}.` : ""}
+- draft_copy: ${platform} ${content_type} caption (engaging, platform-appropriate, with hook in first line). ${limits[platform] ?? limits.linkedin}${assetContributors.length > 0 ? ` Naturally mention or tag the contributors: ${assetContributors.join(", ")}.` : ""}
 - objective: Strategic objective (1 sentence)
 - audience: Target audience segment (1-2 words)
 - campaign_pillar: Relevant content pillar (1-2 words)
