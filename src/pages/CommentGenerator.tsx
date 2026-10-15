@@ -21,7 +21,7 @@ import {
   MessageSquare, Plus, Sparkles, Search, AlertCircle, ExternalLink,
   Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar, Copy, Check,
   CheckCircle2, Trash2, RefreshCw, TrendingUp, ArrowUpDown, Inbox, Clock,
-  Star, AtSign, PenSquare, ChevronRight, Target, Gauge,
+  Star, AtSign, PenSquare, ChevronRight, Target, Gauge, Users, UsersRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
@@ -297,11 +297,12 @@ export default function CommentGenerator() {
   const targetData = dailyTarget;
   const targetProgress = targetData ? Math.min((targetData.completed / Math.max(targetData.target, 1)) * 100, 100) : 0;
 
+  // Icon set mirrors the design mock: bubble, group, @-mention, community.
   const kpis = [
     { label: "Needs Response", value: needsResponse, icon: MessageSquare, accent: "cyan", filter: "needs_response" as InboxFilter },
-    { label: "High Impact", value: highImpact, icon: Star, accent: "lime", filter: "high_impact" as InboxFilter },
-    { label: "Review Needed", value: reviewNeeded, icon: AlertTriangle, accent: "magenta", filter: "review_needed" as InboxFilter },
-    { label: "Total Comments", value: totalComments, icon: AtSign, accent: "gold", filter: "all" as InboxFilter },
+    { label: "High Impact", value: highImpact, icon: Users, accent: "lime", filter: "high_impact" as InboxFilter },
+    { label: "Review Needed", value: reviewNeeded, icon: AtSign, accent: "magenta", filter: "review_needed" as InboxFilter },
+    { label: "Total Comments", value: totalComments, icon: UsersRound, accent: "gold", filter: "all" as InboxFilter },
   ];
 
   const inboxItems: { key: InboxFilter; label: string; count: number; icon: typeof Inbox }[] = [
