@@ -1,14 +1,12 @@
 import type { ReactNode } from "react";
 import { BarChart3, Users, Zap } from "lucide-react";
 import bird from "@/assets/brand/socialmotive-header-bird.png";
+import logo from "@/assets/socialmotive-logo.jpg";
 
 function Wordmark({ className = "" }: { className?: string }) {
   return (
     <div className={className}>
-      <div className="sm-auth-wordmark">
-        Social<strong>Motive</strong>
-      </div>
-      <div className="sm-auth-tagline">AI-powered social intelligence</div>
+      <img src={logo} alt="SocialMotive — AI-powered social intelligence" className="sm-auth-logo" />
     </div>
   );
 }
@@ -38,7 +36,6 @@ export function AuthShell({ children }: { children: ReactNode }) {
       <section className="sm-auth-panel">
         <div className="sm-auth-card">
           <div className="sm-auth-card-logo">
-            <img src={bird} alt="" aria-hidden />
             <Wordmark />
           </div>
           {children}

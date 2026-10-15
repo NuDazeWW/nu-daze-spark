@@ -7,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ArrowRight, Building2, Check, ChevronDown, Crown, HeartHandshake, Info, Waves, Zap } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
+import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 import { cn } from "@/lib/utils";
 import { fmtUsd, useTierDefinitions, type TierDefinition } from "@/hooks/useBilling";
 import { useAuth } from "@/hooks/useAuth";
@@ -67,7 +68,7 @@ function FeatureLine({ text }: { text: string }) {
         <PopoverTrigger asChild>
           <button type="button" className="group flex w-full gap-2 rounded text-left hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={`More about ${text}`}>
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <span className="flex-1">{text}</span>
+            <span className="min-w-0 flex-1 break-words">{text}</span>
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-primary" />
           </button>
         </PopoverTrigger>
@@ -112,7 +113,7 @@ export default function Pricing() {
     <div className="sm-pricing min-h-screen bg-background text-foreground">
       <header className="sm-pricing-header border-b">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link to="/" className="font-display text-lg font-semibold tracking-tight">SocialMotive</Link>
+          <Link to="/" aria-label="SocialMotive home"><img src={socialMotiveLogo} alt="SocialMotive" className="h-9 w-auto rounded-md" /></Link>
           <Button variant="outline" size="sm" asChild><Link to={user ? "/" : "/auth"}>{user ? "Back to workspace" : "Sign in"}</Link></Button>
         </div>
       </header>

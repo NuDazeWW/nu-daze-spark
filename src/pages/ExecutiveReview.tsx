@@ -83,7 +83,7 @@ export default function ExecutiveReview() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <img src={logo} alt="SocialMotive" className="h-8 w-8 rounded-md object-cover" />
+          <img src={logo} alt="SocialMotive" className="h-9 w-auto rounded-md" />
           <div className="flex-1">
             <p className="font-display text-sm font-semibold">Executive Review</p>
             <p className="font-mono text-xs text-muted-foreground">{pending.length} awaiting your sign-off</p>

@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import agreement from "@/content/legal/user-agreement.md?raw";
 import privacy from "@/content/legal/privacy.md?raw";
+import logo from "@/assets/socialmotive-logo.jpg";
 
 export const LEGAL_VERSION = "2026-10-15";
 
@@ -34,6 +35,7 @@ export default function Legal() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-6 py-12">
+        <Link to="/" aria-label="SocialMotive home"><img src={logo} alt="SocialMotive" className="mb-8 h-10 w-auto rounded-md" /></Link>
         <div className="mb-6 flex gap-4 text-sm">
           <Link to="/terms" className="text-primary hover:underline">User Agreement</Link>
           <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
