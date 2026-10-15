@@ -15,7 +15,7 @@ import { MotiveScore, type MotiveBreakdown } from "@/components/preflight/Motive
 import { postLabel } from "@/components/tracking/PostTracking";
 import logo from "@/assets/socialmotive-logo.jpg";
 
-const QUICK = ["Tone too promotional", "Tighten the opening hook", "Needs a stronger proof point", "Shorten it"];
+const QUICK = ["Punchier hook", "Tone too formal", "Tone too promotional", "Shorten it", "Needs a stronger proof point", "Remove hashtags", "More direct CTA"];
 
 /** Distraction-free sign-off view for executives and clients. */
 export default function ExecutiveReview() {
@@ -84,11 +84,11 @@ export default function ExecutiveReview() {
             <p className="font-display text-sm font-semibold">Executive Review</p>
             <p className="font-mono text-xs text-muted-foreground">{pending.length} awaiting your sign-off</p>
           </div>
-          <Button asChild variant="outline" size="sm"><Link to="/queue"><ArrowLeft className="mr-1 h-4 w-4" />Back to workspace</Link></Button>
+          <Button asChild variant="outline" size="sm" className="shrink-0"><Link to="/queue" aria-label="Back to workspace"><ArrowLeft className="h-4 w-4 sm:mr-1" /><span className="hidden sm:inline">Back to workspace</span></Link></Button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-5 px-4 py-6">
+      <main className="mx-auto max-w-3xl space-y-4 px-3 pb-40 pt-4 sm:space-y-5 sm:px-4 sm:py-6">
         {isLoading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : !card ? (
@@ -106,7 +106,7 @@ export default function ExecutiveReview() {
               {index >= 0 && <span className="ml-auto font-mono text-xs text-muted-foreground">{index + 1} of {pending.length}</span>}
             </div>
 
-            <div className="rounded-xl border bg-card p-4"><NativePostPreview card={card} /></div>
+            <div className="overflow-hidden rounded-xl border bg-card p-2 sm:p-4 [&_img]:max-w-full"><NativePostPreview card={card} /></div>
 
             {review?.motive_score != null && (
               <div className="rounded-xl border bg-card p-4">
@@ -124,9 +124,21 @@ export default function ExecutiveReview() {
             )}
 
             {card.approval_status === "in_review" ? (
-              <div className="sticky bottom-4 flex gap-3 rounded-xl border bg-card p-3 shadow-lg">
-                <Button variant="outline" className="flex-1" disabled={busy} onClick={() => setReviseOpen(true)}><MessageSquareWarning className="mr-2 h-4 w-4" />Request revisions</Button>
-                <Button className="flex-1" disabled={busy} onClick={() => act("approved")}><Check className="mr-2 h-4 w-4" />Approve</Button>
+              <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-card/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-lg backdrop-blur sm:sticky sm:bottom-4 sm:rounded-xl sm:border">
+                <div className="mx-auto max-w-3xl space-y-2">
+                  <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="One-tap revision requests">
+                    {QUICK.map((q) => (
+                      <button key={q} disabled={busy} onClick={() => act("needs_revision", q)}
+                        className="h-9 shrink-0 whitespace-nowrap rounded-full border px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-50">
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="h-12 flex-1 whitespace-nowrap" disabled={busy} onClick={() => setReviseOpen(true)}><MessageSquareWarning className="mr-2 h-4 w-4" />Revise…</Button>
+                    <Button className="h-12 flex-[1.4] whitespace-nowrap text-base" disabled={busy} onClick={() => act("approved")}><Check className="mr-2 h-5 w-5" />Approve</Button>
+                  </div>
+                </div>
               </div>
             ) : (
               <p className="text-center text-sm text-muted-foreground">This post isn't waiting for review.</p>
@@ -136,7 +148,7 @@ export default function ExecutiveReview() {
       </main>
 
       <Dialog open={reviseOpen} onOpenChange={setReviseOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-[calc(100vw-1.5rem)] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Request revisions</DialogTitle>
             <DialogDescription>Your note goes straight to the team with the post.</DialogDescription>
