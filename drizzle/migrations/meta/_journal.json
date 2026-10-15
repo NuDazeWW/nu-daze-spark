@@ -162,6 +162,13 @@
       "when": 1791991219253,
       "tag": "0022_brief_collaboration",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792032166658,
+      "tag": "0023_migration",
+      "breakpoints": true
     }
   ]
 }
