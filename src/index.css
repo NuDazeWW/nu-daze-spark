@@ -298,6 +298,19 @@ body[data-sm-surface="reading"] [role="dialog"] [class*="text-brand-warning/"] {
   from { opacity: 0; transform: translateX(-4px); }
   to { opacity: 1; transform: translateX(0); }
 }
+/* Glowing gradient outline on the selected row in side-nav pop-ups */
+.sm-hover-panel .sm-hover-item { border: 1px solid transparent; }
+.sm-hover-panel .sm-hover-item:hover,
+.sm-hover-panel .sm-hover-item:focus-visible {
+  background:
+    linear-gradient(hsl(var(--sidebar-accent) / .85), hsl(var(--sidebar-accent) / .85)) padding-box,
+    linear-gradient(115deg, hsl(var(--sm-fx-turquoise)), hsl(var(--sm-fx-violet)) 52%, hsl(var(--sm-fx-magenta))) border-box;
+  box-shadow:
+    0 0 14px -2px hsl(var(--sm-fx-turquoise) / .55),
+    0 0 22px -4px hsl(var(--sm-fx-violet) / .45),
+    inset 0 1px 0 hsl(0 0% 100% / .07);
+  outline: none;
+}
 
 /* ── SocialMotive package treatment (namespaced so semantic tokens never collide) ── */
 :root {

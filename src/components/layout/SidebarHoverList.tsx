@@ -276,7 +276,7 @@ function NavHoverPanel() {
               {it.to && <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-sidebar-foreground/40" />}
             </>
           );
-          const cls = "flex w-full gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-sidebar-accent focus-visible:bg-sidebar-accent";
+          const cls = "sm-hover-item flex w-full gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-sidebar-accent focus-visible:bg-sidebar-accent";
           return it.to ? (
             <Link key={it.label} to={it.to} onClick={closeNow} className={cls}>
               {row}
