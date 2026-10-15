@@ -320,11 +320,11 @@ export default function PostGenerator() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-xs">Platform</Label>
-                <Select value={platform} onValueChange={(v) => setPlatform(v as "instagram" | "linkedin" | "facebook")}>
+                <Select value={platform} onValueChange={(v) => setPlatform(v as "instagram" | "linkedin" | "facebook" | "x")}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="instagram">Instagram</SelectItem>
-                    <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem><SelectItem value="x">X</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -342,6 +342,15 @@ export default function PostGenerator() {
                 </Select>
               </div>
 
+              {textLed ? (
+                <div className="space-y-2">
+                  <Label className="text-xs">Variations</Label>
+                  <Select value={String(variants)} onValueChange={(v) => setVariants(Number(v))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{[1, 2, 3, 4, 5].map((n) => <SelectItem key={n} value={String(n)}>{n} draft{n > 1 ? "s, different angles" : ""}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              ) : (
               <div className="rounded-md border p-3 space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-0.5">
@@ -359,6 +368,7 @@ export default function PostGenerator() {
                   />
                 </div>
               </div>
+              )}
 
               {/* Reminder about account tags */}
               <p className="text-[10px] text-muted-foreground flex items-center gap-1">
@@ -379,13 +389,13 @@ export default function PostGenerator() {
 
               <Button
                 onClick={handleGenerate}
-                disabled={selectedAssetIds.length === 0 || isGenerating}
+                disabled={!canGenerate || isGenerating}
                 className="w-full"
               >
                 {isGenerating ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Generating…</>
                 ) : (
-                  <><Sparkles className="mr-2 h-4 w-4" />Generate Post Cards ({selectedAssetIds.length})</>
+                  <><Sparkles className="mr-2 h-4 w-4" />{textLed ? `Generate ${variants} text post${variants > 1 ? "s" : ""}` : `Generate Post Cards (${selectedAssetIds.length})`}</>
                 )}
               </Button>
             </CardContent>
