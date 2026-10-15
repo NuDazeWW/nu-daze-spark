@@ -1,4 +1,5 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { LifeBuoy, Megaphone } from "lucide-react";
 import { useLayoutEffect } from "react";
 import { pageSurface } from "@/lib/contentPresentation";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
@@ -23,6 +24,14 @@ export function AppLayout() {
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <div className="min-w-0 flex-1" />
+            <nav aria-label="Help and updates" className="flex shrink-0 items-center gap-1">
+              {[{ href: "/help", label: "Help", icon: LifeBuoy }, { href: "/whats-new", label: "What's new", icon: Megaphone }].map((l) => (
+                <Link key={l.href} to={l.href} aria-current={pathname.startsWith(l.href) ? "page" : undefined}
+                  className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${pathname.startsWith(l.href) ? "text-foreground" : "text-muted-foreground"}`}>
+                  <l.icon className="size-4" /><span className="hidden sm:inline">{l.label}</span>
+                </Link>
+              ))}
+            </nav>
             <ClientSwitcher />
             <UserMenu />
           </header>
