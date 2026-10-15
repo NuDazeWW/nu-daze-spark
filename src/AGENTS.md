@@ -9,3 +9,4 @@
 - Reference-page composition uses scoped `sm-reference` classes in existing pages and centralized surface selection; preserve hooks, copy, permissions and handlers because the uploaded package is visual reference only.
 - Brief approval runs through `submit_brief`/`decide_brief` RPCs (a trigger blocks direct approval when approval mode is on); a named Approver or any Admin decides, and open `brief_comments` block generation in both UI and `generate-from-brief`, so feedback can't be skipped.
 - Queue, Approved and Publishing share `PipelineNav` as three views of one content pipeline, so users always see where a post sits.
+- The final SocialMotive design system is the last block of `src/index.css` (`--ds-*` tokens plus shared button/input/tab/dialog/sidebar rules) and `Button` variants ai/success/warning; extend it there rather than adding per-page patches, because it supersedes earlier layers.

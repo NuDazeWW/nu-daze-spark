@@ -2,7 +2,7 @@
 
 ## Core
 SocialMotive — AI-powered social intelligence platform (formerly NuDaze Content Copilot / PimpSocial AI). Dark mode only. Deep Plum #1B1028 bg, Signal Turquoise #19D8D2 primary, Electric Citrine #C7FF27 accent, Social Coral, Warm Gold, Soft Bone.
-Space Grotesk display / Inter body / IBM Plex Mono metadata. Lovable Cloud backend with strict RLS via has_role() security definer.
+Final UI Design System card governs visuals: cyan #00E5FF, teal #00C2A8, magenta #FF4EDB, violet #8B5CF6, gold #FFC830, base #0B0F26, surface #13183A, light #F8FAFF; JetBrains Mono headings, Space Grotesk UI, Inter reading, IBM Plex Mono metadata. Lovable Cloud backend with strict RLS via has_role() security definer.
 
 Roles in user_roles table (admin/member). Never store roles on profiles.
 Quota counts at Approved status. Comments use separate engagement_targets table. Repurpose suggestions on ingest.
