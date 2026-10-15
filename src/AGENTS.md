@@ -8,3 +8,4 @@
 - Decorative package effects use namespaced `--sm-fx-*` variables and `sm-app-bg`/`sm-light-page` surfaces set by AppLayout, so glow never collides with semantic color roles.
 - Reference-page composition uses scoped `sm-reference` classes in existing pages and centralized surface selection; preserve hooks, copy, permissions and handlers because the uploaded package is visual reference only.
 - Brief approval runs through `submit_brief`/`decide_brief` RPCs (a trigger blocks direct approval when approval mode is on); a named Approver or any Admin decides, and open `brief_comments` block generation in both UI and `generate-from-brief`, so feedback can't be skipped.
+- Queue, Approved and Publishing share `PipelineNav` as three views of one content pipeline, so users always see where a post sits.
