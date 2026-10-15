@@ -21,7 +21,7 @@ import {
   MessageSquare, Plus, Sparkles, Search, AlertCircle, ExternalLink,
   Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar, Copy, Check,
   CheckCircle2, Trash2, RefreshCw, TrendingUp, ArrowUpDown, Inbox, Clock,
-  Star, AtSign, PenSquare, ChevronRight, Target, Gauge,
+  Star, AtSign, PenSquare, ChevronRight, Target, Gauge, Users, UsersRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
@@ -156,6 +156,15 @@ type InboxFilter = "all" | "needs_response" | "high_impact" | "review_needed" | 
 function authorInitials(name: string | null) {
   if (!name) return "?";
   return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
+}
+
+// Deterministic accent per author so each avatar reads as a distinct person.
+const AVATAR_ACCENTS = ["cyan", "violet", "magenta", "gold", "lime"] as const;
+function authorAccent(name: string | null) {
+  if (!name) return AVATAR_ACCENTS[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_ACCENTS[hash % AVATAR_ACCENTS.length];
 }
 
 function timeAgo(iso: string | null) {
@@ -297,11 +306,12 @@ export default function CommentGenerator() {
   const targetData = dailyTarget;
   const targetProgress = targetData ? Math.min((targetData.completed / Math.max(targetData.target, 1)) * 100, 100) : 0;
 
+  // Icon set mirrors the design mock: bubble, group, @-mention, community.
   const kpis = [
     { label: "Needs Response", value: needsResponse, icon: MessageSquare, accent: "cyan", filter: "needs_response" as InboxFilter },
-    { label: "High Impact", value: highImpact, icon: Star, accent: "lime", filter: "high_impact" as InboxFilter },
-    { label: "Review Needed", value: reviewNeeded, icon: AlertTriangle, accent: "magenta", filter: "review_needed" as InboxFilter },
-    { label: "Total Comments", value: totalComments, icon: AtSign, accent: "gold", filter: "all" as InboxFilter },
+    { label: "High Impact", value: highImpact, icon: Users, accent: "lime", filter: "high_impact" as InboxFilter },
+    { label: "Review Needed", value: reviewNeeded, icon: AtSign, accent: "magenta", filter: "review_needed" as InboxFilter },
+    { label: "Total Comments", value: totalComments, icon: UsersRound, accent: "gold", filter: "all" as InboxFilter },
   ];
 
   const inboxItems: { key: InboxFilter; label: string; count: number; icon: typeof Inbox }[] = [
@@ -339,10 +349,12 @@ export default function CommentGenerator() {
             onClick={() => setInboxFilter(k.filter)}
           >
             <span className="sm-cg-kpi-icon lg-icon-well" data-accent={k.accent}>
-              <k.icon className="h-4 w-4" />
+              <k.icon />
             </span>
-            <span className="sm-cg-kpi-value">{k.value}</span>
-            <span className="sm-cg-kpi-label">{k.label}</span>
+            <span className="sm-cg-kpi-text">
+              <span className="sm-cg-kpi-value">{k.value}</span>
+              <span className="sm-cg-kpi-label">{k.label}</span>
+            </span>
           </button>
         ))}
       </div>
@@ -553,7 +565,7 @@ export default function CommentGenerator() {
                           className="shrink-0 mt-1"
                         />
                       )}
-                      <span className="sm-cg-avatar shrink-0">
+                      <span className="sm-cg-avatar shrink-0" data-accent={authorAccent(post.author_name)}>
                         {authorInitials(post.author_name)}
                         <span className="sm-cg-avatar-badge">
                           <PlatformIcon platform={post.platform} className="h-2.5 w-2.5" />
@@ -613,7 +625,7 @@ export default function CommentGenerator() {
               <div className="sm-cg-detail-post">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="sm-cg-avatar sm-cg-avatar-sm shrink-0">
+                    <span className="sm-cg-avatar sm-cg-avatar-sm shrink-0" data-accent={authorAccent(activePost.author_name)}>
                       {authorInitials(activePost.author_name)}
                       <span className="sm-cg-avatar-badge">
                         <PlatformIcon platform={activePost.platform} className="h-2.5 w-2.5" />
