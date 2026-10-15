@@ -220,10 +220,10 @@ export default function PublishingStatus() {
             return (
               <div key={f.key} className="pub-soon" style={{ ["--b" as string]: st.b }}>
                 <img src={st.art} alt="" aria-hidden className="pub-art" loading="lazy" />
-                <div className="relative z-10 flex gap-5 pr-[40%]">
+                <div className="relative z-10 flex gap-4 pr-[34%]">
                   <span className="pub-tile flex-none">{st.mark}</span>
                   <div>
-                    <p className="font-display text-xl font-semibold">{f.name}</p>
+                    <p className="font-display text-xl font-semibold whitespace-nowrap">{f.name}</p>
                     <p className="text-[15px]" style={{ color: "hsl(230 20% 80%)" }}>{f.note}</p>
                     <p className="mt-2 text-[13px] leading-snug" style={{ color: "hsl(230 20% 72%)" }}>{st.copy}</p>
                   </div>
