@@ -17,7 +17,7 @@ export function CollapsibleNavGroup({ id, label, defaultOpen = true, children }:
     <Collapsible open={open} onOpenChange={change}>
       <SidebarGroup>
         <SidebarGroupLabel asChild>
-          <CollapsibleTrigger className="flex w-full items-center justify-between hover:text-sidebar-foreground">
+          <CollapsibleTrigger className="sm-nav-group-label justify-between">
             {label}
             <ChevronDown className={`size-3.5 transition-transform ${open ? "" : "-rotate-90"}`} />
           </CollapsibleTrigger>

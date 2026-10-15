@@ -1773,3 +1773,23 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 @media (max-width: 1100px) { .sm-al-grid, .sm-al-layout:not(.has-inspector) .sm-al-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sm-assets .sm-header-bird { width: 150px; } }
 @media (max-width: 560px) { .sm-al-grid, .sm-al-layout:not(.has-inspector) .sm-al-grid { grid-template-columns: minmax(0, 1fr); } .sm-assets .sm-page-header h1 { font-size: 30px; } }
 @media (max-width: 1100px) { .sm-al-inspector:not(.is-explicit) { display: none; } }
+
+/* Sidebar section titles — bold, encased brand chips */
+.sm-nav-group-label {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 6px 10px; margin-bottom: 4px;
+  border-radius: 8px;
+  border: 1px solid hsl(var(--brand-turquoise) / 0.28);
+  background: linear-gradient(120deg, hsl(var(--brand-turquoise) / 0.14), hsl(var(--brand-plum-light) / 0.35) 55%, hsl(var(--brand-gold) / 0.10));
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.06), 0 2px 10px -4px hsl(var(--brand-turquoise) / 0.35);
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: hsl(var(--brand-turquoise-glow));
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+}
+.sm-nav-group-label:hover {
+  border-color: hsl(var(--brand-turquoise) / 0.5);
+  color: hsl(var(--brand-bone));
+}
+.sm-nav-group-label svg { color: hsl(var(--brand-gold)); }
