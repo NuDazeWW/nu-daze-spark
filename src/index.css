@@ -1726,3 +1726,13 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 .sm-src-tone-teal img.sm-src-ribbon { filter: hue-rotate(-95deg) saturate(1.1); }
 .sm-src-tone-gold img.sm-src-ribbon { filter: hue-rotate(150deg) saturate(1.2); }
 .sm-src-cloud > :not(.sm-src-ribbon) { position: relative; }
+.sm-strategy .sm-strategy-rule, .sm-strategy .sm-strategy-rule * { --foreground: 258 48% 12%; --muted-foreground: 255 15% 40%; }
+.sm-strategy .sm-strategy-rule-labels h3 { color: hsl(258 48% 12%); }
+.sm-strategy .sm-strategy-rule-copy p { color: hsl(255 18% 36%); }
+.sm-strategy .sm-strategy-rule-labels > div:not(.sm-strategy-rule-status) { color: hsl(258 40% 22%); background: hsl(0 0% 100%); border-color: hsl(262 40% 80%); }
+.sm-strategy .sm-strategy-rule-actions button { color: hsl(258 40% 22%); background: #fff; border-color: hsl(262 40% 85%); }
+.sm-strategy .sm-page-header h1 + p { text-shadow: 0 1px 10px hsl(244 52% 6%), 0 0 2px hsl(244 52% 6%); }
+.sm-strategy-background { filter: brightness(.72); }
+.sm-al-card, .sm-al-body { min-width: 0; }
+.sm-al-foot { flex-wrap: wrap; }
+.sm-al-title { white-space: nowrap; }
