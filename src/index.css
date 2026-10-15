@@ -1772,3 +1772,4 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 @media (max-width: 1360px) { .sm-al-grid, .sm-al-layout:not(.has-inspector) .sm-al-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 1100px) { .sm-al-grid, .sm-al-layout:not(.has-inspector) .sm-al-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sm-assets .sm-header-bird { width: 150px; } }
 @media (max-width: 560px) { .sm-al-grid, .sm-al-layout:not(.has-inspector) .sm-al-grid { grid-template-columns: minmax(0, 1fr); } .sm-assets .sm-page-header h1 { font-size: 30px; } }
+@media (max-width: 1100px) { .sm-al-inspector:not(.is-explicit) { display: none; } }

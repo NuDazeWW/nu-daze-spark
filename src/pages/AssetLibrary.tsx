@@ -405,7 +405,7 @@ export default function AssetLibrary() {
             })}
           </div>
           {selected && (
-            <aside className="sm-al-inspector" aria-label={`Details for ${selected.title}`}>
+            <aside className={`sm-al-inspector ${selectedId && selectedId !== "none" ? "is-explicit" : ""}`} aria-label={`Details for ${selected.title}`}>
               {(() => {
                 const a = selected;
                 const Icon = ASSET_TYPE_ICON[a.asset_type] ?? FileText;
