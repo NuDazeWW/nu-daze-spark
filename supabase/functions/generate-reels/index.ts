@@ -28,7 +28,6 @@ serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
 
     if (!lovableKey) {
@@ -38,10 +37,11 @@ serve(async (req) => {
       });
     }
 
-    const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
     const anonClient = createClient(supabaseUrl, (Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY"))!, {
       global: { headers: { Authorization: authHeader } },
     });
+    // All reads/writes run as the caller so workspace permissions (RLS) apply.
+    const supabaseAdmin = anonClient;
 
     const { data: { user }, error: userError } = await anonClient.auth.getUser();
     if (userError || !user) {
