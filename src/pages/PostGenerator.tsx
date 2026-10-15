@@ -150,13 +150,33 @@ export default function PostGenerator() {
     <div className="sm-reference sm-generator animate-fade-in">
       <PageHeader
         title="Social Post Generator"
-        description="Select source assets and generate structured post cards with AI."
+        description="Start from your media, or just an idea — text-led posts need no assets."
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Main area */}
         <div className="space-y-6">
-          {/* Source assets selection */}
+          <div role="tablist" aria-label="Generation mode" className="grid grid-cols-2 gap-1 rounded-lg border bg-card p-1">
+            {([["media", "Media-led", FolderOpen], ["text", "Text-led / thought leadership", PenLine]] as const).map(([k, label, Icon]) => (
+              <button key={k} role="tab" aria-selected={mode === k} onClick={() => switchMode(k)}
+                className={`flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors ${mode === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
+                <Icon className="h-4 w-4" />{label}
+              </button>
+            ))}
+          </div>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">{textLed ? "Your idea or key message" : "Extra direction (optional)"}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Textarea rows={textLed ? 6 : 3} value={topic} maxLength={4000} onChange={(e) => setTopic(e.target.value)}
+                placeholder={textLed ? "e.g. Most nonprofits measure social reach, but the boards we work with care about donor retention. Share our view on what to track instead." : "e.g. Focus on the volunteers, keep it under 100 words."} />
+              {textLed && <p className="text-xs text-muted-foreground">The AI only uses what you write here plus your brand rules — it won't invent stats or quotes. {topic.trim().length < 10 && "Write at least 10 characters."}</p>}
+            </CardContent>
+          </Card>
+
+          {!textLed && (
           <Card className="sm-generator-sources">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center justify-between">
