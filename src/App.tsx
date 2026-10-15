@@ -39,6 +39,7 @@ import UserGuide from "./pages/UserGuide";
 import Pricing from "./pages/Pricing";
 import Billing from "./pages/settings/Billing";
 import ExecutiveReview from "./pages/ExecutiveReview";
+import Legal from "./pages/Legal";
 import { CreditGateProvider } from "@/components/billing/CreditGate";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/terms" element={<Legal />} />
+            <Route path="/privacy" element={<Legal />} />
             <Route path="/review" element={<ProtectedRoute><ExecutiveReview /></ProtectedRoute>} />
             <Route
               element={
