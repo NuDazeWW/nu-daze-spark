@@ -86,13 +86,9 @@ export function AppSidebar() {
   const location = useLocation();
   useAuth();
   const ws = useWorkspace();
-  const workspaceTop = ws.canManage ? adminWorkspaceTop : [];
-  const workspaceBottom = [
-    ...(ws.canManage ? adminWorkspaceBottom : []),
-    { title: "Your Brand Profiles", icon: Building2, href: "/settings/clients" },
-    { title: "Account Tags", icon: AtSign, href: "/settings/tags" },
-    { title: "Notifications", icon: Bell, href: "/settings/notifications" },
-  ];
+  void adminWorkspaceTop; void adminWorkspaceBottom;
+  const workspaceTop = [{ title: "Setup", icon: ListChecks, href: "/setup" }];
+  const workspaceBottom: typeof workspaceTop = [];
   const workspaceLabel = `${ws.settings?.company_name?.trim() || "Your"} Workspace`;
   const renderItems = (items: { title: string; icon: typeof Bell; href: string }[]) => items.map((item) => (
     <SidebarMenuItem key={item.href}>
@@ -154,8 +150,7 @@ export function AppSidebar() {
 
         <CollapsibleNavGroup id="settings" label={workspaceLabel}>
           <SidebarMenu>{renderItems(workspaceTop)}</SidebarMenu>
-          <SidebarPostTo embedded />
-          <SidebarMenu>{renderItems(workspaceBottom)}</SidebarMenu>
+          {workspaceBottom.length > 0 && <SidebarMenu>{renderItems(workspaceBottom)}</SidebarMenu>}
         </CollapsibleNavGroup>
 
         <SidebarSeparator />
