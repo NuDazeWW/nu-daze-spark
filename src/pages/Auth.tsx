@@ -9,6 +9,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Lock, Mail } from "lucide-react";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { LEGAL_DOCS, LEGAL_VERSION, LegalText } from "./Legal";
+
+const CONSENTS = [
+  "I have read and agree to the SocialMotive User Agreement, including the Acceptable Use Policy, the Metering, Credits and Allowances terms, and the Privacy and Data Processing terms.",
+  "I confirm I am at least 18 years old and that I have authority to bind the organization I represent to this agreement.",
+  "I understand that AI media credits, X dispatch allowance, AI text drafts, direct posts and storage are metered; that my balance is checked before each action; and that exceeding a cap blocks that feature until I buy a top-up, upgrade my plan, or connect my own provider key.",
+  "I understand that credit packs and top-ups are non-refundable and do not roll over from month to month.",
+  "I understand that publishing to connected social platforms depends on third-party APIs and their rate limits, and that X charges a fee per post which may be passed through to me or capped by my plan.",
+  "I understand that automated actions are checked before they run and that the platform will not spend on my behalf beyond my plan limits.",
+];
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,6 +30,9 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [checks, setChecks] = useState<boolean[]>(() => CONSENTS.map(() => false));
+  const [doc, setDoc] = useState<null | "terms" | "privacy">(null);
+  const allChecked = checks.every(Boolean);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -58,7 +72,12 @@ export default function Auth() {
         else localStorage.removeItem(REMEMBER_KEY);
         navigate("/");
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        if (!allChecked) throw new Error("Please accept all terms to create an account.");
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { terms_version: LEGAL_VERSION, terms_accepted_at: new Date().toISOString() } },
+        });
         if (error) throw error;
         toast({
           title: "Account created",
@@ -186,7 +205,27 @@ export default function Auth() {
                 Remember me
               </label>
             )}
-            <Button type="submit" className="sm-auth-primary w-full" disabled={loading}>
+            {!isLogin && (
+              <div className="space-y-3 rounded-md border border-border p-3">
+                <div className="flex items-center justify-between gap-2 text-xs">
+                  <span className="text-muted-foreground">
+                    Read the{" "}
+                    <button type="button" className="sm-auth-link underline" onClick={() => setDoc("terms")}>User Agreement</button>{" "}and{" "}
+                    <button type="button" className="sm-auth-link underline" onClick={() => setDoc("privacy")}>Privacy Policy</button>
+                  </span>
+                  <button type="button" className="sm-auth-link whitespace-nowrap underline" onClick={() => setChecks(CONSENTS.map(() => !allChecked))}>
+                    {allChecked ? "Clear all" : "Check all"}
+                  </button>
+                </div>
+                {CONSENTS.map((text, i) => (
+                  <label key={i} className="flex items-start gap-2 text-xs leading-snug text-muted-foreground cursor-pointer">
+                    <Checkbox className="mt-0.5" checked={checks[i]} onCheckedChange={(c) => setChecks((p) => p.map((v, j) => (j === i ? !!c : v)))} />
+                    <span>{text}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+            <Button type="submit" className="sm-auth-primary w-full" disabled={loading || (!isLogin && !allChecked)}>
               {loading ? "Loading..." : isLogin ? "Sign in" : "Create account"}
               <ArrowRight className="absolute right-5 h-5 w-5" aria-hidden />
             </Button>
@@ -213,6 +252,12 @@ export default function Auth() {
             </button>
           </div>
         </div>
+        <Dialog open={!!doc} onOpenChange={(o) => !o && setDoc(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader><DialogTitle>{doc ? LEGAL_DOCS[doc].title : ""}</DialogTitle></DialogHeader>
+            <div className="max-h-[65vh] overflow-y-auto pr-2">{doc && <LegalText text={LEGAL_DOCS[doc].text} />}</div>
+          </DialogContent>
+        </Dialog>
     </AuthShell>
   );
 }
