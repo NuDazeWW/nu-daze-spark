@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRight, Bookmark, Sparkles, Share2, LayoutGrid, Smile, Users, MousePointerClick, FileText } from "lucide-react";
+import { BrandBadge } from "@/components/shared/BrandBadge";
 import { toast } from "sonner";
 
 export type StudioSettings = {
@@ -45,7 +46,11 @@ export function StudioControls({ clientId, value, onChange, onGenerate, busy, di
     <div className="space-y-1">
       <Label className="text-xs text-muted-foreground">{label}</Label>
       <Select value={(value[k] as string) || undefined} onValueChange={(v) => set(k, v)}>
-        <SelectTrigger className="sm-studio-select h-10 gap-2"><span className="sm-field-well" style={{ "--tone": FIELD_TONES[k] } as React.CSSProperties}><Icon className="h-3.5 w-3.5" /></span><span className="flex-1 text-left truncate"><SelectValue placeholder={placeholder} /></span></SelectTrigger>
+        <SelectTrigger className="sm-studio-select h-11 gap-2.5 items-center">
+          {k === "platform" && value.platform
+            ? <BrandBadge platform={value.platform} size={26} />
+            : <span className="sm-field-well" style={{ "--tone": FIELD_TONES[k] } as React.CSSProperties}><Icon className="h-4 w-4" /></span>}
+          <span className="flex-1 text-left truncate"><SelectValue placeholder={placeholder} /></span></SelectTrigger>
         <SelectContent>{opts.map(([v, l]) => <SelectItem key={v} value={v} className="capitalize">{l}</SelectItem>)}</SelectContent>
       </Select>
     </div>

@@ -2653,7 +2653,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-app-bg .pub-stage { background-color: transparent !important; background-image: none !important; }
 
 /* Media Studio: glowing field icons matching the shared icon wells */
-.sm-field-well { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+.sm-field-well { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; align-self: center;
   color: hsl(var(--tone, var(--sm-fx-violet)));
   background: linear-gradient(160deg, hsl(var(--tone, var(--sm-fx-violet)) / .28), hsl(var(--tone, var(--sm-fx-violet)) / .08));
   box-shadow: inset 0 0 0 1px hsl(var(--tone, var(--sm-fx-violet)) / .5), inset 0 1px 0 hsl(0 0% 100% / .14), 0 0 14px -4px hsl(var(--tone, var(--sm-fx-violet)) / .65); }
