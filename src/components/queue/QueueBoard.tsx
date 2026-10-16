@@ -98,14 +98,10 @@ export function QueueBoard({ items, renderItem }: { items: Item[]; renderItem: (
       const diff = Math.round((+d - +today) / 86400000);
       return diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : diff === -1 ? "Yesterday" : format(d, "EEE, MMM d");
     };
-    const sub = (d: Date, list: Item[]) => {
-      const sched = list.some((i) => i.postCard?.scheduled_for);
-      return `${format(d, "EEE, MMM d")}${list.length ? (sched ? " · scheduled" : " · created") : ""}`;
-    };
     return {
       cols: buckets,
-      titles: [...days.map(label), "Earlier & later"],
-      subs: [...days.map((d, n) => sub(d, buckets[n])), "Other dates"],
+      titles: [...days.map(label), "Other dates"],
+      subs: [...days.map((d) => format(d, "EEE, MMM d")), "Earlier or later"],
     };
   }, [items]);
   return (

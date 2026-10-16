@@ -2062,6 +2062,9 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 /* Compact board card: header row, thumb + caption, 4-icon footer */
 .sm-queue .sm-qcard{border-left-width:3px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,hsl(var(--card)),hsl(var(--brand-midnight) / .7))}
 .sm-queue .sm-qcard > div:first-child{background:transparent;border-bottom:0}
+.sm-reference .sm-qcard > .sm-qcard-head{padding:8px 6px 6px 10px}
+.sm-reference .sm-qcard > .sm-qcard-foot{padding:2px 4px}
+.sm-qthumb{white-space:normal}
 .sm-qcard-head{display:flex;align-items:center;gap:6px;min-width:0;padding:8px 8px 6px 10px}
 .sm-qcard-time{font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0}
 .sm-qcard-kind{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:hsl(var(--muted-foreground));white-space:nowrap;flex-shrink:0}
