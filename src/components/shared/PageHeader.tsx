@@ -30,7 +30,7 @@ export function PageHeader({ title, description, children, linksMenu = false }: 
   const isSettings = pathname.startsWith("/settings") || pathname === "/setup";
   const related = RELATED[pathname] ?? [];
   // Dashboard and Media Studio render their own approved header art.
-  const showArt = pathname !== "/" && pathname !== "/media-studio" && !linksMenu;
+  const showArt = pathname !== "/" && pathname !== "/media-studio";
   const links = [
     ...(!isSettings ? [{ to: "/settings/workspace", label: "Workspace settings" }] : []),
     ...related,

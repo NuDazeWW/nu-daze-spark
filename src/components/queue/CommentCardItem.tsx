@@ -61,7 +61,7 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
     <Card className="group sm-content-card" data-status={comment.approval_status} data-content-type="comment">
       <CardHeader className="py-3 px-4 space-y-0">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+          <div className="flex items-center gap-1.5 min-w-0 flex-nowrap overflow-hidden">
             <Badge variant="outline" className={`text-xs shrink-0 ${statusMeta.color}`}>
               {statusMeta.label}
             </Badge>
@@ -69,35 +69,26 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
               <MessageSquare className="h-2.5 w-2.5" />Comment
             </Badge>
             {ext && (
-              <Badge variant="outline" className="text-[10px] capitalize shrink-0">{ext.platform}</Badge>
+              <Badge variant="outline" className="text-[10px] capitalize min-w-0 truncate">{ext.platform}</Badge>
             )}
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            {canRevert && prevStatus && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onStatusChange(prevStatus)} disabled={isUpdating}>
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Back to {STATUS_META[prevStatus].label}</TooltipContent>
-              </Tooltip>
-            )}
-            {canAdvance && nextStatus && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onStatusChange(nextStatus)} disabled={isUpdating}>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Move to {STATUS_META[nextStatus].label}</TooltipContent>
-              </Tooltip>
-            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-7 w-7"><MoreVertical className="h-3.5 w-3.5" /></Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {canAdvance && nextStatus && (
+                  <DropdownMenuItem onClick={() => onStatusChange(nextStatus)} disabled={isUpdating}>
+                    <ChevronRight className="mr-2 h-3.5 w-3.5" />Move to {STATUS_META[nextStatus].label}
+                  </DropdownMenuItem>
+                )}
+                {canRevert && prevStatus && (
+                  <DropdownMenuItem onClick={() => onStatusChange(prevStatus)} disabled={isUpdating}>
+                    <ChevronLeft className="mr-2 h-3.5 w-3.5" />Back to {STATUS_META[prevStatus].label}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => copyToClipboard(comment.draft_copy, "Comment")}>
                   <Copy className="mr-2 h-3.5 w-3.5" />Copy Comment
                 </DropdownMenuItem>
