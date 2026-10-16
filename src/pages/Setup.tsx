@@ -48,6 +48,12 @@ function SetupInner() {
   const [step, setStep] = useState<SetupStepKey>(() => (params.get("step") as SetupStepKey) || "company");
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    const s = params.get("step") as SetupStepKey | null;
+    if (s && SETUP_STEPS.some((x) => x.key === s)) setStep(s);
+  }, [params]);
+
+
   const [companyName, setCompanyName] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [orgType, setOrgType] = useState("agency");
