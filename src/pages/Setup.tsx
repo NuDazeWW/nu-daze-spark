@@ -256,8 +256,8 @@ function SetupInner() {
             <div className="sm-setup-footer flex flex-wrap gap-3 justify-between pt-6">
               <Button variant="ghost" disabled={idx === 0} onClick={() => setStep(SETUP_STEPS[idx - 1].key)}>Back</Button>
               <div className="flex gap-2">
-                {idx < SETUP_STEPS.length - 1 && <Button variant="outline" onClick={next}>Skip for now</Button>}
-                <Button disabled={busy} onClick={() => complete(actions[step])}>{idx === SETUP_STEPS.length - 1 ? "Finish" : "Save & continue"}<ArrowRight className="ml-2 h-4 w-4" /></Button>
+                {idx < SETUP_STEPS.length - 1 && <Button variant="outline" className="sm-setup-pill" onClick={next}>Skip for now</Button>}
+                <Button disabled={busy} className="sm-setup-save" onClick={() => complete(actions[step])}>{idx === SETUP_STEPS.length - 1 ? "Finish" : "Save & continue"}<ArrowRight className="ml-2 h-4 w-4" /></Button>
               </div>
             </div>
           </CardContent>
@@ -269,19 +269,21 @@ function SetupInner() {
 
 /* ================= Settings grid cards ================= */
 
-function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className }: {
-  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string;
+function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className, art }: {
+  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string; art?: string;
 }) {
   return (
-    <Card className={cn("sm-setup-hub-card flex flex-col", className)}>
-      <CardHeader className="pb-3">
+    <Card className={cn("sm-setup-hub-card relative flex flex-col overflow-hidden", className)}>
+      <CardHeader className="relative z-10 pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span><span className="min-w-0">{title}</span>
+          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span><span className="min-w-0 flex-1">{title}</span>
+          {href && <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />}
         </CardTitle>
         {desc && <CardDescription>{desc}</CardDescription>}
       </CardHeader>
-      <CardContent className="flex-1 space-y-2">{children}</CardContent>
-      {href && <div className="border-t border-border px-6 py-2.5"><Button asChild size="sm" variant="ghost" className="h-7 px-2 text-xs"><Link to={href}>{linkLabel ?? "Manage"}<ArrowRight className="ml-1 h-3 w-3" /></Link></Button></div>}
+      {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
+      <CardContent className={cn("relative z-10 flex-1 space-y-2", art && "sm-setup-hub-pad")}>{children}</CardContent>
+      {href && <div className="relative z-10 mt-auto px-5 pb-5 pt-3"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta w-full"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
     </Card>
   );
 }
