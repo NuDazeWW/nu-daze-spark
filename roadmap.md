@@ -47,5 +47,7 @@
 - [x] Page-by-page pass completed across every route; key reference screens verified with desktop and phone screenshots
 
 - [x] Setup hub: settings folded into /setup cards, sidebar trimmed
+- [x] Unified Setup page per approved mock: dark luminous surface, stepper + 4-column settings grid, /settings/workspace redirects to /setup, Back to Setup on sub-settings pages
+- [x] Social accounts dialog: "Add new account" section with labeled fields, X/YouTube platforms, fallback badge
 - [x] Pricing: updated features + per-line explainers
 - [ ] Personal per-user Post to links (needs per-user storage)

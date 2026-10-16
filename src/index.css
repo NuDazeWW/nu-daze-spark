@@ -2332,3 +2332,60 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
   .sm-cg-kpi, .sm-cg-comment, .sm-cg-inbox-item { transition: none; }
   .sm-cg-kpi:hover { transform: none; }
 }
+
+/* ===== Workspace Setup — unified luminous command center ===== */
+.sm-setup-momentum { max-width: 860px; space-y: 6px; }
+.sm-setup-progress { height: 10px; border-radius: 999px; margin-top: 6px; overflow: hidden;
+  background: hsl(var(--muted) / .5); border: 1px solid hsl(var(--border));
+  box-shadow: inset 0 1px 3px hsl(233 70% 3% / .5); }
+.sm-setup-progress i { display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, hsl(var(--sm-fx-lavender, 262 83% 65%)), hsl(var(--lg-cyan, var(--sm-fx-turquoise))));
+  box-shadow: 0 0 14px -2px hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .8);
+  transition: width 400ms ease; }
+
+.sm-setup-step-dot { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 999px; flex-shrink: 0; margin-top: 1px;
+  color: hsl(var(--muted-foreground)); border: 1px solid hsl(var(--border)); }
+.sm-setup-step-dot-done { color: hsl(var(--brand-success)); border-color: hsl(var(--brand-success) / .5);
+  background: hsl(var(--brand-success) / .1); }
+.sm-app-bg .sm-setup-step-active, .sm-dark .sm-setup-step-active {
+  color: hsl(var(--lg-cyan, var(--sm-fx-turquoise)));
+  background: linear-gradient(90deg, hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .18), hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .06));
+  border: 1px solid hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .7);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .1), 0 0 18px -4px hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .55); }
+.sm-app-bg .sm-setup-step-active .sm-setup-step-dot, .sm-dark .sm-setup-step-active .sm-setup-step-dot {
+  color: hsl(var(--lg-cyan, var(--sm-fx-turquoise))); border-color: hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .7);
+  box-shadow: 0 0 10px -2px hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .7); }
+.sm-app-bg .sm-setup-step-active .sm-setup-step-dot-done { color: hsl(var(--brand-success)); border-color: hsl(var(--brand-success) / .6); box-shadow: none; }
+
+.sm-setup-well { width: 30px; height: 30px; border-radius: 9px; }
+.sm-setup-hub-card { border-radius: 16px; transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease; }
+.sm-app-bg .sm-setup-hub-card:hover, .sm-dark .sm-setup-hub-card:hover {
+  border-color: hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .45);
+  box-shadow: 0 0 24px -10px hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .5), 0 14px 30px -18px hsl(233 70% 3% / .8); }
+
+.sm-setup-avatars { display: flex; align-items: center; }
+.sm-setup-avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; color: hsl(var(--primary-foreground));
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--sm-fx-lavender, 262 83% 65%)));
+  border: 2px solid hsl(var(--card)); margin-left: -8px;
+  box-shadow: 0 0 12px -4px hsl(var(--primary) / .6); }
+.sm-setup-avatar:first-child { margin-left: 0; }
+.sm-setup-avatar-more { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); box-shadow: none; }
+
+.sm-setup-tile { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 4px;
+  border-radius: 12px; border: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground)); font-size: 10px; text-align: center;
+  background: linear-gradient(160deg, hsl(var(--primary) / .08), transparent 60%);
+  transition: border-color 200ms ease, color 200ms ease, box-shadow 200ms ease; }
+.sm-app-bg .sm-setup-tile:hover, .sm-dark .sm-setup-tile:hover {
+  color: hsl(var(--lg-cyan, var(--sm-fx-turquoise))); border-color: hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .5);
+  box-shadow: 0 0 16px -6px hsl(var(--lg-cyan, var(--sm-fx-turquoise)) / .6); }
+
+.sm-setup-connected { background: hsl(var(--brand-success) / .14); color: hsl(var(--brand-success));
+  border: 1px solid hsl(var(--brand-success) / .45);
+  box-shadow: 0 0 12px -4px hsl(var(--brand-success) / .7); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-setup-progress i, .sm-setup-hub-card, .sm-setup-tile { transition: none; }
+  .sm-setup-hub-card:hover { transform: none; }
+}

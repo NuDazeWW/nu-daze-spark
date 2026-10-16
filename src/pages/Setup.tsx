@@ -1,30 +1,43 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveClient } from "@/contexts/ClientContext";
 import { useWorkspace, SETUP_STEPS, markSetupStep, updateWorkspaceSettings, type SetupStepKey, ROLE_META, type WorkspaceRole } from "@/hooks/useWorkspace";
+import { useAccountTags } from "@/hooks/useAccountTags";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { AdminOnly } from "@/components/settings/AdminOnly";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, Briefcase, AtSign, Bell, Send, ExternalLink, ArrowRight, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send, ExternalLink,
+  ArrowRight, ShieldCheck, Globe, Download, Loader2, Lock, Music2, Youtube, Sparkles, Pin,
+  ChevronDown, ChevronUp,
+} from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { openInNewTab } from "@/lib/openInNewTab";
+import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 
 const PLATFORMS = ["linkedin", "instagram", "facebook"] as const;
 const PL: Record<string, string> = { linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook" };
+const EXPORT_TABLES = ["campaign_briefs", "master_content_objects", "post_cards", "comments", "external_posts", "source_assets", "brand_voice_rules", "cadence_targets", "social_accounts"] as const;
+
+/* ================= 8-step guided setup ================= */
 
 function SetupInner() {
   const [params, setParams] = useSearchParams();
@@ -35,7 +48,12 @@ function SetupInner() {
   const [step, setStep] = useState<SetupStepKey>(() => (params.get("step") as SetupStepKey) || "company");
   const [busy, setBusy] = useState(false);
 
-  // form state
+  useEffect(() => {
+    const s = params.get("step") as SetupStepKey | null;
+    if (s && SETUP_STEPS.some((x) => x.key === s)) setStep(s);
+  }, [params]);
+
+
   const [companyName, setCompanyName] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [orgType, setOrgType] = useState("agency");
@@ -114,17 +132,29 @@ function SetupInner() {
 
   return (
     <div className="sm-reference sm-setup animate-fade-in space-y-6">
-      <PageHeader title="Workspace setup" description={preview ? "Previewing the setup a new organization sees. Nothing you enter is saved." : `${ws.setupCompleted} of ${ws.setupTotal} steps complete. Reopen any step to change it.`}>
+      <PageHeader title="Workspace setup" description={preview ? "Previewing the setup a new organization sees. Nothing you enter is saved." : "Everything about your workspace in one place. Reopen any step to change it."}>
         <Button variant="outline" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
       </PageHeader>
       {preview && <Alert><AlertDescription>Preview mode: this is what a brand-new workspace looks like. Changes are not saved.</AlertDescription></Alert>}
+
+      <div className="sm-setup-momentum">
+        <div className="flex items-center justify-between gap-3 text-xs font-mono text-muted-foreground">
+          <span>{preview ? 0 : ws.setupCompleted} of {ws.setupTotal} steps complete</span>
+          <span>{Math.round(((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100)}%</span>
+        </div>
+        <div className="sm-setup-progress" role="progressbar" aria-valuenow={preview ? 0 : ws.setupCompleted} aria-valuemax={ws.setupTotal}>
+          <i style={{ width: `${((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100}%` }} />
+        </div>
+      </div>
 
       <div className="sm-setup-layout grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
         <ol className="sm-setup-steps space-y-2">
           {SETUP_STEPS.map((s, i) => (
             <li key={s.key}>
-              <Button variant="ghost" onClick={() => setStep(s.key)} className={cn("sm-setup-step flex h-auto min-h-14 w-full items-start justify-start gap-3 rounded-xl px-4 py-3 text-left text-sm whitespace-normal", s.key === step ? "sm-setup-step-active bg-muted font-semibold" : "hover:bg-muted/60")}>
-                {progress[s.key] ? <CheckCircle2 className="mt-0.5 h-4 w-4 text-brand-success shrink-0" /> : <Circle className="mt-0.5 h-4 w-4 text-muted-foreground shrink-0" />}
+              <Button variant="ghost" onClick={() => setStep(s.key)} className={cn("sm-setup-step flex h-auto min-h-14 w-full items-start justify-start gap-3 rounded-xl px-4 py-3 text-left text-sm whitespace-normal", s.key === step ? "sm-setup-step-active font-semibold" : "hover:bg-muted/60")}>
+                <span className={cn("sm-setup-step-dot", progress[s.key] && "sm-setup-step-dot-done", s.key === step && !progress[s.key] && "sm-setup-step-dot-active")}>
+                  {progress[s.key] ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
+                </span>
                 <span><span className="font-mono text-xs text-muted-foreground mr-1">{i + 1}.</span>{s.title}</span>
               </Button>
             </li>
@@ -132,9 +162,15 @@ function SetupInner() {
         </ol>
 
         <Card className="sm-setup-focus">
-          <CardHeader className="flex flex-row items-start gap-4 space-y-0"><Building2 className="h-16 w-16 shrink-0 rounded-2xl p-4 border border-primary/25 bg-primary/10 text-primary" /><div><CardTitle className="text-2xl">{current.title}</CardTitle><CardDescription className="mt-2">{current.description}</CardDescription></div></CardHeader>
+          <CardHeader className="flex flex-row items-start gap-4 space-y-0"><Building2 className="sm-icon-well h-16 w-16 shrink-0 rounded-2xl p-4" /><div><CardTitle className="text-2xl">{current.title}</CardTitle><CardDescription className="mt-2">{current.description}</CardDescription></div></CardHeader>
           <CardContent className="space-y-6">
             {step === "company" && (<>
+              <div className="flex items-center gap-4 rounded-md border border-border p-3">
+                <img src={socialMotiveLogo} alt="SocialMotive" className="h-10 rounded object-contain" />
+                <span className="text-sm text-muted-foreground">for</span>
+                {logoUrl ? <img src={logoUrl} alt={companyName} className="h-10 max-w-[140px] object-contain" /> : null}
+                <span className="font-semibold">{companyName || "your company"}</span>
+              </div>
               <div className="space-y-1.5"><Label>Company name</Label><Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Acme Inc." /></div>
               <div className="space-y-1.5"><Label>Company logo link (optional)</Label><Input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" /></div>
               <p className="text-xs text-muted-foreground">The app stays branded SocialMotive; your company appears alongside it.</p>
@@ -202,7 +238,7 @@ function SetupInner() {
               <Button variant="ghost" disabled={idx === 0} onClick={() => setStep(SETUP_STEPS[idx - 1].key)}>Back</Button>
               <div className="flex gap-2">
                 {idx < SETUP_STEPS.length - 1 && <Button variant="outline" onClick={next}>Skip for now</Button>}
-                <Button disabled={busy} onClick={() => complete(actions[step])}>{idx === SETUP_STEPS.length - 1 ? "Finish" : "Save & continue"}</Button>
+                <Button disabled={busy} onClick={() => complete(actions[step])}>{idx === SETUP_STEPS.length - 1 ? "Finish" : "Save & continue"}<ArrowRight className="ml-2 h-4 w-4" /></Button>
               </div>
             </div>
           </CardContent>
@@ -212,41 +248,47 @@ function SetupInner() {
   );
 }
 
-const HUB: { title: string; desc: string; href: string; icon: typeof Users; admin?: boolean }[] = [
-  { title: "Team", desc: "Invite people and choose Admin, Editor, Approver or Viewer.", href: "/settings/team", icon: Users, admin: true },
-  { title: "Social Connections", desc: "Connect posting accounts and AI tools.", href: "/settings/connections", icon: Link2, admin: true },
-  { title: "Email Provider", desc: "The email account used to send team alerts.", href: "/settings/email-provider", icon: Mail, admin: true },
-  { title: "Workspace", desc: "Company name, logo and your web address.", href: "/settings/workspace", icon: Briefcase, admin: true },
-  { title: "Your Brand Profiles", desc: "Brands, their social accounts and profile links.", href: "/settings/clients", icon: Building2 },
-  { title: "Account Tags", desc: "People and organizations you tag in posts.", href: "/settings/tags", icon: AtSign },
-  { title: "Notifications", desc: "Which emails you get, and when.", href: "/settings/notifications", icon: Bell },
-];
+/* ================= Settings grid cards ================= */
+
+function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className }: {
+  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string;
+}) {
+  return (
+    <Card className={cn("sm-setup-hub-card flex flex-col", className)}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span><span className="min-w-0">{title}</span>
+        </CardTitle>
+        {desc && <CardDescription>{desc}</CardDescription>}
+      </CardHeader>
+      <CardContent className="flex-1 space-y-2">{children}</CardContent>
+      {href && <div className="border-t border-border px-6 py-2.5"><Button asChild size="sm" variant="ghost" className="h-7 px-2 text-xs"><Link to={href}>{linkLabel ?? "Manage"}<ArrowRight className="ml-1 h-3 w-3" /></Link></Button></div>}
+    </Card>
+  );
+}
 
 function PostToCard() {
   const { activeClientId, activeClient } = useActiveClient();
   const { data: accounts = [] } = useClientSocialAccounts(activeClientId);
   return (
-    <Card className="sm-setup-hub-card">
-      <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><Send className="h-4 w-4 text-primary" />Post to</CardTitle>
-        <CardDescription>Quick links to post for {activeClient?.name ?? "the selected brand"}.</CardDescription></CardHeader>
-      <CardContent className="space-y-2">
-        {accounts.length === 0 && <p className="text-sm text-muted-foreground">No social accounts saved yet.</p>}
-        {accounts.map((a) => (
-          <div key={a.id} className="flex items-center gap-2 text-sm">
-            <PlatformIcon platform={a.platform} className="h-4 w-4" />
-            <span className="flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
-            {a.profile_url
-              ? <Button size="sm" variant="outline" className="whitespace-nowrap" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
-              : <Button size="sm" variant="ghost" className="whitespace-nowrap" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+    <GridCard title="Post to" desc={`Quick links to post for ${activeClient?.name ?? "the selected brand"}.`} icon={Send}>
+      {accounts.length === 0 && <p className="text-sm text-muted-foreground">No social accounts saved yet.</p>}
+      {accounts.map((a) => (
+        <div key={a.id} className="flex items-center gap-2 text-sm">
+          <PlatformIcon platform={a.platform} className="h-4 w-4" />
+          <span className="flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
+          {a.profile_url
+            ? <Button size="sm" variant="outline" className="whitespace-nowrap" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
+            : <Button size="sm" variant="ghost" className="whitespace-nowrap" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
+        </div>
+      ))}
+    </GridCard>
   );
 }
 
 function ReviewChipsEditor() {
   const ws = useWorkspace();
+  const [open, setOpen] = useState(false);
   const [chips, setChips] = useState(ws.reviewChips);
   const [busy, setBusy] = useState(false);
   useEffect(() => { setChips(ws.reviewChips); }, [JSON.stringify(ws.reviewChips)]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -260,25 +302,27 @@ function ReviewChipsEditor() {
     finally { setBusy(false); }
   };
   return (
-    <div className="space-y-2 border-t pt-4">
-      <div>
-        <Label className="text-sm">Executive Review revision chips</Label>
+    <div className="space-y-2 border-t pt-3">
+      <Button size="sm" variant="outline" className="w-full" onClick={() => setOpen((o) => !o)}>
+        Manage revision chips{open ? <ChevronUp className="ml-1 h-3 w-3" /> : <ChevronDown className="ml-1 h-3 w-3" />}
+      </Button>
+      {open && (<>
         <p className="text-xs text-muted-foreground">One-tap feedback on the review screen. The instruction is what the AI receives when revising.</p>
-      </div>
-      {chips.map((c, i) => (
-        <div key={i} className="space-y-1.5 rounded-md border p-2">
-          <div className="flex gap-2">
-            <Input value={c.label} maxLength={30} placeholder="Chip label" onChange={(e) => set(i, "label", e.target.value)} />
-            <Button size="sm" variant="ghost" onClick={() => setChips((x) => x.filter((_, j) => j !== i))}>Remove</Button>
+        {chips.map((c, i) => (
+          <div key={i} className="space-y-1.5 rounded-md border p-2">
+            <div className="flex gap-2">
+              <Input value={c.label} maxLength={30} placeholder="Chip label" onChange={(e) => set(i, "label", e.target.value)} />
+              <Button size="sm" variant="ghost" onClick={() => setChips((x) => x.filter((_, j) => j !== i))}>Remove</Button>
+            </div>
+            <Textarea rows={2} value={c.instruction} maxLength={300} placeholder="Instruction for the AI" onChange={(e) => set(i, "instruction", e.target.value)} />
           </div>
-          <Textarea rows={2} value={c.instruction} maxLength={300} placeholder="Instruction for the AI" onChange={(e) => set(i, "instruction", e.target.value)} />
+        ))}
+        {dupes && <p className="text-xs text-destructive">Two chips have the same label.</p>}
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" disabled={chips.length >= 10} onClick={() => setChips((x) => [...x, { label: "", instruction: "" }])}>Add chip</Button>
+          <Button size="sm" disabled={busy || dupes} onClick={save}>Save chips</Button>
         </div>
-      ))}
-      {dupes && <p className="text-xs text-destructive">Two chips have the same label.</p>}
-      <div className="flex gap-2">
-        <Button size="sm" variant="outline" disabled={chips.length >= 10} onClick={() => setChips((x) => [...x, { label: "", instruction: "" }])}>Add chip</Button>
-        <Button size="sm" disabled={busy || dupes} onClick={save}>Save chips</Button>
-      </div>
+      </>)}
     </div>
   );
 }
@@ -290,49 +334,355 @@ function GovernanceCard() {
     catch (e) { toast.error("Couldn't save", { description: (e as Error).message }); }
   };
   return (
-    <Card className="sm-setup-hub-card">
-      <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><ShieldCheck className="h-4 w-4 text-primary" />Governance</CardTitle>
-        <CardDescription>Optional guardrails. Turn on only what your team needs.</CardDescription></CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div><Label className="text-sm">Require approval to publish</Label>
-            <p className="text-xs text-muted-foreground">{ws.approvalRequired ? "Posts need sign-off first." : "Publish, schedule or export straight from draft."}</p></div>
-          <Switch checked={ws.approvalRequired} onCheckedChange={(v) => save({ post_approval_required: v })} />
-        </div>
-        <div className="space-y-1">
-          <Label className="text-sm">Preflight checks</Label>
-          <Select value={ws.preflightMode} onValueChange={(v) => save({ preflight_mode: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="advisory">Advisory — show issues, never block</SelectItem>
-              <SelectItem value="strict">Strict — block until cleared</SelectItem>
-              <SelectItem value="off">Off</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <ReviewChipsEditor />
+    <GridCard title="Governance" desc="Optional guardrails. Turn on only what your team needs." icon={ShieldCheck}>
+      <div className="flex items-center justify-between gap-3">
+        <div><Label className="text-sm">Require approval to publish</Label>
+          <p className="text-xs text-muted-foreground">{ws.approvalRequired ? "Posts need sign-off first." : "Publish, schedule or export straight from draft."}</p></div>
+        <Switch checked={ws.approvalRequired} onCheckedChange={(v) => save({ post_approval_required: v })} />
+      </div>
+      <div className="space-y-1">
+        <Label className="text-sm">Preflight checks</Label>
+        <Select value={ws.preflightMode} onValueChange={(v) => save({ preflight_mode: v })}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="advisory">Advisory — show issues, never block</SelectItem>
+            <SelectItem value="strict">Strict — block until cleared</SelectItem>
+            <SelectItem value="off">Off</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <ReviewChipsEditor />
+    </GridCard>
+  );
+}
+
+function TeamCard() {
+  const { data: users = [] } = useQuery({
+    queryKey: ["workspace_users"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("list_workspace_users");
+      if (error) throw error;
+      return (data ?? []) as { user_id: string; display_name: string | null; email: string; role: WorkspaceRole }[];
+    },
+  });
+  const roles = [...new Set(users.map((u) => u.role).filter(Boolean))];
+  return (
+    <GridCard title="Team" desc={`${users.length} member${users.length === 1 ? "" : "s"} in this workspace.`} icon={Users} href="/settings/team" linkLabel="Manage team">
+      <div className="sm-setup-avatars">
+        {users.slice(0, 6).map((u) => {
+          const name = u.display_name ?? u.email;
+          const initials = name.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
+          return <span key={u.user_id} title={name} className="sm-setup-avatar">{initials}</span>;
+        })}
+        {users.length > 6 && <span className="sm-setup-avatar sm-setup-avatar-more">+{users.length - 6}</span>}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {roles.map((r) => <Badge key={r} variant="outline" className="text-xs">{ROLE_META[r]?.label ?? r}</Badge>)}
+      </div>
+    </GridCard>
+  );
+}
+
+function ConnectionsCard() {
+  const tiles = [
+    { key: "linkedin", label: "LinkedIn" }, { key: "instagram", label: "Instagram" },
+    { key: "facebook", label: "Facebook" }, { key: "x", label: "X" },
+    { key: "tiktok", label: "TikTok" }, { key: "youtube", label: "YouTube" },
+    { key: "pinterest", label: "Pinterest" }, { key: "ai", label: "AI tools" },
+  ];
+  return (
+    <GridCard title="Social Connections" desc="Posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections">
+      <div className="grid grid-cols-4 gap-2">
+        {tiles.map((t) => (
+          <div key={t.key} className="sm-setup-tile" title={t.label}>
+            {t.key === "tiktok" ? <Music2 className="h-4 w-4" /> : t.key === "pinterest" ? <Pin className="h-4 w-4" /> : t.key === "ai" ? <Sparkles className="h-4 w-4" /> : t.key === "youtube" ? <Youtube className="h-4 w-4" /> : <PlatformIcon platform={t.key} className="h-4 w-4" />}
+            <span>{t.label}</span>
+          </div>
+        ))}
+      </div>
+    </GridCard>
+  );
+}
+
+function EmailProviderCard() {
+  const { data } = useQuery({
+    queryKey: ["email_provider_settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("email_provider_settings").select("provider").maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const connected = Boolean(data && data.provider && data.provider !== "none");
+  return (
+    <GridCard title="Email Provider" desc="The email account used to send team alerts." icon={Mail} href="/settings/email-provider" linkLabel="Configure">
+      <div className="flex items-center gap-2 text-sm">
+        <span className="capitalize">{connected ? data!.provider : "Not connected"}</span>
+        {connected && <Badge className="sm-setup-connected gap-1"><CheckCircle2 className="h-3 w-3" />Connected</Badge>}
+      </div>
+    </GridCard>
+  );
+}
+
+function WorkspaceCard() {
+  const ws = useWorkspace();
+  const s = ws.settings;
+  return (
+    <GridCard title="Workspace" desc="Company name, logo and organization type." icon={Building2} href="/setup?step=company" linkLabel="Edit details">
+      <div className="flex items-center gap-3 rounded-md border border-border p-2.5">
+        <img src={socialMotiveLogo} alt="SocialMotive" className="h-8 rounded object-contain" />
+        <span className="text-xs text-muted-foreground">for</span>
+        {s?.company_logo_url ? <img src={s.company_logo_url} alt={s.company_name} className="h-8 max-w-[100px] object-contain" /> : null}
+        <span className="truncate text-sm font-semibold">{s?.company_name}</span>
+      </div>
+      <p className="text-xs text-muted-foreground capitalize">{s?.org_type} · {s?.entity_label_plural}</p>
+    </GridCard>
+  );
+}
+
+function BrandProfilesCard() {
+  const { clients } = useActiveClient();
+  return (
+    <GridCard title="Your Brand Profiles" desc="Brands, their social accounts and profile links." icon={Building2} href="/settings/clients" linkLabel="Manage profiles">
+      <div className="flex flex-wrap gap-1.5">
+        {clients.length === 0 && <p className="text-sm text-muted-foreground">No brand profiles yet.</p>}
+        {clients.map((c) => <Badge key={c.id} variant="outline" className="text-xs">{c.name}</Badge>)}
+      </div>
+    </GridCard>
+  );
+}
+
+function AccountTagsCard() {
+  const { activeTags } = useAccountTags();
+  return (
+    <GridCard title="Account Tags" desc="People and organizations you tag in posts." icon={AtSign} href="/settings/tags" linkLabel="Manage tags">
+      <div className="flex flex-wrap gap-1.5">
+        {activeTags.length === 0 && <p className="text-sm text-muted-foreground">No tags yet.</p>}
+        {activeTags.slice(0, 12).map((t) => <Badge key={t.id} variant="outline" className="text-xs font-mono">@{t.handle}</Badge>)}
+        {activeTags.length > 12 && <Badge variant="outline" className="text-xs">+{activeTags.length - 12} more</Badge>}
+      </div>
+    </GridCard>
+  );
+}
+
+function NotificationsCard() {
+  return (
+    <GridCard title="Notifications" desc="Which emails your team gets, and when." icon={Bell} href="/settings/notifications" linkLabel="Manage notifications">
+      <p className="text-sm text-muted-foreground">Daily digest, post approvals, review requests and went-out alerts — configured per teammate.</p>
+    </GridCard>
+  );
+}
+
+function PlanLimitsCard() {
+  const ws = useWorkspace();
+  const s = ws.settings;
+  const [planName, setPlanName] = useState("");
+  const [seatLimit, setSeatLimit] = useState("");
+  const [clientLimit, setClientLimit] = useState("");
+  const [saving, setSaving] = useState(false);
+  useEffect(() => {
+    if (!s) return;
+    setPlanName(s.plan_name); setSeatLimit(s.seat_limit?.toString() ?? ""); setClientLimit(s.client_limit?.toString() ?? "");
+  }, [s]);
+  const save = async () => {
+    setSaving(true);
+    try {
+      await updateWorkspaceSettings({ plan_name: planName.trim() || "Unlimited", seat_limit: seatLimit ? Number(seatLimit) : null, client_limit: clientLimit ? Number(clientLimit) : null } as never);
+      ws.refresh(); toast.success("Plan and limits saved");
+    } catch (e) { toast.error((e as Error).message); } finally { setSaving(false); }
+  };
+  return (
+    <GridCard title="Plan and limits" desc="Leave a limit blank for unlimited." icon={ShieldCheck}>
+      <div className="grid grid-cols-3 gap-2">
+        <div className="space-y-1"><Label className="text-xs">Plan name</Label><Input disabled={!ws.isOwner} value={planName} onChange={(e) => setPlanName(e.target.value)} /></div>
+        <div className="space-y-1"><Label className="text-xs">Seats</Label><Input disabled={!ws.isOwner} type="number" min={1} placeholder="∞" value={seatLimit} onChange={(e) => setSeatLimit(e.target.value)} /></div>
+        <div className="space-y-1"><Label className="text-xs">{ws.entityPlural}</Label><Input disabled={!ws.isOwner} type="number" min={1} placeholder="∞" value={clientLimit} onChange={(e) => setClientLimit(e.target.value)} /></div>
+      </div>
+      {ws.isOwner
+        ? <Button size="sm" variant="outline" disabled={saving} onClick={save}>{saving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}Save</Button>
+        : <Badge variant="outline" className="text-xs">Owner only</Badge>}
+    </GridCard>
+  );
+}
+
+function SignInCard() {
+  const ws = useWorkspace();
+  const s = ws.settings;
+  const [domain, setDomain] = useState("");
+  const [saving, setSaving] = useState(false);
+  useEffect(() => { if (s) setDomain(s.auto_admin_domain ?? ""); }, [s]);
+  const save = async () => {
+    setSaving(true);
+    try {
+      await updateWorkspaceSettings({ auto_admin_domain: domain.trim().replace(/^@/, "") || null } as never);
+      ws.refresh(); toast.success("Sign-in domain saved");
+    } catch (e) { toast.error((e as Error).message); } finally { setSaving(false); }
+  };
+  return (
+    <GridCard title="Sign-in" desc="Verified emails at this domain become Admins automatically. Blank turns it off." icon={Lock}>
+      <div className="flex items-end gap-2">
+        <div className="flex-1 space-y-1"><Label className="text-xs">Company email domain</Label><Input placeholder="example.com" value={domain} onChange={(e) => setDomain(e.target.value)} /></div>
+        <Button size="sm" variant="outline" disabled={saving} onClick={save}>Save</Button>
+      </div>
+    </GridCard>
+  );
+}
+
+function WebAddressCard() {
+  const ws = useWorkspace();
+  const s = ws.settings;
+  const [appDomain, setAppDomain] = useState("");
+  const [dnsCheck, setDnsCheck] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  useEffect(() => { if (s) setAppDomain((s as { app_domain?: string | null }).app_domain ?? ""); }, [s]);
+  const clean = () => appDomain.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "").toLowerCase();
+  const save = async () => {
+    setSaving(true);
+    try {
+      await updateWorkspaceSettings({ app_domain: clean() || null } as never);
+      ws.refresh(); toast.success("Web address saved");
+    } catch (e) { toast.error((e as Error).message); } finally { setSaving(false); }
+  };
+  return (
+    <GridCard title="Your web address" desc="The address your team uses to open this workspace. Email links point here once it's saved." icon={Globe}>
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="flex-1 min-w-[180px] space-y-1"><Label className="text-xs">Web address</Label><Input placeholder="social.yourcompany.com" value={appDomain} onChange={(e) => { setAppDomain(e.target.value); setDnsCheck(null); }} /></div>
+        <Button size="sm" variant="outline" disabled={!appDomain.trim()} onClick={async () => {
+          const d = clean();
+          setDnsCheck("Checking…");
+          try {
+            const r = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(d)}&type=A`).then((x) => x.json());
+            const ips: string[] = (r.Answer ?? []).filter((a: { type: number }) => a.type === 1).map((a: { data: string }) => a.data);
+            setDnsCheck(ips.includes("185.158.133.1") ? `${d} points to SocialMotive. It's ready once the connection shows Active.` : ips.length ? `${d} points somewhere else (${ips.join(", ")}). Update the A record to 185.158.133.1.` : `${d} isn't set up yet. Add the A record below.`);
+          } catch { setDnsCheck("Couldn't check right now. Try again in a minute."); }
+        }}>Check address</Button>
+        <Button size="sm" variant="outline" disabled={saving} onClick={save}>Save</Button>
+      </div>
+      {dnsCheck && <p className="text-sm">{dnsCheck}</p>}
+      <ol className="list-decimal space-y-1 pl-5 text-xs text-muted-foreground">
+        <li>Choose an address you own and save it here.</li>
+        <li>At your domain provider, add an A record pointing to 185.158.133.1, plus the TXT verification record shown when connected.</li>
+        <li>Ask your SocialMotive operator to connect the address at handover. Changes can take up to 72 hours.</li>
+        <li>Press Check address to confirm it points here.</li>
+      </ol>
+    </GridCard>
+  );
+}
+
+function DataExportCard() {
+  const ws = useWorkspace();
+  const { clients } = useActiveClient();
+  const [exporting, setExporting] = useState(false);
+  async function exportData(clientId?: string) {
+    setExporting(true);
+    try {
+      const out: Record<string, unknown> = { exported_at: new Date().toISOString(), company: ws.settings?.company_name };
+      for (const t of EXPORT_TABLES) {
+        let q = supabase.from(t).select("*");
+        if (clientId) q = q.eq("client_id", clientId);
+        const { data, error } = await q;
+        if (error) throw error;
+        out[t] = data;
+      }
+      const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `socialmotive-export-${clientId ? clients.find((c) => c.id === clientId)?.slug : "all"}-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (e) { toast.error((e as Error).message); } finally { setExporting(false); }
+  }
+  return (
+    <GridCard title="Data export" desc="Download briefs, posts, comments, assets and strategy as a file." icon={Download} className="lg:col-span-2">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" disabled={exporting} onClick={() => exportData()}><Download className="mr-2 h-4 w-4" />Everything</Button>
+        {clients.map((c) => (
+          <Button key={c.id} variant="outline" size="sm" disabled={exporting} onClick={() => exportData(c.id)}><Download className="mr-2 h-4 w-4" />{c.name}</Button>
+        ))}
+      </div>
+    </GridCard>
+  );
+}
+
+function DangerZoneCard() {
+  const ws = useWorkspace();
+  const s = ws.settings;
+  const [confirmText, setConfirmText] = useState("");
+  const locked = Boolean(s?.is_demo_master);
+  async function runDanger(rpc: "reset_workspace_content" | "prepare_blank_copy") {
+    const { error } = await supabase.rpc(rpc, { _confirm: confirmText });
+    if (error) { toast.error(error.message); return; }
+    toast.success(rpc === "prepare_blank_copy" ? "Blank copy prepared" : "Workspace content cleared");
+    ws.refresh();
+    setConfirmText("");
+  }
+  if (!s || (locked && !s.company_name)) return null;
+  const tools = [
+    { key: "reset", title: "Reset to clean workspace", desc: `Deletes all briefs, posts, comments, reviews and assets. Settings, strategy, ${ws.entityPlural.toLowerCase()} and team stay.`, rpc: "reset_workspace_content" as const, cta: "Reset workspace content…" },
+    { key: "blank", title: "Prepare blank copy for a new organization", desc: `Run once by our team during handover: deletes all content, strategy, ${ws.entityPlural.toLowerCase()}, social accounts, invites, activity and every team member except the operator. Locks itself afterwards.`, rpc: "prepare_blank_copy" as const, cta: "Prepare blank copy…" },
+  ];
+  return (
+    <Card className="sm-setup-hub-card border-destructive/40 lg:col-span-2">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base text-destructive">
+          Danger zone {locked && <Badge variant="outline" className="gap-1"><Lock className="h-3 w-3" />Locked demo workspace</Badge>}
+        </CardTitle>
+        <CardDescription>
+          {locked
+            ? "These tools are permanently disabled in this NuDaze demo workspace. In a sold copy, our team runs the blank-copy preparation during handover."
+            : "Operator-only tools, run by our team during handover. Both permanently delete data and can't be undone."}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {tools.map((tool) => (
+          <div key={tool.key} className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">{tool.title}</p>
+              <p className="text-xs text-muted-foreground">{tool.desc}</p>
+            </div>
+            {locked || !ws.isOwner ? (
+              <Button variant="destructive" size="sm" disabled title={locked ? "Disabled in the demo workspace" : "Owner only"}><Lock className="mr-2 h-4 w-4" />{tool.cta.replace("…", "")}</Button>
+            ) : (
+              <AlertDialog onOpenChange={() => setConfirmText("")}>
+                <AlertDialogTrigger asChild><Button variant="destructive" size="sm">{tool.cta}</Button></AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader><AlertDialogTitle>{tool.title}?</AlertDialogTitle>
+                    <AlertDialogDescription>This can't be undone. Type <strong>{s.company_name}</strong> to confirm.</AlertDialogDescription></AlertDialogHeader>
+                  <Input value={confirmText} onChange={(e) => setConfirmText(e.target.value)} />
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction disabled={confirmText !== s.company_name} onClick={() => runDanger(tool.rpc)} className="bg-destructive">Delete permanently</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
+        ))}
       </CardContent>
     </Card>
   );
 }
 
-function SetupHub() {
+function SettingsGrid() {
   const ws = useWorkspace();
-  const items = HUB.filter((h) => !h.admin || ws.canManage);
   return (
     <section className="space-y-3">
       <h2 className="font-display text-lg font-semibold">Workspace settings</h2>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <PostToCard />
         {ws.canManage && <GovernanceCard />}
-        {items.map((h) => (
-          <Link key={h.href} to={h.href} className="group">
-            <Card className="sm-setup-hub-card h-full transition-colors group-hover:border-primary/50">
-              <CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-base"><h.icon className="h-4 w-4 text-primary" />{h.title}<ArrowRight className="ml-auto h-4 w-4 opacity-50 group-hover:opacity-100" /></CardTitle></CardHeader>
-              <CardContent><p className="text-sm text-muted-foreground">{h.desc}</p></CardContent>
-            </Card>
-          </Link>
-        ))}
+        {ws.canManage && <TeamCard />}
+        {ws.canManage && <ConnectionsCard />}
+        {ws.canManage && <EmailProviderCard />}
+        {ws.canManage && <WorkspaceCard />}
+        <BrandProfilesCard />
+        <AccountTagsCard />
+        <NotificationsCard />
+        {ws.canManage && <PlanLimitsCard />}
+        {ws.canManage && <SignInCard />}
+        {ws.canManage && <WebAddressCard />}
+        {ws.canManage && <DataExportCard />}
+        {ws.canManage && <DangerZoneCard />}
       </div>
     </section>
   );
@@ -341,6 +691,6 @@ function SetupHub() {
 export default function Setup() {
   const ws = useWorkspace();
   if (ws.loading) return null;
-  if (!ws.canManage) return <div className="sm-reference sm-setup animate-fade-in space-y-6"><PageHeader title="Setup" description="Your settings in one place." /><SetupHub /></div>;
-  return <div className="space-y-8"><SetupInner /><SetupHub /></div>;
+  if (!ws.canManage) return <div className="sm-reference sm-setup animate-fade-in space-y-6"><PageHeader title="Setup" description="Your settings in one place." /><SettingsGrid /></div>;
+  return <div className="space-y-8"><SetupInner /><div className="sm-reference sm-setup"><SettingsGrid /></div></div>;
 }

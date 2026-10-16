@@ -70,7 +70,7 @@ export default function Help() {
       topics: [
         { q: "Who can do what?", keywords: "roles permissions owner admin editor reviewer viewer", a: <ul className="list-disc pl-5">{(Object.keys(ROLE_META) as WorkspaceRole[]).map((r) => <li key={r}><strong>{ROLE_META[r].label}:</strong> {ROLE_META[r].description}</li>)}</ul> },
         { q: "How do I add a teammate?", keywords: "invite team member add user", a: <>An Admin creates an invite on the <Link className="underline" to="/settings/team">Team</Link> page and shares the sign-up link. They get access as soon as they sign up with the invited email.</> },
-        { q: "How do I get my data out?", keywords: "export data download backup", a: <>Admins can download everything, or one {entitySingular.toLowerCase()} at a time, from <Link className="underline" to="/settings/workspace">Workspace settings</Link>.</> },
+        { q: "How do I get my data out?", keywords: "export data download backup", a: <>Admins can download everything, or one {entitySingular.toLowerCase()} at a time, from <Link className="underline" to="/setup">Workspace setup</Link>.</> },
         { q: "How do notification emails work?", keywords: "email notifications sendgrid smtp", a: <>Email sends through your workspace-configured provider (SendGrid or SMTP), set up in workspace settings. Credentials stay server-side and are never visible in the browser.</> },
       ],
     },

@@ -123,6 +123,8 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
   "/setup": [
     { icon: ListChecks, label: "Setup checklist", description: "Everything before first use" },
     { icon: Wand2, label: "Starter tools", description: "Presets, brand import, voice synth" },
+    { icon: Building2, label: "Company profile", description: "Name, logo, org type" },
+    { icon: Shield, label: "Plan & limits", description: "Seats and generation limits" },
   ],
   "/settings/clients": [
     { icon: Building2, label: "Organizations", description: "Client workspaces" },
@@ -131,10 +133,6 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
   "/settings/tags": [
     { icon: AtSign, label: "Account tags", description: "People & orgs to recommend" },
     { icon: Globe, label: "Profile links", description: "Validated platform URLs" },
-  ],
-  "/settings/workspace": [
-    { icon: Building2, label: "Company profile", description: "Name, logo, org type" },
-    { icon: Shield, label: "Plan & limits", description: "Seats and generation limits" },
   ],
   "/settings/team": [
     { icon: Users, label: "Members & invites", description: "Owner, admin, editor, reviewer, viewer" },

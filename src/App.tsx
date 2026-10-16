@@ -23,7 +23,6 @@ import RepurposeCenter from "./pages/RepurposeCenter";
 import AccountTags from "./pages/AccountTags";
 import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
-import WorkspaceSettings from "./pages/settings/WorkspaceSettings";
 import Team from "./pages/settings/Team";
 import Usage from "./pages/settings/Usage";
 import Notifications from "./pages/settings/Notifications";
@@ -79,7 +78,7 @@ const App = () => (
               <Route path="/repurpose" element={<RepurposeCenter />} />
               <Route path="/settings/tags" element={<AccountTags />} />
               <Route path="/settings/clients" element={<Clients />} />
-              <Route path="/settings/workspace" element={<WorkspaceSettings />} />
+              <Route path="/settings/workspace" element={<Navigate to="/setup" replace />} />
               <Route path="/settings/team" element={<Team />} />
               <Route path="/settings/usage" element={<Usage />} />
               <Route path="/settings/billing" element={<Billing />} />

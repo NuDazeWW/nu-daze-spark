@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Trash2, Plus } from "lucide-react";
 
-const PL: Record<string, string> = { linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook" };
+const PL: Record<string, string> = { linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook", x: "X", youtube: "YouTube" };
 
 export function useSocialAccounts() {
   return useQuery({
@@ -66,7 +66,7 @@ export function SocialAccountsDialog({ client, onClose }: { client: { id: string
         <ul className="divide-y divide-border">
           {rows.map((a) => (
             <li key={a.id} className="flex items-center gap-2 py-2 text-sm">
-              <Badge variant="outline">{PL[a.platform]}</Badge>
+              <Badge variant="outline">{PL[a.platform] ?? a.platform}</Badge>
               <span className="font-medium">{a.account_name}</span>
               {a.handle && <span className="text-muted-foreground font-mono text-xs">{a.handle}</span>}
               <ProfileLinkEditor id={a.id} value={a.profile_url} onSaved={() => qc.invalidateQueries({ queryKey: ["social_accounts"] })} />
@@ -75,14 +75,29 @@ export function SocialAccountsDialog({ client, onClose }: { client: { id: string
           ))}
           {rows.length === 0 && <li className="py-2 text-sm text-muted-foreground">No accounts yet.</li>}
         </ul>
-        <div className="grid gap-2 sm:grid-cols-2 pt-2 border-t border-border">
-          <Select value={platform} onValueChange={setPlatform}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>{Object.entries(PL).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
-          </Select>
-          <Input placeholder="Account / page name" value={name} onChange={(e) => setName(e.target.value)} />
-          <Input placeholder="@handle (optional)" value={handle} onChange={(e) => setHandle(e.target.value)} />
-          <Input placeholder="https://profile link (optional)" value={url} onChange={(e) => setUrl(e.target.value)} />
+        <div className="space-y-2 pt-3 border-t border-border">
+          <p className="text-sm font-semibold">Add new account</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium" htmlFor="sa-platform">Platform</label>
+              <Select value={platform} onValueChange={setPlatform}>
+                <SelectTrigger id="sa-platform"><SelectValue /></SelectTrigger>
+                <SelectContent>{Object.entries(PL).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium" htmlFor="sa-name">Account name</label>
+              <Input id="sa-name" placeholder="e.g. NuDaze WorldWide" value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium" htmlFor="sa-handle">Handle (optional)</label>
+              <Input id="sa-handle" placeholder="@handle" value={handle} onChange={(e) => setHandle(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium" htmlFor="sa-url">Profile link (optional)</label>
+              <Input id="sa-url" placeholder="https://linkedin.com/company/…" value={url} onChange={(e) => setUrl(e.target.value)} />
+            </div>
+          </div>
         </div>
         <Button onClick={() => add.mutate()} disabled={add.isPending}><Plus className="mr-2 h-4 w-4" />Add account</Button>
       </DialogContent>
