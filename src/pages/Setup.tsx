@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import {
-  CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send, ExternalLink,
+  CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send,
   ArrowRight, ArrowLeft, ShieldCheck, Globe, Download, Loader2, Lock, Sparkles,
   ChevronDown, ChevronUp, ChevronRight, Tag, UserCircle,
 } from "lucide-react";
@@ -34,7 +34,6 @@ import artSocial from "@/assets/setup/art-social.png";
 import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { openInNewTab } from "@/lib/openInNewTab";
 import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
@@ -42,6 +41,30 @@ import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 const PLATFORMS = ["linkedin", "instagram", "facebook"] as const;
 const PL: Record<string, string> = { linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook" };
 const EXPORT_TABLES = ["campaign_briefs", "master_content_objects", "post_cards", "comments", "external_posts", "source_assets", "brand_voice_rules", "cadence_targets", "social_accounts"] as const;
+
+/* Glossy 3D platform badges (mock-exact): brand gradients, inset highlights, glow. */
+function BrandBadge({ platform, size = 52 }: { platform: string; size?: number }) {
+  const labels: Record<string, string> = { linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook", x: "X" };
+  const glyph =
+    platform === "linkedin" ? <span className="sm-brand-glyph" style={{ fontSize: size * 0.44, letterSpacing: "-0.04em" }}>in</span> :
+    platform === "facebook" ? <span className="sm-brand-glyph" style={{ fontSize: size * 0.52 }}>f</span> :
+    platform === "instagram" ? (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+        <rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4" />
+        <circle cx="12" cy="12" r="4.3" />
+        <circle cx="17.4" cy="6.6" r="1.15" fill="currentColor" stroke="none" />
+      </svg>
+    ) : (
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.2l7.3-8.3L2.8 2h6.4l4.4 5.9L18.9 2zm-1.1 18h1.7L7.1 3.8H5.3L17.8 20z" />
+      </svg>
+    );
+  return (
+    <span className={`sm-brand-badge sm-brand-${platform}`} style={{ width: size, height: size }} role="img" aria-label={labels[platform] ?? platform} title={labels[platform] ?? platform}>
+      {glyph}
+    </span>
+  );
+}
 
 /* ================= 8-step guided setup ================= */
 
@@ -273,41 +296,47 @@ function SetupInner() {
 
 /* ================= Settings grid cards ================= */
 
-function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className, art }: {
-  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string; art?: string;
+function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className, art, belowCta }: {
+  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string; art?: string; belowCta?: React.ReactNode;
 }) {
   return (
     <Card className={cn("sm-setup-hub-card relative flex min-h-[196px] flex-col overflow-hidden", className)}>
       {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
-      <CardHeader className="relative z-10 pb-2">
-        <CardTitle className="flex items-center gap-2.5 text-base">
-          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span>
-          <span className="min-w-0 flex-1">{title}</span>
-          {href && <Link to={href} aria-label={linkLabel ?? title} className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-4 w-4" /></Link>}
+      {href && <Link to={href} aria-label={linkLabel ?? title} className="absolute right-3.5 top-4 z-20 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-4 w-4" /></Link>}
+      <CardHeader className="relative z-10 px-4 pb-2 pt-4">
+        <CardTitle className="sm-setup-hub-title flex items-center gap-1.5 text-xs font-semibold">
+          <span className="sm-icon-well sm-setup-well"><Icon className="h-3 w-3" /></span>
+          <span className="min-w-0 flex-1 truncate pr-3">{title}</span>
         </CardTitle>
-        {desc && <CardDescription>{desc}</CardDescription>}
+        {desc && <CardDescription className="text-xs">{desc}</CardDescription>}
       </CardHeader>
-      <CardContent className={cn("relative z-10 flex-1 space-y-2", art && "sm-setup-hub-pad")}>{children}</CardContent>
-      {href && <div className="relative z-10 mt-auto px-5 pb-5 pt-2"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
+      <CardContent className={cn("relative z-10 flex-1 space-y-2 px-4", art && "sm-setup-hub-pad")}>{children}</CardContent>
+      {href && <div className="relative z-10 mt-auto px-4 pb-4 pt-2"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
+      {belowCta && <div className="relative z-10 px-4 pb-4">{belowCta}</div>}
     </Card>
   );
 }
+
+const POST_TO_PLATFORMS = ["linkedin", "instagram", "facebook", "x"] as const;
 
 function PostToCard() {
   const { activeClientId, activeClient } = useActiveClient();
   const { data: accounts = [] } = useClientSocialAccounts(activeClientId);
   return (
     <GridCard title="Post to" desc={`Quick links to post for ${activeClient?.name ?? "the selected brand"}.`} icon={Send}>
-      {accounts.length === 0 && <p className="text-sm text-muted-foreground">No social accounts saved yet.</p>}
-      {accounts.map((a) => (
-        <div key={a.id} className="flex items-center gap-1.5 text-[13px]">
-          <PlatformIcon platform={a.platform} className="h-4 w-4 shrink-0" />
-          <span className="min-w-0 flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
-          {a.profile_url
-            ? <Button size="sm" variant="outline" className="h-7 shrink-0 whitespace-nowrap px-2 text-xs" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
-            : <Button size="sm" variant="ghost" className="h-7 shrink-0 whitespace-nowrap px-2 text-xs" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
-        </div>
-      ))}
+      {POST_TO_PLATFORMS.map((p) => {
+        const a = accounts.find((x) => x.platform === p);
+        const label = p === "x" ? `X${a?.handle ? ` · ${a.handle}` : ""}` : (PLATFORM_LABEL[p] ?? p);
+        return (
+          <div key={p} className="flex items-center gap-1.5 text-[11px]">
+            <BrandBadge platform={p} size={20} />
+            <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
+            {a?.profile_url
+              ? <Button size="sm" variant="outline" title={`Open ${label}`} className="sm-setup-card-cta h-6 shrink-0 whitespace-nowrap px-2 text-[10px]" onClick={() => openInNewTab(a.profile_url!)}>Open ↗</Button>
+              : <Button size="sm" variant="outline" title={`Add ${label} link`} className="sm-setup-card-cta h-6 shrink-0 whitespace-nowrap px-2 text-[10px]" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Open ↗</Link></Button>}
+          </div>
+        );
+      })}
     </GridCard>
   );
 }
@@ -329,8 +358,8 @@ function ReviewChipsEditor() {
   };
   return (
     <div className="space-y-2 border-t pt-3">
-      <Button size="sm" variant="outline" className="w-full" onClick={() => setOpen((o) => !o)}>
-        Manage revision chips{open ? <ChevronUp className="ml-1 h-3 w-3" /> : <ChevronDown className="ml-1 h-3 w-3" />}
+      <Button size="sm" variant="outline" className="h-8 w-full text-xs" onClick={() => setOpen((o) => !o)}>
+        <span className="truncate">Manage revision chips</span>{open ? <ChevronUp className="ml-1 h-3 w-3 shrink-0" /> : <ChevronDown className="ml-1 h-3 w-3 shrink-0" />}
       </Button>
       {open && (<>
         <p className="text-xs text-muted-foreground">One-tap feedback on the review screen. The instruction is what the AI receives when revising.</p>
@@ -361,15 +390,15 @@ function GovernanceCard() {
   };
   return (
     <GridCard title="Governance" desc="Optional guardrails. Turn on only what your team needs." icon={ShieldCheck}>
-      <div className="flex items-center justify-between gap-3">
-        <div><Label className="text-sm">Require approval to publish</Label>
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0"><Label className="text-[13px] leading-snug">Require approval to publish</Label>
           <p className="text-xs text-muted-foreground">{ws.approvalRequired ? "Posts need sign-off first." : "Publish, schedule or export straight from draft."}</p></div>
-        <Switch checked={ws.approvalRequired} onCheckedChange={(v) => save({ post_approval_required: v })} />
+        <Switch className="shrink-0" checked={ws.approvalRequired} onCheckedChange={(v) => save({ post_approval_required: v })} />
       </div>
       <div className="space-y-1">
-        <Label className="text-sm">Preflight checks</Label>
+        <Label className="text-[13px]">Preflight checks</Label>
         <Select value={ws.preflightMode} onValueChange={(v) => save({ preflight_mode: v })}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="advisory">Advisory — show issues, never block</SelectItem>
             <SelectItem value="strict">Strict — block until cleared</SelectItem>
@@ -393,25 +422,21 @@ function TeamCard() {
   });
   return (
     <GridCard title="Team" desc="Invite people and choose Admin, Editor, Approver or Viewer." icon={Users} href="/settings/team" linkLabel="Manage team" art={artTeam}>
-      <p className="text-sm text-muted-foreground">{users.length} member{users.length === 1 ? "" : "s"} in this workspace.</p>
+      <p className="text-sm text-muted-foreground">{users.length} member{users.length === 1 ? "" : "s"}</p>
     </GridCard>
   );
 }
 
 function ConnectionsCard() {
-  const tiles = [
-    { key: "linkedin", label: "LinkedIn" }, { key: "instagram", label: "Instagram" },
-    { key: "facebook", label: "Facebook" }, { key: "x", label: "X" },
-  ];
+  const tiles = ["linkedin", "instagram", "facebook", "x"];
   return (
-    <GridCard title="Social Connections" desc="Connect posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections">
-      <div className="flex flex-wrap gap-2.5 pt-1">
-        {tiles.map((t) => (
-          <div key={t.key} className="sm-setup-tile" title={t.label} role="img" aria-label={t.label}>
-            <PlatformIcon platform={t.key} className="h-5 w-5" />
-          </div>
-        ))}
-      </div>
+    <GridCard title="Social Connections" desc="Connect posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections"
+      belowCta={
+        <div className="flex items-center gap-2 pt-1">
+          {tiles.map((t) => <BrandBadge key={t} platform={t} size={36} />)}
+        </div>
+      }>
+      <span className="sr-only">Posting and AI tool connections</span>
     </GridCard>
   );
 }
@@ -672,7 +697,7 @@ function SettingsGrid() {
     <section className="space-y-4">
       <h2 className="font-display text-lg font-semibold">Workspace settings</h2>
       {/* Mock grid: exactly 8 cards, 2 rows of 4 */}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <PostToCard />
         {ws.canManage && <GovernanceCard />}
         {ws.canManage && <TeamCard />}
