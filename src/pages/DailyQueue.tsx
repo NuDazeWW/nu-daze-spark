@@ -155,11 +155,11 @@ export default function DailyQueue() {
 
   return (
     <div className="sm-reference sm-queue animate-fade-in">
-      <PageHeader
+      <PageHeader linksMenu
         title="Daily Content Queue"
         description={`${activeCount} active item${activeCount !== 1 ? "s" : ""} in the pipeline · ${typeCounts.post} post${typeCounts.post !== 1 ? "s" : ""} · ${typeCounts.comment} comment${typeCounts.comment !== 1 ? "s" : ""}`}
       />
-      <PipelineNav className="mt-4" />
+      <PipelineNav className="mt-1 mb-4" />
 
       <ScheduleImportDialog open={importOpen} onOpenChange={setImportOpen} />
       <QueueKpis items={queueItems} />
@@ -206,7 +206,7 @@ export default function DailyQueue() {
             </Button>
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex items-center gap-2 lg:ml-auto">
           <Button asChild size="sm" className="h-9">
             <Link to="/generator"><Plus className="h-4 w-4 mr-1.5" />New Post</Link>
           </Button>

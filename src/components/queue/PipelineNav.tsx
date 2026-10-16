@@ -10,16 +10,12 @@ const STEPS = [
 /** One pipeline, three views: shared switcher across Queue, Approved and Publishing. */
 export function PipelineNav({ className = "" }: { className?: string }) {
   return (
-    <nav aria-label="Content pipeline" className={`grid grid-cols-3 gap-1 rounded-lg border bg-card p-1 ${className}`}>
-      {STEPS.map(({ to, label, hint, Icon }, i) => (
-        <NavLink key={to} to={to} end
-          className={({ isActive }) => `flex min-w-0 items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
-          <span className="font-mono text-xs opacity-70">{i + 1}</span>
-          <Icon className="h-4 w-4 shrink-0" />
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-medium">{label}</span>
-            <span className="hidden truncate text-xs opacity-80 md:block">{hint}</span>
-          </span>
+    <nav aria-label="Content pipeline" className={`flex w-fit flex-wrap items-center gap-1 rounded-full border bg-card p-1 ${className}`}>
+      {STEPS.map(({ to, label, hint, Icon }) => (
+        <NavLink key={to} to={to} end title={hint}
+          className={({ isActive }) => `flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-colors ${isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
+          <Icon className="h-3.5 w-3.5 shrink-0" />
+          <span className="font-medium">{label}</span>
         </NavLink>
       ))}
     </nav>
