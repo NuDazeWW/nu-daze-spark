@@ -61,7 +61,7 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
     <Card className="group sm-content-card" data-status={comment.approval_status} data-content-type="comment">
       <CardHeader className="py-3 px-4 space-y-0">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-1.5 min-w-0 flex-nowrap">
+          <div className="flex items-center gap-1.5 min-w-0 flex-nowrap overflow-hidden">
             <Badge variant="outline" className={`text-xs shrink-0 ${statusMeta.color}`}>
               {statusMeta.label}
             </Badge>
@@ -69,7 +69,7 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
               <MessageSquare className="h-2.5 w-2.5" />Comment
             </Badge>
             {ext && (
-              <Badge variant="outline" className="text-[10px] capitalize shrink-0">{ext.platform}</Badge>
+              <Badge variant="outline" className="text-[10px] capitalize min-w-0 truncate">{ext.platform}</Badge>
             )}
           </div>
           <div className="flex items-center gap-1 shrink-0">
