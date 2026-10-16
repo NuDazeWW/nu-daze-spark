@@ -169,7 +169,7 @@ function SetupInner() {
         <ol className="sm-setup-steps space-y-1.5">
           {SETUP_STEPS.map((s, i) => (
             <li key={s.key}>
-              <Button variant="ghost" onClick={() => setStep(s.key)} className={cn("sm-setup-step flex h-auto w-full items-center justify-start gap-3 rounded-full px-4 py-2.5 text-left text-sm whitespace-normal", s.key === step ? "sm-setup-step-active font-semibold" : "hover:bg-muted/60")}>
+              <Button variant="ghost" onClick={() => setStep(s.key)} className={cn("sm-setup-step flex h-auto w-full items-center justify-start gap-3 rounded-full px-4 py-2.5 text-left text-[13px] whitespace-normal", s.key === step ? "sm-setup-step-active font-semibold" : "hover:bg-muted/60")}>
                 <span className={cn("sm-setup-step-dot", progress[s.key] && "sm-setup-step-dot-done", s.key === step && !progress[s.key] && "sm-setup-step-dot-active")}>
                   {progress[s.key] ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
                 </span>
@@ -282,10 +282,10 @@ function GridCard({ title, desc, icon: Icon, href, linkLabel, children, classNam
       <CardHeader className="relative z-10 pb-2">
         <CardTitle className="flex items-center gap-2.5 text-base">
           <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span>
-          <span className="min-w-0 flex-1 truncate">{title}</span>
+          <span className="min-w-0 flex-1">{title}</span>
           {href && <Link to={href} aria-label={linkLabel ?? title} className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-4 w-4" /></Link>}
         </CardTitle>
-        {desc && <CardDescription className={cn(art && "pr-24")}>{desc}</CardDescription>}
+        {desc && <CardDescription>{desc}</CardDescription>}
       </CardHeader>
       <CardContent className={cn("relative z-10 flex-1 space-y-2", art && "sm-setup-hub-pad")}>{children}</CardContent>
       {href && <div className="relative z-10 mt-auto px-5 pb-5 pt-2"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
@@ -300,12 +300,12 @@ function PostToCard() {
     <GridCard title="Post to" desc={`Quick links to post for ${activeClient?.name ?? "the selected brand"}.`} icon={Send}>
       {accounts.length === 0 && <p className="text-sm text-muted-foreground">No social accounts saved yet.</p>}
       {accounts.map((a) => (
-        <div key={a.id} className="flex items-center gap-2 text-sm">
-          <PlatformIcon platform={a.platform} className="h-4 w-4" />
-          <span className="flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
+        <div key={a.id} className="flex items-center gap-1.5 text-[13px]">
+          <PlatformIcon platform={a.platform} className="h-4 w-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
           {a.profile_url
-            ? <Button size="sm" variant="outline" className="whitespace-nowrap" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
-            : <Button size="sm" variant="ghost" className="whitespace-nowrap" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
+            ? <Button size="sm" variant="outline" className="h-7 shrink-0 whitespace-nowrap px-2 text-xs" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
+            : <Button size="sm" variant="ghost" className="h-7 shrink-0 whitespace-nowrap px-2 text-xs" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
         </div>
       ))}
     </GridCard>
