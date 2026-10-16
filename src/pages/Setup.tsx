@@ -303,7 +303,7 @@ function GridCard({ title, desc, icon: Icon, href, linkLabel, children, classNam
     <Card className={cn("sm-setup-hub-card relative flex min-h-[196px] flex-col overflow-hidden", className)}>
       {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
       <CardHeader className="relative z-10 px-4 pb-2 pt-4">
-        <CardTitle className="sm-setup-hub-title flex items-center gap-2 text-[13px] font-semibold">
+        <CardTitle className="sm-setup-hub-title flex items-center gap-2 text-xs font-semibold">
           <span className="sm-icon-well sm-setup-well"><Icon className="h-3.5 w-3.5" /></span>
           <span className="min-w-0 flex-1">{title}</span>
           {href && <Link to={href} aria-label={linkLabel ?? title} className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-3.5 w-3.5" /></Link>}
@@ -328,12 +328,12 @@ function PostToCard() {
         const a = accounts.find((x) => x.platform === p);
         const label = p === "x" ? `X${a?.handle ? ` · ${a.handle}` : ""}` : (PLATFORM_LABEL[p] ?? p);
         return (
-          <div key={p} className="flex items-center gap-2 text-xs">
-            <BrandBadge platform={p} size={22} />
+          <div key={p} className="flex items-center gap-1.5 text-[11px]">
+            <BrandBadge platform={p} size={20} />
             <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
             {a?.profile_url
-              ? <Button size="sm" variant="outline" className="sm-setup-card-cta h-6 shrink-0 whitespace-nowrap px-1.5 text-[10px]" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-0.5 h-2.5 w-2.5" /></Button>
-              : <Button size="sm" variant="outline" className="sm-setup-card-cta h-6 shrink-0 whitespace-nowrap px-1.5 text-[10px]" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Open<ExternalLink className="ml-0.5 h-2.5 w-2.5" /></Link></Button>}
+              ? <Button size="sm" variant="outline" title={`Open ${label}`} className="sm-setup-card-cta h-6 shrink-0 whitespace-nowrap px-2 text-[10px]" onClick={() => openInNewTab(a.profile_url!)}>Open ↗</Button>
+              : <Button size="sm" variant="outline" title={`Add ${label} link`} className="sm-setup-card-cta h-6 shrink-0 whitespace-nowrap px-2 text-[10px]" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Open ↗</Link></Button>}
           </div>
         );
       })}
@@ -432,8 +432,8 @@ function ConnectionsCard() {
   return (
     <GridCard title="Social Connections" desc="Connect posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections"
       belowCta={
-        <div className="flex flex-wrap items-center gap-2.5 pt-1">
-          {tiles.map((t) => <BrandBadge key={t} platform={t} size={40} />)}
+        <div className="flex items-center gap-2 pt-1">
+          {tiles.map((t) => <BrandBadge key={t} platform={t} size={36} />)}
         </div>
       }>
       <span className="sr-only">Posting and AI tool connections</span>

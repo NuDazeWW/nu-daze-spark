@@ -2558,6 +2558,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 
 .sm-app-bg .sm-setup-card-cta {
   border-color: hsl(var(--sm-fx-turquoise) / .5); color: hsl(0 0% 100% / .96);
+  font-size: 12px; height: 34px; white-space: nowrap;
   background: linear-gradient(160deg, hsl(var(--sm-fx-turquoise) / .16), hsl(var(--sm-fx-panel-top) / .55));
   box-shadow: inset 0 1px 0 hsl(0 0% 100% / .1), 0 0 16px -8px hsl(var(--sm-fx-turquoise) / .75); }
 
