@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { addDays, format, isSameDay, startOfDay } from "date-fns";
-import { CalendarClock, CheckCircle2, Clock, Eye, AlertTriangle, Flame, Hourglass, Ban, ChevronRight } from "lucide-react";
+import { CalendarDays, CalendarClock, CheckCircle2, Clock, Eye, AlertTriangle, Flame, Hourglass, Ban, ChevronRight } from "lucide-react";
 import type { QueueItem } from "@/hooks/usePostCards";
 import { STATUS_META } from "@/hooks/usePostCards";
 import { postLabel } from "@/components/tracking/PostTracking";
@@ -45,7 +45,7 @@ export function QueueKpis({ items }: { items: Item[] }) {
     { label: "At Risk", value: k.risk, icon: AlertTriangle, tone: "gold", hint: "Sent back for revision" },
   ];
   return (
-    <div className="sm-qkpis grid gap-3 grid-cols-2 md:grid-cols-3 xl:grid-cols-5 mb-5">
+    <div className="sm-qkpis grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-4">
       {cards.map((c) => (
         <div key={c.label} className="sm-qkpi" data-tone={c.tone} title={c.hint}>
           <span className="sm-qkpi-well"><c.icon /></span>
@@ -62,32 +62,65 @@ export function QueueKpis({ items }: { items: Item[] }) {
   );
 }
 
+const dayKey = (d: Date) => format(d, "yyyy-MM-dd");
+
 export function QueueBoard({ items, renderItem }: { items: Item[]; renderItem: (i: Item) => React.ReactNode }) {
-  const today = startOfDay(new Date());
-  const days = [0, 1, 2, 3].map((n) => addDays(today, n));
-  const cols = useMemo(() => {
+  const { cols, titles, subs } = useMemo(() => {
+    const today = startOfDay(new Date());
+    // Columns: Today, then the three nearest days that actually hold content
+    // (upcoming first, then most recent), then everything else.
+    const byDay = new Map<string, Date>();
+    for (const i of items) {
+      const d = boardDate(i);
+      if (d && !isSameDay(d, today)) byDay.set(dayKey(d), startOfDay(d));
+    }
+    const all = [...byDay.values()];
+    const future = all.filter((d) => d > today).sort((x, y) => +x - +y);
+    const past = all.filter((d) => d < today).sort((x, y) => +y - +x);
+    const picked = [...future, ...past].slice(0, 3);
+    for (let n = 1; picked.length < 3; n++) {
+      const d = addDays(today, n);
+      if (!picked.some((p) => isSameDay(p, d))) picked.push(d);
+    }
+    picked.sort((x, y) => {
+      const fx = x > today, fy = y > today;
+      if (fx !== fy) return fx ? -1 : 1;
+      return fx ? +x - +y : +y - +x;
+    });
+    const days = [today, ...picked];
     const buckets: Item[][] = [[], [], [], [], []];
     for (const i of items) {
       const d = boardDate(i);
       const idx = d ? days.findIndex((day) => isSameDay(d, day)) : -1;
       buckets[idx >= 0 ? idx : 4].push(i);
     }
-    return buckets;
-  }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
-  const titles = [...days.map((d, n) => (n === 0 ? "Today" : n === 1 ? "Tomorrow" : format(d, "EEE, MMM d"))), "Other dates"];
-  const subs = [...days.map((d) => format(d, "EEE, MMM d")), "Earlier or later"];
+    const label = (d: Date) => {
+      const diff = Math.round((+d - +today) / 86400000);
+      return diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : diff === -1 ? "Yesterday" : format(d, "EEE, MMM d");
+    };
+    const sub = (d: Date, list: Item[]) => {
+      const sched = list.some((i) => i.postCard?.scheduled_for);
+      return `${format(d, "EEE, MMM d")}${list.length ? (sched ? " · scheduled" : " · created") : ""}`;
+    };
+    return {
+      cols: buckets,
+      titles: [...days.map(label), "Earlier & later"],
+      subs: [...days.map((d, n) => sub(d, buckets[n])), "Other dates"],
+    };
+  }, [items]);
   return (
     <div className="sm-qboard">
       {cols.map((list, idx) => (
         <section key={idx} className="sm-qcol" data-today={idx === 0 || undefined} aria-label={titles[idx]}>
-          <header className="flex items-baseline justify-between gap-2 px-1 pb-2">
-            <div className="min-w-0">
+          <header className="sm-qcol-head">
+            <CalendarDays className="sm-qcol-icon" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
               <h3 className="text-sm font-semibold truncate">{titles[idx]}</h3>
-              <p className="text-[10px] font-mono text-muted-foreground truncate">{idx === 0 ? subs[0] : idx === 4 ? subs[4] : subs[idx]}</p>
+              <p className="text-[10px] font-mono text-muted-foreground truncate">{subs[idx]}</p>
             </div>
-            <span className="sm-qcol-count shrink-0">{list.length} post{list.length !== 1 ? "s" : ""}</span>
+            <span className="sm-qcol-count shrink-0">{list.length} {list.length === 1 ? "item" : "items"}</span>
           </header>
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {list.length === 0
               ? <p className="text-xs text-muted-foreground text-center py-6 border border-dashed rounded-lg">Nothing here</p>
               : list.map(renderItem)}
