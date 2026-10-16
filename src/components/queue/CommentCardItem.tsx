@@ -73,26 +73,6 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
             )}
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            {canRevert && prevStatus && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onStatusChange(prevStatus)} disabled={isUpdating}>
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Back to {STATUS_META[prevStatus].label}</TooltipContent>
-              </Tooltip>
-            )}
-            {canAdvance && nextStatus && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onStatusChange(nextStatus)} disabled={isUpdating}>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Move to {STATUS_META[nextStatus].label}</TooltipContent>
-              </Tooltip>
-            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-7 w-7"><MoreVertical className="h-3.5 w-3.5" /></Button>
