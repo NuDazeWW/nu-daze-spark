@@ -302,17 +302,17 @@ function GridCard({ title, desc, icon: Icon, href, linkLabel, children, classNam
   return (
     <Card className={cn("sm-setup-hub-card relative flex min-h-[196px] flex-col overflow-hidden", className)}>
       {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
-      <CardHeader className="relative z-10 pb-2">
-        <CardTitle className="sm-setup-hub-title flex items-center gap-2.5 text-[15px]">
-          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span>
+      <CardHeader className="relative z-10 px-4 pb-2 pt-4">
+        <CardTitle className="sm-setup-hub-title flex items-center gap-2 text-[13px] font-semibold">
+          <span className="sm-icon-well sm-setup-well"><Icon className="h-3.5 w-3.5" /></span>
           <span className="min-w-0 flex-1">{title}</span>
-          {href && <Link to={href} aria-label={linkLabel ?? title} className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-4 w-4" /></Link>}
+          {href && <Link to={href} aria-label={linkLabel ?? title} className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-3.5 w-3.5" /></Link>}
         </CardTitle>
-        {desc && <CardDescription>{desc}</CardDescription>}
+        {desc && <CardDescription className="text-xs">{desc}</CardDescription>}
       </CardHeader>
-      <CardContent className={cn("relative z-10 flex-1 space-y-2", art && "sm-setup-hub-pad")}>{children}</CardContent>
-      {href && <div className="relative z-10 mt-auto px-5 pb-5 pt-2"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
-      {belowCta && <div className="relative z-10 px-5 pb-5">{belowCta}</div>}
+      <CardContent className={cn("relative z-10 flex-1 space-y-2 px-4", art && "sm-setup-hub-pad")}>{children}</CardContent>
+      {href && <div className="relative z-10 mt-auto px-4 pb-4 pt-2"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
+      {belowCta && <div className="relative z-10 px-4 pb-4">{belowCta}</div>}
     </Card>
   );
 }
@@ -328,12 +328,12 @@ function PostToCard() {
         const a = accounts.find((x) => x.platform === p);
         const label = p === "x" ? `X${a?.handle ? ` · ${a.handle}` : ""}` : (PLATFORM_LABEL[p] ?? p);
         return (
-          <div key={p} className="flex items-center gap-2.5 text-[13px]">
-            <BrandBadge platform={p} size={24} />
+          <div key={p} className="flex items-center gap-2 text-xs">
+            <BrandBadge platform={p} size={22} />
             <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
             {a?.profile_url
-              ? <Button size="sm" variant="outline" className="sm-setup-card-cta h-7 shrink-0 whitespace-nowrap px-2.5 text-xs" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
-              : <Button size="sm" variant="outline" className="sm-setup-card-cta h-7 shrink-0 whitespace-nowrap px-2.5 text-xs" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Open<ExternalLink className="ml-1 h-3 w-3" /></Link></Button>}
+              ? <Button size="sm" variant="outline" className="sm-setup-card-cta h-6 shrink-0 whitespace-nowrap px-1.5 text-[10px]" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-0.5 h-2.5 w-2.5" /></Button>
+              : <Button size="sm" variant="outline" className="sm-setup-card-cta h-6 shrink-0 whitespace-nowrap px-1.5 text-[10px]" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Open<ExternalLink className="ml-0.5 h-2.5 w-2.5" /></Link></Button>}
           </div>
         );
       })}
@@ -422,7 +422,7 @@ function TeamCard() {
   });
   return (
     <GridCard title="Team" desc="Invite people and choose Admin, Editor, Approver or Viewer." icon={Users} href="/settings/team" linkLabel="Manage team" art={artTeam}>
-      <p className="text-sm text-muted-foreground">{users.length} member{users.length === 1 ? "" : "s"} in this workspace.</p>
+      <p className="text-sm text-muted-foreground">{users.length} member{users.length === 1 ? "" : "s"}</p>
     </GridCard>
   );
 }
@@ -432,8 +432,8 @@ function ConnectionsCard() {
   return (
     <GridCard title="Social Connections" desc="Connect posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections"
       belowCta={
-        <div className="flex items-center gap-3 pt-2">
-          {tiles.map((t) => <BrandBadge key={t} platform={t} size={52} />)}
+        <div className="flex flex-wrap items-center gap-2.5 pt-1">
+          {tiles.map((t) => <BrandBadge key={t} platform={t} size={40} />)}
         </div>
       }>
       <span className="sr-only">Posting and AI tool connections</span>
