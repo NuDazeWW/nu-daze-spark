@@ -79,7 +79,7 @@ const adminWorkspaceTop = [
 const adminWorkspaceBottom = [
   { title: "Social Connections", icon: Link2, href: "/settings/connections" },
   { title: "Email Provider", icon: Mail, href: "/settings/email-provider" },
-  { title: "Workspace", icon: Briefcase, href: "/settings/workspace" },
+  { title: "Workspace", icon: Briefcase, href: "/setup" },
 ];
 
 export function AppSidebar() {
