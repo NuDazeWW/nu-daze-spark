@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { addDays, format, isSameDay, startOfDay } from "date-fns";
-import { CalendarClock, CheckCircle2, Clock, Eye, AlertTriangle, Flame, Hourglass, Ban, ArrowRight } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock, Eye, AlertTriangle, Flame, Hourglass, Ban, ChevronRight } from "lucide-react";
 import type { QueueItem } from "@/hooks/usePostCards";
+import { STATUS_META } from "@/hooks/usePostCards";
 import { postLabel } from "@/components/tracking/PostTracking";
 import { PlatformIcon } from "@/components/layout/PlatformIcon";
 
@@ -15,6 +16,15 @@ const itemDate = (i: Item) => {
 const boardDate = (i: Item) => {
   const s = i.postCard?.scheduled_for ?? (i as { created_at?: string }).created_at;
   return s ? new Date(s) : null;
+};
+
+// Decorative mini bar charts on the KPI cards (heights in px).
+const BARS: Record<string, number[]> = {
+  cyan: [10, 18, 12, 24, 16, 28],
+  coral: [22, 12, 20, 10, 24, 14],
+  sky: [8, 14, 22, 12, 26, 18],
+  emerald: [12, 20, 14, 26, 18, 24],
+  gold: [24, 14, 20, 10, 22, 12],
 };
 
 export function QueueKpis({ items }: { items: Item[] }) {
@@ -32,17 +42,20 @@ export function QueueKpis({ items }: { items: Item[] }) {
     { label: "Needs Review", value: k.review, icon: Eye, tone: "coral", hint: "Waiting in review" },
     { label: "Scheduled", value: k.scheduled, icon: Clock, tone: "sky", hint: "Upcoming scheduled times" },
     { label: "Ready to Post", value: k.ready, icon: CheckCircle2, tone: "emerald", hint: "Approved and ready" },
-    { label: "At Risk", value: k.risk, icon: AlertTriangle, tone: "crimson", hint: "Sent back for revision" },
+    { label: "At Risk", value: k.risk, icon: AlertTriangle, tone: "gold", hint: "Sent back for revision" },
   ];
   return (
     <div className="sm-qkpis grid gap-3 grid-cols-2 md:grid-cols-3 xl:grid-cols-5 mb-5">
       {cards.map((c) => (
         <div key={c.label} className="sm-qkpi" data-tone={c.tone} title={c.hint}>
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">{c.label}</span>
-            <c.icon className="sm-qkpi-icon h-4 w-4" />
-          </div>
-          <p className="sm-qkpi-value">{c.value}</p>
+          <span className="sm-qkpi-well"><c.icon /></span>
+          <span className="sm-qkpi-meta">
+            <span className="sm-qkpi-value">{c.value}</span>
+            <span className="sm-qkpi-label">{c.label}</span>
+          </span>
+          <span className="sm-qkpi-bars" aria-hidden="true">
+            {(BARS[c.tone] ?? BARS.cyan).map((h, i) => <i key={i} style={{ height: `${h}px` }} />)}
+          </span>
         </div>
       ))}
     </div>
@@ -61,18 +74,18 @@ export function QueueBoard({ items, renderItem }: { items: Item[]; renderItem: (
     }
     return buckets;
   }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
-  const titles = [...days.map((d, n) => (n === 0 ? "Today" : format(d, "EEE"))), "Other dates"];
-  const subs = [...days.map((d) => format(d, "MMM d")), "Earlier or later"];
+  const titles = [...days.map((d, n) => (n === 0 ? "Today" : n === 1 ? "Tomorrow" : format(d, "EEE, MMM d"))), "Other dates"];
+  const subs = [...days.map((d) => format(d, "EEE, MMM d")), "Earlier or later"];
   return (
-    <div className="sm-qboard grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-start">
+    <div className="sm-qboard">
       {cols.map((list, idx) => (
         <section key={idx} className="sm-qcol" data-today={idx === 0 || undefined} aria-label={titles[idx]}>
-          <header className="flex items-baseline justify-between px-1 pb-2">
-            <div>
-              <h3 className="text-sm font-semibold">{titles[idx]}</h3>
-              <p className="text-[10px] font-mono text-muted-foreground">{subs[idx]}</p>
+          <header className="flex items-baseline justify-between gap-2 px-1 pb-2">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold truncate">{titles[idx]}</h3>
+              <p className="text-[10px] font-mono text-muted-foreground truncate">{idx === 0 ? subs[0] : idx === 4 ? subs[4] : subs[idx]}</p>
             </div>
-            <span className="sm-qcol-count">{list.length}</span>
+            <span className="sm-qcol-count shrink-0">{list.length} post{list.length !== 1 ? "s" : ""}</span>
           </header>
           <div className="space-y-2.5">
             {list.length === 0
@@ -99,24 +112,36 @@ export function QueueTriage({ items, onOpen }: { items: Item[]; onOpen: (i: Item
     <div className="grid gap-3 md:grid-cols-3 mt-6">
       {panels.map((p) => (
         <div key={p.title} className="sm-qtriage" data-tone={p.tone}>
-          <div className="flex items-center gap-2 mb-2">
-            <p.icon className="sm-qkpi-icon h-4 w-4" />
+          <div className="flex items-center gap-2 mb-2.5">
+            <span className="sm-qtriage-well"><p.icon className="h-4 w-4" /></span>
             <h3 className="text-sm font-semibold">{p.title}</h3>
-            <span className="ml-auto sm-qcol-count">{p.list.length}</span>
+            <span className="ml-auto sm-qcol-count">{p.list.length} item{p.list.length !== 1 ? "s" : ""}</span>
           </div>
           {p.list.length === 0 ? <p className="text-xs text-muted-foreground">{p.empty}</p> : (
-            <ul className="space-y-1">
-              {p.list.slice(0, 4).map((i) => (
-                <li key={i.id}>
-                  <button onClick={() => onOpen(i)} className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs hover:bg-muted/50">
-                    <PlatformIcon platform={i.platform} className="h-3.5 w-3.5 shrink-0" />
-                    <span className="font-mono text-[10px] text-muted-foreground shrink-0">{i.postCard ? postLabel(i.postCard) : "Comment"}</span>
-                    <span className="truncate">{i.draft_copy}</span>
-                    <ArrowRight className="h-3 w-3 ml-auto shrink-0 opacity-60" />
-                  </button>
-                </li>
-              ))}
-              {p.list.length > 4 && <li className="text-[10px] text-muted-foreground px-2">+{p.list.length - 4} more — use the status filter to see all</li>}
+            <ul className="space-y-1.5">
+              {p.list.slice(0, 4).map((i) => {
+                const meta = STATUS_META[i.approval_status];
+                const d = itemDate(i);
+                return (
+                  <li key={i.id}>
+                    <button onClick={() => onOpen(i)} className="sm-qtriage-row">
+                      <span className="sm-qplatform shrink-0" data-platform={i.platform} aria-label={i.platform}>
+                        <PlatformIcon platform={i.platform} className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-xs font-medium">{i.draft_copy}</span>
+                        <span className="block truncate text-[10px] text-muted-foreground font-mono">
+                          {i.postCard ? postLabel(i.postCard) : "Comment"}
+                          {d ? ` · ${format(d, "EEE, h:mm a")}` : ""}
+                        </span>
+                      </span>
+                      <span className={`sm-qtriage-badge shrink-0 ${meta.color}`}>{meta.label}</span>
+                      <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                    </button>
+                  </li>
+                );
+              })}
+              {p.list.length > 4 && <li className="text-[10px] text-muted-foreground px-2 pt-1">+{p.list.length - 4} more — use the status filter to see all</li>}
             </ul>
           )}
         </div>
