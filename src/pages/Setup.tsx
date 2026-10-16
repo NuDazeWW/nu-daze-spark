@@ -432,8 +432,8 @@ function ConnectionsCard() {
   return (
     <GridCard title="Social Connections" desc="Connect posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections"
       belowCta={
-        <div className="flex items-center gap-2 pt-1">
-          {tiles.map((t) => <span key={t} className="sm-conn-tile"><BrandBadge platform={t} size={36} /></span>)}
+        <div className="flex items-center gap-1.5 pt-1">
+          {tiles.map((t) => <span key={t} className="sm-conn-tile"><BrandBadge platform={t} size={28} /></span>)}
         </div>
       }>
       <span className="sr-only">Posting and AI tool connections</span>
