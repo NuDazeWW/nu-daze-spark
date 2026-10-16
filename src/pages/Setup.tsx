@@ -296,14 +296,14 @@ function SetupInner() {
 
 /* ================= Settings grid cards ================= */
 
-function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className, art }: {
-  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string; art?: string;
+function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className, art, belowCta }: {
+  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string; art?: string; belowCta?: React.ReactNode;
 }) {
   return (
     <Card className={cn("sm-setup-hub-card relative flex min-h-[196px] flex-col overflow-hidden", className)}>
       {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
       <CardHeader className="relative z-10 pb-2">
-        <CardTitle className="flex items-center gap-2.5 text-base">
+        <CardTitle className="sm-setup-hub-title flex items-center gap-2.5 text-[15px]">
           <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span>
           <span className="min-w-0 flex-1">{title}</span>
           {href && <Link to={href} aria-label={linkLabel ?? title} className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-4 w-4" /></Link>}
@@ -312,6 +312,7 @@ function GridCard({ title, desc, icon: Icon, href, linkLabel, children, classNam
       </CardHeader>
       <CardContent className={cn("relative z-10 flex-1 space-y-2", art && "sm-setup-hub-pad")}>{children}</CardContent>
       {href && <div className="relative z-10 mt-auto px-5 pb-5 pt-2"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
+      {belowCta && <div className="relative z-10 px-5 pb-5">{belowCta}</div>}
     </Card>
   );
 }
@@ -422,19 +423,15 @@ function TeamCard() {
 }
 
 function ConnectionsCard() {
-  const tiles = [
-    { key: "linkedin", label: "LinkedIn" }, { key: "instagram", label: "Instagram" },
-    { key: "facebook", label: "Facebook" }, { key: "x", label: "X" },
-  ];
+  const tiles = ["linkedin", "instagram", "facebook", "x"];
   return (
-    <GridCard title="Social Connections" desc="Connect posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections">
-      <div className="flex flex-wrap gap-2.5 pt-1">
-        {tiles.map((t) => (
-          <div key={t.key} className="sm-setup-tile" title={t.label} role="img" aria-label={t.label}>
-            <PlatformIcon platform={t.key} className="h-5 w-5" />
-          </div>
-        ))}
-      </div>
+    <GridCard title="Social Connections" desc="Connect posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections"
+      belowCta={
+        <div className="flex items-center gap-3 pt-2">
+          {tiles.map((t) => <BrandBadge key={t} platform={t} size={52} />)}
+        </div>
+      }>
+      <span className="sr-only">Posting and AI tool connections</span>
     </GridCard>
   );
 }
