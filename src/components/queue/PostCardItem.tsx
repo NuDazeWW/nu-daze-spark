@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import {
 import {
   Copy, Pencil, Trash2, ChevronRight, ChevronLeft, MoreVertical,
   Users, Hash, Building2, Target, Megaphone, BookOpen, Eye, ShieldCheck,
-  Mic, Lightbulb, AlertTriangle, Info,
+  Mic, Lightbulb, AlertTriangle, MoreHorizontal, Play,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -103,144 +103,158 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
     { show: !!card.revision_notes, icon: AlertTriangle, label: "Revision notes", text: card.revision_notes, warn: true },
   ].filter((d) => d.show);
 
+  const tags = (card.hashtags ?? []).map((h) => `#${h.replace(/^#/, "")}`);
+  const captionText = card.draft_copy.replace(/#[\w-]+/g, "").replace(/\s+\n/g, "\n").trim();
+  // Text tile fallback: the post's own opening words, like a native text graphic.
+  const hookWords = captionText.split(/\s+/).slice(0, 4).join(" ").replace(/[—–,:;.!?]+$/, "");
+  const time = card.scheduled_for ? format(new Date(card.scheduled_for), "h:mm a") : null;
+  const preflightLabel = gateState === "none" ? "Not checked yet" : gateState.charAt(0).toUpperCase() + gateState.slice(1);
+
   return (
-    <Card className="group sm-content-card" data-status={card.approval_status} data-content-type="post">
-      <CardHeader className="px-3 pt-3 pb-2 space-y-0">
-        <div className="flex items-center gap-1.5 min-w-0 flex-nowrap">
-          <Tooltip><TooltipTrigger asChild>
-            <span className="sm-qplatform shrink-0" data-platform={card.platform} aria-label={card.platform}><PlatformIcon platform={card.platform} className="h-3.5 w-3.5" /></span>
-          </TooltipTrigger><TooltipContent className="capitalize">{card.platform} · {card.content_type}</TooltipContent></Tooltip>
-          <span className="shrink-0"><PostNumber card={card} /></span>
-          {card.scheduled_for && <span className="font-mono text-[10px] text-muted-foreground shrink-0 whitespace-nowrap">{format(new Date(card.scheduled_for), "h:mm a")}</span>}
-          <Badge variant="outline" className={`ml-auto text-[10px] shrink-0 rounded-full ${statusMeta.color}`}>
-            {statusMeta.label}
-          </Badge>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0"><MoreVertical className="h-3.5 w-3.5" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {canAdvance && nextStatus && (
-                <DropdownMenuItem onClick={() => changeStatus(nextStatus)} disabled={isUpdating}>
-                  <ChevronRight className="mr-2 h-3.5 w-3.5" />Move to {STATUS_META[nextStatus].label}
-                </DropdownMenuItem>
-              )}
-              {canRevert && prevStatus && (
-                <DropdownMenuItem onClick={() => changeStatus(prevStatus)} disabled={isUpdating}>
-                  <ChevronLeft className="mr-2 h-3.5 w-3.5" />Back to {STATUS_META[prevStatus].label}
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={() => { setGateIntent(null); setPreflightOpen(true); }}>
-                <ShieldCheck className="mr-2 h-3.5 w-3.5" />Preflight check
+    <Card className="group sm-content-card sm-qcard" data-status={card.approval_status} data-content-type="post">
+      {/* Header: platform · time · status · menu */}
+      <div className="sm-qcard-head">
+        <Tooltip><TooltipTrigger asChild>
+          <span className="sm-qplatform shrink-0" data-platform={card.platform} aria-label={card.platform}><PlatformIcon platform={card.platform} className="h-3.5 w-3.5" /></span>
+        </TooltipTrigger><TooltipContent className="capitalize">{card.platform} · {card.content_type}</TooltipContent></Tooltip>
+        {time
+          ? <span className="sm-qcard-time">{time}</span>
+          : <span className="shrink-0 min-w-0 truncate"><PostNumber card={card} /></span>}
+        <span className={`sm-qpill ml-auto ${statusMeta.color}`}>{statusMeta.label}</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0 -mr-1" aria-label="More actions"><MoreVertical className="h-3.5 w-3.5" /></Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {canAdvance && nextStatus && (
+              <DropdownMenuItem onClick={() => changeStatus(nextStatus)} disabled={isUpdating}>
+                <ChevronRight className="mr-2 h-3.5 w-3.5" />Move to {STATUS_META[nextStatus].label}
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => copyToClipboard(card.draft_copy, "Post copy")}>
-                <Copy className="mr-2 h-3.5 w-3.5" />Copy Post
+            )}
+            {canRevert && prevStatus && (
+              <DropdownMenuItem onClick={() => changeStatus(prevStatus)} disabled={isUpdating}>
+                <ChevronLeft className="mr-2 h-3.5 w-3.5" />Back to {STATUS_META[prevStatus].label}
               </DropdownMenuItem>
-              {hashtagString && (
-                <DropdownMenuItem onClick={() => copyToClipboard(hashtagString, "Hashtags")}>
-                  <Hash className="mr-2 h-3.5 w-3.5" />Copy Hashtags
-                </DropdownMenuItem>
-              )}
-              {peopleString && (
-                <DropdownMenuItem onClick={() => copyToClipboard(peopleString, "Tags")}>
-                  <Users className="mr-2 h-3.5 w-3.5" />Copy People Tags
-                </DropdownMenuItem>
-              )}
-              {orgString && (
-                <DropdownMenuItem onClick={() => copyToClipboard(orgString, "Tags")}>
-                  <Building2 className="mr-2 h-3.5 w-3.5" />Copy Organization Tags
-                </DropdownMenuItem>
-              )}
-              {canCreate && card.content_type !== "comment" && (
-                <DropdownMenuItem onClick={() => setSplitOpen(true)}>
-                  <Split className="mr-2 h-3.5 w-3.5" />Split across platforms
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onEdit}>
-                <Pencil className="mr-2 h-3.5 w-3.5" />Edit
+            )}
+            <DropdownMenuItem onClick={() => { setGateIntent(null); setPreflightOpen(true); }}>
+              <ShieldCheck className="mr-2 h-3.5 w-3.5" />Preflight check
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => copyToClipboard(card.draft_copy, "Post copy")}>
+              <Copy className="mr-2 h-3.5 w-3.5" />Copy Post
+            </DropdownMenuItem>
+            {hashtagString && (
+              <DropdownMenuItem onClick={() => copyToClipboard(hashtagString, "Hashtags")}>
+                <Hash className="mr-2 h-3.5 w-3.5" />Copy Hashtags
               </DropdownMenuItem>
-              {isAdmin && card.approval_status !== "archived" && (
-                <DropdownMenuItem onClick={() => onStatusChange("archived")}>
-                  <BookOpen className="mr-2 h-3.5 w-3.5" />Archive
+            )}
+            {peopleString && (
+              <DropdownMenuItem onClick={() => copyToClipboard(peopleString, "Tags")}>
+                <Users className="mr-2 h-3.5 w-3.5" />Copy People Tags
+              </DropdownMenuItem>
+            )}
+            {orgString && (
+              <DropdownMenuItem onClick={() => copyToClipboard(orgString, "Tags")}>
+                <Building2 className="mr-2 h-3.5 w-3.5" />Copy Organization Tags
+              </DropdownMenuItem>
+            )}
+            {canCreate && card.content_type !== "comment" && (
+              <DropdownMenuItem onClick={() => setSplitOpen(true)}>
+                <Split className="mr-2 h-3.5 w-3.5" />Split across platforms
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onEdit}>
+              <Pencil className="mr-2 h-3.5 w-3.5" />Edit
+            </DropdownMenuItem>
+            {isAdmin && card.approval_status !== "archived" && (
+              <DropdownMenuItem onClick={() => onStatusChange("archived")}>
+                <BookOpen className="mr-2 h-3.5 w-3.5" />Archive
+              </DropdownMenuItem>
+            )}
+            {isAdmin && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                  <Trash2 className="mr-2 h-3.5 w-3.5" />Delete
                 </DropdownMenuItem>
-              )}
-              {isAdmin && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                    <Trash2 className="mr-2 h-3.5 w-3.5" />Delete
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
-      <CardContent className="px-3 pb-3 pt-0 space-y-2">
-        {/* Copy snippet with media thumbnail — click to expand */}
-        <div className="flex gap-3">
-          {thumb?.url && (
-            <button type="button" onClick={() => setPreviewOpen(true)} aria-label="Open preview" className="sm-qthumb shrink-0">
-              {thumb.asset_type === "video"
-                ? <video src={thumb.url} muted className="h-full w-full object-cover" />
-                : <img src={thumb.url} alt={thumb.title} loading="lazy" className="h-full w-full object-cover" />}
-            </button>
-          )}
-          <div
-            className={`min-w-0 flex-1 text-sm whitespace-pre-wrap cursor-pointer leading-snug ${!expanded ? "line-clamp-3" : ""}`}
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Body: thumbnail beside caption, hashtag pills underneath */}
+      <div className="sm-qcard-body">
+        <button type="button" onClick={() => setPreviewOpen(true)} aria-label="Open preview" className="sm-qthumb" data-platform={card.platform}>
+          {thumb?.url
+            ? (thumb.asset_type === "video"
+              ? <><video src={thumb.url} muted className="h-full w-full object-cover" /><span className="sm-qthumb-play"><Play className="h-3.5 w-3.5" /></span></>
+              : <img src={thumb.url} alt={thumb.title} loading="lazy" className="h-full w-full object-cover" />)
+            : <span className="sm-qthumb-text">{hookWords}</span>}
+        </button>
+        <div className="min-w-0 flex-1">
+          <p
+            className={`sm-qcard-copy ${!expanded ? "line-clamp-3" : "whitespace-pre-wrap"}`}
             onClick={() => setExpanded(!expanded)}
             title={expanded ? "Click to collapse" : "Click to read full copy"}
           >
-            {card.draft_copy.split(/(#[\w-]+)/g).map((part, i) => part.startsWith("#") ? <span key={i} className="sm-qtag">{part}</span> : part)}
+            {expanded ? captionText : captionText.replace(/\s+/g, " ")}
+          </p>
+          <div className="sm-qcard-tags">
+            {(expanded ? tags : tags.slice(0, 2)).map((t) => <span key={t} className="sm-qtag">{t}</span>)}
+            {!expanded && tags.length > 2 && <span className="sm-qtag-more">+{tags.length - 2}</span>}
+            {time && <span className="sm-qtag-id"><PostNumber card={card} /></span>}
           </div>
         </div>
+      </div>
 
-        {/* Bottom action icon bar */}
-        <div className="flex items-center gap-1 border-t border-border/50 pt-2">
+      {/* Footer: preview · edit · copy · more */}
+      <div className="sm-qcard-foot">
+        <Tooltip><TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Preview" onClick={() => setPreviewOpen(true)}><Eye className="h-4 w-4" /></Button>
+        </TooltipTrigger><TooltipContent>Preview</TooltipContent></Tooltip>
+        <Tooltip><TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Edit" onClick={onEdit}><Pencil className="h-4 w-4" /></Button>
+        </TooltipTrigger><TooltipContent>Edit</TooltipContent></Tooltip>
+        <Tooltip><TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Copy post" onClick={() => copyToClipboard(card.draft_copy, "Post copy")}><Copy className="h-4 w-4" /></Button>
+        </TooltipTrigger><TooltipContent>Copy post</TooltipContent></Tooltip>
+        <Popover>
           <Tooltip><TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Preview" onClick={() => setPreviewOpen(true)}><Eye className="h-3.5 w-3.5" /></Button>
-          </TooltipTrigger><TooltipContent>Preview</TooltipContent></Tooltip>
-          <Tooltip><TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Edit" onClick={onEdit}><Pencil className="h-3.5 w-3.5" /></Button>
-          </TooltipTrigger><TooltipContent>Edit</TooltipContent></Tooltip>
-          <Tooltip><TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Copy post" onClick={() => copyToClipboard(card.draft_copy, "Post copy")}><Copy className="h-3.5 w-3.5" /></Button>
-          </TooltipTrigger><TooltipContent>Copy post</TooltipContent></Tooltip>
-          <Popover>
-            <Tooltip><TooltipTrigger asChild>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Post details"><Info className="h-3.5 w-3.5" /></Button>
-              </PopoverTrigger>
-            </TooltipTrigger><TooltipContent>Details: objective, audience, tags, progress</TooltipContent></Tooltip>
-            <PopoverContent className="w-72 p-3 space-y-2 max-h-80 overflow-y-auto" align="start">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{postLabel(card)} · Created {format(new Date(card.created_at), "MMM d")}</p>
-              {details.map((d) => (
-                <div key={d.label} className="flex gap-2">
-                  <d.icon className={`h-3.5 w-3.5 mt-0.5 shrink-0 ${d.warn ? "text-brand-attention" : "text-muted-foreground"}`} />
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide">{d.label}</p>
-                    <p className="text-xs whitespace-pre-wrap break-words">{d.text}</p>
-                  </div>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7 relative" aria-label="Details, preflight and history">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className={`sm-qdot ${gateIconCls}`} aria-hidden="true" />
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger><TooltipContent>Details · Preflight: {preflightLabel}</TooltipContent></Tooltip>
+          <PopoverContent className="w-72 p-3 space-y-2 max-h-96 overflow-y-auto" align="end">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{postLabel(card)} · Created {format(new Date(card.created_at), "MMM d")}</p>
+            <Button variant="outline" size="sm" className={`w-full justify-start h-8 text-xs gap-2 ${gateIconCls}`} onClick={() => { setGateIntent(null); setPreflightOpen(true); }}>
+              <ShieldCheck className="h-3.5 w-3.5" />Preflight: {preflightLabel}
+            </Button>
+            <div className="grid grid-cols-1 gap-1.5">
+              <PostHistoryButton card={card} className="w-full justify-start h-8 text-xs gap-2" />
+              {["approved", "exported"].includes(card.approval_status) && (
+                <OpenPlatformButton clientId={card.client_id} platform={card.platform} className="w-full justify-start h-8 text-xs"
+                  copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")} />
+              )}
+            </div>
+            {details.map((d) => (
+              <div key={d.label} className="flex gap-2">
+                <d.icon className={`h-3.5 w-3.5 mt-0.5 shrink-0 ${d.warn ? "text-brand-attention" : "text-muted-foreground"}`} />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide">{d.label}</p>
+                  <p className="text-xs whitespace-pre-wrap break-words">{d.text}</p>
                 </div>
-              ))}
-              <StatusProgress card={card} dates={statusDates} />
-              <WhereIsIt card={card} here="queue" />
-            </PopoverContent>
-          </Popover>
-          <div className="ml-auto flex items-center gap-0.5">
-            <Tooltip><TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className={`h-7 w-7 ${gateIconCls}`} aria-label="Preflight" onClick={() => { setGateIntent(null); setPreflightOpen(true); }}><ShieldCheck className="h-3.5 w-3.5" /></Button>
-            </TooltipTrigger><TooltipContent>Preflight: {gateState === "none" ? "not checked yet" : gateState}</TooltipContent></Tooltip>
-            <PostHistoryButton card={card} />
-            {["approved", "exported"].includes(card.approval_status) && (
-              <OpenPlatformButton clientId={card.client_id} platform={card.platform}
-                copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")} />
-            )}
-          </div>
-        </div>
-      </CardContent>
+              </div>
+            ))}
+            <StatusProgress card={card} dates={statusDates} />
+            <WhereIsIt card={card} here="queue" />
+          </PopoverContent>
+        </Popover>
+      </div>
       <NativePreviewDialog card={card} open={previewOpen} onOpenChange={setPreviewOpen} />
       <PreflightDialog open={preflightOpen} onOpenChange={setPreflightOpen} pf={pf} isAdmin={isAdmin} intent={gateIntent} draft={card.draft_copy} />
       {splitOpen && <SplitPlatformsDialog card={card} open={splitOpen} onOpenChange={setSplitOpen} />}
