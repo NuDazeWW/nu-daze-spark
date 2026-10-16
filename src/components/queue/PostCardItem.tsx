@@ -88,7 +88,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const gateIconCls =
     gateState === "pass" || gateState === "acknowledged" ? "text-brand-success" :
     gateState === "blocked" ? "text-destructive" :
-    gateState === "advisory" || gateState === "overridden" || gateState === "stale" ? "text-brand-warning" :
+    gateState === "warnings" || gateState === "overridden" || gateState === "stale" ? "text-brand-warning" :
     "text-muted-foreground";
 
   const details = [
