@@ -251,12 +251,12 @@ function GridCard({ title, desc, icon: Icon, href, linkLabel, children, classNam
     <Card className={cn("sm-setup-hub-card flex flex-col", className)}>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span>{title}
-          {href && <Button asChild size="sm" variant="ghost" className="ml-auto h-7 px-2 text-xs"><Link to={href}>{linkLabel ?? "Manage"}<ArrowRight className="ml-1 h-3 w-3" /></Link></Button>}
+          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span><span className="min-w-0">{title}</span>
         </CardTitle>
         {desc && <CardDescription>{desc}</CardDescription>}
       </CardHeader>
       <CardContent className="flex-1 space-y-2">{children}</CardContent>
+      {href && <div className="border-t border-border px-6 py-2.5"><Button asChild size="sm" variant="ghost" className="h-7 px-2 text-xs"><Link to={href}>{linkLabel ?? "Manage"}<ArrowRight className="ml-1 h-3 w-3" /></Link></Button></div>}
     </Card>
   );
 }

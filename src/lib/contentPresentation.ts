@@ -6,7 +6,6 @@ const READING_SURFACES = [
   "/planner",
   "/sources",
   "/sources",
-  "/setup",
   "/settings/workspace",
   "/settings/team",
   "/settings/notifications",
