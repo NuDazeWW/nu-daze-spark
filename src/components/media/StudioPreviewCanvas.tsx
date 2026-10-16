@@ -32,7 +32,7 @@ export function StudioPreviewCanvas({ image, clientName, caption, onCaption, for
           <button key={v} role="tab" aria-selected={format === v} onClick={() => onFormat(v)}
             className={cn("sm-studio-tab flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-medium whitespace-nowrap",
               format === v && "is-active")}>
-            <BrandBadge platform={v === "linkedin" ? "linkedin" : "instagram"} size={22} />{l}
+            <BrandBadge platform={v === "linkedin" ? "linkedin" : v === "story" ? "story" : v === "reel" ? "reel" : "instagram"} size={22} />{l}
           </button>
         ))}
       </div>

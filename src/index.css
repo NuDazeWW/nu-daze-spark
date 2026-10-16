@@ -2658,3 +2658,20 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
   background: linear-gradient(160deg, hsl(var(--tone, var(--sm-fx-violet)) / .28), hsl(var(--tone, var(--sm-fx-violet)) / .08));
   box-shadow: inset 0 0 0 1px hsl(var(--tone, var(--sm-fx-violet)) / .5), inset 0 1px 0 hsl(0 0% 100% / .14), 0 0 14px -4px hsl(var(--tone, var(--sm-fx-violet)) / .65); }
 .sm-field-well svg { filter: drop-shadow(0 0 4px hsl(var(--tone, var(--sm-fx-violet)) / .6)); }
+
+/* Media Studio — 3D field badges, matching platform badges */
+.sm-brand-youtube { background: linear-gradient(150deg, #ff5a4f 0%, #e62117 58%, #b3120b 100%);
+  box-shadow: inset 0 1.5px 0 hsl(0 0% 100% / .38), inset 0 -8px 14px hsl(0 0% 0% / .26), 0 8px 18px -8px hsl(0 0% 0% / .85), 0 0 20px -6px hsl(2 85% 52% / .8); }
+.sm-brand-story { background: linear-gradient(45deg, #fa7e1e 0%, #d62976 50%, #962fbf 100%);
+  box-shadow: inset 0 1.5px 0 hsl(0 0% 100% / .38), inset 0 -8px 14px hsl(0 0% 0% / .26), 0 8px 18px -8px hsl(0 0% 0% / .85), 0 0 20px -6px hsl(330 85% 55% / .75); }
+.sm-brand-reel { background: linear-gradient(45deg, #d62976 0%, #962fbf 55%, #4f5bd5 100%);
+  box-shadow: inset 0 1.5px 0 hsl(0 0% 100% / .38), inset 0 -8px 14px hsl(0 0% 0% / .26), 0 8px 18px -8px hsl(0 0% 0% / .85), 0 0 20px -6px hsl(270 80% 60% / .75); }
+.sm-brand-badge svg { width: auto; height: auto; }
+.sm-field-badge { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 30px; height: 30px; border-radius: 26%; color: hsl(0 0% 100%);
+  background: linear-gradient(150deg, hsl(var(--tone) / 1) 0%, hsl(var(--tone) / .72) 55%, hsl(var(--tone) / .5) 100%);
+  box-shadow: inset 0 1.5px 0 hsl(0 0% 100% / .4), inset 0 -7px 12px hsl(0 0% 0% / .28), 0 6px 14px -6px hsl(0 0% 0% / .8), 0 0 16px -4px hsl(var(--tone) / .8); }
+.sm-field-badge svg { width: 16px; height: 16px; filter: drop-shadow(0 1px 1px hsl(0 0% 0% / .4)); }
+.sm-field-dot { width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0;
+  background: hsl(var(--tone)); box-shadow: 0 0 8px hsl(var(--tone) / .8); }
+.sm-select-value .sm-brand-badge, .sm-select-value .sm-field-dot { display: none !important; }
