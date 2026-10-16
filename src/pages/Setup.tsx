@@ -23,9 +23,16 @@ import {
 import { toast } from "sonner";
 import {
   CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send, ExternalLink,
-  ArrowRight, ShieldCheck, Globe, Download, Loader2, Lock, Music2, Youtube, Sparkles, Pin,
-  ChevronDown, ChevronUp,
+  ArrowRight, ArrowLeft, ShieldCheck, Globe, Download, Loader2, Lock, Music2, Youtube, Sparkles, Pin,
+  ChevronDown, ChevronUp, ChevronRight,
 } from "lucide-react";
+import artTeam from "@/assets/setup/art-team.png";
+import artEmail from "@/assets/setup/art-email.png";
+import artWorkspace from "@/assets/setup/art-workspace.png";
+import artBrands from "@/assets/setup/art-brands.png";
+import artTags from "@/assets/setup/art-tags.png";
+import artSocial from "@/assets/setup/art-social.png";
+import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { PlatformIcon } from "@/components/layout/PlatformIcon";
@@ -132,19 +139,31 @@ function SetupInner() {
 
   return (
     <div className="sm-reference sm-setup animate-fade-in space-y-6">
-      <PageHeader title="Workspace setup" description={preview ? "Previewing the setup a new organization sees. Nothing you enter is saved." : "Everything about your workspace in one place. Reopen any step to change it."}>
-        <Button variant="outline" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
-      </PageHeader>
+      <nav aria-label="Setup" className="flex flex-wrap items-center gap-2">
+        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/"><ArrowLeft className="mr-1.5 h-3.5 w-3.5" />Back to workspace</Link></Button>
+        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/setup">Workspace settings</Link></Button>
+        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/help">Help</Link></Button>
+      </nav>
+
+      <div className="sm-setup-hero">
+        <div className="min-w-0">
+          <h1>Workspace setup</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            {preview
+              ? "Previewing the setup a new organization sees. Nothing you enter is saved."
+              : `${ws.setupCompleted} of ${ws.setupTotal} steps complete. Reopen any step to change it.`}
+          </p>
+        </div>
+        <div className="sm-setup-hero-side">
+          <img src={headerBirdUrl} alt="" aria-hidden className="sm-setup-hero-bird" />
+          <p className="sm-dash-tagline text-sm leading-snug">Turn strategy<br />into <em className="sm-dash-em-cyan not-italic font-semibold">social</em> <em className="not-italic font-semibold text-brand-citrine">momentum.</em></p>
+          <Button variant="outline" className="sm-setup-pill" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
+        </div>
+      </div>
       {preview && <Alert><AlertDescription>Preview mode: this is what a brand-new workspace looks like. Changes are not saved.</AlertDescription></Alert>}
 
-      <div className="sm-setup-momentum">
-        <div className="flex items-center justify-between gap-3 text-xs font-mono text-muted-foreground">
-          <span>{preview ? 0 : ws.setupCompleted} of {ws.setupTotal} steps complete</span>
-          <span>{Math.round(((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100)}%</span>
-        </div>
-        <div className="sm-setup-progress" role="progressbar" aria-valuenow={preview ? 0 : ws.setupCompleted} aria-valuemax={ws.setupTotal}>
-          <i style={{ width: `${((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100}%` }} />
-        </div>
+      <div className="sm-setup-progress" role="progressbar" aria-valuenow={preview ? 0 : ws.setupCompleted} aria-valuemax={ws.setupTotal} aria-label={`${preview ? 0 : ws.setupCompleted} of ${ws.setupTotal} steps complete`}>
+        <i style={{ width: `${((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100}%` }} />
       </div>
 
       <div className="sm-setup-layout grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
