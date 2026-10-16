@@ -36,7 +36,6 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { openInNewTab } from "@/lib/openInNewTab";
-import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 
 const PLATFORMS = ["linkedin", "instagram", "facebook"] as const;
 const PL: Record<string, string> = { linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook" };
