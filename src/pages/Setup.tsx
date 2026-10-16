@@ -317,21 +317,26 @@ function GridCard({ title, desc, icon: Icon, href, linkLabel, children, classNam
   );
 }
 
+const POST_TO_PLATFORMS = ["linkedin", "instagram", "facebook", "x"] as const;
+
 function PostToCard() {
   const { activeClientId, activeClient } = useActiveClient();
   const { data: accounts = [] } = useClientSocialAccounts(activeClientId);
   return (
     <GridCard title="Post to" desc={`Quick links to post for ${activeClient?.name ?? "the selected brand"}.`} icon={Send}>
-      {accounts.length === 0 && <p className="text-sm text-muted-foreground">No social accounts saved yet.</p>}
-      {accounts.map((a) => (
-        <div key={a.id} className="flex items-center gap-1.5 text-[13px]">
-          <PlatformIcon platform={a.platform} className="h-4 w-4 shrink-0" />
-          <span className="min-w-0 flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
-          {a.profile_url
-            ? <Button size="sm" variant="outline" className="h-7 shrink-0 whitespace-nowrap px-2 text-xs" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
-            : <Button size="sm" variant="ghost" className="h-7 shrink-0 whitespace-nowrap px-2 text-xs" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
-        </div>
-      ))}
+      {POST_TO_PLATFORMS.map((p) => {
+        const a = accounts.find((x) => x.platform === p);
+        const label = p === "x" ? `X${a?.handle ? ` · ${a.handle}` : ""}` : (PLATFORM_LABEL[p] ?? p);
+        return (
+          <div key={p} className="flex items-center gap-2.5 text-[13px]">
+            <BrandBadge platform={p} size={24} />
+            <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
+            {a?.profile_url
+              ? <Button size="sm" variant="outline" className="sm-setup-card-cta h-7 shrink-0 whitespace-nowrap px-2.5 text-xs" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
+              : <Button size="sm" variant="outline" className="sm-setup-card-cta h-7 shrink-0 whitespace-nowrap px-2.5 text-xs" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Open<ExternalLink className="ml-1 h-3 w-3" /></Link></Button>}
+          </div>
+        );
+      })}
     </GridCard>
   );
 }
@@ -692,7 +697,7 @@ function SettingsGrid() {
     <section className="space-y-4">
       <h2 className="font-display text-lg font-semibold">Workspace settings</h2>
       {/* Mock grid: exactly 8 cards, 2 rows of 4 */}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <PostToCard />
         {ws.canManage && <GovernanceCard />}
         {ws.canManage && <TeamCard />}
