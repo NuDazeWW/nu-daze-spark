@@ -57,7 +57,6 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/terms" element={<Legal />} />
             <Route path="/privacy" element={<Legal />} />
-            <Route path="/review" element={<ProtectedRoute><ExecutiveReview /></ProtectedRoute>} />
             <Route
               element={
                 <ProtectedRoute>
@@ -66,6 +65,7 @@ const App = () => (
               }
             >
               <Route path="/" element={<Dashboard />} />
+              <Route path="/review" element={<ExecutiveReview />} />
               <Route path="/assets" element={<AssetLibrary />} />
               <Route path="/sources" element={<ConnectedSources />} />
               <Route path="/strategy" element={<Strategy />} />

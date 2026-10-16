@@ -80,19 +80,10 @@ export default function ExecutiveReview() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <img src={logo} alt="SocialMotive" className="h-9 w-auto rounded-md" />
-          <div className="flex-1">
-            <p className="font-display text-sm font-semibold">Executive Review</p>
-            <p className="font-mono text-xs text-muted-foreground">{pending.length} awaiting your sign-off</p>
-          </div>
-          <Button asChild variant="outline" size="sm" className="shrink-0"><Link to="/queue" aria-label="Back to workspace"><ArrowLeft className="h-4 w-4 sm:mr-1" /><span className="hidden sm:inline">Back to workspace</span></Link></Button>
-        </div>
-      </header>
+    <div className="text-foreground">
+      <PageHeader title="Executive Review" description={`${pending.length} awaiting your sign-off`} />
 
-      <main className="mx-auto max-w-3xl space-y-4 px-3 pb-40 pt-4 sm:space-y-5 sm:px-4 sm:py-6">
+      <main className="mx-auto max-w-3xl space-y-4 pb-8 sm:space-y-5">
         {isLoading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : !card ? (
