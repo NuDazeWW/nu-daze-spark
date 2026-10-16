@@ -102,6 +102,8 @@ export default function DailyQueue() {
 
   const activeCount = queueItems.filter((c) => !["archived", "posted"].includes(c.approval_status)).length;
 
+  const platforms = useMemo(() => Array.from(new Set(queueItems.map((q) => q.platform))).sort(), [queueItems]);
+
   const renderItem = (item: typeof queueItems[0]) => {
             if (item.type === "comment" && item.comment) {
               return (
