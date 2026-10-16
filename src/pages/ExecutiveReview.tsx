@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, MessageSquareWarning, Inbox } from "lucide-react";
+import { Check, MessageSquareWarning, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,7 +14,7 @@ import { NativePostPreview } from "@/components/preview/NativePostPreview";
 import { MotiveScore, type MotiveBreakdown } from "@/components/preflight/MotiveScore";
 import { postLabel } from "@/components/tracking/PostTracking";
 import { useWorkspace } from "@/hooks/useWorkspace";
-import logo from "@/assets/socialmotive-logo.jpg";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 type Chip = { label: string; instruction: string };
 /** Structured note stored on the post and in approval_log, which generation reads back as reviewer feedback. */
@@ -119,7 +119,7 @@ export default function ExecutiveReview() {
             )}
 
             {card.approval_status === "in_review" ? (
-              <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-card/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-lg backdrop-blur sm:sticky sm:bottom-4 sm:rounded-xl sm:border">
+              <div className="sticky bottom-0 z-10 rounded-xl border bg-card/95 px-3 pb-3 pt-3 shadow-lg backdrop-blur">
                 <div className="mx-auto max-w-3xl space-y-2">
                   <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="One-tap revision requests">
                     {QUICK.map((q) => (
