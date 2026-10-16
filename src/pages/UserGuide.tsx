@@ -251,7 +251,7 @@ export default function UserGuide() {
     },
     {
       title: "Notifications & workspace settings",
-      route: "/settings/workspace",
+      route: "/setup",
       intro: "Company profile, labels, email provider, notifications and AI tools.",
       subs: [{ heading: "Settings", bullets: ["Workspace — company name, logo, organization labels, time zone.", "Notifications — daily digest and “post went out” emails per recipient.", "Email provider — SendGrid or SMTP; credentials stay server-side.", "Connections — social accounts and AI image/video providers.", "Data export — all data or one " + ent + " at a time."] }],
     },
