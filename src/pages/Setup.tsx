@@ -358,8 +358,8 @@ function ReviewChipsEditor() {
   };
   return (
     <div className="space-y-2 border-t pt-3">
-      <Button size="sm" variant="outline" className="w-full" onClick={() => setOpen((o) => !o)}>
-        Manage revision chips{open ? <ChevronUp className="ml-1 h-3 w-3" /> : <ChevronDown className="ml-1 h-3 w-3" />}
+      <Button size="sm" variant="outline" className="h-8 w-full text-xs" onClick={() => setOpen((o) => !o)}>
+        <span className="truncate">Manage revision chips</span>{open ? <ChevronUp className="ml-1 h-3 w-3 shrink-0" /> : <ChevronDown className="ml-1 h-3 w-3 shrink-0" />}
       </Button>
       {open && (<>
         <p className="text-xs text-muted-foreground">One-tap feedback on the review screen. The instruction is what the AI receives when revising.</p>
@@ -390,15 +390,15 @@ function GovernanceCard() {
   };
   return (
     <GridCard title="Governance" desc="Optional guardrails. Turn on only what your team needs." icon={ShieldCheck}>
-      <div className="flex items-center justify-between gap-3">
-        <div><Label className="text-sm">Require approval to publish</Label>
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0"><Label className="text-[13px] leading-snug">Require approval to publish</Label>
           <p className="text-xs text-muted-foreground">{ws.approvalRequired ? "Posts need sign-off first." : "Publish, schedule or export straight from draft."}</p></div>
-        <Switch checked={ws.approvalRequired} onCheckedChange={(v) => save({ post_approval_required: v })} />
+        <Switch className="shrink-0" checked={ws.approvalRequired} onCheckedChange={(v) => save({ post_approval_required: v })} />
       </div>
       <div className="space-y-1">
-        <Label className="text-sm">Preflight checks</Label>
+        <Label className="text-[13px]">Preflight checks</Label>
         <Select value={ws.preflightMode} onValueChange={(v) => save({ preflight_mode: v })}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="advisory">Advisory — show issues, never block</SelectItem>
             <SelectItem value="strict">Strict — block until cleared</SelectItem>
