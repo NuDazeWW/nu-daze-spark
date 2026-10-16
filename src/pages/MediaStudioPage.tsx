@@ -86,13 +86,7 @@ export default function MediaStudioPage() {
 
   return (
     <div className="sm-studio space-y-3 max-w-[1600px]">
-      <div className="sm-studio-heading">
-        <PageHeader linksMenu title="AI Content Creation Studio" description="Create on-brand posts, imagery, captions, and video concepts from one brief." />
-        <div className="sm-dash-art" aria-hidden="true">
-          <img src={headerBirdUrl} alt="" className="sm-dash-bird" />
-          <p className="sm-dash-tagline">Turn strategy<br />into <span className="sm-dash-em-cyan">social</span> <span className="sm-dash-em-lime">momentum.</span></p>
-        </div>
-      </div>
+      <PageHeader linksMenu title="AI Content Creation Studio" description="Create on-brand posts, imagery, captions, and video concepts from one brief." />
       <Tabs defaultValue={params.get("tab") ?? "create"}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <TabsList className="h-8"><TabsTrigger value="create" className="text-xs">Create media</TabsTrigger><TabsTrigger value="providers" className="text-xs">AI providers</TabsTrigger></TabsList>
