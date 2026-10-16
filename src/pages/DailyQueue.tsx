@@ -164,26 +164,41 @@ export default function DailyQueue() {
       <ScheduleImportDialog open={importOpen} onOpenChange={setImportOpen} />
       <QueueKpis items={queueItems} />
 
-      {/* Row 1: platform selector + view/import, search top-right */}
-      <div className="flex flex-wrap items-center gap-2 mb-3">
-        <div role="group" aria-label="Platform" className="flex flex-wrap items-center gap-1 rounded-full border p-1">
-          {[
-            { value: "all", label: "All Platforms" },
-            { value: "linkedin", label: "LinkedIn" },
-            { value: "instagram", label: "Instagram" },
-            { value: "facebook", label: "Facebook" },
-          ].map((p) => {
-            const isActive = platformFilter === p.value;
-            const count = p.value === "all" ? queueItems.length : queueItems.filter((q) => q.platform === p.value).length;
-            return (
-              <Button key={p.value} size="sm" variant={isActive ? "default" : "ghost"} aria-pressed={isActive}
-                onClick={() => setPlatformFilter(p.value)} className="rounded-full h-8 px-3 text-sm">
-                {p.label}
-                <span className="ml-1.5 text-[10px] opacity-70">{count}</span>
-              </Button>
-            );
-          })}
+      {/* Single-row toolbar: search, filters, view, actions */}
+      <div className="sm-qtoolbar flex flex-wrap items-center gap-2 mb-5">
+        <div className="relative w-full sm:w-[280px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input aria-label="Search queue" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search posts, captions, or tags…" className="pl-9 h-9" />
         </div>
+        <Select value={platformFilter} onValueChange={setPlatformFilter}>
+          <SelectTrigger aria-label="Platform" className="h-9 w-[160px]"><SelectValue placeholder="All Platforms" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Platforms ({queueItems.length})</SelectItem>
+            {platforms.map((p) => (
+              <SelectItem key={p} value={p} className="capitalize">{p} ({queueItems.filter((q) => q.platform === p).length})</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger aria-label="Status" className="h-9 w-[160px]"><SelectValue placeholder="All Statuses" /></SelectTrigger>
+          <SelectContent>
+            {STATUS_FILTERS.map((sf) => (
+              <SelectItem key={sf.value} value={sf.value}>
+                {sf.value === "all" ? "All Statuses" : sf.label} ({sf.value === "all" ? queueItems.length : (statusCounts[sf.value] || 0)})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger aria-label="Type" className="h-9 w-[140px]"><SelectValue placeholder="All Items" /></SelectTrigger>
+          <SelectContent>
+            {TYPE_FILTERS.map((tf) => (
+              <SelectItem key={tf.value} value={tf.value}>
+                {tf.value === "all" ? "All Items" : tf.label} ({tf.value === "all" ? queueItems.length : (typeCounts[tf.value] || 0)})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div role="group" aria-label="View" className="flex items-center gap-1 rounded-full border p-1">
           {([["board", LayoutGrid, "Board"], ["list", List, "List"], ["calendar", CalendarDays, "Calendar"]] as const).map(([v, Icon, l]) => (
             <Button key={v} size="sm" variant={view === v ? "default" : "ghost"} aria-pressed={view === v} onClick={() => setView(v)} className="rounded-full h-8 px-3 text-sm">
@@ -191,51 +206,14 @@ export default function DailyQueue() {
             </Button>
           ))}
         </div>
-        <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
-          <Upload className="h-4 w-4 mr-1.5" />Import schedule
-        </Button>
-        <div className="relative ml-auto w-full sm:w-[300px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input aria-label="Search queue" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search post number, copy, author…" className="pl-9 h-9" />
+        <div className="ml-auto flex items-center gap-2">
+          <Button asChild size="sm" className="h-9">
+            <Link to="/generator"><Plus className="h-4 w-4 mr-1.5" />New Post</Link>
+          </Button>
+          <Button variant="outline" size="sm" className="h-9" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4 mr-1.5" />Import schedule
+          </Button>
         </div>
-      </div>
-
-      {/* Row 2: type + status in one line */}
-      <div className="flex flex-wrap items-center gap-1.5 mb-6">
-        {TYPE_FILTERS.map((tf) => {
-          const count = tf.value === "all" ? queueItems.length : (typeCounts[tf.value] || 0);
-          const Icon = tf.icon;
-          const isActive = typeFilter === tf.value;
-          return (
-            <Button variant="outline" size="sm"
-              key={tf.value}
-              onClick={() => setTypeFilter(tf.value)}
-              aria-pressed={isActive}
-              className={`flex items-center gap-1.5 px-3 py-1.5 h-8 rounded-full text-xs border transition-colors ${tf.value !== "all" ? `sm-type sm-type-${tf.value}` : ""} ${
-                isActive ? "bg-primary/10 text-primary border-primary/30" : "text-muted-foreground hover:text-foreground hover:border-border"
-              }`}
-            >
-              <Icon className="h-3 w-3" />
-              {tf.value === "all" ? "All Items" : tf.label}
-              {count > 0 && <Badge variant="secondary" className="ml-0.5 h-4 min-w-[16px] px-1 text-[10px]">{count}</Badge>}
-            </Button>
-          );
-        })}
-        <span className="mx-1 h-5 w-px bg-border" aria-hidden />
-        <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-          <TabsList className="flex flex-wrap h-auto gap-1.5 bg-transparent p-0">
-            {STATUS_FILTERS.map((sf) => {
-              const count = sf.value === "all" ? queueItems.length : (statusCounts[sf.value] || 0);
-              return (
-                <TabsTrigger key={sf.value} value={sf.value}
-                  className={`sm-status-filter text-xs px-3 py-1.5 rounded-full border ${sf.value !== "all" ? STATUS_META[sf.value as ApprovalStatus].color : ""}`}>
-                  {sf.value === "all" ? "All Statuses" : sf.label}
-                  {count > 0 && <Badge variant="secondary" className="ml-1.5 h-4 min-w-[16px] px-1 text-[10px]">{count}</Badge>}
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
-        </Tabs>
       </div>
 
       {/* Cards */}
