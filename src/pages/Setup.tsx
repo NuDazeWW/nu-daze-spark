@@ -302,11 +302,11 @@ function GridCard({ title, desc, icon: Icon, href, linkLabel, children, classNam
   return (
     <Card className={cn("sm-setup-hub-card relative flex min-h-[196px] flex-col overflow-hidden", className)}>
       {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
+      {href && <Link to={href} aria-label={linkLabel ?? title} className="absolute right-3.5 top-4 z-20 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-4 w-4" /></Link>}
       <CardHeader className="relative z-10 px-4 pb-2 pt-4">
         <CardTitle className="sm-setup-hub-title flex items-center gap-2 text-xs font-semibold">
           <span className="sm-icon-well sm-setup-well"><Icon className="h-3.5 w-3.5" /></span>
-          <span className="min-w-0 flex-1">{title}</span>
-          {href && <Link to={href} aria-label={linkLabel ?? title} className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-3.5 w-3.5" /></Link>}
+          <span className="min-w-0 flex-1 pr-4">{title}</span>
         </CardTitle>
         {desc && <CardDescription className="text-xs">{desc}</CardDescription>}
       </CardHeader>
