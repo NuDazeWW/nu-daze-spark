@@ -2629,7 +2629,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 
 /* ===== FINAL LAYER: crystalline frame for shared sidebar + top header (reference image-55). Page bodies untouched. ===== */
 .sm-sidebar-bg, .sm-sidebar-bg [data-sidebar="sidebar"] {
-  background: url("/__l5e/assets-v1/a451373f-37a3-4df7-aa84-fc7ae9ab2e79/sm-crystal-sidebar.jpg") center bottom / cover no-repeat, hsl(262 70% 7%) !important;
+  background: url("./assets/sm-crystal-sidebar.jpg") center bottom / cover no-repeat, hsl(262 70% 7%) !important;
 }
 .sm-sidebar-bg [data-sidebar="sidebar"] { position: relative; isolation: isolate;
   box-shadow: inset -1px 0 0 hsl(260 100% 75% / .55), 1px 0 18px -2px hsl(255 100% 65% / .7) !important; }
@@ -2641,7 +2641,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
     linear-gradient(90deg, hsl(188 100% 62%), hsl(280 95% 68%)) border-box !important;
   box-shadow: 0 0 18px -4px hsl(188 100% 60% / .75), inset 0 1px 0 hsl(0 0% 100% / .18) !important; }
 .sm-command-bar { position: relative; isolation: isolate;
-  background: url("/__l5e/assets-v1/e29eb1fa-22a8-468b-b725-3f330b55862d/sm-crystal-header.jpg") left center / cover no-repeat, hsl(255 70% 8%) !important;
+  background: url("./assets/sm-crystal-header.jpg") left center / cover no-repeat, hsl(255 70% 8%) !important;
   border-bottom: 1px solid hsl(260 100% 78% / .45) !important;
   box-shadow: 0 1px 16px -2px hsl(275 100% 65% / .6) !important; }
 .sm-command-bar > * { position: relative; z-index: 1; }
