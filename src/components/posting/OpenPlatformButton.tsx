@@ -6,8 +6,9 @@ import { copyThenOpen } from "@/lib/openInNewTab";
 
 /** Opens the client's saved account for a platform. Optionally copies text first. Never publishes. */
 export function OpenPlatformButton({
-  clientId, platform, copyText, label, disabled, onOpened, size = "sm", variant = "outline",
+  clientId, platform, copyText, label, disabled, onOpened, size = "sm", variant = "outline", className,
 }: {
+  className?: string;
   clientId: string | null | undefined;
   platform: string;
   copyText?: string;
@@ -38,6 +39,7 @@ export function OpenPlatformButton({
       variant={variant}
       disabled={disabled || !url}
       onClick={open}
+      className={className}
       title={url ? undefined : `No ${name} profile link saved for this client`}
     >
       <ExternalLink className="h-3.5 w-3.5 mr-1" />

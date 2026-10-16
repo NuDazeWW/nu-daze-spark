@@ -108,11 +108,11 @@ export function WhereIsIt({ card, here }: { card: PostCard; here: "queue" | "app
 
 type Event = { at: string; title: string; detail?: string | null; who?: string | null };
 
-export function PostHistoryButton({ card }: { card: PostCard }) {
+export function PostHistoryButton({ card, className }: { card: PostCard; className?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setOpen(true)}>
+      <Button variant="outline" size="sm" className={className ?? "h-7 text-xs gap-1.5"} onClick={() => setOpen(true)}>
         <History className="h-3.5 w-3.5" />History
       </Button>
       {open && <PostHistoryDialog card={card} open={open} onOpenChange={setOpen} />}
