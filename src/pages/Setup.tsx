@@ -159,11 +159,6 @@ function SetupInner() {
 
   return (
     <div className="sm-reference sm-setup animate-fade-in space-y-6">
-      <nav aria-label="Setup" className="flex flex-wrap items-center gap-2">
-        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/"><ArrowLeft className="mr-1.5 h-3.5 w-3.5" />Back to workspace</Link></Button>
-        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/setup">Workspace settings</Link></Button>
-        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/help">Help</Link></Button>
-      </nav>
 
       <div className="sm-setup-hero">
         <div className="min-w-0">
