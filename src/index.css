@@ -2036,7 +2036,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-qkpi-bars{margin-left:auto;display:flex;align-items:flex-end;gap:3px;height:34px;flex-shrink:0}
 .sm-qkpi-bars i{display:block;width:5px;border-radius:2px;background:linear-gradient(180deg,hsl(var(--qk)),hsl(var(--qk) / .2));box-shadow:0 0 8px -2px hsl(var(--qk) / .8)}
 /* Day columns: fixed comfortable width, horizontal scroll instead of squishing */
-.sm-qboard{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(240px,1fr);gap:12px;overflow-x:auto;padding:4px 2px 10px;align-items:start}
+.sm-qboard{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(228px,1fr);gap:12px;overflow-x:auto;padding:4px 2px 10px;align-items:start}
 .sm-qcol{border-radius:16px;padding:10px;border:1px solid hsl(var(--border));background:hsl(var(--muted) / .25);min-width:0}
 .sm-qcol[data-today]{border-color:hsl(186 100% 50% / .7);box-shadow:0 0 0 1px hsl(186 100% 50% / .25),0 0 28px -6px hsl(186 100% 50% / .45)}
 .sm-qcol-count{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground));white-space:nowrap}
