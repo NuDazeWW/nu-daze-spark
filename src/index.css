@@ -2550,6 +2550,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 
 @media (min-width: 1024px) { .sm-setup-hub-card { min-height: 236px; } }
 .sm-app-bg .sm-setup-hub-card h3, .sm-dark .sm-setup-hub-card h3 { color: hsl(0 0% 100% / .98); text-shadow: 0 0 14px hsl(var(--sm-fx-turquoise) / .25); }
+.sm-app-bg .sm-setup-hub-card h3.sm-setup-hub-title, .sm-dark .sm-setup-hub-card h3.sm-setup-hub-title { font-size: 12px; line-height: 1.2; letter-spacing: 0; }
 .sm-setup-hub-title { white-space: nowrap; overflow: hidden; }
 .sm-app-bg .sm-setup-hub-card .sm-setup-well, .sm-dark .sm-setup-hub-card .sm-setup-well { width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; }
 .sm-app-bg .sm-setup-hub-card .sm-setup-well svg, .sm-dark .sm-setup-hub-card .sm-setup-well svg { width: 12px; height: 12px; }
