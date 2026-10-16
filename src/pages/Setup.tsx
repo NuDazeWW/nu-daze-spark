@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import {
-  CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send, ExternalLink,
+  CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send,
   ArrowRight, ArrowLeft, ShieldCheck, Globe, Download, Loader2, Lock, Sparkles,
   ChevronDown, ChevronUp, ChevronRight, Tag, UserCircle,
 } from "lucide-react";
