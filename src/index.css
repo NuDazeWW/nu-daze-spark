@@ -2033,8 +2033,6 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-qkpi-meta{display:flex;flex-direction:column;min-width:0}
 .sm-qkpi-value{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:1.7rem;font-weight:700;line-height:1.05}
 @media (max-width:1400px){.sm-qkpi{padding:10px 12px;gap:10px}.sm-qkpi-well{height:38px;width:38px}.sm-qkpi-well svg{height:19px;width:19px}.sm-qkpi-value{font-size:1.45rem}}
-@media (max-width:1279px){.sm-qkpi-bars{display:none}}
-@media (max-width:1279px){.sm-qkpi-label{white-space:normal;line-height:1.2}}
 .sm-qkpi-label{font-size:11px;color:hsl(var(--muted-foreground));white-space:nowrap}
 .sm-qkpi-bars{margin-left:auto;display:flex;align-items:flex-end;gap:3px;height:34px;flex-shrink:0}
 .sm-qkpi-bars i{display:block;width:5px;border-radius:2px;background:linear-gradient(180deg,hsl(var(--qk)),hsl(var(--qk) / .2));box-shadow:0 0 8px -2px hsl(var(--qk) / .8)}
@@ -2087,6 +2085,8 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-qtriage-row:hover{border-color:hsl(var(--qk) / .5);background:hsl(var(--qk) / .07)}
 .sm-qtriage-badge{display:inline-flex;align-items:center;border-radius:999px;padding:1px 8px;font-size:10px;font-weight:600;border:1px solid currentColor;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.sm-qboard .sm-content-card:hover{transform:none}}
+@media (max-width:1279px){.sm-qkpi-bars{display:none}.sm-qkpi-label{white-space:normal;line-height:1.2}}
+.sm-qthumb-text{max-height:100%}
 
 /* ===== Luminous Glass UI treatment (final shared layer) =====
    Approved dashboard is the source of truth: dark precision-cut glass with

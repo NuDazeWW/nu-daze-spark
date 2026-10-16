@@ -105,7 +105,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const tags = (card.hashtags ?? []).map((h) => `#${h.replace(/^#/, "")}`);
   const captionText = card.draft_copy.replace(/#[\w-]+/g, "").replace(/\s+\n/g, "\n").trim();
   // Text tile fallback: the post's own opening words, like a native text graphic.
-  const hookWords = captionText.split(/\s+/).slice(0, 3).join(" ").replace(/[—–,:;.!?]+$/, "");
+  const hookWords = captionText.split(/[\s—–]+/).slice(0, 3).join(" ").replace(/[—–,:;.!?]+$/, "");
   const time = card.scheduled_for ? format(new Date(card.scheduled_for), "h:mm a") : null;
   const preflightLabel = gateState === "none" ? "Not checked yet" : gateState.charAt(0).toUpperCase() + gateState.slice(1);
 
