@@ -36,7 +36,6 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
 import { openInNewTab } from "@/lib/openInNewTab";
-import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 
 const PLATFORMS = ["linkedin", "instagram", "facebook"] as const;
 const PL: Record<string, string> = { linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook" };
@@ -209,12 +208,12 @@ function SetupInner() {
           </CardHeader>
           <CardContent className="space-y-6">
             {step === "company" && (<>
-              <div className="flex items-center gap-4 rounded-md border border-border p-3">
-                <img src={socialMotiveLogo} alt="SocialMotive" className="h-10 rounded object-contain" />
-                <span className="text-sm text-muted-foreground">for</span>
-                {logoUrl ? <img src={logoUrl} alt={companyName} className="h-10 max-w-[140px] object-contain" /> : null}
-                <span className="font-semibold">{companyName || "your company"}</span>
-              </div>
+              {logoUrl ? (
+                <div className="flex items-center gap-4 rounded-md border border-border p-3">
+                  <img src={logoUrl} alt={companyName} className="h-10 max-w-[140px] object-contain" />
+                  <span className="font-semibold">{companyName || "your company"}</span>
+                </div>
+              ) : null}
               <div className="space-y-1.5"><Label>Company name</Label><Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Acme Inc." /></div>
               <div className="space-y-1.5"><Label>Company logo link (optional)</Label>
                 <div className="relative"><Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-9" value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" /></div>
