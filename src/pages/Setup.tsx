@@ -388,7 +388,7 @@ function TeamCard() {
   });
   const roles = [...new Set(users.map((u) => u.role).filter(Boolean))];
   return (
-    <GridCard title="Team" desc={`${users.length} member${users.length === 1 ? "" : "s"} in this workspace.`} icon={Users} href="/settings/team" linkLabel="Manage team">
+    <GridCard title="Team" desc={`${users.length} member${users.length === 1 ? "" : "s"} in this workspace.`} icon={Users} href="/settings/team" linkLabel="Manage team" art={artTeam}>
       <div className="sm-setup-avatars">
         {users.slice(0, 6).map((u) => {
           const name = u.display_name ?? u.email;
@@ -412,7 +412,7 @@ function ConnectionsCard() {
     { key: "pinterest", label: "Pinterest" }, { key: "ai", label: "AI tools" },
   ];
   return (
-    <GridCard title="Social Connections" desc="Posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections">
+    <GridCard title="Social Connections" desc="Posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections" art={artSocial}>
       <div className="grid grid-cols-4 gap-2">
         {tiles.map((t) => (
           <div key={t.key} className="sm-setup-tile" title={t.label}>
@@ -436,7 +436,7 @@ function EmailProviderCard() {
   });
   const connected = Boolean(data && data.provider && data.provider !== "none");
   return (
-    <GridCard title="Email Provider" desc="The email account used to send team alerts." icon={Mail} href="/settings/email-provider" linkLabel="Configure">
+    <GridCard title="Email Provider" desc="The email account used to send team alerts." icon={Mail} href="/settings/email-provider" linkLabel="Configure email provider" art={artEmail}>
       <div className="flex items-center gap-2 text-sm">
         <span className="capitalize">{connected ? data!.provider : "Not connected"}</span>
         {connected && <Badge className="sm-setup-connected gap-1"><CheckCircle2 className="h-3 w-3" />Connected</Badge>}
@@ -449,7 +449,7 @@ function WorkspaceCard() {
   const ws = useWorkspace();
   const s = ws.settings;
   return (
-    <GridCard title="Workspace" desc="Company name, logo and organization type." icon={Building2} href="/setup?step=company" linkLabel="Edit details">
+    <GridCard title="Workspace" desc="Company name, logo and organization type." icon={Building2} href="/setup?step=company" linkLabel="Edit workspace details" art={artWorkspace}>
       <div className="flex items-center gap-3 rounded-md border border-border p-2.5">
         <img src={socialMotiveLogo} alt="SocialMotive" className="h-8 rounded object-contain" />
         <span className="text-xs text-muted-foreground">for</span>
@@ -464,7 +464,7 @@ function WorkspaceCard() {
 function BrandProfilesCard() {
   const { clients } = useActiveClient();
   return (
-    <GridCard title="Your Brand Profiles" desc="Brands, their social accounts and profile links." icon={Building2} href="/settings/clients" linkLabel="Manage profiles">
+    <GridCard title="Your Brand Profiles" desc="Brands, their social accounts and profile links." icon={Building2} href="/settings/clients" linkLabel="Manage brand profiles" art={artBrands}>
       <div className="flex flex-wrap gap-1.5">
         {clients.length === 0 && <p className="text-sm text-muted-foreground">No brand profiles yet.</p>}
         {clients.map((c) => <Badge key={c.id} variant="outline" className="text-xs">{c.name}</Badge>)}
@@ -476,7 +476,7 @@ function BrandProfilesCard() {
 function AccountTagsCard() {
   const { activeTags } = useAccountTags();
   return (
-    <GridCard title="Account Tags" desc="People and organizations you tag in posts." icon={AtSign} href="/settings/tags" linkLabel="Manage tags">
+    <GridCard title="Account Tags" desc="People and organizations you tag in posts." icon={AtSign} href="/settings/tags" linkLabel="Manage tags" art={artTags}>
       <div className="flex flex-wrap gap-1.5">
         {activeTags.length === 0 && <p className="text-sm text-muted-foreground">No tags yet.</p>}
         {activeTags.slice(0, 12).map((t) => <Badge key={t.id} variant="outline" className="text-xs font-mono">@{t.handle}</Badge>)}
