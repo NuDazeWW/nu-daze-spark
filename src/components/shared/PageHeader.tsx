@@ -25,16 +25,12 @@ const RELATED: Record<string, { to: string; label: string }[]> = {
   "/assets": [{ to: "/media-studio", label: "Create with AI" }],
 };
 
-export function PageHeader({ title, description, children, linksMenu = false }: PageHeaderProps & { linksMenu?: boolean }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function PageHeader({ title, description, children, linksMenu: _linksMenu = false }: PageHeaderProps & { linksMenu?: boolean }) {
   const { pathname } = useLocation();
-  const isSettings = pathname.startsWith("/settings") || pathname === "/setup";
-  const related = RELATED[pathname] ?? [];
-  // Dashboard and Media Studio render their own approved header art.
-  const showArt = pathname !== "/" && pathname !== "/media-studio";
-  const links = [
-    ...(!isSettings ? [{ to: "/setup", label: "Workspace setup" }] : []),
-    ...related,
-  ];
+  void RELATED; void Link; void ArrowLeft; void ChevronDown; void Button; void DropdownMenu; void DropdownMenuContent; void DropdownMenuItem; void DropdownMenuTrigger;
+  // Dashboard renders its own header art next to this header.
+  const showArt = pathname !== "/";
   return (
     <div className="sm-page-header sm-unified-header mb-6">
       <div className="sm-page-title-row flex items-start justify-between gap-6">
