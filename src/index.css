@@ -2674,3 +2674,4 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-field-badge svg { width: 16px; height: 16px; filter: drop-shadow(0 1px 1px hsl(0 0% 0% / .4)); }
 .sm-field-dot { width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0;
   background: hsl(var(--tone)); box-shadow: 0 0 8px hsl(var(--tone) / .8); }
+.sm-select-value .sm-brand-badge, .sm-select-value .sm-field-dot { display: none !important; }

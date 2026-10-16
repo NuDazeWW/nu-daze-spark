@@ -51,7 +51,7 @@ export function StudioControls({ clientId, value, onChange, onGenerate, busy, di
             {k === "platform" && value.platform
               ? <BrandBadge platform={value.platform} size={30} />
               : <FieldBadge k={k} tone={FIELD_TONES[k]} Icon={Icon} />}
-            <div className="min-w-0 flex-1 truncate text-left"><SelectValue placeholder={placeholder} /></div>
+            <div className="sm-select-value min-w-0 flex-1 truncate text-left"><SelectValue placeholder={placeholder} /></div>
           </div>
         </SelectTrigger>
         <SelectContent>{opts.map(([v, l]) => (
