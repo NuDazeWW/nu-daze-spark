@@ -340,9 +340,21 @@ body[data-sm-surface="reading"] [role="dialog"] [class*="text-brand-warning/"] {
 .sm-sidebar-bg [data-sidebar="sidebar"] {
   background-color: hsl(266 48% 6%);
   background-image:
-    radial-gradient(260px 340px at 0% 100%, hsl(var(--sm-fx-magenta) / .28), transparent 70%),
-    radial-gradient(240px 300px at 100% 92%, hsl(var(--sm-fx-violet) / .22), transparent 70%),
-    linear-gradient(180deg, hsl(268 50% 8%) 0%, hsl(266 52% 6%) 60%, hsl(268 55% 9%) 100%);
+    radial-gradient(300px 220px at 50% -8%, hsl(var(--sm-fx-turquoise) / .30), transparent 70%),
+    radial-gradient(260px 340px at 0% 100%, hsl(var(--sm-fx-magenta) / .30), transparent 70%),
+    radial-gradient(240px 300px at 100% 92%, hsl(var(--sm-fx-violet) / .26), transparent 70%),
+    linear-gradient(115deg, transparent 30%, hsl(var(--sm-fx-violet) / .07) 45%, transparent 60%),
+    linear-gradient(180deg, hsl(268 50% 9%) 0%, hsl(266 52% 6%) 60%, hsl(268 55% 10%) 100%);
+  border-right: 1px solid hsl(var(--sm-fx-turquoise) / .22);
+  box-shadow:
+    inset -1px 0 0 hsl(var(--sm-fx-violet) / .18),
+    12px 0 40px -18px hsl(var(--sm-fx-turquoise) / .35),
+    6px 0 28px -14px hsl(0 0% 0% / .8);
+}
+.sm-sidebar-bg [data-sidebar="header"] img { filter: drop-shadow(0 0 14px hsl(var(--sm-fx-turquoise) / .35)); }
+.sm-sidebar-bg [data-sidebar="group-label"] {
+  color: hsl(var(--sm-fx-turquoise) / .85);
+  text-shadow: 0 0 12px hsl(var(--sm-fx-turquoise) / .4);
 }
 .sm-sidebar-bg [data-sidebar="menu-button"][data-active="true"] {
   background: hsl(var(--sm-fx-turquoise) / .14);
@@ -543,8 +555,15 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 
 /* ===== Full SocialMotive UI adoption ===== */
 .sm-command-bar {
-  background: hsl(var(--brand-midnight) / .96);
-  box-shadow: inset 0 -1px 0 hsl(var(--sm-fx-lavender) / .12), 0 10px 30px -24px hsl(0 0% 0% / .9);
+  background:
+    radial-gradient(420px 60px at 18% 0%, hsl(var(--sm-fx-turquoise) / .16), transparent 70%),
+    radial-gradient(380px 60px at 82% 0%, hsl(var(--sm-fx-violet) / .14), transparent 70%),
+    hsl(var(--brand-midnight) / .96);
+  box-shadow:
+    inset 0 -1px 0 hsl(var(--sm-fx-turquoise) / .28),
+    inset 0 -2px 0 hsl(var(--sm-fx-violet) / .14),
+    0 12px 32px -18px hsl(var(--sm-fx-turquoise) / .30),
+    0 10px 30px -24px hsl(0 0% 0% / .9);
   backdrop-filter: blur(14px);
 }
 .sm-page-header { position: relative; padding-bottom: 18px; border-bottom: 1px solid hsl(var(--border) / .72); }
