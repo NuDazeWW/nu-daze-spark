@@ -408,16 +408,14 @@ function ConnectionsCard() {
   const tiles = [
     { key: "linkedin", label: "LinkedIn" }, { key: "instagram", label: "Instagram" },
     { key: "facebook", label: "Facebook" }, { key: "x", label: "X" },
-    { key: "tiktok", label: "TikTok" }, { key: "youtube", label: "YouTube" },
-    { key: "pinterest", label: "Pinterest" }, { key: "ai", label: "AI tools" },
+    { key: "ai", label: "AI tools" },
   ];
   return (
     <GridCard title="Social Connections" desc="Posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections" art={artSocial}>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="flex flex-wrap gap-2.5 pt-1">
         {tiles.map((t) => (
-          <div key={t.key} className="sm-setup-tile" title={t.label}>
-            {t.key === "tiktok" ? <Music2 className="h-4 w-4" /> : t.key === "pinterest" ? <Pin className="h-4 w-4" /> : t.key === "ai" ? <Sparkles className="h-4 w-4" /> : t.key === "youtube" ? <Youtube className="h-4 w-4" /> : <PlatformIcon platform={t.key} className="h-4 w-4" />}
-            <span>{t.label}</span>
+          <div key={t.key} className="sm-setup-tile" title={t.label} role="img" aria-label={t.label}>
+            {t.key === "ai" ? <Sparkles className="h-5 w-5" /> : <PlatformIcon platform={t.key} className="h-5 w-5" />}
           </div>
         ))}
       </div>

@@ -2465,3 +2465,11 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
   .sm-app-bg .sm-setup-hub-card { transition: none; }
   .sm-app-bg .sm-setup-hub-card:hover { transform: none; }
 }
+
+/* Setup fidelity refinements */
+.sm-setup-card-art { top: auto; bottom: -8px; transform: none; width: 116px; height: 116px; }
+.sm-app-bg .sm-setup-tile { width: 44px; height: 44px; padding: 0; justify-content: center; flex-direction: row; border-radius: 12px;
+  background: linear-gradient(160deg, hsl(var(--sm-fx-turquoise) / .16), hsl(var(--sm-fx-violet, 262 83% 65%) / .1));
+  border-color: hsl(var(--sm-fx-lavender) / .3); color: hsl(var(--foreground));
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .1), 0 0 14px -6px hsl(var(--sm-fx-turquoise) / .5); }
+@media (max-width: 640px) { .sm-setup-card-art { width: 88px; height: 88px; } }
