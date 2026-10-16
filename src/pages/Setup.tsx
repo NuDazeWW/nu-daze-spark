@@ -23,7 +23,7 @@ import {
 import { toast } from "sonner";
 import {
   CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send, ExternalLink,
-  ArrowRight, ArrowLeft, ShieldCheck, Globe, Download, Loader2, Lock, Music2, Youtube, Sparkles, Pin,
+  ArrowRight, ArrowLeft, ShieldCheck, Globe, Download, Loader2, Lock, Sparkles,
   ChevronDown, ChevronUp, ChevronRight,
 } from "lucide-react";
 import artTeam from "@/assets/setup/art-team.png";
