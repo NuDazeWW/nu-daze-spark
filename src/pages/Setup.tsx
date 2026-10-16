@@ -23,9 +23,16 @@ import {
 import { toast } from "sonner";
 import {
   CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send, ExternalLink,
-  ArrowRight, ShieldCheck, Globe, Download, Loader2, Lock, Music2, Youtube, Sparkles, Pin,
-  ChevronDown, ChevronUp,
+  ArrowRight, ArrowLeft, ShieldCheck, Globe, Download, Loader2, Lock, Sparkles,
+  ChevronDown, ChevronUp, ChevronRight,
 } from "lucide-react";
+import artTeam from "@/assets/setup/art-team.png";
+import artEmail from "@/assets/setup/art-email.png";
+import artWorkspace from "@/assets/setup/art-workspace.png";
+import artBrands from "@/assets/setup/art-brands.png";
+import artTags from "@/assets/setup/art-tags.png";
+import artSocial from "@/assets/setup/art-social.png";
+import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { PlatformIcon } from "@/components/layout/PlatformIcon";
@@ -132,19 +139,31 @@ function SetupInner() {
 
   return (
     <div className="sm-reference sm-setup animate-fade-in space-y-6">
-      <PageHeader title="Workspace setup" description={preview ? "Previewing the setup a new organization sees. Nothing you enter is saved." : "Everything about your workspace in one place. Reopen any step to change it."}>
-        <Button variant="outline" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
-      </PageHeader>
+      <nav aria-label="Setup" className="flex flex-wrap items-center gap-2">
+        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/"><ArrowLeft className="mr-1.5 h-3.5 w-3.5" />Back to workspace</Link></Button>
+        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/setup">Workspace settings</Link></Button>
+        <Button variant="outline" size="sm" asChild className="sm-setup-pill"><Link to="/help">Help</Link></Button>
+      </nav>
+
+      <div className="sm-setup-hero">
+        <div className="min-w-0">
+          <h1>Workspace setup</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            {preview
+              ? "Previewing the setup a new organization sees. Nothing you enter is saved."
+              : `${ws.setupCompleted} of ${ws.setupTotal} steps complete. Reopen any step to change it.`}
+          </p>
+        </div>
+        <div className="sm-setup-hero-side">
+          <img src={headerBirdUrl} alt="" aria-hidden className="sm-setup-hero-bird" />
+          <p className="sm-dash-tagline text-sm leading-snug">Turn strategy<br />into <em className="sm-dash-em-cyan not-italic font-semibold">social</em> <em className="not-italic font-semibold text-brand-citrine">momentum.</em></p>
+          <Button variant="outline" className="sm-setup-pill" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
+        </div>
+      </div>
       {preview && <Alert><AlertDescription>Preview mode: this is what a brand-new workspace looks like. Changes are not saved.</AlertDescription></Alert>}
 
-      <div className="sm-setup-momentum">
-        <div className="flex items-center justify-between gap-3 text-xs font-mono text-muted-foreground">
-          <span>{preview ? 0 : ws.setupCompleted} of {ws.setupTotal} steps complete</span>
-          <span>{Math.round(((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100)}%</span>
-        </div>
-        <div className="sm-setup-progress" role="progressbar" aria-valuenow={preview ? 0 : ws.setupCompleted} aria-valuemax={ws.setupTotal}>
-          <i style={{ width: `${((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100}%` }} />
-        </div>
+      <div className="sm-setup-progress" role="progressbar" aria-valuenow={preview ? 0 : ws.setupCompleted} aria-valuemax={ws.setupTotal} aria-label={`${preview ? 0 : ws.setupCompleted} of ${ws.setupTotal} steps complete`}>
+        <i style={{ width: `${((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100}%` }} />
       </div>
 
       <div className="sm-setup-layout grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
@@ -237,8 +256,8 @@ function SetupInner() {
             <div className="sm-setup-footer flex flex-wrap gap-3 justify-between pt-6">
               <Button variant="ghost" disabled={idx === 0} onClick={() => setStep(SETUP_STEPS[idx - 1].key)}>Back</Button>
               <div className="flex gap-2">
-                {idx < SETUP_STEPS.length - 1 && <Button variant="outline" onClick={next}>Skip for now</Button>}
-                <Button disabled={busy} onClick={() => complete(actions[step])}>{idx === SETUP_STEPS.length - 1 ? "Finish" : "Save & continue"}<ArrowRight className="ml-2 h-4 w-4" /></Button>
+                {idx < SETUP_STEPS.length - 1 && <Button variant="outline" className="sm-setup-pill" onClick={next}>Skip for now</Button>}
+                <Button disabled={busy} className="sm-setup-save" onClick={() => complete(actions[step])}>{idx === SETUP_STEPS.length - 1 ? "Finish" : "Save & continue"}<ArrowRight className="ml-2 h-4 w-4" /></Button>
               </div>
             </div>
           </CardContent>
@@ -250,19 +269,21 @@ function SetupInner() {
 
 /* ================= Settings grid cards ================= */
 
-function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className }: {
-  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string;
+function GridCard({ title, desc, icon: Icon, href, linkLabel, children, className, art }: {
+  title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string; art?: string;
 }) {
   return (
-    <Card className={cn("sm-setup-hub-card flex flex-col", className)}>
-      <CardHeader className="pb-3">
+    <Card className={cn("sm-setup-hub-card relative flex flex-col overflow-hidden", className)}>
+      <CardHeader className="relative z-10 pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span><span className="min-w-0">{title}</span>
+          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span><span className="min-w-0 flex-1">{title}</span>
+          {href && <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />}
         </CardTitle>
         {desc && <CardDescription>{desc}</CardDescription>}
       </CardHeader>
-      <CardContent className="flex-1 space-y-2">{children}</CardContent>
-      {href && <div className="border-t border-border px-6 py-2.5"><Button asChild size="sm" variant="ghost" className="h-7 px-2 text-xs"><Link to={href}>{linkLabel ?? "Manage"}<ArrowRight className="ml-1 h-3 w-3" /></Link></Button></div>}
+      {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
+      <CardContent className={cn("relative z-10 flex-1 space-y-2", art && "sm-setup-hub-pad")}>{children}</CardContent>
+      {href && <div className="relative z-10 mt-auto px-5 pb-5 pt-3"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta w-full"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
     </Card>
   );
 }
@@ -367,7 +388,7 @@ function TeamCard() {
   });
   const roles = [...new Set(users.map((u) => u.role).filter(Boolean))];
   return (
-    <GridCard title="Team" desc={`${users.length} member${users.length === 1 ? "" : "s"} in this workspace.`} icon={Users} href="/settings/team" linkLabel="Manage team">
+    <GridCard title="Team" desc={`${users.length} member${users.length === 1 ? "" : "s"} in this workspace.`} icon={Users} href="/settings/team" linkLabel="Manage team" art={artTeam}>
       <div className="sm-setup-avatars">
         {users.slice(0, 6).map((u) => {
           const name = u.display_name ?? u.email;
@@ -387,16 +408,14 @@ function ConnectionsCard() {
   const tiles = [
     { key: "linkedin", label: "LinkedIn" }, { key: "instagram", label: "Instagram" },
     { key: "facebook", label: "Facebook" }, { key: "x", label: "X" },
-    { key: "tiktok", label: "TikTok" }, { key: "youtube", label: "YouTube" },
-    { key: "pinterest", label: "Pinterest" }, { key: "ai", label: "AI tools" },
+    { key: "ai", label: "AI tools" },
   ];
   return (
-    <GridCard title="Social Connections" desc="Posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections">
-      <div className="grid grid-cols-4 gap-2">
+    <GridCard title="Social Connections" desc="Posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections" art={artSocial}>
+      <div className="flex flex-wrap gap-2.5 pt-1">
         {tiles.map((t) => (
-          <div key={t.key} className="sm-setup-tile" title={t.label}>
-            {t.key === "tiktok" ? <Music2 className="h-4 w-4" /> : t.key === "pinterest" ? <Pin className="h-4 w-4" /> : t.key === "ai" ? <Sparkles className="h-4 w-4" /> : t.key === "youtube" ? <Youtube className="h-4 w-4" /> : <PlatformIcon platform={t.key} className="h-4 w-4" />}
-            <span>{t.label}</span>
+          <div key={t.key} className="sm-setup-tile" title={t.label} role="img" aria-label={t.label}>
+            {t.key === "ai" ? <Sparkles className="h-5 w-5" /> : <PlatformIcon platform={t.key} className="h-5 w-5" />}
           </div>
         ))}
       </div>
@@ -415,7 +434,7 @@ function EmailProviderCard() {
   });
   const connected = Boolean(data && data.provider && data.provider !== "none");
   return (
-    <GridCard title="Email Provider" desc="The email account used to send team alerts." icon={Mail} href="/settings/email-provider" linkLabel="Configure">
+    <GridCard title="Email Provider" desc="The email account used to send team alerts." icon={Mail} href="/settings/email-provider" linkLabel="Configure email provider" art={artEmail}>
       <div className="flex items-center gap-2 text-sm">
         <span className="capitalize">{connected ? data!.provider : "Not connected"}</span>
         {connected && <Badge className="sm-setup-connected gap-1"><CheckCircle2 className="h-3 w-3" />Connected</Badge>}
@@ -428,7 +447,7 @@ function WorkspaceCard() {
   const ws = useWorkspace();
   const s = ws.settings;
   return (
-    <GridCard title="Workspace" desc="Company name, logo and organization type." icon={Building2} href="/setup?step=company" linkLabel="Edit details">
+    <GridCard title="Workspace" desc="Company name, logo and organization type." icon={Building2} href="/setup?step=company" linkLabel="Edit workspace details" art={artWorkspace}>
       <div className="flex items-center gap-3 rounded-md border border-border p-2.5">
         <img src={socialMotiveLogo} alt="SocialMotive" className="h-8 rounded object-contain" />
         <span className="text-xs text-muted-foreground">for</span>
@@ -443,7 +462,7 @@ function WorkspaceCard() {
 function BrandProfilesCard() {
   const { clients } = useActiveClient();
   return (
-    <GridCard title="Your Brand Profiles" desc="Brands, their social accounts and profile links." icon={Building2} href="/settings/clients" linkLabel="Manage profiles">
+    <GridCard title="Your Brand Profiles" desc="Brands, their social accounts and profile links." icon={Building2} href="/settings/clients" linkLabel="Manage brand profiles" art={artBrands}>
       <div className="flex flex-wrap gap-1.5">
         {clients.length === 0 && <p className="text-sm text-muted-foreground">No brand profiles yet.</p>}
         {clients.map((c) => <Badge key={c.id} variant="outline" className="text-xs">{c.name}</Badge>)}
@@ -455,7 +474,7 @@ function BrandProfilesCard() {
 function AccountTagsCard() {
   const { activeTags } = useAccountTags();
   return (
-    <GridCard title="Account Tags" desc="People and organizations you tag in posts." icon={AtSign} href="/settings/tags" linkLabel="Manage tags">
+    <GridCard title="Account Tags" desc="People and organizations you tag in posts." icon={AtSign} href="/settings/tags" linkLabel="Manage tags" art={artTags}>
       <div className="flex flex-wrap gap-1.5">
         {activeTags.length === 0 && <p className="text-sm text-muted-foreground">No tags yet.</p>}
         {activeTags.slice(0, 12).map((t) => <Badge key={t.id} variant="outline" className="text-xs font-mono">@{t.handle}</Badge>)}
