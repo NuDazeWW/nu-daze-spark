@@ -13,15 +13,13 @@ import { ScheduleImportDialog } from "@/components/queue/ScheduleImportDialog";
 import { DeleteConfirmDialog } from "@/components/strategy/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WeeklyCalendarView } from "@/components/queue/WeeklyCalendarView";
 import { QueueBoard, QueueKpis, QueueTriage } from "@/components/queue/QueueBoard";
 import {
-  CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid, Upload, List,
+  CalendarDays, Search, AlertCircle, Inbox, FileText, MessageSquare, LayoutGrid, Upload, List, Plus,
 } from "lucide-react";
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
