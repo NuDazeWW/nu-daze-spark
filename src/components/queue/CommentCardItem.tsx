@@ -78,6 +78,17 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
                 <Button variant="ghost" size="icon" className="h-7 w-7"><MoreVertical className="h-3.5 w-3.5" /></Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {canAdvance && nextStatus && (
+                  <DropdownMenuItem onClick={() => onStatusChange(nextStatus)} disabled={isUpdating}>
+                    <ChevronRight className="mr-2 h-3.5 w-3.5" />Move to {STATUS_META[nextStatus].label}
+                  </DropdownMenuItem>
+                )}
+                {canRevert && prevStatus && (
+                  <DropdownMenuItem onClick={() => onStatusChange(prevStatus)} disabled={isUpdating}>
+                    <ChevronLeft className="mr-2 h-3.5 w-3.5" />Back to {STATUS_META[prevStatus].label}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => copyToClipboard(comment.draft_copy, "Comment")}>
                   <Copy className="mr-2 h-3.5 w-3.5" />Copy Comment
                 </DropdownMenuItem>
