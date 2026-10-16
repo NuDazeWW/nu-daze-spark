@@ -46,12 +46,22 @@ export function StudioControls({ clientId, value, onChange, onGenerate, busy, di
     <div className="space-y-1">
       <Label className="text-xs text-muted-foreground">{label}</Label>
       <Select value={(value[k] as string) || undefined} onValueChange={(v) => set(k, v)}>
-        <SelectTrigger className="sm-studio-select h-11 gap-2.5 items-center">
-          {k === "platform" && value.platform
-            ? <BrandBadge platform={value.platform} size={26} />
-            : <span className="sm-field-well" style={{ "--tone": FIELD_TONES[k] } as React.CSSProperties}><Icon className="h-4 w-4" /></span>}
-          <span className="flex-1 text-left truncate"><SelectValue placeholder={placeholder} /></span></SelectTrigger>
-        <SelectContent>{opts.map(([v, l]) => <SelectItem key={v} value={v} className="capitalize">{l}</SelectItem>)}</SelectContent>
+        <SelectTrigger className="sm-studio-select h-12 gap-2.5">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            {k === "platform" && value.platform
+              ? <BrandBadge platform={value.platform} size={30} />
+              : <FieldBadge k={k} tone={FIELD_TONES[k]} Icon={Icon} />}
+            <div className="min-w-0 flex-1 truncate text-left"><SelectValue placeholder={placeholder} /></div>
+          </div>
+        </SelectTrigger>
+        <SelectContent>{opts.map(([v, l]) => (
+          <SelectItem key={v} value={v} className="capitalize">
+            <span className="flex items-center gap-2">
+              {k === "platform" ? <BrandBadge platform={v} size={20} /> : <span className="sm-field-dot" style={{ "--tone": FIELD_TONES[k] } as React.CSSProperties} />}
+              {l}
+            </span>
+          </SelectItem>
+        ))}</SelectContent>
       </Select>
     </div>
     );
@@ -92,4 +102,8 @@ export function buildPromptContext(s: StudioSettings, assetTitles: string[]) {
     assetTitles.length && `inspired by source assets: ${assetTitles.join(", ")}`,
   ].filter(Boolean);
   return parts.join("; ");
+}
+
+function FieldBadge({ tone, Icon }: { k: string; tone: string; Icon: React.ElementType }) {
+  return <span className="sm-field-badge" style={{ "--tone": tone } as React.CSSProperties} aria-hidden><Icon strokeWidth={2.4} /></span>;
 }
