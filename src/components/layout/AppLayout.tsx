@@ -7,6 +7,7 @@ import { AppSidebar } from "./AppSidebar";
 import { Separator } from "@/components/ui/separator";
 import { UserMenu } from "./UserMenu";
 import { ClientSwitcher } from "./ClientSwitcher";
+import ribbons from "@/assets/strategy-studio-ribbons.jpg";
 import { ClientProvider } from "@/contexts/ClientContext";
 
 export function AppLayout() {
@@ -35,8 +36,9 @@ export function AppLayout() {
             <ClientSwitcher />
             <UserMenu />
           </header>
-          <main className={`sm-page min-w-0 max-w-full flex-1 overflow-x-hidden overflow-y-auto text-foreground ${pageSurface(pathname) === "dark" ? "sm-app-bg" : "sm-light-page"} ${pathname === "/" ? "sm-route-dashboard" : "sm-route-themed"} p-4 md:p-6 lg:p-8`}>
-             <div className="mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
+          <main className={`sm-page relative isolate min-w-0 max-w-full flex-1 overflow-x-hidden overflow-y-auto text-foreground ${pageSurface(pathname) === "dark" ? "sm-app-bg" : "sm-light-page"} ${pathname === "/" ? "sm-route-dashboard" : "sm-route-themed"} p-4 md:p-6 lg:p-8`}>
+             {pageSurface(pathname) === "dark" && <img src={ribbons} alt="" aria-hidden="true" className="sm-header-ribbons" />}
+             <div className="relative z-[1] mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
           </main>
         </SidebarInset>
       </SidebarProvider>

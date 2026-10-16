@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Sparkles, FileText, LayoutTemplate, AudioLines, ShieldCheck, PanelsTopLeft, Users, Megaphone, Hash, MousePointerClick, Clock3, MessagesSquare } from "lucide-react";
-import strategyBackground from "@/assets/strategy-studio-ribbons.jpg";
 import { useAuth } from "@/hooks/useAuth";
 import { BrandVoiceTab } from "@/components/strategy/BrandVoiceTab";
 import { PlatformRulesTab } from "@/components/strategy/PlatformRulesTab";
@@ -55,7 +54,6 @@ export default function Strategy() {
   );
   return (
     <div className="sm-reference sm-strategy animate-fade-in">
-      <img src={strategyBackground} alt="" aria-hidden="true" className="sm-strategy-background" width={1920} height={1280} />
       <PageHeader
         title="Brand & Strategy Studio"
         description="Brand kit, voice, guardrails, platform rules, audiences, campaigns, hashtags, CTAs, and targets — in one place."

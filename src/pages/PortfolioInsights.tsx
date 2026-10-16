@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/shared/PageHeader";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,10 +69,7 @@ export default function PortfolioInsights() {
 
   return (
     <div className="sm-reference sm-insights space-y-6">
-      <div className="sm-insights-heading">
-        <h1 className="text-4xl font-display font-semibold flex items-center gap-4"><PieChart className="h-12 w-12 p-3 rounded-xl border border-primary/30 bg-primary/10 text-primary shrink-0" /> Portfolio Insights</h1>
-        <p className="text-sm text-muted-foreground">How your content is balanced across pillars, platforms and formats over the last 30 days — and where you're falling short this week.</p>
-      </div>
+      <PageHeader title="Portfolio Insights" description="How your content is balanced across pillars, platforms and formats over the last 30 days — and where you're falling short this week." />
       {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : (
         <>
           <div className="sm-metric-row grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
