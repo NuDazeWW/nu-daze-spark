@@ -15,7 +15,7 @@ const RELATED: Record<string, { to: string; label: string }[]> = {
   "/media-studio": [{ to: "/settings/connections?tab=ai", label: "AI tool connections" }, { to: "/settings/brand-kit", label: "Brand Kit" }, { to: "/assets", label: "Asset Library" }],
   "/settings/connections": [{ to: "/media-studio", label: "Motive Media Studio" }, { to: "/setup", label: "Workspace setup" }],
   "/settings/brand-kit": [{ to: "/media-studio", label: "Motive Media Studio" }],
-  "/setup": [{ to: "/settings/workspace", label: "Workspace settings" }, { to: "/help", label: "Help" }],
+  "/setup": [{ to: "/help", label: "Help" }],
   "/queue": [{ to: "/planner", label: "Content Planner" }, { to: "/approved", label: "Approved Content" }],
   "/approved": [{ to: "/queue", label: "Daily Queue" }, { to: "/publishing", label: "Publishing Status" }],
   "/generator": [{ to: "/briefs", label: "Campaign Briefs" }, { to: "/queue", label: "Daily Queue" }],
@@ -32,7 +32,7 @@ export function PageHeader({ title, description, children, linksMenu = false }: 
   // Dashboard and Media Studio render their own approved header art.
   const showArt = pathname !== "/" && pathname !== "/media-studio";
   const links = [
-    ...(!isSettings ? [{ to: "/settings/workspace", label: "Workspace settings" }] : []),
+    ...(!isSettings ? [{ to: "/setup", label: "Workspace setup" }] : []),
     ...related,
   ];
   return (
@@ -55,9 +55,14 @@ export function PageHeader({ title, description, children, linksMenu = false }: 
               <ArrowLeft className="h-3.5 w-3.5" />Back to workspace
             </Link>
           </Button>
+          {isSettings && pathname !== "/setup" && (
+            <Button asChild variant="ghost" size="sm" className="border border-border/60">
+              <Link to="/setup" className="gap-1.5"><ArrowLeft className="h-3.5 w-3.5" />Back to Setup</Link>
+            </Button>
+          )}
           {!isSettings && (
             <Button asChild variant="ghost" size="sm" className="border border-border/60">
-              <Link to="/settings/workspace">Workspace settings</Link>
+              <Link to="/setup">Workspace setup</Link>
             </Button>
           )}
           {related.map((r) => (

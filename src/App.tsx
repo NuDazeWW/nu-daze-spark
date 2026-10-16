@@ -24,7 +24,6 @@ import AccountTags from "./pages/AccountTags";
 import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
 import Team from "./pages/settings/Team";
-import Team from "./pages/settings/Team";
 import Usage from "./pages/settings/Usage";
 import Notifications from "./pages/settings/Notifications";
 import EmailProvider from "./pages/settings/EmailProvider";
