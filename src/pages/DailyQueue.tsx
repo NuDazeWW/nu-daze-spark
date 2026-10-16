@@ -165,13 +165,13 @@ export default function DailyQueue() {
       <QueueKpis items={queueItems} />
 
       {/* Single-row toolbar: search, filters, view, actions */}
-      <div className="sm-qtoolbar flex flex-wrap items-center gap-2 mb-5">
-        <div className="relative w-full sm:w-[280px]">
+      <div className="sm-qtoolbar flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative flex-1 min-w-[170px] max-w-[300px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input aria-label="Search queue" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search posts, captions, or tags…" className="pl-9 h-9" />
         </div>
         <Select value={platformFilter} onValueChange={setPlatformFilter}>
-          <SelectTrigger aria-label="Platform" className="h-9 w-[160px]"><SelectValue placeholder="All Platforms" /></SelectTrigger>
+          <SelectTrigger aria-label="Platform" className="h-9 w-auto min-w-[128px] gap-2"><SelectValue placeholder="All Platforms" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Platforms ({queueItems.length})</SelectItem>
             {platforms.map((p) => (
@@ -180,7 +180,7 @@ export default function DailyQueue() {
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger aria-label="Status" className="h-9 w-[160px]"><SelectValue placeholder="All Statuses" /></SelectTrigger>
+          <SelectTrigger aria-label="Status" className="h-9 w-auto min-w-[128px] gap-2"><SelectValue placeholder="All Statuses" /></SelectTrigger>
           <SelectContent>
             {STATUS_FILTERS.map((sf) => (
               <SelectItem key={sf.value} value={sf.value}>
@@ -190,7 +190,7 @@ export default function DailyQueue() {
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger aria-label="Type" className="h-9 w-[140px]"><SelectValue placeholder="All Items" /></SelectTrigger>
+          <SelectTrigger aria-label="Type" className="h-9 w-auto min-w-[112px] gap-2"><SelectValue placeholder="All Items" /></SelectTrigger>
           <SelectContent>
             {TYPE_FILTERS.map((tf) => (
               <SelectItem key={tf.value} value={tf.value}>
@@ -199,19 +199,19 @@ export default function DailyQueue() {
             ))}
           </SelectContent>
         </Select>
-        <div role="group" aria-label="View" className="flex items-center gap-1 rounded-full border p-1">
+        <div role="group" aria-label="View" className="flex items-center gap-0.5 rounded-full border p-0.5">
           {([["board", LayoutGrid, "Board"], ["list", List, "List"], ["calendar", CalendarDays, "Calendar"]] as const).map(([v, Icon, l]) => (
-            <Button key={v} size="sm" variant={view === v ? "default" : "ghost"} aria-pressed={view === v} onClick={() => setView(v)} className="rounded-full h-8 px-3 text-sm">
-              <Icon className="h-4 w-4 mr-1.5" />{l}
+            <Button key={v} size="sm" variant={view === v ? "default" : "ghost"} aria-pressed={view === v} onClick={() => setView(v)} className="rounded-full h-8 px-2.5 text-sm" title={l} aria-label={l}>
+              <Icon className="h-4 w-4 2xl:mr-1.5" /><span className="hidden 2xl:inline">{l}</span>
             </Button>
           ))}
         </div>
-        <div className="flex items-center gap-2 lg:ml-auto">
+        <div className="flex items-center gap-2 ml-auto">
           <Button asChild size="sm" className="h-9">
             <Link to="/generator"><Plus className="h-4 w-4 mr-1.5" />New Post</Link>
           </Button>
-          <Button variant="outline" size="sm" className="h-9" onClick={() => setImportOpen(true)}>
-            <Upload className="h-4 w-4 mr-1.5" />Import schedule
+          <Button variant="outline" size="sm" className="h-9" title="Import schedule" aria-label="Import schedule" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4 2xl:mr-1.5" /><span className="hidden 2xl:inline">Import schedule</span>
           </Button>
         </div>
       </div>
