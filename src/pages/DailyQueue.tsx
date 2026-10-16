@@ -4,7 +4,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useStatusDates, postLabel, matchesPostNumber } from "@/components/tracking/PostTracking";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { usePostCards, STATUS_META, type ApprovalStatus, type QueueItemType } from "@/hooks/usePostCards";
+import { usePostCards, type QueueItemType } from "@/hooks/usePostCards";
 import { PostCardItem } from "@/components/queue/PostCardItem";
 import { CommentCardItem } from "@/components/queue/CommentCardItem";
 import { PostCardEditDialog } from "@/components/queue/PostCardEditDialog";

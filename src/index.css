@@ -2024,14 +2024,22 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 
 
 /* ===== Daily Queue board (reference layout) ===== */
-.sm-qkpi{position:relative;border-radius:16px;padding:14px 16px;border:1px solid hsl(var(--qk) / .45);background:linear-gradient(160deg,hsl(var(--qk) / .14),hsl(var(--card) / .9) 60%);box-shadow:0 0 0 1px hsl(var(--qk) / .08),0 8px 28px -12px hsl(var(--qk) / .55)}
-.sm-qkpi-value{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:1.9rem;font-weight:700;line-height:1.1;margin-top:6px}
-.sm-qkpi-icon{color:hsl(var(--qk))}
 [data-tone=cyan]{--qk:186 100% 50%}[data-tone=coral]{--qk:12 90% 64%}[data-tone=sky]{--qk:205 90% 62%}
 [data-tone=emerald]{--qk:158 75% 48%}[data-tone=crimson]{--qk:350 85% 58%}[data-tone=gold]{--qk:45 100% 60%}
+/* KPI cards: glowing icon well, bold counter, accent mini bar chart */
+.sm-qkpi{display:flex;align-items:center;gap:12px;position:relative;border-radius:16px;padding:12px 14px;border:1px solid hsl(var(--qk) / .4);background:linear-gradient(160deg,hsl(var(--qk) / .12),hsl(var(--card) / .92) 55%);box-shadow:inset 0 1px 0 hsl(0 0% 100% / .05),0 10px 30px -16px hsl(var(--qk) / .6);overflow:hidden}
+.sm-qkpi-well{display:flex;align-items:center;justify-content:center;height:44px;width:44px;flex-shrink:0;border-radius:12px;background:hsl(var(--qk) / .14);border:1px solid hsl(var(--qk) / .45);color:hsl(var(--qk));box-shadow:0 0 16px -4px hsl(var(--qk) / .65)}
+.sm-qkpi-well svg{height:22px;width:22px;filter:drop-shadow(0 0 6px hsl(var(--qk) / .8))}
+.sm-qkpi-meta{display:flex;flex-direction:column;min-width:0}
+.sm-qkpi-value{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:1.7rem;font-weight:700;line-height:1.05}
+.sm-qkpi-label{font-size:11px;color:hsl(var(--muted-foreground));white-space:nowrap}
+.sm-qkpi-bars{margin-left:auto;display:flex;align-items:flex-end;gap:3px;height:34px;flex-shrink:0}
+.sm-qkpi-bars i{display:block;width:5px;border-radius:2px;background:linear-gradient(180deg,hsl(var(--qk)),hsl(var(--qk) / .2));box-shadow:0 0 8px -2px hsl(var(--qk) / .8)}
+/* Day columns: fixed comfortable width, horizontal scroll instead of squishing */
+.sm-qboard{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(240px,1fr);gap:12px;overflow-x:auto;padding:4px 2px 10px;align-items:start}
 .sm-qcol{border-radius:16px;padding:10px;border:1px solid hsl(var(--border));background:hsl(var(--muted) / .25);min-width:0}
 .sm-qcol[data-today]{border-color:hsl(186 100% 50% / .7);box-shadow:0 0 0 1px hsl(186 100% 50% / .25),0 0 28px -6px hsl(186 100% 50% / .45)}
-.sm-qcol-count{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground))}
+.sm-qcol-count{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground));white-space:nowrap}
 .sm-qboard .sm-content-card{transition:transform .15s ease,box-shadow .15s ease}
 .sm-qboard .sm-content-card:hover{transform:translateY(-2px);box-shadow:0 10px 30px -14px hsl(186 100% 50% / .55)}
 .sm-qplatform{display:inline-flex;height:22px;width:22px;align-items:center;justify-content:center;border-radius:6px;background:hsl(var(--muted));color:hsl(var(--foreground))}
@@ -2039,9 +2047,14 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-qplatform[data-platform=instagram]{background:linear-gradient(135deg,hsl(40 95% 55%),hsl(330 80% 55%),hsl(270 70% 55%));color:hsl(0 0% 100%)}
 .sm-qplatform[data-platform=facebook]{background:hsl(220 85% 52%);color:hsl(0 0% 100%)}
 .sm-qplatform[data-platform=x]{background:hsl(0 0% 8%);color:hsl(0 0% 100%)}
-.sm-qthumb{height:64px;width:64px;border-radius:10px;overflow:hidden;border:1px solid hsl(var(--border));background:hsl(var(--muted))}
-.sm-qtag{color:hsl(186 85% 42%);font-weight:500}
+.sm-qthumb{height:68px;width:68px;border-radius:10px;overflow:hidden;border:1px solid hsl(var(--border));background:hsl(var(--muted))}
+.sm-qtag{color:hsl(186 85% 55%);font-weight:500}
+/* Triage panels: platform well, title, status pill, chevron */
 .sm-qtriage{border-radius:16px;padding:14px;border:1px solid hsl(var(--qk) / .45);background:linear-gradient(160deg,hsl(var(--qk) / .10),hsl(var(--card)) 55%);box-shadow:0 8px 26px -14px hsl(var(--qk) / .6)}
+.sm-qtriage-well{display:inline-flex;align-items:center;justify-content:center;height:28px;width:28px;border-radius:9px;background:hsl(var(--qk) / .14);border:1px solid hsl(var(--qk) / .4);color:hsl(var(--qk))}
+.sm-qtriage-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border-radius:10px;padding:8px;border:1px solid hsl(var(--border) / .6);background:hsl(var(--muted) / .18);transition:border-color .15s ease,background .15s ease}
+.sm-qtriage-row:hover{border-color:hsl(var(--qk) / .5);background:hsl(var(--qk) / .07)}
+.sm-qtriage-badge{display:inline-flex;align-items:center;border-radius:999px;padding:1px 8px;font-size:10px;font-weight:600;border:1px solid currentColor;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.sm-qboard .sm-content-card:hover{transform:none}}
 
 /* ===== Luminous Glass UI treatment (final shared layer) =====
