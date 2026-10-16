@@ -38,13 +38,14 @@ export function StudioControls({ clientId, value, onChange, onGenerate, busy, di
     },
   });
   const ICONS: Record<string, React.ElementType> = { platform: Share2, contentType: LayoutGrid, tone: Smile, audience: Users, cta: MousePointerClick, voice: FileText };
+  const TONES: Record<string, string> = { platform: "var(--sm-fx-turquoise)", contentType: "var(--sm-fx-violet)", tone: "var(--sm-fx-citrine)", audience: "var(--sm-fx-lime)", cta: "var(--sm-fx-coral)", voice: "var(--sm-fx-magenta)" };
   const field = (label: string, k: keyof StudioSettings, opts: [string, string][], placeholder = "Select") => {
     const Icon = ICONS[k];
     return (
     <div className="space-y-1">
       <Label className="text-xs text-muted-foreground">{label}</Label>
       <Select value={(value[k] as string) || undefined} onValueChange={(v) => set(k, v)}>
-        <SelectTrigger className="sm-studio-select h-10 gap-2"><span className="sm-well sm-well-sm sm-well-violet"><Icon className="h-3.5 w-3.5" /></span><span className="flex-1 text-left truncate"><SelectValue placeholder={placeholder} /></span></SelectTrigger>
+        <SelectTrigger className="sm-studio-select h-10 gap-2"><span className="sm-field-well" style={{ "--tone": TONES[k] } as React.CSSProperties}><Icon className="h-3.5 w-3.5" /></span><span className="flex-1 text-left truncate"><SelectValue placeholder={placeholder} /></span></SelectTrigger>
         <SelectContent>{opts.map(([v, l]) => <SelectItem key={v} value={v} className="capitalize">{l}</SelectItem>)}</SelectContent>
       </Select>
     </div>
