@@ -25,65 +25,26 @@ const RELATED: Record<string, { to: string; label: string }[]> = {
   "/assets": [{ to: "/media-studio", label: "Create with AI" }],
 };
 
-export function PageHeader({ title, description, children, linksMenu = false }: PageHeaderProps & { linksMenu?: boolean }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function PageHeader({ title, description, children, linksMenu: _linksMenu = false }: PageHeaderProps & { linksMenu?: boolean }) {
   const { pathname } = useLocation();
-  const isSettings = pathname.startsWith("/settings") || pathname === "/setup";
-  const related = RELATED[pathname] ?? [];
-  // Dashboard and Media Studio render their own approved header art.
-  const showArt = pathname !== "/" && pathname !== "/media-studio";
-  const links = [
-    ...(!isSettings ? [{ to: "/setup", label: "Workspace setup" }] : []),
-    ...related,
-  ];
+  void RELATED; void Link; void ArrowLeft; void ChevronDown; void Button; void DropdownMenu; void DropdownMenuContent; void DropdownMenuItem; void DropdownMenuTrigger;
+  // Dashboard renders its own header art next to this header.
+  const showArt = pathname !== "/";
   return (
-    <div className="sm-page-header mb-6 space-y-3">
-      {pathname !== "/" && linksMenu && (
-        <nav aria-label="Quick navigation" className="sm-page-links flex flex-wrap items-center gap-2">
-          <Button asChild variant="ghost" size="sm" className="h-7 px-2 text-xs"><Link to="/" className="gap-1.5"><ArrowLeft className="h-3.5 w-3.5" />Back to workspace</Link></Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">Shortcuts <ChevronDown className="h-3 w-3" /></Button></DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {links.map((r) => <DropdownMenuItem key={r.to} asChild><Link to={r.to}>{r.label}</Link></DropdownMenuItem>)}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </nav>
-      )}
-      {pathname !== "/" && !linksMenu && (
-        <nav aria-label="Quick navigation" className="sm-page-links flex flex-wrap items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link to="/" className="gap-1.5">
-              <ArrowLeft className="h-3.5 w-3.5" />Back to workspace
-            </Link>
-          </Button>
-          {isSettings && pathname !== "/setup" && (
-            <Button asChild variant="ghost" size="sm" className="border border-border/60">
-              <Link to="/setup" className="gap-1.5"><ArrowLeft className="h-3.5 w-3.5" />Back to Setup</Link>
-            </Button>
-          )}
-          {!isSettings && (
-            <Button asChild variant="ghost" size="sm" className="border border-border/60">
-              <Link to="/setup">Workspace setup</Link>
-            </Button>
-          )}
-          {related.map((r) => (
-            <Button asChild key={r.to} variant="ghost" size="sm" className="border border-border/60">
-              <Link to={r.to}>{r.label}</Link>
-            </Button>
-          ))}
-        </nav>
-      )}
-      <div className="sm-page-title-row flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0">
+    <div className="sm-page-header sm-unified-header mb-6">
+      <div className="sm-page-title-row flex items-start justify-between gap-6">
+        <div className="min-w-0 flex-1">
           <h1 className="text-3xl md:text-4xl font-semibold leading-tight text-foreground break-words">{title}</h1>
           {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+          {children && <div className="sm-page-actions mt-4 flex flex-wrap items-center gap-2">{children}</div>}
         </div>
         {showArt && (
-          <div className="sm-header-art" aria-hidden="true">
-            <img src={headerBirdUrl} alt="" className="sm-header-bird" />
+          <div className="sm-header-art sm-dash-art" aria-hidden="true">
+            <img src={headerBirdUrl} alt="" className="sm-dash-bird" />
             <p className="sm-dash-tagline">Turn strategy<br />into <span className="sm-dash-em-cyan">social</span> <span className="sm-dash-em-lime">momentum.</span></p>
           </div>
         )}
-        {children && <div className="sm-page-actions flex flex-wrap items-center gap-2">{children}</div>}
       </div>
     </div>
   );
