@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveClient } from "@/contexts/ClientContext";
 import { useWorkspace, SETUP_STEPS, markSetupStep, updateWorkspaceSettings, type SetupStepKey, ROLE_META, type WorkspaceRole } from "@/hooks/useWorkspace";
-import { useAccountTags } from "@/hooks/useAccountTags";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,7 @@ import { toast } from "sonner";
 import {
   CheckCircle2, Circle, Eye, Building2, Users, Link2, Mail, AtSign, Bell, Send, ExternalLink,
   ArrowRight, ArrowLeft, ShieldCheck, Globe, Download, Loader2, Lock, Sparkles,
-  ChevronDown, ChevronUp, ChevronRight,
+  ChevronDown, ChevronUp, ChevronRight, Tag, UserCircle,
 } from "lucide-react";
 import artTeam from "@/assets/setup/art-team.png";
 import artEmail from "@/assets/setup/art-email.png";
@@ -59,7 +58,6 @@ function SetupInner() {
     const s = params.get("step") as SetupStepKey | null;
     if (s && SETUP_STEPS.some((x) => x.key === s)) setStep(s);
   }, [params]);
-
 
   const [companyName, setCompanyName] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
@@ -166,11 +164,12 @@ function SetupInner() {
         <i style={{ width: `${((preview ? 0 : ws.setupCompleted) / ws.setupTotal) * 100}%` }} />
       </div>
 
-      <div className="sm-setup-layout grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
-        <ol className="sm-setup-steps space-y-2">
+      {/* Unified stepper frame: rail + active step in one glass container */}
+      <div className="sm-setup-frame">
+        <ol className="sm-setup-steps space-y-1.5">
           {SETUP_STEPS.map((s, i) => (
             <li key={s.key}>
-              <Button variant="ghost" onClick={() => setStep(s.key)} className={cn("sm-setup-step flex h-auto min-h-14 w-full items-start justify-start gap-3 rounded-xl px-4 py-3 text-left text-sm whitespace-normal", s.key === step ? "sm-setup-step-active font-semibold" : "hover:bg-muted/60")}>
+              <Button variant="ghost" onClick={() => setStep(s.key)} className={cn("sm-setup-step flex h-auto w-full items-center justify-start gap-3 rounded-full px-4 py-2.5 text-left text-[13px] whitespace-normal", s.key === step ? "sm-setup-step-active font-semibold" : "hover:bg-muted/60")}>
                 <span className={cn("sm-setup-step-dot", progress[s.key] && "sm-setup-step-dot-done", s.key === step && !progress[s.key] && "sm-setup-step-dot-active")}>
                   {progress[s.key] ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
                 </span>
@@ -181,7 +180,10 @@ function SetupInner() {
         </ol>
 
         <Card className="sm-setup-focus">
-          <CardHeader className="flex flex-row items-start gap-4 space-y-0"><Building2 className="sm-icon-well h-16 w-16 shrink-0 rounded-2xl p-4" /><div><CardTitle className="text-2xl">{current.title}</CardTitle><CardDescription className="mt-2">{current.description}</CardDescription></div></CardHeader>
+          <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+            <span className="sm-icon-well sm-setup-focus-well"><Building2 className="h-5 w-5" /></span>
+            <div><CardTitle className="text-xl">{current.title}</CardTitle><CardDescription className="mt-1">{current.description}</CardDescription></div>
+          </CardHeader>
           <CardContent className="space-y-6">
             {step === "company" && (<>
               <div className="flex items-center gap-4 rounded-md border border-border p-3">
@@ -191,7 +193,9 @@ function SetupInner() {
                 <span className="font-semibold">{companyName || "your company"}</span>
               </div>
               <div className="space-y-1.5"><Label>Company name</Label><Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Acme Inc." /></div>
-              <div className="space-y-1.5"><Label>Company logo link (optional)</Label><Input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" /></div>
+              <div className="space-y-1.5"><Label>Company logo link (optional)</Label>
+                <div className="relative"><Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-9" value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" /></div>
+              </div>
               <p className="text-xs text-muted-foreground">The app stays branded SocialMotive; your company appears alongside it.</p>
             </>)}
             {step === "org_type" && (
@@ -273,17 +277,18 @@ function GridCard({ title, desc, icon: Icon, href, linkLabel, children, classNam
   title: string; desc?: string; icon: typeof Users; href?: string; linkLabel?: string; children?: React.ReactNode; className?: string; art?: string;
 }) {
   return (
-    <Card className={cn("sm-setup-hub-card relative flex flex-col overflow-hidden", className)}>
-      <CardHeader className="relative z-10 pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span><span className="min-w-0 flex-1">{title}</span>
-          {href && <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />}
+    <Card className={cn("sm-setup-hub-card relative flex min-h-[196px] flex-col overflow-hidden", className)}>
+      {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
+      <CardHeader className="relative z-10 pb-2">
+        <CardTitle className="flex items-center gap-2.5 text-base">
+          <span className="sm-icon-well sm-setup-well"><Icon className="h-4 w-4" /></span>
+          <span className="min-w-0 flex-1">{title}</span>
+          {href && <Link to={href} aria-label={linkLabel ?? title} className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"><ChevronRight className="h-4 w-4" /></Link>}
         </CardTitle>
         {desc && <CardDescription>{desc}</CardDescription>}
       </CardHeader>
-      {art && <img src={art} alt="" aria-hidden loading="lazy" width={816} height={816} className="sm-setup-card-art" />}
       <CardContent className={cn("relative z-10 flex-1 space-y-2", art && "sm-setup-hub-pad")}>{children}</CardContent>
-      {href && <div className="relative z-10 mt-auto px-5 pb-5 pt-3"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta w-full"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
+      {href && <div className="relative z-10 mt-auto px-5 pb-5 pt-2"><Button asChild size="sm" variant="outline" className="sm-setup-card-cta"><Link to={href}>{linkLabel ?? "Manage"}</Link></Button></div>}
     </Card>
   );
 }
@@ -295,12 +300,12 @@ function PostToCard() {
     <GridCard title="Post to" desc={`Quick links to post for ${activeClient?.name ?? "the selected brand"}.`} icon={Send}>
       {accounts.length === 0 && <p className="text-sm text-muted-foreground">No social accounts saved yet.</p>}
       {accounts.map((a) => (
-        <div key={a.id} className="flex items-center gap-2 text-sm">
-          <PlatformIcon platform={a.platform} className="h-4 w-4" />
-          <span className="flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
+        <div key={a.id} className="flex items-center gap-1.5 text-[13px]">
+          <PlatformIcon platform={a.platform} className="h-4 w-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate">{PLATFORM_LABEL[a.platform] ?? a.platform}{a.handle ? ` · ${a.handle}` : ""}</span>
           {a.profile_url
-            ? <Button size="sm" variant="outline" className="whitespace-nowrap" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
-            : <Button size="sm" variant="ghost" className="whitespace-nowrap" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
+            ? <Button size="sm" variant="outline" className="h-7 shrink-0 whitespace-nowrap px-2 text-xs" onClick={() => openInNewTab(a.profile_url!)}>Open<ExternalLink className="ml-1 h-3 w-3" /></Button>
+            : <Button size="sm" variant="ghost" className="h-7 shrink-0 whitespace-nowrap px-2 text-xs" asChild><Link to={`/settings/clients?accounts=${activeClientId}`}>Add link</Link></Button>}
         </div>
       ))}
     </GridCard>
@@ -386,20 +391,9 @@ function TeamCard() {
       return (data ?? []) as { user_id: string; display_name: string | null; email: string; role: WorkspaceRole }[];
     },
   });
-  const roles = [...new Set(users.map((u) => u.role).filter(Boolean))];
   return (
-    <GridCard title="Team" desc={`${users.length} member${users.length === 1 ? "" : "s"} in this workspace.`} icon={Users} href="/settings/team" linkLabel="Manage team" art={artTeam}>
-      <div className="sm-setup-avatars">
-        {users.slice(0, 6).map((u) => {
-          const name = u.display_name ?? u.email;
-          const initials = name.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
-          return <span key={u.user_id} title={name} className="sm-setup-avatar">{initials}</span>;
-        })}
-        {users.length > 6 && <span className="sm-setup-avatar sm-setup-avatar-more">+{users.length - 6}</span>}
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {roles.map((r) => <Badge key={r} variant="outline" className="text-xs">{ROLE_META[r]?.label ?? r}</Badge>)}
-      </div>
+    <GridCard title="Team" desc="Invite people and choose Admin, Editor, Approver or Viewer." icon={Users} href="/settings/team" linkLabel="Manage team" art={artTeam}>
+      <p className="text-sm text-muted-foreground">{users.length} member{users.length === 1 ? "" : "s"} in this workspace.</p>
     </GridCard>
   );
 }
@@ -408,14 +402,13 @@ function ConnectionsCard() {
   const tiles = [
     { key: "linkedin", label: "LinkedIn" }, { key: "instagram", label: "Instagram" },
     { key: "facebook", label: "Facebook" }, { key: "x", label: "X" },
-    { key: "ai", label: "AI tools" },
   ];
   return (
-    <GridCard title="Social Connections" desc="Posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections" art={artSocial}>
+    <GridCard title="Social Connections" desc="Connect posting accounts and AI tools." icon={Link2} href="/settings/connections" linkLabel="Manage connections">
       <div className="flex flex-wrap gap-2.5 pt-1">
         {tiles.map((t) => (
           <div key={t.key} className="sm-setup-tile" title={t.label} role="img" aria-label={t.label}>
-            {t.key === "ai" ? <Sparkles className="h-5 w-5" /> : <PlatformIcon platform={t.key} className="h-5 w-5" />}
+            <PlatformIcon platform={t.key} className="h-5 w-5" />
           </div>
         ))}
       </div>
@@ -444,53 +437,43 @@ function EmailProviderCard() {
 }
 
 function WorkspaceCard() {
-  const ws = useWorkspace();
-  const s = ws.settings;
   return (
-    <GridCard title="Workspace" desc="Company name, logo and organization type." icon={Building2} href="/setup?step=company" linkLabel="Edit workspace details" art={artWorkspace}>
-      <div className="flex items-center gap-3 rounded-md border border-border p-2.5">
-        <img src={socialMotiveLogo} alt="SocialMotive" className="h-8 rounded object-contain" />
-        <span className="text-xs text-muted-foreground">for</span>
-        {s?.company_logo_url ? <img src={s.company_logo_url} alt={s.company_name} className="h-8 max-w-[100px] object-contain" /> : null}
-        <span className="truncate text-sm font-semibold">{s?.company_name}</span>
-      </div>
-      <p className="text-xs text-muted-foreground capitalize">{s?.org_type} · {s?.entity_label_plural}</p>
+    <GridCard title="Workspace" desc="Company name, logo and your web address." icon={Building2} href="/setup?step=company" linkLabel="Edit workspace details" art={artWorkspace}>
+      <span className="sr-only">Workspace identity settings</span>
     </GridCard>
   );
 }
 
 function BrandProfilesCard() {
-  const { clients } = useActiveClient();
   return (
-    <GridCard title="Your Brand Profiles" desc="Brands, their social accounts and profile links." icon={Building2} href="/settings/clients" linkLabel="Manage brand profiles" art={artBrands}>
-      <div className="flex flex-wrap gap-1.5">
-        {clients.length === 0 && <p className="text-sm text-muted-foreground">No brand profiles yet.</p>}
-        {clients.map((c) => <Badge key={c.id} variant="outline" className="text-xs">{c.name}</Badge>)}
-      </div>
+    <GridCard title="Your Brand Profiles" desc="Brands, their social accounts and profile links." icon={UserCircle} href="/settings/clients" linkLabel="Manage brand profiles" art={artBrands}>
+      <span className="sr-only">Brand profile settings</span>
     </GridCard>
   );
 }
 
 function AccountTagsCard() {
-  const { activeTags } = useAccountTags();
   return (
-    <GridCard title="Account Tags" desc="People and organizations you tag in posts." icon={AtSign} href="/settings/tags" linkLabel="Manage tags" art={artTags}>
-      <div className="flex flex-wrap gap-1.5">
-        {activeTags.length === 0 && <p className="text-sm text-muted-foreground">No tags yet.</p>}
-        {activeTags.slice(0, 12).map((t) => <Badge key={t.id} variant="outline" className="text-xs font-mono">@{t.handle}</Badge>)}
-        {activeTags.length > 12 && <Badge variant="outline" className="text-xs">+{activeTags.length - 12} more</Badge>}
-      </div>
+    <GridCard title="Account Tags" desc="People and organizations you tag in posts." icon={Tag} href="/settings/tags" linkLabel="Manage tags" art={artTags}>
+      <span className="sr-only">Account tag settings</span>
     </GridCard>
   );
 }
 
-function NotificationsCard() {
+function NotificationsBanner() {
   return (
-    <GridCard title="Notifications" desc="Which emails your team gets, and when." icon={Bell} href="/settings/notifications" linkLabel="Manage notifications">
-      <p className="text-sm text-muted-foreground">Daily digest, post approvals, review requests and went-out alerts — configured per teammate.</p>
-    </GridCard>
+    <Link to="/settings/notifications" className="sm-setup-banner-link group">
+      <span className="sm-icon-well sm-setup-well"><Bell className="h-4 w-4" /></span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-base font-semibold">Notifications</span>
+        <span className="block text-sm text-muted-foreground">Which emails you get, and when.</span>
+      </span>
+      <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+    </Link>
   );
 }
+
+/* ================= Advanced tools (kept, folded below the mock grid) ================= */
 
 function PlanLimitsCard() {
   const ws = useWorkspace();
@@ -684,9 +667,11 @@ function DangerZoneCard() {
 
 function SettingsGrid() {
   const ws = useWorkspace();
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <h2 className="font-display text-lg font-semibold">Workspace settings</h2>
+      {/* Mock grid: exactly 8 cards, 2 rows of 4 */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <PostToCard />
         {ws.canManage && <GovernanceCard />}
@@ -696,13 +681,24 @@ function SettingsGrid() {
         {ws.canManage && <WorkspaceCard />}
         <BrandProfilesCard />
         <AccountTagsCard />
-        <NotificationsCard />
-        {ws.canManage && <PlanLimitsCard />}
-        {ws.canManage && <SignInCard />}
-        {ws.canManage && <WebAddressCard />}
-        {ws.canManage && <DataExportCard />}
-        {ws.canManage && <DangerZoneCard />}
       </div>
+      <NotificationsBanner />
+      {ws.canManage && (
+        <div className="space-y-4 pt-2">
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setAdvancedOpen((o) => !o)}>
+            Advanced workspace tools{advancedOpen ? <ChevronUp className="ml-1.5 h-4 w-4" /> : <ChevronDown className="ml-1.5 h-4 w-4" />}
+          </Button>
+          {advancedOpen && (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <PlanLimitsCard />
+              <SignInCard />
+              <WebAddressCard />
+              <DataExportCard />
+              <DangerZoneCard />
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }
