@@ -2587,3 +2587,20 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-unified-header .sm-header-art { position: relative !important; top: auto !important; right: auto !important; }
 .sm-unified-header .sm-dash-bird { width: 240px; height: 82px; }
 @media (max-width: 1100px) { .sm-unified-header .sm-header-art { display: none; } }
+
+/* Executive Review — luminous glass treatment (visual only). */
+.sm-xr { position: relative; isolation: isolate; }
+.sm-xr::before { content: ""; position: absolute; inset: -40px -20px auto; height: 420px; z-index: -1; pointer-events: none;
+  background: radial-gradient(40% 60% at 15% 20%, hsl(275 85% 55% / .28), transparent 70%), radial-gradient(35% 55% at 85% 10%, hsl(188 95% 55% / .22), transparent 70%), radial-gradient(30% 45% at 60% 80%, hsl(84 85% 55% / .10), transparent 70%); filter: blur(8px); }
+.sm-xr-card { position: relative; border-radius: 18px; border: 1px solid hsl(200 90% 70% / .22);
+  background: linear-gradient(160deg, hsl(250 45% 22% / .72), hsl(230 50% 10% / .78));
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .12), 0 0 0 1px hsl(275 80% 60% / .08), 0 18px 40px -18px hsl(275 90% 50% / .55), 0 0 32px -12px hsl(188 95% 55% / .35);
+  backdrop-filter: blur(14px); }
+.sm-xr-label { display: flex; align-items: center; gap: .5rem; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--foreground)); }
+.sm-xr-icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0;
+  color: hsl(188 95% 75%); background: linear-gradient(145deg, hsl(275 80% 55% / .45), hsl(200 90% 50% / .25)); border: 1px solid hsl(188 95% 70% / .45); box-shadow: 0 0 14px hsl(188 95% 55% / .45), inset 0 1px 0 hsl(0 0% 100% / .25); }
+.sm-xr-chip { color: hsl(var(--foreground)); border: 1px solid hsl(188 90% 65% / .4); background: hsl(230 50% 18% / .6); transition: box-shadow .2s, border-color .2s; }
+.sm-xr-chip:hover:not(:disabled), .sm-xr-chip:focus-visible { border-color: hsl(188 95% 70%); box-shadow: 0 0 14px hsl(188 95% 55% / .55); outline: none; }
+.sm-xr-approve { box-shadow: 0 0 22px hsl(84 90% 55% / .55), inset 0 1px 0 hsl(0 0% 100% / .35); }
+.sm-xr-revise, .sm-xr-nav { border-color: hsl(275 85% 70% / .55) !important; box-shadow: 0 0 16px hsl(275 90% 60% / .35); }
+@media (max-width: 1023px) { .sm-xr-actions { position: sticky; bottom: 0; z-index: 5; } }
