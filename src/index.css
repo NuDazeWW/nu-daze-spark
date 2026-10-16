@@ -2476,7 +2476,10 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 
 /* ===== Setup: mock-exact unified frame & banner ===== */
 .sm-setup-frame { display: grid; gap: 0; grid-template-columns: 1fr; border-radius: 20px; overflow: hidden; }
-@media (min-width: 1024px) { .sm-setup-frame { grid-template-columns: 250px minmax(0, 1fr); } }
+@media (min-width: 1024px) { .sm-setup-frame { grid-template-columns: 300px minmax(0, 1fr); } }
+/* Keep every step label on one line so incomplete steps (e.g. 7) look identical to the rest */
+.sm-setup-frame .sm-setup-step { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 14px; padding-right: 10px; }
+.sm-setup-frame .sm-setup-step span:last-child { overflow: hidden; text-overflow: ellipsis; }
 .sm-app-bg .sm-setup-frame, .sm-dark .sm-setup-frame {
   border: 1px solid transparent;
   background: linear-gradient(180deg, hsl(262 46% 15% / .96), hsl(266 50% 9% / .98)) padding-box,
@@ -2555,7 +2558,16 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-app-bg .sm-setup-hub-card .sm-setup-well, .sm-dark .sm-setup-hub-card .sm-setup-well { width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; }
 .sm-app-bg .sm-setup-hub-card .sm-setup-well svg, .sm-dark .sm-setup-hub-card .sm-setup-well svg { width: 12px; height: 12px; }
 .sm-setup-hub-pad { padding-right: 96px; }
-.sm-setup-hub-card .sm-setup-card-art { width: 96px; height: 96px; }
+.sm-setup-hub-card .sm-setup-card-art { width: 92px; height: 92px; right: 0; bottom: 0; }
+/* Art cards: never let the button cover the artwork — shrink the button, wrap its text if needed */
+.sm-setup-hub-card:has(.sm-setup-card-art) .sm-setup-card-cta { max-width: calc(100% - 88px); white-space: normal; height: auto; min-height: 34px; line-height: 1.15; text-align: left; padding-top: 4px; padding-bottom: 4px; }
+/* Social platform tiles: encased + glowing like the header icon wells */
+.sm-conn-tile { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  border: 1px solid hsl(var(--sm-fx-lavender) / .35);
+  background: linear-gradient(160deg, hsl(var(--sm-fx-panel-top, 262 46% 17%) / .85), hsl(266 50% 10% / .9));
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .1), 0 0 18px -6px hsl(var(--sm-fx-violet, 262 83% 65%) / .6), 0 10px 20px -10px hsl(0 0% 0% / .8); }
+.sm-app-bg .sm-conn-tile, .sm-dark .sm-conn-tile { border-color: hsl(var(--sm-fx-turquoise) / .4);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .12), 0 0 20px -6px hsl(var(--sm-fx-turquoise) / .55), 0 10px 20px -10px hsl(0 0% 0% / .85); }
 
 .sm-app-bg .sm-setup-card-cta {
   border-color: hsl(var(--sm-fx-turquoise) / .5); color: hsl(0 0% 100% / .96);
