@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { ImagePlus, Heart, MessageCircle, Repeat2, Send, Play, ThumbsUp, Linkedin, Instagram, MoreHorizontal } from "lucide-react";
+import { ImagePlus, Heart, MessageCircle, Repeat2, Send, Play, ThumbsUp, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BrandBadge } from "@/components/shared/BrandBadge";
 import type { Variation } from "./StudioVariationsDeck";
 
 export type PreviewFormat = "linkedin" | "instagram" | "story" | "reel";
@@ -27,16 +28,13 @@ export function StudioPreviewCanvas({ image, clientName, caption, onCaption, for
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="tablist" aria-label="Preview format">
-        {TABS.map(([v, l]) => {
-          const Icon = v === "linkedin" ? Linkedin : Instagram;
-          return (
-            <button key={v} role="tab" aria-selected={format === v} onClick={() => onFormat(v)}
-              className={cn("sm-studio-tab flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-medium whitespace-nowrap",
-                format === v && "is-active")}>
-              <span className={cn("h-6 w-6 rounded-md flex items-center justify-center", v === "linkedin" ? "sm-ico-linkedin" : "sm-ico-instagram")}><Icon className="h-3.5 w-3.5" /></span>{l}
-            </button>
-          );
-        })}
+        {TABS.map(([v, l]) => (
+          <button key={v} role="tab" aria-selected={format === v} onClick={() => onFormat(v)}
+            className={cn("sm-studio-tab flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-medium whitespace-nowrap",
+              format === v && "is-active")}>
+            <BrandBadge platform={v === "linkedin" ? "linkedin" : "instagram"} size={22} />{l}
+          </button>
+        ))}
       </div>
 
       <div className={cn("grid gap-3", rail.length > 0 && "sm:grid-cols-[minmax(0,1fr)_112px]")}>
