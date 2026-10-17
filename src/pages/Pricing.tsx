@@ -26,8 +26,8 @@ const CHANNELS: Record<string, string> = {
   enterprise: "Every channel, plus YouTube and TikTok (when available)",
 };
 const EXTRAS: Record<string, string[]> = {
-  starter: ["Daily queue, planner and Preflight", "Comment drafting", "Asset library", "Brand & Strategy Studio", "Post to quick links"],
-  team: ["Everything in Spark Start", "Motive Media Studio and brand kit", "Split one post across platforms", "Campaign brief approvals", "OneDrive and SharePoint folders", "Post results tracking"],
+  starter: ["AI Post Generator", "Daily queue, planner and Preflight", "Comment drafting", "Asset library", "Brand & Strategy Studio", "Post to quick links"],
+  team: ["Everything in Spark Start", "Repurpose / Repost Center", "Motive Media Studio and brand kit", "Split one post across platforms", "Campaign brief approvals", "Google Drive, OneDrive and SharePoint folders", "Post results tracking"],
   pro: ["Everything in Team Flow", "Executive voice profiles", "Content Motive Score™", "Learns from your feedback", "Portfolio insights and bulk export", "Downloadable publishing reports", "AI video clips"],
   enterprise: ["Everything in Surge Pro", "Executive review mode", "Reporting tool connectors", "Your own email sender and domain", "Scheduled email summaries", "Invoice billing"],
 };
@@ -40,7 +40,9 @@ const EXPLAIN: Record<string, string> = {
   "Motive Media Studio and brand kit": "Create on-brand images inside the app, with your logo added as a watermark.",
   "Split one post across platforms": "Turn one strong post into versions written for LinkedIn, Instagram, Facebook and X.",
   "Campaign brief approvals": "Send a brief to a named approver, discuss it in one comment thread, and only create posts once it's approved.",
-  "OneDrive and SharePoint folders": "Browse your existing company folders so drafts can quote real documents, with the source shown.",
+  "Google Drive, OneDrive and SharePoint folders": "Browse your existing company folders in Google Drive, OneDrive or SharePoint so drafts can quote real documents, with the source shown.",
+  "AI Post Generator": "Turns your approved assets, briefs and strategy into ready-to-edit post drafts for each platform, with sources shown.",
+  "Repurpose / Repost Center": "Turn approved posts into reposts, quote excerpts, Story and Reel adaptations, and LinkedIn-to-Instagram rewrites.",
   "Post results tracking": "Log views, reactions, comments and clicks for each post to see what works.",
   "Executive voice profiles": "Learns how a specific leader writes from real samples, so their posts sound like them.",
   "Content Motive Score™": "A 0–100 score for each draft covering its opening, strategy, platform fit and originality.",
