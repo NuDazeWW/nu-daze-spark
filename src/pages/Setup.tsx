@@ -31,7 +31,6 @@ import artWorkspace from "@/assets/setup/art-workspace.png";
 import artBrands from "@/assets/setup/art-brands.png";
 import artTags from "@/assets/setup/art-tags.png";
 import artSocial from "@/assets/setup/art-social.png";
-import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useClientSocialAccounts, PLATFORM_LABEL } from "@/hooks/useClientSocialAccounts";
@@ -138,21 +137,11 @@ function SetupInner() {
   return (
     <div className="sm-reference sm-setup animate-fade-in space-y-6">
 
-      <div className="sm-setup-hero">
-        <div className="min-w-0">
-          <h1>Workspace setup</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            {preview
-              ? "Previewing the setup a new organization sees. Nothing you enter is saved."
-              : `${ws.setupCompleted} of ${ws.setupTotal} steps complete. Reopen any step to change it.`}
-          </p>
-        </div>
-        <div className="sm-setup-hero-side">
-          <img src={headerBirdUrl} alt="" aria-hidden className="sm-setup-hero-bird" />
-          <p className="sm-dash-tagline text-sm leading-snug">Turn strategy<br />into <em className="sm-dash-em-cyan not-italic font-semibold">social</em> <em className="not-italic font-semibold text-brand-citrine">momentum.</em></p>
-          <Button variant="outline" className="sm-setup-pill" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
-        </div>
-      </div>
+      <PageHeader title="Workspace setup" description={preview
+        ? "Previewing the setup a new organization sees. Nothing you enter is saved."
+        : `${ws.setupCompleted} of ${ws.setupTotal} steps complete. Reopen any step to change it.`}>
+        <Button variant="outline" className="sm-setup-pill" onClick={() => setParams(preview ? {} : { preview: "1" })}><Eye className="mr-2 h-4 w-4" />{preview ? "Exit preview" : "Preview as new organization"}</Button>
+      </PageHeader>
       {preview && <Alert><AlertDescription>Preview mode: this is what a brand-new workspace looks like. Changes are not saved.</AlertDescription></Alert>}
 
       <div className="sm-setup-progress" role="progressbar" aria-valuenow={preview ? 0 : ws.setupCompleted} aria-valuemax={ws.setupTotal} aria-label={`${preview ? 0 : ws.setupCompleted} of ${ws.setupTotal} steps complete`}>

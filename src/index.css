@@ -647,15 +647,6 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   position: relative; color: hsl(var(--strategy-ink));
 }
 .sm-strategy-background { position: fixed; inset: 56px 0 0; width: 100%; height: calc(100vh - 56px); object-fit: cover; pointer-events: none; z-index: -1; }
-.sm-strategy .sm-page-header { margin-bottom: 12px; padding-bottom: 14px; border-color: hsl(var(--strategy-line)); }
-.sm-strategy .sm-page-header h1 { color: hsl(var(--strategy-ink)); font-weight: 700; }
-.sm-strategy .sm-page-header h1 + p { color: hsl(var(--strategy-muted)); }
-.sm-strategy .sm-page-links a { background: hsl(var(--strategy-surface) / .82); box-shadow: 0 3px 10px hsl(var(--brand-plum) / .06); }
-.sm-strategy .sm-page-title-row { display: block; padding-right: 0; }
-.sm-strategy .sm-page-actions { margin-top: 14px; }
-.sm-strategy .sm-header-art { position: absolute; right: 0; top: 30px; }
-.sm-strategy .sm-header-bird { width: 240px; height: 132px; object-fit: contain; }
-.sm-strategy .sm-dash-tagline { color: hsl(var(--strategy-ink)); }
 .sm-strategy > [data-orientation="horizontal"] > [role="tablist"] { flex-wrap: nowrap; overflow-x: auto; gap: 3px; padding: 4px; border-radius: 9px; border-color: hsl(var(--strategy-violet) / .5); box-shadow: inset 0 0 18px hsl(var(--strategy-violet) / .17), 0 6px 18px hsl(var(--brand-plum) / .16); }
 .sm-strategy > [data-orientation="horizontal"] > [role="tablist"] [role="tab"] { flex: 1 0 auto; min-height: 36px; gap: 8px; padding: 8px 12px; font-size: 11px; white-space: nowrap; }
 .sm-strategy [role="tab"] svg { width: 15px; height: 15px; flex-shrink: 0; }
@@ -682,7 +673,7 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 .sm-strategy-rule-actions { display: flex; gap: 8px; flex: 0 0 auto; }
 .sm-strategy-rule-actions button { width: 32px; height: 32px; min-height: 32px; border: 1px solid hsl(var(--strategy-line) / .6); border-radius: 8px; background: hsl(var(--strategy-surface) / .8); box-shadow: 0 3px 8px hsl(var(--brand-plum) / .06); }
 .sm-strategy-rule-actions button:hover { background: hsl(var(--rule-tone) / .1); }
-@media (max-width: 1199px) { .sm-strategy .sm-header-art { display: none; } }
+
 @media (max-width: 640px) {
   .sm-strategy .sm-strategy-rule { gap: 10px; padding: 12px; align-items: flex-start; }
   .sm-strategy-rule-icon { width: 36px; height: 36px; flex-basis: 36px; }
@@ -1604,15 +1595,6 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 /* Fixed Brand & Strategy workstation, scoped to this page. */
 .sm-strategy { --studio-surface: 248 40% 9%; --studio-raised: 248 30% 13%; --studio-ink: 240 40% 94%; --studio-muted: 247 18% 73%; --studio-line: 252 30% 28%; --sm-help-surface: var(--studio-surface); --sm-help-ink: var(--studio-ink); --sm-help-muted: var(--studio-muted); --sm-help-line: var(--studio-line); --sm-help-cyan: var(--brand-turquoise); --sm-help-blue: 211 85% 56%; --sm-help-violet: var(--strategy-violet); --sm-help-magenta: var(--brand-coral); --sm-help-gold: var(--brand-gold); color: hsl(var(--studio-ink)); }
 .sm-strategy-background { background: hsl(var(--studio-surface)); }
-.sm-strategy .sm-page-header { border: 0; padding-bottom: 0; margin-bottom: 16px; }
-.sm-strategy .sm-page-title-row { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 10px 24px; align-items: center; }
-.sm-strategy .sm-page-header h1 { color: hsl(var(--studio-ink)); font-size: 32px; }
-.sm-strategy .sm-page-header h1 + p { color: hsl(var(--studio-muted)); max-width: 600px; }
-.sm-strategy .sm-header-art { display: flex; position: static; grid-column: 2; grid-row: 1 / 3; margin: 0; gap: 12px; min-width: 0; }
-.sm-strategy .sm-header-art::before { display: none; }
-.sm-strategy .sm-header-bird { width: 150px; height: 95px; flex-shrink: 0; }
-.sm-strategy .sm-dash-tagline { color: hsl(var(--studio-ink)); font-size: 12px; padding-left: 14px; border-left-color: hsl(var(--studio-line)); }
-.sm-strategy .sm-page-actions { grid-column: 1; margin: 0; }
 .sm-strategy .sm-page-links a { color: hsl(var(--studio-ink)); background: hsl(var(--studio-raised) / .9); border-color: hsl(var(--studio-line)); }
 .sm-strategy :is(button,.sm-bk-btn-cyan,.sm-bk-save,[role="tab"]) { white-space: nowrap; overflow-wrap: normal; word-break: normal; flex-shrink: 0; }
 .sm-strategy .sm-page-actions button { height: 36px; min-height: 36px; font-size: 12px; }
