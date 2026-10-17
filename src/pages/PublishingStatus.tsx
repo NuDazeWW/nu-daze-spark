@@ -123,10 +123,10 @@ export default function PublishingStatus() {
 
   return (
     <div className="pub-stage -m-4 md:-m-6 lg:-m-8 space-y-6">
-      <PipelineNav />
       <PageHeader title="Publishing Status" description="Every scheduled and sent post, with results for each channel.">
         <button type="button" className="pub-notify !py-2 !text-sm" onClick={() => setReportOpen(true)}><FileDown className="h-4 w-4" />Export report</button>
       </PageHeader>
+      <PipelineNav />
       <PublishingReportDialog open={reportOpen} onOpenChange={setReportOpen} cards={cards ?? []} companyName={company.data?.company_name} />
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
