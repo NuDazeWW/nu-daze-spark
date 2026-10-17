@@ -41,7 +41,7 @@ import ExecutiveReview from "./pages/ExecutiveReview";
 import Legal from "./pages/Legal";
 import { CreditGateProvider } from "@/components/billing/CreditGate";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
