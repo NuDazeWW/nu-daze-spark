@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false);
   const [roleLoading, setRoleLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [roleCheckedFor, setRoleCheckedFor] = useState<string | null>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -31,7 +32,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const applySession = (nextSession: Session | null) => {
       if (ignore) return;
       setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+      // Keep the same user object on token refresh so the app doesn't reload mid-edit.
+      setUser((prev) => {
+        const next = nextSession?.user ?? null;
+        return prev && next && prev.id === next.id ? prev : next;
+      });
       setAuthReady(true);
     };
 
@@ -87,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } finally {
         if (ignore) return;
         setRoleLoading(false);
+        setRoleCheckedFor(user.id);
       }
     }
 
@@ -95,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       ignore = true;
     };
-  }, [authReady, user]);
+  }, [authReady, user?.id]);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -106,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         session,
-        loading: !authReady || roleLoading,
+        loading: !authReady || (!!user && roleCheckedFor !== user.id),
         isAdmin,
         signOut,
       }}
