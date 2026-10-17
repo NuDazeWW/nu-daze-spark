@@ -92,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } finally {
         if (ignore) return;
         setRoleLoading(false);
+        setRoleCheckedFor(user.id);
       }
     }
 
@@ -100,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       ignore = true;
     };
-  }, [authReady, user]);
+  }, [authReady, user?.id]);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -111,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         session,
-        loading: !authReady || roleLoading,
+        loading: !authReady || (!!user && roleCheckedFor !== user.id),
         isAdmin,
         signOut,
       }}
