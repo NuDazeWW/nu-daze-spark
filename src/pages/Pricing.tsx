@@ -68,7 +68,7 @@ function FeatureLine({ text }: { text: string }) {
     <li>
       <Popover>
         <PopoverTrigger asChild>
-          <button type="button" className="group flex w-full gap-2 rounded text-left hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={`More about ${text}`}>
+          <button type="button" className="sm-feature-line group flex w-full gap-2 rounded text-left hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={`More about ${text}`}>
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <span className="min-w-0 flex-1 break-words">{text}</span>
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-primary" />
@@ -149,7 +149,7 @@ export default function Pricing() {
         {nonprofit && <p className="mt-2 text-xs text-muted-foreground">The non-profit program is annual only, so monthly billing is turned off. Prices apply once your 501(c)(3) is verified.</p>}
       </section>
 
-      <section className="mx-auto grid max-w-7xl items-stretch gap-4 px-6 md:grid-cols-2 lg:grid-cols-4">
+      <section className="sm-price-grid mx-auto grid items-stretch gap-4 px-6 md:grid-cols-2 lg:grid-cols-4">
         {(tiers.data ?? []).map((t) => {
           const hero = t.tier_slug === "pro";
           const perMonth = nonprofit ? t.nonprofit_annual_price_cents : billing === "annual" ? t.annual_price_cents : t.monthly_price_cents;

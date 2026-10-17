@@ -946,6 +946,11 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
 .sm-price-card-featured .sm-tier-cta { background: linear-gradient(180deg, hsl(var(--tier-accent)), hsl(var(--tier-accent) / .82)); color: hsl(266 49% 8%); border-color: transparent; font-weight: 600; box-shadow: 0 0 26px -6px hsl(var(--tier-accent) / .8), inset 0 1px 0 hsl(0 0% 100% / .3); }
 .sm-price-card-featured .sm-tier-cta:hover { color: hsl(266 49% 8%); filter: brightness(1.06); }
 .sm-usage-card { border-color: hsl(var(--sm-fx-lavender) / .17); background: linear-gradient(180deg, hsl(268 39% 15% / .96), hsl(266 49% 8% / .98)); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .06), 0 24px 50px -28px hsl(0 0% 0% / .95); }
+/* Pricing feature lines: the global button nowrap rule would push long labels under the info button, so they wrap instead and keep a clear gap beside it. */
+.sm-price-grid { max-width: 1560px; }
+.sm-feature-line { white-space: normal; text-align: left; }
+.sm-feature-line > span { min-width: 0; white-space: normal; overflow-wrap: break-word; }
+.sm-feature-line > svg { flex-shrink: 0; }
 
 /* Dialogs inherit the active visual language without changing their structure. */
 [role="dialog"][data-state="open"] { border-radius: 16px; border-color: hsl(var(--primary) / .28); }
