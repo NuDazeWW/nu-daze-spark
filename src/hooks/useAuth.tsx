@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false);
   const [roleLoading, setRoleLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [roleCheckedFor, setRoleCheckedFor] = useState<string | null>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -31,7 +32,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const applySession = (nextSession: Session | null) => {
       if (ignore) return;
       setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+      // Keep the same user object on token refresh so the app doesn't reload mid-edit.
+      setUser((prev) => {
+        const next = nextSession?.user ?? null;
+        return prev && next && prev.id === next.id ? prev : next;
+      });
       setAuthReady(true);
     };
 
