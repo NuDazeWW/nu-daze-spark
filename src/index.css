@@ -2657,3 +2657,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-field-dot { width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0;
   background: hsl(var(--tone)); box-shadow: 0 0 8px hsl(var(--tone) / .8); }
 .sm-select-value .sm-brand-badge, .sm-select-value .sm-field-dot { display: none !important; }
+/* Header alignment: every dark page header starts at the same spot as Daily Queue. */
+.sm-strategy { padding-top: 32px; }
+.sm-setup { padding-top: 0 !important; }
+@media (min-width: 1024px) { .pub-stage { padding-left: 32px !important; padding-right: 32px !important; } }
