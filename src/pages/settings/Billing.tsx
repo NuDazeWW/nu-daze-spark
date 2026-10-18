@@ -63,7 +63,7 @@ function BillingInner() {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           <Button variant="outline" disabled={internal || busy === "portal"} onClick={() => { setBusy("portal"); startCheckout({ action: "portal" }).catch((e) => toast.error(e.message)).finally(() => setBusy(null)); }}>Manage card & invoices</Button>
-          <Button variant="outline" onClick={() => startCheckout({ action: "topup", packs: 1 }).catch((e) => toast.error(e.message))}>Buy 500 credits · $25</Button>
+
         </CardContent>
       </Card>
 

@@ -8,10 +8,11 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { fmtUsd, meterTone, startCheckout, useBilling } from "@/hooks/useBilling";
+import { fmtUsd, meterTone, useBilling } from "@/hooks/useBilling";
+import { AddonGrantPanel } from "@/components/billing/AddonGrantPanel";
 import { cn } from "@/lib/utils";
 
-const BUCKET_LABEL: Record<string, string> = { credits: "Media credits", text_drafts: "AI text drafts", x_spend: "X spend" };
+const BUCKET_LABEL: Record<string, string> = { credits: "Media credits", text_drafts: "AI text drafts", x_spend: "X spend", video_draft: "Draft clips", video_premium: "Premium clips" };
 
 export function UsageMetersPanel() {
   const { meters, snapshot, daysLeft, refresh } = useBilling();
@@ -40,9 +41,12 @@ export function UsageMetersPanel() {
     { key: "credits", label: "Media credits", used: meters.credits.used, total: meters.credits.total, fmt: (n: number) => n.toLocaleString() },
     { key: "text_drafts", label: "AI text drafts", used: meters.text_drafts.used, total: meters.text_drafts.total, fmt: (n: number) => n.toLocaleString() },
     { key: "x_spend", label: "X spend", used: meters.x_spend.used, total: meters.x_spend.total, fmt: (n: number) => fmtUsd(n, 2) },
+    { key: "video_draft", label: "Draft video clips", used: meters.video_draft.used, total: meters.video_draft.total, fmt: (n: number) => n.toLocaleString() },
+    { key: "video_premium", label: "Premium video clips", used: meters.video_premium.used, total: meters.video_premium.total, fmt: (n: number) => n.toLocaleString() },
     { key: "storage", label: "Storage", used: meters.storage.used, total: meters.storage.total, fmt: (n: number) => `${(n / 1024 ** 3).toFixed(2)} GB` },
   ];
   const open = (alerts.data ?? []).filter((x) => x.status === "open");
+  const notices = (alerts.data ?? []).filter((x) => x.status === "notice" && Date.now() - new Date(x.created_at).getTime() < 7 * 86400000);
 
   const doResume = async () => {
     if (!resume) return;
@@ -54,6 +58,12 @@ export function UsageMetersPanel() {
 
   return (
     <div className="space-y-4">
+      {notices.map((al) => (
+        <div key={al.id} className="rounded-lg border p-3 text-sm">
+          <p className="font-medium">{al.threshold_type === "velocity" ? "Velocity alert" : "Progress alert"} · {BUCKET_LABEL[al.bucket] ?? al.bucket} — {al.threshold_label}</p>
+          <p className="text-xs text-muted-foreground">Notification only; nothing is paused. Usage stops only at 100% of the allowance. {new Date(al.created_at).toLocaleString()}</p>
+        </div>
+      ))}
       {open.map((al) => (
         <div key={al.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
           <div className="flex-1">
@@ -72,8 +82,8 @@ export function UsageMetersPanel() {
             <CardTitle>This cycle</CardTitle>
             <CardDescription>{snapshot.tier.name} plan (v{snapshot.billing.tier_definition_version}) · {daysLeft} days left · resets {new Date(snapshot.billing.cycle_end).toLocaleDateString()}</CardDescription>
           </div>
-          {snapshot.can_control_spend && <Button size="sm" onClick={() => startCheckout({ action: "topup", packs: 1 }).catch((e) => toast.error(e.message))}>Buy 500 credits · $25</Button>}
         </CardHeader>
+        <CardContent><AddonGrantPanel /></CardContent>
         <CardContent className="grid gap-4 md:grid-cols-2">
           {rows.map((r) => {
             const paused = snapshot.billing.paused_buckets.includes(r.key);
