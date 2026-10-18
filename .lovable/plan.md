@@ -93,4 +93,11 @@ Recorded usage contains no video generations, so these are planning estimates us
 | 50 draft + 10 premium | 90-210 | 133-253 | 33-153 |
 | 25 draft + 5 premium | 45-105 | 88-148 | 0-48 |
 
-The plan currently keeps 50 draft + 10 premium. Changing to 25 draft + 5 premium roughly halves this variable cost; tell me if you want that substitution before approval.
+Decision: keep 50 draft + 10 premium clips for Force Enterprise; do not substitute 25 + 5.
+
+## Launch checklist outside this build
+- Start platform app approvals with Meta, Instagram, and LinkedIn.
+- Set each sold instance's Run usage limit and blocking threshold in workspace usage settings.
+- Confirm the included Cloud allowance applies per workspace on the selected plan.
+- Measure the first live instance for 30 days before setting later thresholds.
+- Measure actual cost per clip over the first 30 days of live use; above 3 credits per clip, raise the draft pack from $19 to $24 and revisit included counts.
