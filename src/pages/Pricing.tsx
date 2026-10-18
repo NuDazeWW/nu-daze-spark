@@ -1,3 +1,4 @@
+import { ADDONS } from "@/lib/pricing";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,7 @@ const CHANNELS: Record<string, string> = {
 const EXTRAS: Record<string, string[]> = {
   starter: ["AI Post Generator", "Daily queue, planner and Preflight", "Comment drafting", "Asset library", "Brand & Strategy Studio", "Post to quick links"],
   team: ["Everything in Spark Start", "Repurpose / Repost Center", "Motive Media Studio and brand kit", "Split one post across platforms", "Campaign brief approvals", "Google Drive, OneDrive and SharePoint folders", "Post results tracking"],
-  pro: ["Everything in Team Flow", "Executive voice profiles", "Content Motive Score™", "Learns from your feedback", "Portfolio insights and bulk export", "Downloadable publishing reports", "AI video clips"],
+  pro: ["Everything in Team Flow", "Executive voice profiles", "Content Motive Score™", "Learns from your feedback", "Portfolio insights and bulk export", "Downloadable publishing reports"],
   enterprise: ["Everything in Surge Pro", "Executive review mode", "Reporting tool connectors", "Your own email sender and domain", "Scheduled email summaries", "Invoice billing"],
 };
 const EXPLAIN: Record<string, string> = {
@@ -55,7 +56,9 @@ const EXPLAIN: Record<string, string> = {
   "Your own email sender and domain": "Alerts come from your own email account, and the app lives at your own web address.",
   "Scheduled email summaries": "Weekly or monthly summary emails of what was approved, posted and how it did.",
   "Invoice billing": "Pay by invoice instead of card.",
-  "media credits": "Credits used when creating AI images and videos. Bigger jobs use more credits.",
+  "media credits": "Media credits are for images only; video uses separate clip allowances.",
+  "draft clips": "4-6 second vertical 720p AI video clips. Unused included clips roll over one month.",
+  "premium 1080p": "Premium 1080p AI video clips. Included on Force Enterprise at 10 per month; available as an add-on pack on all four tiers.",
   "AI drafts": "How many AI-written post drafts your team can save each month.",
   "direct posts": "Posts sent straight to a social account from the app, once accounts are connected.",
 };
@@ -84,7 +87,7 @@ const SCOPE: Record<string, string[]> = {
   starter: ["Dedicated instance and DNS", "1 brand profile, 1 voice", "25 assets + 1 import", "LinkedIn and IG Feed setup", "45-minute handoff"],
   team: ["Dedicated instance and DNS", "3 brand profiles, 1 voice", "60 assets + 1 import", "Meta, LinkedIn, X and IG setup", "60-minute session + 7-day hypercare"],
   pro: ["Custom subdomain and SSL", "5 brand profiles, 3 executive voices", "100 assets + cloud sync", "Meta, LinkedIn, X and IG setup", "90-minute session + 14-day hypercare"],
-  enterprise: ["Dedicated domain and branding", "10 brand profiles, bespoke tuning", "500 assets + SharePoint/Drive", "All channels incl. YouTube", "2 workshops + 30-day priority channel"],
+  enterprise: ["Dedicated domain and branding", "14 brand profiles, bespoke tuning", "500 assets + SharePoint/Drive", "All channels incl. YouTube", "2 workshops + 30-day priority channel"],
 };
 
 export default function Pricing() {
@@ -146,7 +149,7 @@ export default function Pricing() {
           <label htmlFor="np" className="cursor-pointer">Non-profit program — 40% off annual plans</label>
           <Switch id="np" checked={nonprofit} onCheckedChange={(v) => setParam("nonprofit", v ? "true" : null)} />
         </div>
-        {nonprofit && <p className="mt-2 text-xs text-muted-foreground">The non-profit program is annual only, so monthly billing is turned off. Prices apply once your 501(c)(3) is verified.</p>}
+        {nonprofit && <p className="mt-2 text-xs text-muted-foreground">The non-profit program is annual only, so monthly billing is turned off. Prices apply once your 501(c)(3) is verified. The subscription discount reflects your mission. Setup covers the work we do — configuration, connector wiring, social account setup, strategy import and team training — so white-glove setup is 25% off, or choose self-guided setup at 50% off and configure your own brand, connectors and accounts with our orientation guide.</p>}
       </section>
 
       <section className="sm-price-grid mx-auto grid items-stretch gap-4 px-6 md:grid-cols-2 lg:grid-cols-4">
@@ -177,7 +180,9 @@ export default function Pricing() {
 
               <ul className="mt-5 space-y-1.5 text-sm">
                 {[`${a.brands} brand${a.brands > 1 ? "s" : ""} · ${a.seats} seat${a.seats > 1 ? "s" : ""}`, `${a.dispatches.toLocaleString()} direct posts / month`,
-                  `${a.media_credits.toLocaleString()} media credits`, `${a.text_drafts.toLocaleString()} AI drafts / month`,
+                  `${a.media_credits.toLocaleString()} media credits (images only)`, `${a.text_drafts.toLocaleString()} AI drafts / month`,
+                  ...((a.video_draft_clips ?? 0) > 0 ? [`${a.video_draft_clips} draft clips / month`] : []),
+                  ...((a.video_premium_clips ?? 0) > 0 ? [`${a.video_premium_clips} premium 1080p clips / month`] : []),
                   a.x_cap_cents ? `X posting up to ${fmtUsd(a.x_cap_cents)} / month` : "X not included", `${a.storage_gb} GB storage`, CHANNELS[t.tier_slug], ...EXTRAS[t.tier_slug]]
                   .map((x) => <FeatureLine key={x} text={x} />)}
               </ul>
@@ -185,9 +190,15 @@ export default function Pricing() {
               <div className="mt-auto pt-6">
                 <Collapsible className="rounded-lg border p-3">
                   <div className="flex items-baseline justify-between text-sm">
-                    <span className="font-medium">One-time setup</span>
+                    <span className="font-medium">{nonprofit ? "White-glove setup" : "One-time setup"}</span>
                     <span className="font-display font-semibold">{fmtUsd(fee)}</span>
                   </div>
+                  {nonprofit && a.self_guided_setup_cents ? (
+                    <div className="mt-1 flex items-baseline justify-between text-sm">
+                      <span className="font-medium">Self-guided setup</span>
+                      <span className="font-display font-semibold">{fmtUsd(a.self_guided_setup_cents)}</span>
+                    </div>
+                  ) : null}
                   <CollapsibleTrigger className="mt-1 flex items-center gap-1 text-xs text-primary">What's included <ChevronDown className="h-3 w-3" /></CollapsibleTrigger>
                   <CollapsibleContent>
                     <ul className="mt-2 space-y-1 text-xs text-muted-foreground">{SCOPE[t.tier_slug].map((s) => <li key={s}>• {s}</li>)}</ul>
@@ -202,6 +213,17 @@ export default function Pricing() {
             </article>
           );
         })}
+      </section>
+
+      <section className="sm-usage-card mx-auto mt-10 max-w-7xl rounded-xl border bg-card p-6 lg:mx-6 xl:mx-auto">
+        <h3 className="font-display text-lg font-semibold">Add-on packs</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Available on every plan. Media credits are for images only; video uses separate clip allowances. Clip packs stay valid for 12 months.</p>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {Object.values(ADDONS).map((x) => (
+            <li key={x.label} className="rounded-lg border p-3 text-sm"><p className="font-medium">{x.label}</p><p className="font-display text-xl font-semibold">{fmtUsd(x.price_cents)}</p></li>
+          ))}
+        </ul>
+        <p className="mt-3 text-xs text-muted-foreground">Premium 1080p clips are included on Force Enterprise at 10 per month and available as an add-on pack on all four tiers.</p>
       </section>
 
       {nonprofit && (

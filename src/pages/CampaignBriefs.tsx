@@ -72,7 +72,7 @@ export default function CampaignBriefs() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [review, setReview] = useState<{ score: number; questions: string[]; issues: string[] } | null>(null);
   const [voiceId, setVoiceId] = useState<string>("");
-  const [threeAngles, setThreeAngles] = useState(true);
+  const [threeAngles, setThreeAngles] = useState(false);
   const { profiles: voices } = useVoiceProfiles();
   const activeVoices = voices.filter((v) => v.is_active);
 
