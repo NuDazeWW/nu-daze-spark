@@ -5,7 +5,7 @@
 - Force Enterprise includes 50 draft and 10 premium video clips monthly; Surge Pro includes 10 draft clips; Spark Start and Team Flow include none.
 - Draft and premium clip packs are available on all tiers.
 - Scheduled processing runs every five minutes inside the database, exits immediately when nothing is due, and makes no platform calls.
-- The 20% pause rule is replaced with notifications only at 60% and 80% of monthly allowance within 24 hours; spending stops only at 100%.
+- The 20% pause rule is replaced with two notification-only alerts: a progress alert when 60% of the monthly allowance is used, and a velocity alert when 80% of the monthly allowance is used within 24 hours. Spending stops only at 100%.
 - AI models remain unchanged.
 
 ## 1. Pricing
@@ -21,7 +21,7 @@ Update current plan definitions and every visible price location: pricing page, 
 - Non-profit pricing is annual only; monthly billing is unavailable.
 - Surge Pro remains highlighted and the "Annual - save 20%" badge remains.
 - Force Enterprise X allowance increases from $50 to $150.
-- Existing subscribers stay on their current plan version until renewal.
+- New prices apply to everyone; no grandfathering or new plan-version logic is added.
 
 ## 2. Separate video allowance and add-ons
 - Track draft clips and premium clips separately from media credits.
@@ -30,6 +30,7 @@ Update current plan definitions and every visible price location: pricing page, 
 - Block generation at zero remaining clips and show the relevant pack in the same view.
 - Add-on packs: 10 draft clips for $19; 10 premium clips for $39.
 - Copy will state that Force Enterprise includes 10 premium 1080p clips monthly and premium packs are available on all four tiers.
+- Pricing copy will state: "Media credits are for images only; video uses separate clip allowances."
 
 ## 3. AI usage limits and top-ups
 Charge AI drafts before these actions run:
@@ -67,17 +68,24 @@ No platform API calls are made. For later approved client apps, include an inact
 - Add a visible environment indicator showing whether the instance is Demo.
 
 ## Verification
-- Add tests for each listed price, discount display, video allowance, draft charge, top-up bundle, alert threshold, and 25-post run cap.
+- Add tests for each listed price, discount display, video allowance, draft charge, top-up bundle, both alert thresholds, and 25-post run cap.
 - Confirm overspending is blocked at 100% and no pause occurs below 100%.
 - Confirm a scheduled post moves to Published and appears in Publishing Status without platform calls.
 - Check desktop and mobile pricing screenshots for accurate prices and no overflow.
 
 ## Technical details
-- Use new tier versions, separate clip balances, and audited payment fulfillment.
+- Update current tier definitions in place, add separate clip balances, and use audited payment fulfillment.
 - Use a security-definer, row-locked batch function with SKIP LOCKED and idempotent channel results.
 - Use pg_cron for both the five-minute staged job and digest schedule.
 - Add migrations without breaking existing columns.
 - Record durable billing, video allowance, and scheduled-processing decisions in project guidance.
 
-## Budget note
-Current recorded usage contains no video generations, so Force Enterprise video spend remains unmeasured. Using your assumed 1.5-3.5 credits per clip, 60 included clips imply about 90-210 video credits monthly before other usage.
+## Force Enterprise video budget
+Recorded usage contains no video generations, so these are planning estimates using your assumed 1.5-3.5 credits per clip:
+
+| Included clips | Video credits/mo | With ~43-credit base | Over 100-credit plan |
+| --- | ---: | ---: | ---: |
+| 50 draft + 10 premium | 90-210 | 133-253 | 33-153 |
+| 25 draft + 5 premium | 45-105 | 88-148 | 0-48 |
+
+The plan currently keeps 50 draft + 10 premium. Changing to 25 draft + 5 premium roughly halves this variable cost; tell me if you want that substitution before approval.
