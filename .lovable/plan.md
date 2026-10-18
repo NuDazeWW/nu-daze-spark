@@ -19,6 +19,8 @@ Update current plan definitions and every visible price location: pricing page, 
 | Force Enterprise | $1,299 | $1,039 | $12,468 | $623 | $7,476 | $4,499 | $3,374 | 14 | 14 |
 
 - Non-profit pricing is annual only; monthly billing is unavailable.
+- Non-profit setup offers two choices: white-glove setup at 25% off ($1,124 / $1,346 / $1,687 / $3,374), or self-guided setup at 50% off ($750 / $898 / $1,125 / $2,250).
+- Copy explains that the subscription discount reflects the mission-driven buyer, while setup covers configuration, connector wiring, account setup, strategy import, and training.
 - Surge Pro remains highlighted and the "Annual - save 20%" badge remains.
 - Force Enterprise X allowance increases from $50 to $150.
 - New prices apply to everyone; no grandfathering or new plan-version logic is added.
@@ -29,6 +31,8 @@ Update current plan definitions and every visible price location: pricing page, 
 - Restrict video generation to Surge Pro, Force Enterprise, or purchased clip packs.
 - Block generation at zero remaining clips and show the relevant pack in the same view.
 - Add-on packs: 10 draft clips for $19; 10 premium clips for $39.
+- Included clips are granted monthly, including on annual billing, and roll over for one billing month only: Surge Pro holds at most 20 draft clips; Force Enterprise holds at most 100 draft and 20 premium clips.
+- Purchased clip packs remain valid for 12 months.
 - Copy will state that Force Enterprise includes 10 premium 1080p clips monthly and premium packs are available on all four tiers.
 - Pricing copy will state: "Media credits are for images only; video uses separate clip allowances."
 
@@ -43,10 +47,11 @@ Charge AI drafts before these actions run:
 | Voice analysis | 5 |
 | Brand strategy extraction | 5 |
 
-- Usage is blocked at the allowance with the matching top-up shown in the same view.
-- Top-ups: 100 media credits for $4; 100 AI drafts for $2.
-- Verify that each purchase grants the correct balance once only.
-- Hosted payment availability will be reported as unverified unless payment configuration can be confirmed.
+- Usage is blocked at the allowance; the same view offers the matching add-on as an admin-granted request.
+- Launch add-ons are granted manually by owners/admins from the admin panel; no self-serve payment checkout is enabled.
+- Add-ons: 100 media credits for $4; 100 AI drafts for $2; 10 draft clips for $19; 10 premium clips for $39.
+- Every grant is recorded once in an audit ledger; repeated submissions cannot grant twice.
+- Define the reusable 24-item payment catalog: 12 subscriptions, 8 setup fees, and 4 add-ons. Self-serve payment remains disabled per instance until that instance's payments are confirmed.
 
 ## 4. Test 3 angles
 - Default the toggle to off.
