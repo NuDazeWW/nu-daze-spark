@@ -40,7 +40,6 @@ Deno.serve(async (req) => {
       const r = await fetch(`${GW}/${id}`, { headers: { Authorization: `Bearer ${key}` } });
       if (!r.ok) return json({ error: await gwError(r) }, r.status);
       const job = await r.json();
-    await sb.rpc("consume_usage", { _bucket: "credits", _capability: capability, _quantity: 1, _client_id: clientId, _dry_run: false });
       if (job.status === "failed") return json({ status: "failed", error: job.error?.message ?? "Video generation failed" });
       if (job.status !== "completed") return json({ status: job.status, progress: job.progress ?? null });
       const path = `${user.id}/generated/${id}.mp4`;
@@ -54,26 +53,30 @@ Deno.serve(async (req) => {
 
     const prompt = String(body.prompt ?? "").trim();
     if (prompt.length < 5 || prompt.length > 2000) return json({ error: "Describe the clip in 5–2000 characters" }, 400);
-    const aspect = body.aspect === "16:9" ? "16:9" : "9:16";
-    const dur = [4, 6, 8].includes(Number(body.duration)) ? Number(body.duration) : 6;
+    // Draft clips: 4-6s vertical 720p. Premium clips: 1080p (up to 8s). Video never draws media credits.
+    const premium = body.quality === "premium";
+    const aspect = premium && body.aspect === "16:9" ? "16:9" : "9:16";
+    const dur = premium ? ([4, 6, 8].includes(Number(body.duration)) ? Number(body.duration) : 8) : (Number(body.duration) === 4 ? 4 : 6);
+    const bucket = premium ? "video_premium" : "video_draft";
     const { data: kit } = await sb.from("brand_kits").select("colors, tone").eq("client_id", clientId).maybeSingle();
     const colors = Array.isArray(kit?.colors) ? (kit!.colors as { hex?: string }[]).map((c) => c.hex).filter(Boolean) : [];
     const brand = body.apply_brand !== false && (colors.length || kit?.tone)
       ? ` Brand direction: ${colors.length ? `accent colors ${colors.join(", ")}.` : ""} ${kit?.tone ? `Mood: ${kit.tone}.` : ""}` : "";
     const input = `Vertical-friendly social media clip for a Reel or Story. ${prompt}.${brand} Strong visual hook in the first second. Consider micro-detail, expression and timing. No logos, no watermarks, no brand names. No dialogue. Upbeat, tasteful background music.`;
 
-    const capability = dur === 8 ? "video_8s_premium" : "video_6s_draft";
-    const { data: pre, error: preErr } = await sb.rpc("consume_usage", { _bucket: "credits", _capability: capability, _quantity: 1, _client_id: clientId, _dry_run: true });
+    const capability = premium ? "video_premium_clip" : "video_draft_clip";
+    const { data: pre, error: preErr } = await sb.rpc("consume_usage", { _bucket: bucket, _capability: capability, _quantity: 1, _client_id: clientId, _dry_run: true });
     if (preErr) return json({ error: preErr.message }, 403);
-    if (!(pre as { ok: boolean }).ok) return json({ error: "Not enough credits", code: "CREDITS_BLOCKED", detail: { ...(pre as object), capability } }, 402);
+    if (!(pre as { ok: boolean }).ok) return json({ error: (pre as { reason?: string }).reason === "not_in_tier" ? "AI video is included on Surge Pro and Force Enterprise, or with a clip pack." : `No ${premium ? "premium" : "draft"} clips left. Ask an admin to add a clip pack.`, code: "CLIPS_BLOCKED", detail: { ...(pre as object), bucket } }, 402);
 
     const r = await fetch(GW, {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "google/gemini-omni-1.1-flash", input, response_format: { type: "video", resolution: "720p", duration: `${dur}s`, aspect_ratio: aspect } }),
+      body: JSON.stringify({ model: "google/gemini-omni-1.1-flash", input, response_format: { type: "video", resolution: premium ? "1080p" : "720p", duration: `${dur}s`, aspect_ratio: aspect } }),
     });
     if (!r.ok) return json({ error: await gwError(r) }, r.status);
     const job = await r.json();
+    await sb.rpc("consume_usage", { _bucket: bucket, _capability: capability, _quantity: 1, _client_id: clientId, _dry_run: false });
 
     try {
       const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
