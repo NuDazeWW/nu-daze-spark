@@ -71,6 +71,8 @@ Deno.serve(async (req) => {
     }
 
     if (b.action === "topup") {
+      // Launch rule: add-ons are admin-granted; self-serve stays off per instance until payments are confirmed.
+      if (Deno.env.get("SELF_SERVE_TOPUPS") !== "true") return json({ error: "Add-on packs are granted by your workspace admin for now." }, 409);
       const s = await stripe.checkout.sessions.create({
         mode: "payment", customer,
         line_items: [{ quantity: b.packs, price_data: { currency: "usd", unit_amount: 2500, product_data: { name: "SocialMotive 500-credit pack" } } }],
