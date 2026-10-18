@@ -1,3 +1,4 @@
+import { briefDraftCost } from "@/lib/pricing";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useWorkspace } from "@/hooks/useWorkspace";
@@ -72,7 +73,7 @@ export default function CampaignBriefs() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [review, setReview] = useState<{ score: number; questions: string[]; issues: string[] } | null>(null);
   const [voiceId, setVoiceId] = useState<string>("");
-  const [threeAngles, setThreeAngles] = useState(true);
+  const [threeAngles, setThreeAngles] = useState(false);
   const { profiles: voices } = useVoiceProfiles();
   const activeVoices = voices.filter((v) => v.is_active);
 
@@ -142,7 +143,7 @@ export default function CampaignBriefs() {
   const generate = useMutation({
     mutationFn: async (id: string) => {
       const b: any = briefs.find((x: any) => x.id === id);
-      const qty = Math.max(b?.target_channels?.length ?? 1, 1) * (threeAngles ? 3 : 1);
+      const qty = briefDraftCost(b?.target_channels?.length ?? 1, threeAngles);
       if (!(await ensure({ bucket: "text_drafts", capability: "text_draft", quantity: qty, clientId: b?.client_id, label: `${qty} platform drafts` }))) return { variants: 0, skipped: true };
       const { data, error } = await supabase.functions.invoke("generate-from-brief", { body: { brief_id: id, voice_profile_id: voiceId || undefined, angles: threeAngles } });
       if (error || data?.error) throw new Error(data?.error ?? error?.message);
@@ -249,7 +250,7 @@ export default function CampaignBriefs() {
                         </Select>
                       )}
                       <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Data-Driven Insight, Founder Story and Bold Contrarian Take for every channel">
-                        <Checkbox checked={threeAngles} onCheckedChange={(c) => setThreeAngles(!!c)} />3 angles per channel
+                        <Checkbox checked={threeAngles} onCheckedChange={(c) => setThreeAngles(!!c)} />Test 3 angles · {briefDraftCost(selected.target_channels?.length ?? 1, threeAngles)} drafts{threeAngles ? ` instead of ${briefDraftCost(selected.target_channels?.length ?? 1, false)}` : ""}
                       </label>
                       <Button size="sm" disabled={generate.isPending || genBlocked} title={genBlocked ? "Check off every discussion comment first" : undefined} onClick={() => generate.mutate(selected.id)}>
                         {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set

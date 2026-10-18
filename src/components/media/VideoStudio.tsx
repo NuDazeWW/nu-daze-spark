@@ -30,6 +30,8 @@ export function VideoStudio({ clientId, postCardId, defaultPrompt = "" }: Props)
   const [prompt, setPrompt] = useState(defaultPrompt);
   const [aspect, setAspect] = useState("9:16");
   const [duration, setDuration] = useState("6");
+  const [quality, setQuality] = useState<"draft" | "premium">("draft");
+  const premium = quality === "premium";
   const [applyBrand, setApplyBrand] = useState(true);
   const [busy, setBusy] = useState(false);
   const [path, setPath] = useState<string | null>(null);
@@ -41,11 +43,11 @@ export function VideoStudio({ clientId, postCardId, defaultPrompt = "" }: Props)
   const { ensure } = useCreditGate();
   const generate = async () => {
     if (!clientId) return toast.error("Pick a client first");
-    const cap = duration === "8" ? "video_8s_premium" : "video_6s_draft";
-    if (!(await ensure({ bucket: "credits", capability: cap, clientId, label: duration === "8" ? "8-second premium AI video" : "Draft AI video clip" }))) return;
+    const bucket = premium ? "video_premium" : "video_draft";
+    if (!(await ensure({ bucket, capability: `${bucket}_clip`, clientId, label: premium ? "Premium 1080p AI video clip" : "Draft 720p vertical AI video clip" }))) return;
     setBusy(true); setPath(null); setSrc(null);
     try {
-      const { video_id } = await call({ client_id: clientId, prompt, aspect, duration: Number(duration), apply_brand: applyBrand });
+      const { video_id } = await call({ client_id: clientId, prompt, aspect: premium ? aspect : "9:16", duration: Number(duration), quality, apply_brand: applyBrand });
       for (let i = 0; i < 60 && alive.current; i++) {
         await new Promise((r) => setTimeout(r, 8000));
         const s = await call({ action: "status", client_id: clientId, video_id });
@@ -86,13 +88,18 @@ export function VideoStudio({ clientId, postCardId, defaultPrompt = "" }: Props)
         <Label>Describe the clip</Label>
         <Textarea rows={3} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g. Slow push-in on a team whiteboard session, sticky notes, warm morning light" />
       </div>
+      <div className="space-y-1"><Label className="text-xs">Clip quality</Label>
+        <Select value={quality} onValueChange={(v) => { setQuality(v as "draft" | "premium"); if (v === "draft") { setAspect("9:16"); if (duration === "8") setDuration("6"); } }}>
+          <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
+          <SelectContent><SelectItem value="draft">Draft · 4-6s vertical 720p · 1 draft clip</SelectItem><SelectItem value="premium">Premium · 1080p · 1 premium clip</SelectItem></SelectContent></Select>
+        <p className="text-[11px] text-muted-foreground">Video uses clip allowances, never media credits.</p></div>
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1"><Label className="text-xs">Shape</Label>
-          <Select value={aspect} onValueChange={setAspect}><SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
+          <Select value={aspect} onValueChange={setAspect} disabled={!premium}><SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
             <SelectContent><SelectItem value="9:16">Tall 9:16 (Reels, Stories, Shorts)</SelectItem><SelectItem value="16:9">Wide 16:9 (LinkedIn, YouTube)</SelectItem></SelectContent></Select></div>
         <div className="space-y-1"><Label className="text-xs">Length</Label>
           <Select value={duration} onValueChange={setDuration}><SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
-            <SelectContent>{["4", "6", "8"].map((d) => <SelectItem key={d} value={d}>{d} seconds</SelectItem>)}</SelectContent></Select></div>
+            <SelectContent>{(premium ? ["4", "6", "8"] : ["4", "6"]).map((d) => <SelectItem key={d} value={d}>{d} seconds</SelectItem>)}</SelectContent></Select></div>
       </div>
       <label className="flex items-center gap-2 text-sm"><Switch checked={applyBrand} onCheckedChange={setApplyBrand} /> Use brand colors & tone</label>
       <Button onClick={generate} disabled={busy || prompt.trim().length < 5} className="gap-2">

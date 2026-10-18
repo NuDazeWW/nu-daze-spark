@@ -183,7 +183,7 @@ export default function UserGuide() {
       intro: "Create images and short videos from prompts and selected source assets.",
       subs: [
         { heading: "Creating media", steps: ["Select source assets — they're used in generation.", "Choose format and write a prompt or use a prompt chip.", "Optionally apply your Brand Kit and AI disclosure.", "Generate, review variations, then save, download or send to the queue as a Draft."] },
-        { heading: "Credits", paragraphs: ["Images and videos use media credits at the rates in the credit table (see Monitoring credits). Video uses more credits than images."] },
+        { heading: "Credits", paragraphs: ["Media credits are for images only. Video uses separate clip allowances: Surge Pro includes 10 draft clips a month; Force Enterprise includes 50 draft and 10 premium 1080p clips. Clip packs are available on every plan."] },
       ],
     },
     {
@@ -238,7 +238,7 @@ export default function UserGuide() {
       route: "/settings/billing",
       intro: "Owners and admins with spend control can add capacity at any time.",
       subs: [
-        { heading: "Buy a credit pack", steps: ["Go to Settings → Billing.", "Click “Buy 500 credits · $25”.", "Complete checkout. Credits are added as bonus credits once payment confirms."] },
+        { heading: "Add a pack", steps: ["Go to Settings → Usage.", "An owner or admin clicks Add next to 100 media credits ($4), 100 AI drafts ($2), 10 draft clips ($19) or 10 premium clips ($39).", "The pack is added immediately and recorded once on the workspace bill."] },
         { heading: "Upgrade your plan", steps: ["Open Pricing from Billing.", "Choose a higher plan and complete checkout.", "New allowances apply once payment confirms."] },
         { heading: "How add-ons are billed", paragraphs: [b?.billing_mode === "invoice" ? "This workspace is billed by invoice: add-ons appear on your next invoice." : "This workspace pays by card: credit packs, storage, seats, " + ents + " and channels charge immediately."] },
       ],

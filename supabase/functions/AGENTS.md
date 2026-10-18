@@ -7,3 +7,5 @@
 - `notifications` builds email links from `workspace_settings.app_domain` when set, so each sold copy points to its own address.
 - Reporting connectors (Tableau, SAP, Power BI, Sigma, QuickSight) use the read-only `reporting-feed` function with per-provider hashed keys from `create_reporting_key`, so BI tools never get user sessions.
 - `generate-reels` runs entirely on the caller's session (RLS applies) and accepts either `asset_ids` or a text-led `topic` (+ `count` variants, `client_id`), so posts no longer require media.
+
+- AI functions charge drafts through `_shared/metering.ts` `chargeDrafts` before calling the gateway, so tenant quotas cover every AI action.

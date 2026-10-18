@@ -87,7 +87,8 @@ Deno.serve(async (req) => {
         const inv = event.data.object as Stripe.Invoice;
         const patch: Record<string, unknown> = { payment_method_status: "valid", billing_status: "active", updated_at: new Date().toISOString() };
         if (inv.billing_reason === "subscription_cycle" && bill) {
-          // Cycle boundary: re-pin to the current tier version and reset meters.
+          // Cycle boundary: roll included clips one month, then re-pin and reset meters.
+          await db.rpc("roll_clip_allowances");
           const { data: t } = await db.from("subscription_tier_definitions").select("version").eq("tier_slug", bill.tier_slug).eq("is_current", true).maybeSingle();
           Object.assign(patch, {
             tier_definition_version: t?.version ?? bill.tier_definition_version,

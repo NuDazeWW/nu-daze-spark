@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.103.0";
+import { chargeDrafts } from "../_shared/metering.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -38,6 +39,8 @@ ${samples.map((s, i) => `--- Post ${i + 1} ---\n${s.slice(0, 2000)}`).join("\n\n
 
 Derive only what the samples evidence. Be concrete and specific, not generic.`;
 
+    const blocked = await chargeDrafts(sb, "analyze_voice", null, cors);
+    if (blocked) return blocked;
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },

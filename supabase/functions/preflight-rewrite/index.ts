@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
+import { chargeDrafts } from "../_shared/metering.ts";
 
 // Proposes a rewritten draft addressing the latest preflight findings.
 // Never saves: the user reviews old vs new and decides in the app.
@@ -84,6 +85,8 @@ DRAFT:
 ${card.draft_copy}
 Return the rewritten draft and a short list of what you changed.`;
 
+    const blocked = await chargeDrafts(sb, "preflight_rewrite", card.client_id, corsHeaders);
+    if (blocked) return blocked;
     const r = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch", "Content-Type": "application/json" },

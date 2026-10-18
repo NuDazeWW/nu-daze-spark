@@ -6,6 +6,7 @@ export type TierAllowances = {
   brands: number; seats: number; dispatches: number; media_credits: number; text_drafts: number;
   x_cap_cents: number; storage_gb: number; absolute_daily_alert_cents: number;
   channels: string[]; features: string[]; overage_hourly_cents: number;
+  video_draft_clips?: number; video_premium_clips?: number; self_guided_setup_cents?: number;
 };
 export type TierDefinition = {
   id: string; tier_slug: TierSlug; version: number; name: string; sort_order: number;
@@ -14,19 +15,21 @@ export type TierDefinition = {
   allowances: TierAllowances; is_current: boolean;
 };
 export type TierSlug = "starter" | "team" | "pro" | "enterprise";
-export type Bucket = "credits" | "text_drafts" | "x_spend";
+export type Bucket = "credits" | "text_drafts" | "x_spend" | "video_draft" | "video_premium";
 
 export type BillingSnapshot = {
   billing: {
     tier_slug: TierSlug; tier_definition_version: number; billing_cycle: string; billing_status: string;
     billing_mode: "self_serve_card" | "invoice"; cycle_start: string; cycle_end: string;
     payment_method_status: string; media_credits_used: number; bonus_credits: number; text_drafts_used: number;
+    bonus_text_drafts?: number; video_draft_used?: number; video_premium_used?: number; video_draft_rollover?: number; video_premium_rollover?: number;
     x_spend_cents: number; storage_bytes: number; paused_buckets: string[]; level2_degraded: boolean;
     anomaly_counters: Record<string, number>; resume_delegate_user_id: string | null; nonprofit_status: string;
   };
   tier: TierDefinition;
   current_version: number;
   storage_bytes_actual: number;
+  clip_packs?: { draft: number; premium: number };
   role: string | null;
   can_control_spend: boolean;
 };
@@ -60,7 +63,9 @@ export function useBilling() {
   const b = s?.billing;
   const meters = s && a && b ? {
     credits: { used: b.media_credits_used, total: a.media_credits + b.bonus_credits },
-    text_drafts: { used: b.text_drafts_used, total: a.text_drafts },
+    text_drafts: { used: b.text_drafts_used, total: a.text_drafts + (b.bonus_text_drafts ?? 0) },
+    video_draft: { used: b.video_draft_used ?? 0, total: (a.video_draft_clips ?? 0) + (b.video_draft_rollover ?? 0) + (s.clip_packs?.draft ?? 0) },
+    video_premium: { used: b.video_premium_used ?? 0, total: (a.video_premium_clips ?? 0) + (b.video_premium_rollover ?? 0) + (s.clip_packs?.premium ?? 0) },
     x_spend: { used: b.x_spend_cents, total: a.x_cap_cents },
     storage: { used: s.storage_bytes_actual, total: a.storage_gb * 1024 ** 3 },
   } : null;
@@ -108,6 +113,12 @@ export function meterTone(used: number, total: number) {
   if (total <= 0) return "neutral" as const;
   const pct = used / total;
   return pct >= 1 ? ("red" as const) : pct >= 0.8 ? ("amber" as const) : ("neutral" as const);
+}
+
+export async function grantAddon(kind: string, packs: number, note?: string) {
+  const { data, error } = await supabase.rpc("grant_addon" as never, { _kind: kind, _packs: packs, _request_key: crypto.randomUUID(), _note: note ?? null } as never);
+  if (error) throw error;
+  return data as unknown as { ok: boolean; duplicate: boolean; quantity?: number };
 }
 
 export async function startCheckout(body: Record<string, unknown>) {

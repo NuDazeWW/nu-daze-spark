@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
+import { chargeDrafts } from "../_shared/metering.ts";
 import {
   draftChecksum, overallStatus, runRuleChecks, splitPhrases,
   type PreflightFinding,
@@ -116,6 +117,8 @@ Deno.serve(async (req) => {
     const { data: card } = await sb.from("post_cards").select("*").eq("id", parsed.data.post_card_id).maybeSingle();
     if (!card) return json({ error: "Post not found" }, 404);
     const cid = card.client_id;
+    const blocked = await chargeDrafts(sb, "preflight_review", cid, corsHeaders);
+    if (blocked) return blocked;
     const scope = <T>(q: T) => (cid ? (q as any).eq("client_id", cid) : q) as T;
 
     const since = new Date(Date.now() - 30 * 86400000).toISOString();

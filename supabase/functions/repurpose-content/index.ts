@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.103.0";
+import { chargeDrafts } from "../_shared/metering.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -73,6 +74,8 @@ ${GUIDE}
 
 Propose 3-5 distinct, high-value repurpose options. Each must use a different recipe or target. Use only facts in the source; never invent stats, names, or claims. Write the complete, ready-to-review draft for each.`;
 
+    const blocked = await chargeDrafts(sb, "repurpose_content", clientId, cors);
+    if (blocked) return blocked;
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },

@@ -4,7 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Coins, KeyRound, Loader2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
-import { nextTier, precheckUsage, startCheckout, useBilling, useCreditWeights, type Bucket, type PrecheckResult } from "@/hooks/useBilling";
+import { ADDONS, type AddonKind } from "@/lib/pricing";
+import { fmtUsd, grantAddon, nextTier, precheckUsage, useBilling, useCreditWeights, type Bucket, type PrecheckResult } from "@/hooks/useBilling";
 
 type GateRequest = { bucket: Bucket; capability: string; quantity?: number; clientId?: string | null; label?: string };
 type Ctx = { ensure: (r: GateRequest) => Promise<boolean> };
@@ -35,7 +36,7 @@ export function CreditGateProvider({ children }: { children: ReactNode }) {
 }
 
 function InsufficientBalanceModal({ state, onClose }: { state: { req: GateRequest; res: PrecheckResult } | null; onClose: () => void }) {
-  const { snapshot } = useBilling();
+  const { snapshot, refresh } = useBilling();
   const weights = useCreditWeights();
   const [busy, setBusy] = useState<string | null>(null);
   if (!state) return null;
@@ -45,7 +46,10 @@ function InsufficientBalanceModal({ state, onClose }: { state: { req: GateReques
   const isVideo = req.capability.startsWith("video");
   const isImage = req.capability.startsWith("image");
   const label = req.label ?? weights.data?.find((w) => w.capability === req.capability)?.label ?? req.capability;
-  const unit = req.bucket === "x_spend" ? "¢" : req.bucket === "text_drafts" ? " drafts" : " credits";
+  const unit = req.bucket === "x_spend" ? "¢" : req.bucket === "text_drafts" ? " drafts" : req.bucket.startsWith("video") ? " clips" : " credits";
+  const kind: AddonKind | null = req.bucket === "credits" ? "media_credits" : req.bucket === "text_drafts" ? "ai_drafts"
+    : req.bucket === "video_draft" ? "draft_clips" : req.bucket === "video_premium" ? "premium_clips" : null;
+  const addon = kind ? ADDONS[kind] : null;
   const canBuy = snapshot?.can_control_spend;
 
   const title = res.reason === "paused" ? "This spend bucket is paused"
@@ -55,7 +59,10 @@ function InsufficientBalanceModal({ state, onClose }: { state: { req: GateReques
 
   const buy = async () => {
     setBusy("topup");
-    try { await startCheckout({ action: "topup", packs: 1 }); } catch (e) { toast.error((e as Error).message); } finally { setBusy(null); }
+    try {
+      await grantAddon(kind!, 1, `Granted from the ${label} limit screen`);
+      toast.success(`${addon!.label} added`); refresh(); onClose();
+    } catch (e) { toast.error((e as Error).message); } finally { setBusy(null); }
   };
 
   return (
@@ -77,14 +84,15 @@ function InsufficientBalanceModal({ state, onClose }: { state: { req: GateReques
         {res.reason === "payment_method_required" && <p className="text-sm text-muted-foreground">AI media and X posting need a card on file so the balance can never go negative.</p>}
 
         <div className="space-y-2">
-          {req.bucket === "credits" && res.reason !== "paused" && (
-            <PathRow icon={<Coins className="h-4 w-4" />} title="Buy 500 credits for $25" body="Added immediately after payment confirms.">
-              <Button size="sm" onClick={buy} disabled={!canBuy || busy === "topup"}>{busy === "topup" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Buy"}</Button>
+          {addon && res.reason !== "paused" && (
+            <PathRow icon={<Coins className="h-4 w-4" />} title={`Add ${addon.label} · ${fmtUsd(addon.price_cents)}`}
+              body={canBuy ? "Granted by an owner or admin and recorded on the workspace bill." : "Ask an owner or admin to add this pack."}>
+              <Button size="sm" onClick={buy} disabled={!canBuy || busy === "topup"}>{busy === "topup" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add pack"}</Button>
             </PathRow>
           )}
           {up && (
             <PathRow icon={<TrendingUp className="h-4 w-4" />} title={`Upgrade to ${up[0].toUpperCase() + up.slice(1)}`}
-              body={isVideo ? "More monthly credits for video clips, plus a higher X cap." : "Higher monthly allowances across every bucket."}>
+              body={isVideo ? "Surge Pro includes 10 draft clips; Force Enterprise includes 50 draft and 10 premium clips." : "Higher monthly allowances across every bucket."}>
               <Button size="sm" variant={isVideo ? "default" : "outline"} asChild><Link to="/settings/billing" onClick={onClose}>See plans</Link></Button>
             </PathRow>
           )}
@@ -93,7 +101,7 @@ function InsufficientBalanceModal({ state, onClose }: { state: { req: GateReques
               <Button size="sm" variant="outline" asChild><Link to={req.bucket === "x_spend" ? "/settings/connections" : "/media-studio?tab=providers"} onClick={onClose}>Connect</Link></Button>
             </PathRow>
           )}
-          {!canBuy && <p className="text-xs text-muted-foreground">Only owners and admins can buy credits or change the plan.</p>}
+          {!canBuy && <p className="text-xs text-muted-foreground">Only owners and admins can add packs or change the plan.</p>}
         </div>
         <Button variant="ghost" onClick={onClose}>Cancel</Button>
       </DialogContent>

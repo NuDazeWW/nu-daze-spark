@@ -1,3 +1,4 @@
+import { ScheduledRunsPanel } from "@/components/publishing/ScheduledRunsPanel";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { PipelineNav } from "@/components/queue/PipelineNav";
 import { TikTokMark, PinterestMark, ThreadsMark } from "@/components/publishing/PlatformMarks";
@@ -127,6 +128,7 @@ export default function PublishingStatus() {
         <button type="button" className="pub-notify !py-2 !text-sm" onClick={() => setReportOpen(true)}><FileDown className="h-4 w-4" />Export report</button>
       </PageHeader>
       <PipelineNav />
+      <ScheduledRunsPanel />
       <PublishingReportDialog open={reportOpen} onOpenChange={setReportOpen} cards={cards ?? []} companyName={company.data?.company_name} />
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
