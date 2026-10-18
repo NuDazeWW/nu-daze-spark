@@ -91,6 +91,48 @@ export type Database = {
         }
         Relationships: []
       }
+      addon_grants: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          granted_by: string | null
+          id: string
+          kind: string
+          note: string | null
+          packs: number
+          price_cents: number
+          quantity: number
+          remaining: number
+          request_key: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          kind: string
+          note?: string | null
+          packs: number
+          price_cents: number
+          quantity: number
+          remaining: number
+          request_key: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          kind?: string
+          note?: string | null
+          packs?: number
+          price_cents?: number
+          quantity?: number
+          remaining?: number
+          request_key?: string
+        }
+        Relationships: []
+      }
       ai_provider_credentials: {
         Row: {
           api_key: string
@@ -1697,6 +1739,7 @@ export type Database = {
           content_type: Database["public"]["Enums"]["content_type"]
           created_at: string
           created_by: string
+          delivered_at: string | null
           draft_copy: string
           first_comment: string | null
           hashtags: string[] | null
@@ -1739,6 +1782,7 @@ export type Database = {
           content_type: Database["public"]["Enums"]["content_type"]
           created_at?: string
           created_by: string
+          delivered_at?: string | null
           draft_copy: string
           first_comment?: string | null
           hashtags?: string[] | null
@@ -1781,6 +1825,7 @@ export type Database = {
           content_type?: Database["public"]["Enums"]["content_type"]
           created_at?: string
           created_by?: string
+          delivered_at?: string | null
           draft_copy?: string
           first_comment?: string | null
           hashtags?: string[] | null
@@ -2120,6 +2165,7 @@ export type Database = {
           platform: string
           platform_post_id: string | null
           post_card_id: string
+          run_id: string | null
           social_account_id: string | null
           status: string
         }
@@ -2134,6 +2180,7 @@ export type Database = {
           platform: string
           platform_post_id?: string | null
           post_card_id: string
+          run_id?: string | null
           social_account_id?: string | null
           status: string
         }
@@ -2148,6 +2195,7 @@ export type Database = {
           platform?: string
           platform_post_id?: string | null
           post_card_id?: string
+          run_id?: string | null
           social_account_id?: string | null
           status?: string
         }
@@ -2174,6 +2222,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      publish_runs: {
+        Row: {
+          backlog_remaining: number
+          channels_skipped: number
+          channels_staged: number
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          posts_processed: number
+          started_at: string
+          status: string
+        }
+        Insert: {
+          backlog_remaining?: number
+          channels_skipped?: number
+          channels_staged?: number
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          posts_processed?: number
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          backlog_remaining?: number
+          channels_skipped?: number
+          channels_staged?: number
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          posts_processed?: number
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
       }
       publishing_credentials: {
         Row: {
@@ -2726,6 +2810,7 @@ export type Database = {
           billing_mode: string
           billing_status: string
           bonus_credits: number
+          bonus_text_drafts: number
           cycle_end: string
           cycle_start: string
           id: boolean
@@ -2743,6 +2828,10 @@ export type Database = {
           tier_definition_version: number
           tier_slug: string
           updated_at: string
+          video_draft_rollover: number
+          video_draft_used: number
+          video_premium_rollover: number
+          video_premium_used: number
           x_spend_cents: number
         }
         Insert: {
@@ -2751,6 +2840,7 @@ export type Database = {
           billing_mode?: string
           billing_status?: string
           bonus_credits?: number
+          bonus_text_drafts?: number
           cycle_end?: string
           cycle_start?: string
           id?: boolean
@@ -2768,6 +2858,10 @@ export type Database = {
           tier_definition_version?: number
           tier_slug?: string
           updated_at?: string
+          video_draft_rollover?: number
+          video_draft_used?: number
+          video_premium_rollover?: number
+          video_premium_used?: number
           x_spend_cents?: number
         }
         Update: {
@@ -2776,6 +2870,7 @@ export type Database = {
           billing_mode?: string
           billing_status?: string
           bonus_credits?: number
+          bonus_text_drafts?: number
           cycle_end?: string
           cycle_start?: string
           id?: boolean
@@ -2793,6 +2888,10 @@ export type Database = {
           tier_definition_version?: number
           tier_slug?: string
           updated_at?: string
+          video_draft_rollover?: number
+          video_draft_used?: number
+          video_premium_rollover?: number
+          video_premium_used?: number
           x_spend_cents?: number
         }
         Relationships: []
@@ -2843,6 +2942,7 @@ export type Database = {
           default_timezone: string
           entity_label_plural: string
           entity_label_singular: string
+          environment: string
           id: boolean
           is_demo_master: boolean
           org_type: string
@@ -2868,6 +2968,7 @@ export type Database = {
           default_timezone?: string
           entity_label_plural?: string
           entity_label_singular?: string
+          environment?: string
           id?: boolean
           is_demo_master?: boolean
           org_type?: string
@@ -2893,6 +2994,7 @@ export type Database = {
           default_timezone?: string
           entity_label_plural?: string
           entity_label_singular?: string
+          environment?: string
           id?: boolean
           is_demo_master?: boolean
           org_type?: string
@@ -2913,6 +3015,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      addon_catalog: { Args: never; Returns: Json }
       ai_provider_status: {
         Args: never
         Returns: {
@@ -2950,6 +3053,15 @@ export type Database = {
       }
       demo_content_counts: { Args: never; Returns: Json }
       evaluate_anomalies: { Args: { _bucket: string }; Returns: undefined }
+      grant_addon: {
+        Args: {
+          _kind: string
+          _note?: string
+          _packs: number
+          _request_key: string
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2973,6 +3085,7 @@ export type Database = {
         Returns: undefined
       }
       prepare_blank_copy: { Args: { _confirm: string }; Returns: undefined }
+      process_scheduled_posts: { Args: { _cap?: number }; Returns: Json }
       publishing_credentials_status: {
         Args: never
         Returns: {
@@ -2996,6 +3109,7 @@ export type Database = {
         Args: { _decision: string; _id: string; _notes: string }
         Returns: undefined
       }
+      roll_clip_allowances: { Args: never; Returns: undefined }
       set_billing_mode: { Args: { _mode: string }; Returns: undefined }
       set_resume_delegate: { Args: { _user_id: string }; Returns: undefined }
       set_workspace_role: {

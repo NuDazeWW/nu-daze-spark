@@ -183,6 +183,13 @@
       "when": 1792043484219,
       "tag": "0025_review_revision_chips",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792363058549,
+      "tag": "0026_pricing_clips_addons_scheduled_delivery",
+      "breakpoints": true
     }
   ]
 }
