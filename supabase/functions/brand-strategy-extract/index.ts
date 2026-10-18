@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
+import { chargeDrafts } from "../_shared/metering.ts";
 
 const MODEL = "openai/gpt-6-astra";
 const json = (b: unknown, status = 200) =>
@@ -95,6 +96,8 @@ Deno.serve(async (req) => {
       ? "Extract the brand's existing strategy from its own brand/style guide. Only include what the document states or clearly implies. Do not invent. Leave arrays empty when the document is silent."
       : "Reverse-engineer a brand voice and content strategy from the brand's own public material. Ground every item in the supplied sources; cite a short quote or observation as evidence. Never invent facts, numbers, or claims about the company. Recommendations (CTAs, hashtags, platform tone) must fit what the sources show.";
 
+    const blocked = await chargeDrafts(sb, "brand_strategy_extract", (b as { client_id?: string }).client_id ?? null, corsHeaders);
+    if (blocked) return blocked;
     const r = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch", "Content-Type": "application/json" },
