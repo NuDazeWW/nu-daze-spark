@@ -464,7 +464,8 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   background: hsl(var(--sm-fx-turquoise) / .12); box-shadow: inset 0 0 0 1px hsl(var(--sm-fx-turquoise) / .35), 0 0 14px -6px hsl(var(--sm-fx-turquoise) / .7); }
 .sm-dashboard .sm-dashboard-panels [role="progressbar"] { height: 7px; background: hsl(var(--sm-fx-lavender) / .1); box-shadow: inset 0 1px 2px hsl(0 0% 0% / .5); }
 .sm-dashboard .sm-dashboard-panels [role="progressbar"] > div { background: linear-gradient(90deg, hsl(var(--sm-fx-coral)), hsl(var(--sm-fx-magenta))); }
- background: hsl(var(--sm-fx-lavender) / .04); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .05); }
+.sm-dashboard .sm-dashboard-panels .grid > div.rounded-lg, .sm-dashboard .sm-dashboard-panels .grid > div.rounded-md {
+  background: hsl(var(--sm-fx-lavender) / .04); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .05); }
 .sm-dashboard .sm-dashboard-panels .grid > div.rounded-lg > svg { width: 40px; height: 40px; padding: 10px; border-radius: 10px; background: currentColor; background: hsl(var(--sm-fx-lavender) / .08); box-shadow: inset 0 0 0 1px currentColor; }
 .sm-dashboard .sm-dashboard-panels .rounded-full.overflow-hidden { height: 18px; box-shadow: inset 0 1px 2px hsl(0 0% 0% / .5), 0 0 16px -6px hsl(var(--sm-fx-turquoise) / .5); }
 .sm-insights-heading > p { margin-top: 10px; margin-left: 64px; }
