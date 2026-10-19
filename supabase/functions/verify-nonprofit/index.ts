@@ -60,8 +60,12 @@ Deno.serve(async (req) => {
   }
 
   if (b.application_id) {
-    await supabase.from("nonprofit_applications").update({
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: u.user.id, _role: "admin" });
+    if (!isAdmin) return json({ error: "Admins only" }, 403);
+    const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    await svc.from("nonprofit_applications").update({
       corroboration: result, matched_name: (result.matched_name as string) ?? null, review_route: result.route as string,
+      last_recheck_at: new Date().toISOString(),
     }).eq("id", b.application_id);
   }
   return json(result);
