@@ -57,7 +57,7 @@ export function AccountPhotoControl({ account, clientId, hasPhoto }: { account: 
       setSelectedFile(null);
       toast.success("Account photo saved");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
+      toast.error(e instanceof Error ? e.message : "Couldn't add the photo");
     } finally {
       setBusy(false);
       if (input.current) input.current.value = "";

@@ -25,7 +25,7 @@ export function IdentityDialog({ open, onOpenChange }: { open: boolean; onOpenCh
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Your profile picture</DialogTitle>
-          <DialogDescription>Pick an icon or upload a photo. If you skip this, your initials are shown.</DialogDescription>
+          <DialogDescription>Pick an icon or add a photo. If you skip this, your initials are shown.</DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-6 gap-2" role="radiogroup" aria-label="Identity icons">
           {Object.entries(IDENTITY_ICONS).map(([key, Icon]) => {

@@ -16,7 +16,7 @@ const PROVIDERS = [
   { key: "tableau", name: "Tableau", how: "Data → New Data Source → Web Data Connector or 'JSON file' via URL. Paste the CSV or JSON link." },
   { key: "sap", name: "SAP Analytics Cloud", how: "Create a model → Import data → OData services. Use the JSON link; rows are in 'value'." },
   { key: "power_bi", name: "Power BI", how: "Get data → Web. Paste the CSV link, or the JSON link and expand 'value'. Set a scheduled refresh." },
-  { key: "sigma", name: "Sigma", how: "Use a CSV upload from the link, or load it through your warehouse's HTTP/external stage." },
+  { key: "sigma", name: "Sigma", how: "Import the CSV from the link, or load it through your warehouse's HTTP/external stage." },
   { key: "quicksight", name: "Amazon QuickSight", how: "Schedule the CSV link into S3 (e.g. Lambda/EventBridge), then create a dataset from S3." },
 ] as const;
 

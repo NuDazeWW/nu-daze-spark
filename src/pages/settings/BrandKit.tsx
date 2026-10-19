@@ -74,8 +74,8 @@ export default function BrandKitPage({ center, navigation, onBuilder }: { center
         ? await supabase.from("brand_kits").update({ logo_path: path }).eq("id", q.data.kit.id)
         : await supabase.from("brand_kits").insert({ client_id: clientId, logo_path: path, colors, fonts, tone: tone || null });
       if (res.error) throw res.error;
-      toast.success("Logo uploaded"); qc.invalidateQueries({ queryKey: ["brand-kit", clientId] });
-    } catch (e) { toast.error(e instanceof Error ? e.message : "Upload failed (admins only)"); }
+      toast.success("Logo added"); qc.invalidateQueries({ queryKey: ["brand-kit", clientId] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't add the file (admins only)"); }
     finally { setUploading(false); }
   };
 

@@ -27,7 +27,7 @@ const TONES = [
 
 const META: Record<BuilderMode, { title: string; desc: string; icon: typeof Sparkles }> = {
   website: { title: "Generate brand voice", desc: "No brand guide? We'll read your website, social pages, and any marketing copy you paste, then draft your voice and strategy for you to review.", icon: Sparkles },
-  document: { title: "Import brand guide", desc: "Upload a brand or style guide (PDF, Word, or text). We'll pull out the voice, rules, audiences, and more for you to review.", icon: FileText },
+  document: { title: "Import brand guide", desc: "Import a brand or style guide (PDF, Word, or text). We'll pull out the voice, rules, audiences, and more for you to review.", icon: FileText },
   preset: { title: "Industry starter kits", desc: "Start from a proven foundation for your industry, then edit anything.", icon: LayoutTemplate },
 };
 
