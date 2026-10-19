@@ -56,3 +56,36 @@ Prices, allowances, discounts and setup fees stay as they are. The one approved 
 - Non-profit: extend the existing `nonprofit_applications` table with new nullable columns (EIN, matched name, corroboration JSON, decision fields, expiry). Add a new append-only `nonprofit_decision_log` with insert-only RLS and a decision RPC; the existing `review_nonprofit_application` is kept and reused. Add a new edge function, `verify-nonprofit`, that calls the ProPublica v2 organization endpoint with a timeout and stores only the result. Add a private storage bucket that only admins can read. Pricing, checkout and entitlements gain an `isNonprofitEligible(tier)` check that excludes spark_start, covered by unit tests in `pricing.test.ts`.
 - Legal: add a `legal_acceptances` table (version, accepted_at, IP, user agent, doc) and a version constant per document; the sign-in check compares the current version with the latest accepted one.
 - AI label: a new nullable `ai_assisted` column on `post_cards`.
+
+## G. Additions (non-profit verification and related)
+
+**1. Spark Start in the non-profit view.** With the non-profit toggle on, Spark Start's card always shows the annual price, $159 a month billed $1,908 a year. The non-profit view is annual only, so the $199 monthly price can't be bought there. The card adds one line: "Non-profit pricing starts at Team Flow." It never shows a blank or a dash. The same treatment applies wherever a non-profit price doesn't exist: the comparison table, checkout, and upgrade and downgrade screens.
+
+**2. No IRS check outside the US.** The form asks for the country first. US applicants get the live IRS check. Canadian applicants enter their CRA registration number and add their latest T3010; other countries add equivalent documents. Both go straight to manual review with no lookup and no "not found" message. The screen says "Manual review — CRA documents" or "Manual review — international documents". The admin queue shows the same label, plus a link to the CRA charity search for Canadian applicants. During the build I'll check whether that search accepts a pre-filled registration number. If it does, the link fills it in. If it doesn't, the link opens the search page and the number appears beside it with a Copy button so the reviewer can paste it in.
+
+**3. ProPublica terms and credit.**
+- Before going live, NuDaze agrees to ProPublica's Data Store terms (see F).
+- Wherever a check result appears (applicant screen, admin queue, decision record), it shows: "Source: ProPublica Nonprofit Explorer, using IRS Form 990 and Exempt Organization data", with ProPublica's citation text and a link to the organization's ProPublica page. The citation is saved on the decision record.
+- The outside services page lists ProPublica (non-profit lookup) and the IRS (original data source), with what is sent (the EIN only) and what is kept (the match result and citation).
+- The attorney checklist gets an extra item: confirm that the ProPublica terms allow use in a commercial product, and confirm the attribution wording.
+
+**4. Outside-the-app list with links and steps.** Section F is delivered as a checklist document. Each item has a direct link and numbered steps:
+- Attorney review: what to send (the four documents, the non-profit terms, the ProPublica terms), and the questions to ask.
+- Governing law, address and contacts: the exact fields to fill in, and where to send them to me.
+- DMCA agent: https://dmca.copyright.gov/osp/ — create an account, register NuDaze as a service provider, name the agent, pay the $6 fee, renew every 3 years, then send me the agent details for the DMCA page.
+- ProPublica terms: https://www.propublica.org/about/propublica-data-terms-of-use — read the Data Terms of Use, agree to them for API use, and keep a dated copy of that page. The attorney checklist uses the same link. (The Data Store terms cover ProPublica's paid data marketplace, which is a separate product.)
+- Email sending domain: how to verify your domain in Lovable's email settings and which DNS records to add at your domain host.
+- Stripe live products: https://dashboard.stripe.com/products — create each product and price from the payment catalog, turn on live mode, then send me the confirmation so self-serve checkout can be turned on. The catalog has 24 items as the app builds it today: 12 plan prices (4 plans, each monthly, annual and non-profit annual), 8 setup fees (4 plans, each standard and non-profit) and 4 add-on packs. Any document that says 28, including the operational guide, will be corrected to 24 with this breakdown.
+- Lovable settings for sold copies: the usage limit, with blocking on.
+I'll check every link is live before I hand the list over.
+
+**5. A real scheduled job for the yearly re-check.** A new scheduled job, `nonprofit-annual-recheck`, runs every day at 06:00 UTC. It looks for approved organizations within 30 days of their verification anniversary.
+- US organizations: it runs the IRS lookup again. A match extends verification for one more year. A miss sends the organization to manual review and emails the admins.
+- Canadian and other organizations: they're sent to manual review with a request for current documents.
+- 30 days before expiry, and again at 7 days, the organization gets an email notice. On expiry it gets a 30-day grace period, and after that it returns to standard pricing with written notice.
+- Each run is recorded in the run history (how many checked, extended or sent to review). When I report back, I'll name the job and its schedule and show its first logged run.
+
+### Technical details (additions)
+- `nonprofitDisplay(tier, billing)` helper in `src/lib/pricing.ts` returns `{ price, note }`. When the non-profit state is active it forces annual pricing, whatever the billing parameter says. spark_start returns $159/mo billed $1,908/yr plus the note. It's used on the cards, in the comparison table, at checkout and in upgrade/downgrade screens. Unit tests in `pricing.test.ts` cover: spark_start with monthly billing still returns $159, and `paymentCatalog()` returns exactly 24 items.
+- `nonprofit_applications.country`. `verify-nonprofit` returns `skipped_non_us` without calling ProPublica when the country isn't US. It saves `source_citation` and `source_url` in the corroboration JSON.
+- The `nonprofit-annual-recheck` edge function uses `authenticateCronRequest`, with the schedule created through the managed HTTP schedule tools (`0 6 * * *`). If those tools aren't available in this project, a pg_cron SQL job does the database work and calls the lookup through the existing function. New columns: `verified_until`, `grace_until`, `last_recheck_at`. Runs are logged in a `nonprofit_recheck_runs` table (admin-read RLS, grants included).
