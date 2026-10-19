@@ -253,7 +253,6 @@ export default function Dashboard() {
                 </p>
               ) : (
                 comments.map((c) => {
-                  const Icon = PLATFORM_ICON[c.platform];
                   const pct = c.daily_target > 0 ? Math.min((c.current_count / c.daily_target) * 100, 100) : 0;
                   return (
                     <div key={c.platform} className="space-y-1.5">
