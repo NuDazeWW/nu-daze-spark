@@ -38,3 +38,23 @@ export function paymentCatalog(tiers: { tier_slug: string; name: string; monthly
   const addons = Object.entries(ADDONS).map(([k, a]) => ({ sku: `addon_${k}`, name: a.label, cents: a.price_cents, interval: null }));
   return [...recurring, ...setup, ...addons];
 }
+
+/** Tiers that can get non-profit pricing. Spark Start (starter) is excluded. */
+export const NONPROFIT_EXCLUDED = ["starter", "spark_start"] as const;
+export const isNonprofitEligible = (slug: string) => !(NONPROFIT_EXCLUDED as readonly string[]).includes(slug);
+export const NONPROFIT_NOTE = "Non-profit pricing starts at Team Flow.";
+
+/** Per-month price to show. Non-profit view always uses annual billing, whatever `billing` says. */
+export function nonprofitDisplay(
+  t: { tier_slug: string; monthly_price_cents: number; annual_price_cents: number; nonprofit_annual_price_cents: number },
+  billing: "monthly" | "annual",
+  nonprofit: boolean,
+): { perMonthCents: number; billedYearlyCents: number | null; note: string | null; nonprofitApplied: boolean } {
+  if (nonprofit) {
+    const eligible = isNonprofitEligible(t.tier_slug);
+    const per = eligible ? t.nonprofit_annual_price_cents : t.annual_price_cents;
+    return { perMonthCents: per, billedYearlyCents: per * 12, note: eligible ? null : NONPROFIT_NOTE, nonprofitApplied: eligible };
+  }
+  const per = billing === "annual" ? t.annual_price_cents : t.monthly_price_cents;
+  return { perMonthCents: per, billedYearlyCents: billing === "annual" ? per * 12 : null, note: null, nonprofitApplied: false };
+}

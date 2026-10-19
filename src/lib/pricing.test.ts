@@ -48,3 +48,21 @@ describe("pricing rules", () => {
     expect(c.filter((x) => x.interval).length).toBe(12);
   });
 });
+
+import { nonprofitDisplay, isNonprofitEligible, NONPROFIT_NOTE } from "./pricing";
+describe("non-profit display", () => {
+  it("Spark Start in non-profit view shows annual $159 billed $1,908 even if billing=monthly", () => {
+    const r = nonprofitDisplay(TIERS[0], "monthly", true);
+    expect(r).toMatchObject({ perMonthCents: 15900, billedYearlyCents: 190800, note: NONPROFIT_NOTE, nonprofitApplied: false });
+  });
+  it("Spark Start is not non-profit eligible; others are", () => {
+    expect(isNonprofitEligible("starter")).toBe(false);
+    expect(["team", "pro", "enterprise"].every(isNonprofitEligible)).toBe(true);
+  });
+  it("Team Flow non-profit is $167/mo annual", () => {
+    expect(nonprofitDisplay(TIERS[1], "monthly", true).perMonthCents).toBe(16700);
+  });
+  it("payment catalog has exactly 24 items", () => {
+    expect(paymentCatalog(TIERS)).toHaveLength(24);
+  });
+});
