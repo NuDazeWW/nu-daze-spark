@@ -45,10 +45,10 @@ function BillingInner() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const subscribe = async (t: TierDefinition) => {
-    setBusy(t.tier_slug);
     { const d = nonprofitDisplay(t, (npVerified ? "annual" : cycle) as "monthly" | "annual", npVerified);
       const amount = d.billedYearlyCents ? `${fmtUsd(d.billedYearlyCents)} every year` : `${fmtUsd(d.perMonthCents)} every month`;
       if (!window.confirm(`Billing authorization\n\nYour ${t.name} plan renews automatically at ${amount}, plus the one-time setup fee, until you cancel. We give at least 30 days' notice before any price change.\n\nAuthorize this charge?`)) return; }
+    setBusy(t.tier_slug);
     try { await startCheckout({ action: "subscribe", tier: t.tier_slug, cycle: npVerified ? "annual" : cycle, nonprofit: npVerified && isNonprofitEligible(t.tier_slug) }); }
     catch (e) { toast.error((e as Error).message); } finally { setBusy(null); }
   };
