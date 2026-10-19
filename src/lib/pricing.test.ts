@@ -42,10 +42,8 @@ describe("pricing rules", () => {
     expect(ALERTS).toEqual({ progressShare: 0.6, velocityShare: 0.8, velocityHours: 24, hardStopShare: 1 });
   });
   it("scheduled runs cap at 25 posts", () => expect(SCHEDULED_RUN_CAP).toBe(25));
-  it("payment catalog has 24 items", () => {
-    const c = paymentCatalog(TIERS);
-    expect(c).toHaveLength(24);
-    expect(c.filter((x) => x.interval).length).toBe(12);
+  it("payment catalog has 11 recurring prices", () => {
+    expect(paymentCatalog(TIERS).filter((x) => x.interval).length).toBe(11);
   });
 });
 

@@ -23,7 +23,7 @@ export const briefDraftCost = (channels: number, threeAngles: boolean) => Math.m
 
 export const discountPct = (full: number, discounted: number) => ((full - discounted) / full) * 100;
 
-/** The reusable 24-item payment catalog. */
+/** The reusable 22-item payment catalog (no Spark Start non-profit items). */
 export function paymentCatalog(tiers: { tier_slug: string; name: string; monthly_price_cents: number; annual_price_cents: number;
   nonprofit_annual_price_cents: number; implementation_fee_cents: number; nonprofit_implementation_fee_cents: number }[]) {
   // Spark Start has no non-profit price, so it gets no non-profit items.
