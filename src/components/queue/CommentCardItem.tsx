@@ -87,6 +87,19 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
                 <ChevronLeft className="mr-2 h-3.5 w-3.5" />Back to {STATUS_META[prevStatus].label}
               </DropdownMenuItem>
             )}
+            {["draft", "needs_revision"].includes(comment.approval_status) && (
+              <DropdownMenuItem
+                disabled={isUpdating}
+                onClick={() => {
+                  onStatusChange("in_review");
+                  toast.success("Comment sent for Executive Review", {
+                    description: "It now shows as Pending Executive Review in the review queue.",
+                  });
+                }}
+              >
+                <Send className="mr-2 h-3.5 w-3.5" />Send for Executive Review
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => copyToClipboard(comment.draft_copy, "Comment")}>
               <Copy className="mr-2 h-3.5 w-3.5" />Copy Comment
