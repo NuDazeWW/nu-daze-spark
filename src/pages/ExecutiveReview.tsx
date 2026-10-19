@@ -49,7 +49,7 @@ export default function ExecutiveReview() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("comments")
-        .select("*, external_posts(platform, author_name, external_url, content_snippet)")
+        .select("*, external_posts(platform, author_name, external_url, post_content)")
         .eq("approval_status", "in_review")
         .order("updated_at", { ascending: true });
       if (error) throw error;
@@ -191,8 +191,8 @@ export default function ExecutiveReview() {
                   {c.tone && <Badge variant="outline" className="text-[10px]">{c.tone}</Badge>}
                   <span className="sm-status sm-status-in_review ml-auto">Pending Executive Review</span>
                 </div>
-                {c.external_posts?.content_snippet && (
-                  <p className="text-xs text-muted-foreground border-l-2 border-border pl-3 line-clamp-2">{c.external_posts.content_snippet}</p>
+                {c.external_posts?.post_content && (
+                  <p className="text-xs text-muted-foreground border-l-2 border-border pl-3 line-clamp-2">{c.external_posts.post_content}</p>
                 )}
                 <p className="text-sm whitespace-pre-wrap">{c.draft_copy}</p>
                 <div className="flex flex-wrap items-center gap-2">
