@@ -13,12 +13,13 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Sparkles, MessageSquare, Upload, CalendarDays,
   TrendingUp, TrendingDown, Minus, ArrowRight,
-  Linkedin, Instagram, FileText, Image, FolderOpen,
+  FileText, Image, FolderOpen,
   ShieldCheck, Eye, ShieldX, Archive, Info,
 } from "lucide-react";
 
@@ -40,11 +41,6 @@ function PanelInfo({ description }: { description: string }) {
     </Popover>
   );
 }
-
-const PLATFORM_ICON: Record<string, React.ElementType> = {
-  linkedin: Linkedin,
-  instagram: Instagram,
-};
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = STATUS_META;
 const PIPELINE_COLORS: Record<string, string> = Object.fromEntries(
@@ -209,13 +205,12 @@ export default function Dashboard() {
                 </p>
               ) : (
                 cadence.map((c) => {
-                  const Icon = PLATFORM_ICON[c.platform];
                   const pct = c.weekly_target > 0 ? Math.min((c.current_count / c.weekly_target) * 100, 100) : 0;
                   return (
                     <div key={`${c.platform}-${c.content_type}`} className="space-y-1.5">
                       <div className="flex items-center justify-between text-sm">
                         <span className="flex items-center gap-1.5">
-                          {Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground" />}
+                          <PlatformIcon platform={c.platform} className="h-3.5 w-3.5" />
                           <span className="capitalize">{c.platform}</span>
                           <span className="text-muted-foreground capitalize">· {c.content_type}s</span>
                         </span>
@@ -264,7 +259,7 @@ export default function Dashboard() {
                     <div key={c.platform} className="space-y-1.5">
                       <div className="flex items-center justify-between text-sm">
                         <span className="flex items-center gap-1.5">
-                          {Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground" />}
+                          <PlatformIcon platform={c.platform} className="h-3.5 w-3.5" />
                           <span className="capitalize">{c.platform}</span>
                         </span>
                         <span className={cadenceColor(c.current_count, c.daily_target)}>
@@ -394,7 +389,7 @@ export default function Dashboard() {
               ) : (
                 <div className="grid md:grid-cols-2 gap-2">
                   {recentCards.map((card) => {
-                    const Icon = PLATFORM_ICON[card.platform];
+
                     const meta = STATUS_LABELS[card.approval_status] ?? { label: card.approval_status, color: "" };
                     return (
                       <div
@@ -403,7 +398,7 @@ export default function Dashboard() {
                         onClick={() => navigate("/queue")}
                       >
                         <div className="mt-0.5">
-                          {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+                          <PlatformIcon platform={card.platform} className="h-4 w-4" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm truncate">{card.draft_copy.slice(0, 80)}…</p>

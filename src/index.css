@@ -464,11 +464,7 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   background: hsl(var(--sm-fx-turquoise) / .12); box-shadow: inset 0 0 0 1px hsl(var(--sm-fx-turquoise) / .35), 0 0 14px -6px hsl(var(--sm-fx-turquoise) / .7); }
 .sm-dashboard .sm-dashboard-panels [role="progressbar"] { height: 7px; background: hsl(var(--sm-fx-lavender) / .1); box-shadow: inset 0 1px 2px hsl(0 0% 0% / .5); }
 .sm-dashboard .sm-dashboard-panels [role="progressbar"] > div { background: linear-gradient(90deg, hsl(var(--sm-fx-coral)), hsl(var(--sm-fx-magenta))); }
-.sm-dashboard .sm-dashboard-panels .lucide-linkedin { width: 22px; height: 22px; padding: 3px; border-radius: 5px; color: hsl(0 0% 100%); background: hsl(210 90% 42%); }
-.sm-dashboard .sm-dashboard-panels .lucide-instagram { width: 22px; height: 22px; padding: 3px; border-radius: 6px; color: hsl(0 0% 100%);
-  background: linear-gradient(45deg, hsl(40 100% 55%), hsl(340 85% 55%) 55%, hsl(280 75% 55%)); }
-.sm-dashboard .sm-dashboard-panels .grid > div.rounded-lg, .sm-dashboard .sm-dashboard-panels .grid > div.rounded-md {
-  border-color: hsl(var(--sm-fx-lavender) / .16); background: hsl(var(--sm-fx-lavender) / .04); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .05); }
+ background: hsl(var(--sm-fx-lavender) / .04); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .05); }
 .sm-dashboard .sm-dashboard-panels .grid > div.rounded-lg > svg { width: 40px; height: 40px; padding: 10px; border-radius: 10px; background: currentColor; background: hsl(var(--sm-fx-lavender) / .08); box-shadow: inset 0 0 0 1px currentColor; }
 .sm-dashboard .sm-dashboard-panels .rounded-full.overflow-hidden { height: 18px; box-shadow: inset 0 1px 2px hsl(0 0% 0% / .5), 0 0 16px -6px hsl(var(--sm-fx-turquoise) / .5); }
 .sm-insights-heading > p { margin-top: 10px; margin-left: 64px; }
