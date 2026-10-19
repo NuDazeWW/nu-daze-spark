@@ -1,3 +1,5 @@
+DRAFT — PENDING LEGAL REVIEW
+
 Last updated: October 15, 2026
 
 These Privacy and Data Processing terms form part of the SocialMotive User Agreement. They explain what information NuDaze Worldwide ("we", "us") collects when you use SocialMotive, how we use it, and the choices you have.
@@ -30,6 +32,8 @@ We use row-level security, server-side role enforcement, private media storage w
 
 8. RETENTION AND DELETION
 We retain Workspace data for the term of your subscription. After termination you have thirty (30) days to export approved content and media, after which we delete or de-identify Workspace data, except where retention is required by law, accounting obligations or a legal hold. Source video files are retained per the storage terms of the User Agreement.
+Non-profit verification documents are kept privately, visible only to admins, while the organization subscribes plus one (1) year. The record of each verification decision is kept for seven (7) years. For US applicants we send the EIN to the ProPublica Nonprofit Explorer API, which uses IRS data, and keep only the match result and citation.
+If you delete your account, your sign-in and profile are removed. Content you created stays with the workspace under the retention terms above.
 
 9. INTERNATIONAL TRANSFERS
 Data may be processed in the United States and other countries where our sub-processors operate. Where required, we rely on appropriate safeguards such as standard contractual clauses.

@@ -1,3 +1,5 @@
+DRAFT — PENDING LEGAL REVIEW
+
 
 Last updated: October 15, 2026
 
@@ -122,3 +124,7 @@ This Agreement, together with the Privacy and Data Processing terms and any orde
 Legal notices to us: NuDaze Worldwide, [ADDRESS], attention Legal. Email: [LEGAL EMAIL].
 Notices to you: the email address on your workspace account. You are responsible for keeping it current.
 General contact: hello@nudaze.com
+
+
+BILLING AUTHORIZATION AND PRICE CHANGES
+Your plan renews automatically at the frequency and amount shown at checkout until you cancel. We will give you at least thirty (30) days' notice before any price change. Governing law: [state and county — pending].
