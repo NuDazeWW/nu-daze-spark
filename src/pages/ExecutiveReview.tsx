@@ -106,7 +106,7 @@ export default function ExecutiveReview() {
 
   return (
     <div className="text-foreground">
-      <PageHeader title="Executive Review" description={`${pending.length} awaiting your sign-off`} />
+      <PageHeader title="Executive Review" description={`${pending.length + pendingComments.length} awaiting your sign-off`} />
 
       <main className="sm-xr pb-8">
         {isLoading ? (
