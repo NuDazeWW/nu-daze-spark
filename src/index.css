@@ -2721,27 +2721,35 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-src-empty { border-style: dashed; }
 @media (prefers-reduced-motion: reduce) { .sm-src-card, .sm-src-cloud { transition: none; } }
 
-/* Post Generator — luminous card treatment */
-.sm-generator .card {
-  --gen-tone: 262 70% 60%;
-  border: 1px solid hsl(var(--gen-tone) / .35);
-  background: linear-gradient(165deg, hsl(var(--gen-tone) / .06), hsl(0 0% 100%) 46%);
-  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .9), 0 0 0 1px hsl(var(--gen-tone) / .08),
-    0 2px 6px -2px hsl(222 47% 16% / .12), 0 16px 32px -16px hsl(222 47% 16% / .28),
-    0 0 24px -10px hsl(var(--gen-tone) / .45);
+/* Post Generator — luminous card treatment (dark theme) */
+.sm-generator .sm-card {
+  border: 1px solid hsl(var(--ds-violet) / .45);
+  background: linear-gradient(165deg, hsl(var(--ds-violet) / .14), hsl(var(--ds-surface)) 42%, hsl(233 52% 12%));
+  box-shadow: var(--ds-inset), 0 0 0 1px hsl(var(--ds-violet) / .12),
+    0 2px 6px -2px hsl(233 60% 6% / .5), 0 18px 36px -18px hsl(233 60% 4% / .7),
+    0 0 26px -10px hsl(var(--ds-violet) / .55);
   transition: border-color 200ms var(--sm-fx-ease, ease), box-shadow 200ms var(--sm-fx-ease, ease);
 }
-.sm-generator .card:hover {
-  border-color: hsl(var(--gen-tone) / .6);
-  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .9), 0 0 0 1px hsl(var(--gen-tone) / .14),
-    0 4px 10px -3px hsl(222 47% 16% / .16), 0 22px 40px -18px hsl(222 47% 16% / .36),
-    0 0 32px -10px hsl(var(--gen-tone) / .6);
+.sm-generator .sm-card:hover {
+  border-color: hsl(var(--ds-violet) / .75);
+  box-shadow: var(--ds-inset), 0 0 0 1px hsl(var(--ds-violet) / .2),
+    0 4px 10px -3px hsl(233 60% 6% / .55), 0 24px 44px -18px hsl(233 60% 4% / .8),
+    0 0 36px -8px hsl(var(--ds-violet) / .7);
 }
-.sm-generator .sm-generation-settings .card { --gen-tone: 186 85% 45%; }
+.sm-generator .sm-generation-settings .sm-card {
+  border-color: hsl(var(--ds-cyan) / .5);
+  background: linear-gradient(165deg, hsl(var(--ds-cyan) / .12), hsl(var(--ds-surface)) 42%, hsl(233 52% 12%));
+  box-shadow: var(--ds-inset), 0 0 0 1px hsl(var(--ds-cyan) / .12),
+    0 2px 6px -2px hsl(233 60% 6% / .5), 0 18px 36px -18px hsl(233 60% 4% / .7),
+    0 0 26px -10px hsl(var(--ds-cyan) / .5);
+}
+.sm-generator .sm-generation-settings .sm-card:hover {
+  border-color: hsl(var(--ds-cyan) / .8);
+  box-shadow: var(--ds-inset), var(--ds-glow-cyan, 0 0 30px -6px hsl(var(--ds-cyan) / .6));
+}
 .sm-generator [role="tablist"] {
-  border: 1px solid hsl(262 70% 60% / .35);
-  background: linear-gradient(165deg, hsl(262 70% 60% / .06), hsl(0 0% 100%) 46%);
-  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .9), 0 2px 6px -2px hsl(222 47% 16% / .12),
-    0 12px 28px -16px hsl(222 47% 16% / .26), 0 0 20px -10px hsl(262 70% 60% / .4);
+  border: 1px solid hsl(var(--ds-violet) / .4);
+  background: linear-gradient(165deg, hsl(var(--ds-violet) / .12), hsl(var(--ds-surface)) 60%);
+  box-shadow: var(--ds-inset), 0 0 22px -8px hsl(var(--ds-violet) / .5);
 }
-@media (prefers-reduced-motion: reduce) { .sm-generator .card { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .sm-generator .sm-card { transition: none; } }
