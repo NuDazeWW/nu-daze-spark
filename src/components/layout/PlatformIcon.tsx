@@ -13,7 +13,35 @@ const MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   linkedin: Linkedin, instagram: Instagram, facebook: Facebook, youtube: Youtube, x: XLogo,
 };
 
-export function PlatformIcon({ platform, className }: { platform: string; className?: string }) {
+const LABELS: Record<string, string> = {
+  linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook", youtube: "YouTube", x: "X",
+};
+
+/**
+ * Single source of truth for social platform icons.
+ * Default ("brand") renders the approved full-color badge from the Dashboard
+ * Weekly Cadence panel: brand-gradient rounded tile, white glyph.
+ * Use tone="mono" only where a plain single-color glyph is required.
+ */
+export function PlatformIcon({
+  platform,
+  className,
+  tone = "brand",
+}: {
+  platform: string;
+  className?: string;
+  tone?: "brand" | "mono";
+}) {
   const Icon = MAP[platform] ?? Globe;
-  return <Icon className={className} />;
+  if (tone === "mono") return <Icon className={className} />;
+  return (
+    <span
+      className={`sm-pfi sm-pfi-${MAP[platform] ? platform : "other"}`}
+      role="img"
+      aria-label={LABELS[platform] ?? platform}
+      title={LABELS[platform] ?? platform}
+    >
+      <Icon className={className} />
+    </span>
+  );
 }
