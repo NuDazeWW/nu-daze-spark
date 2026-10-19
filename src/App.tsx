@@ -57,6 +57,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/terms" element={<Legal />} />
             <Route path="/privacy" element={<Legal />} />
+            {["/acceptable-use", "/cookies", "/subprocessors", "/dmca", "/security", "/accessibility"].map((p) => <Route key={p} path={p} element={<Legal />} />)}
             <Route
               element={
                 <ProtectedRoute>
