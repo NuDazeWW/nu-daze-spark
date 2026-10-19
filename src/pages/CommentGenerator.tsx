@@ -197,7 +197,7 @@ export default function CommentGenerator() {
   const {
     posts, isLoading, error,
     addPost, generateComments, scrapePosts, updateAuthorContext,
-    commentsMap, updateComment,
+    commentsMap, updateComment, sendCommentForReview,
     markCommented, unmarkCommented,
     deletePost, bulkDelete, bulkMarkCommented,
     dailyTarget,
@@ -722,6 +722,8 @@ export default function CommentGenerator() {
                     onCopied={() => !activePost.is_commented && markCommented.mutate(activePost.id)}
                     onRegenerate={() => handleRegenerate(activePost.id)}
                     isRegenerating={generateComments.isPending}
+                    onSendForReview={() => sendCommentForReview.mutate(activeComment.id)}
+                    isSendingForReview={sendCommentForReview.isPending}
                   />
                 ) : activePost.risk_flag === "blocked" ? (
                   <p className="text-xs text-muted-foreground">This post is blocked from comment generation.</p>
