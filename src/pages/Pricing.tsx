@@ -232,7 +232,7 @@ export default function Pricing() {
       {nonprofit && (
         <section className="mx-auto mt-10 max-w-3xl rounded-xl border bg-card p-6 text-center">
           <h3 className="font-display text-lg font-semibold">Apply for non-profit pricing</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Upload your IRS determination letter and EIN. Invoice and grant-funded billing is available once verified.</p>
+          <p className="mt-1 text-sm text-muted-foreground">US 501(c)(3) organizations and Canadian registered charities, starting at Team Flow. Add your IRS or CRA documents. Invoice and grant-funded billing is available once you are verified.</p>
           <Button className="mt-4" onClick={() => setIntake(true)}>Start verification</Button>
         </section>
       )}
