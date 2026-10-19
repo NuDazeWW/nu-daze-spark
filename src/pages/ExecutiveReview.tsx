@@ -15,6 +15,7 @@ import { MotiveScore, type MotiveBreakdown } from "@/components/preflight/Motive
 import { postLabel } from "@/components/tracking/PostTracking";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
 
 type Chip = { label: string; instruction: string };
 /** Structured note stored on the post and in approval_log, which generation reads back as reviewer feedback. */
