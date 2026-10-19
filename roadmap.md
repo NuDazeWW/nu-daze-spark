@@ -10,3 +10,13 @@
 - [x] Tests, browser checks, project guidance
 - [ ] Outside this build: platform app approvals, usage limits, 30-day cost measurement
 
+
+# Combined build: navigation, non-profit, legal gate, copy (approved 2026-10-19)
+- [ ] Spark Start non-profit display (annual $159, note) everywhere; 24-item catalog test
+- [ ] Non-profit form: country routing, IRS lookup US only, ProPublica attribution, CRA link
+- [ ] Admin review queue + permanent decision log
+- [ ] Yearly re-check scheduled job
+- [ ] Back button + clickable side-menu pop-out rows
+- [ ] Legal acceptance at sign-up, new legal pages, subprocessors (ProPublica, IRS)
+- [ ] Copy cleanup (Upload → Add/Import, banned words)
+- [ ] Outside-the-app checklist document with links and steps; fix 28 → 24 in guide
