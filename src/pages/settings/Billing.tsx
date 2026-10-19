@@ -82,6 +82,7 @@ function BillingInner() {
                 <div key={t.id} className={cn("rounded-lg border p-4", preTier === t.tier_slug && "border-primary ring-1 ring-primary", t.tier_slug === "pro" && "border-primary/60")}>
                   <p className="font-display font-semibold">{t.name}</p>
                   <p className="mt-1 text-2xl font-semibold">{fmtUsd(price)}<span className="text-xs text-muted-foreground"> /mo</span></p>
+                  {disp.note && <p className="text-xs font-medium">{disp.note}</p>}
                   <p className="text-xs text-muted-foreground">+ {fmtUsd(disp.nonprofitApplied ? t.nonprofit_implementation_fee_cents : t.implementation_fee_cents)} one-time setup</p>
                   <Button className="mt-3 w-full" size="sm" variant={current ? "outline" : "default"} disabled={current || busy === t.tier_slug} onClick={() => subscribe(t)}>
                     {busy === t.tier_slug ? <Loader2 className="h-4 w-4 animate-spin" /> : current ? "Current plan" : "Choose"}
