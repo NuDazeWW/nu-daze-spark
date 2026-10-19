@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PlatformOption } from "@/components/layout/PlatformIcon";
 import { useStrategyTable } from "@/hooks/useStrategyTable";
 import { StrategyTabShell } from "./StrategyTabShell";
 import { StrategyFormDialog } from "./StrategyFormDialog";
@@ -81,7 +82,7 @@ export function PlatformRulesTab() {
           <div><Label>Platform</Label>
             <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" | "facebook" | "youtube" | "x" }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem><SelectItem value="instagram">Instagram</SelectItem></SelectContent>
+              <SelectContent><PlatformOption value="linkedin" /><PlatformOption value="facebook" /><PlatformOption value="instagram" /></SelectContent>
             </Select>
           </div>
           <div><Label>Character Limit</Label><Input type="number" value={form.char_limit} onChange={(e) => setForm((f) => ({ ...f, char_limit: e.target.value }))} placeholder="Optional" /></div>

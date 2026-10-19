@@ -1,4 +1,5 @@
 import { PipelineNav } from "@/components/queue/PipelineNav";
+import { PlatformOption } from "@/components/layout/PlatformIcon";
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { PostNumber, StatusProgress, WhereIsIt, PostHistoryButton, useStatusDates, postLabel, matchesPostNumber } from "@/components/tracking/PostTracking";
@@ -183,9 +184,9 @@ export default function ApprovedContent() {
           <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Platforms</SelectItem>
-            <SelectItem value="linkedin">LinkedIn</SelectItem>
-            <SelectItem value="instagram">Instagram</SelectItem>
-            <SelectItem value="facebook">Facebook</SelectItem>
+            <PlatformOption value="linkedin" />
+            <PlatformOption value="instagram" />
+            <PlatformOption value="facebook" />
           </SelectContent>
         </Select>
         <div className="flex-1" />
