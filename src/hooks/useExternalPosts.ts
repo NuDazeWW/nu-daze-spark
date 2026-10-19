@@ -286,7 +286,7 @@ export function useExternalPosts() {
   return {
     posts, isLoading, error,
     addPost, generateComments, scrapePosts, updateAuthorContext,
-    commentsMap, updateComment,
+    commentsMap, updateComment, sendCommentForReview,
     markCommented, unmarkCommented,
     deletePost, bulkDelete, bulkMarkCommented,
     dailyTarget,
