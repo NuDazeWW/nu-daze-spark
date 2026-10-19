@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LEGAL_DOCS, LEGAL_VERSION, LegalText, type LegalDocKey } from "@/pages/Legal";
 
@@ -40,7 +39,7 @@ export function LegalScrollBox({ checked, onChecked }: { checked: boolean; onChe
       </div>
       <label className="flex items-start gap-2 text-xs leading-snug">
         <Checkbox className="mt-0.5" disabled={!reachedEnd} checked={checked} onCheckedChange={(c) => onChecked(!!c)} />
-        <span>{reachedEnd ? "I have read and agree to the Terms of Service, Privacy Policy, Acceptable Use Policy and Cookie Notice." : "Scroll to the end of the documents to agree."}</span>
+        <span>I have read and agree to the Terms of Service, Privacy Policy, Acceptable Use Policy and Cookie Notice.</span>
       </label>
     </div>
   );
@@ -79,8 +78,7 @@ export function LegalReacceptGate() {
           <DialogTitle>Our terms have changed</DialogTitle>
           <DialogDescription>Please review and accept the updated documents to keep using SocialMotive. Your earlier acceptance stays on record.</DialogDescription>
         </DialogHeader>
-        <LegalScrollBox checked={agree} onChecked={setAgree} />
-        <Button disabled={!agree} onClick={async () => { await recordAcceptance(user.id, missing); setMissing([]); }}>Accept and continue</Button>
+        <LegalScrollBox checked={agree} onChecked={(v) => { setAgree(v); if (v) { const docs = missing; setMissing([]); recordAcceptance(user.id, docs); } }} />
       </DialogContent>
     </Dialog>
   );
