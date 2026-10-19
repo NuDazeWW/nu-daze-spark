@@ -1,3 +1,4 @@
+import { nonprofitDisplay, isNonprofitEligible } from "@/lib/pricing";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -44,7 +45,7 @@ function BillingInner() {
 
   const subscribe = async (t: TierDefinition) => {
     setBusy(t.tier_slug);
-    try { await startCheckout({ action: "subscribe", tier: t.tier_slug, cycle: npVerified ? "annual" : cycle, nonprofit: npVerified }); }
+    try { await startCheckout({ action: "subscribe", tier: t.tier_slug, cycle: npVerified ? "annual" : cycle, nonprofit: npVerified && isNonprofitEligible(t.tier_slug) }); }
     catch (e) { toast.error((e as Error).message); } finally { setBusy(null); }
   };
 
@@ -75,13 +76,13 @@ function BillingInner() {
           </CardHeader>
           <CardContent className="grid gap-3 md:grid-cols-4">
             {(tiers.data ?? []).map((t) => {
-              const price = npVerified ? t.nonprofit_annual_price_cents : cycle === "annual" ? t.annual_price_cents : t.monthly_price_cents;
+              const disp = nonprofitDisplay(t, cycle as "monthly" | "annual", npVerified); const price = disp.perMonthCents;
               const current = t.tier_slug === b.tier_slug;
               return (
                 <div key={t.id} className={cn("rounded-lg border p-4", preTier === t.tier_slug && "border-primary ring-1 ring-primary", t.tier_slug === "pro" && "border-primary/60")}>
                   <p className="font-display font-semibold">{t.name}</p>
                   <p className="mt-1 text-2xl font-semibold">{fmtUsd(price)}<span className="text-xs text-muted-foreground"> /mo</span></p>
-                  <p className="text-xs text-muted-foreground">+ {fmtUsd(npVerified ? t.nonprofit_implementation_fee_cents : t.implementation_fee_cents)} one-time setup</p>
+                  <p className="text-xs text-muted-foreground">+ {fmtUsd(disp.nonprofitApplied ? t.nonprofit_implementation_fee_cents : t.implementation_fee_cents)} one-time setup</p>
                   <Button className="mt-3 w-full" size="sm" variant={current ? "outline" : "default"} disabled={current || busy === t.tier_slug} onClick={() => subscribe(t)}>
                     {busy === t.tier_slug ? <Loader2 className="h-4 w-4 animate-spin" /> : current ? "Current plan" : "Choose"}
                   </Button>

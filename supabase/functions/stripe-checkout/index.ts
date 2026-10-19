@@ -86,6 +86,7 @@ Deno.serve(async (req) => {
 
     // subscribe
     if (b.nonprofit && bill?.nonprofit_status !== "verified") return json({ error: "Non-profit pricing applies once your 501(c)(3) is verified." }, 409);
+    if (b.nonprofit && ["starter", "spark_start"].includes(b.tier)) return json({ error: "Non-profit pricing starts at Team Flow." }, 400);
     if (b.nonprofit && b.cycle !== "annual") return json({ error: "The non-profit program is annual only." }, 400);
 
     const { data: tier } = await admin.from("subscription_tier_definitions").select("*").eq("tier_slug", b.tier).eq("is_current", true).order("version", { ascending: false }).limit(1).maybeSingle();
