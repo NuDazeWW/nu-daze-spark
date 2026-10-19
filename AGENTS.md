@@ -18,5 +18,9 @@
 - Video uses separate `video_draft`/`video_premium` clip buckets (included allowance + one-month rollover + 12-month packs in `addon_grants`), never media credits, so video cannot drain image allowance.
 - Launch add-ons are admin-granted through idempotent `grant_addon` (unique request key); self-serve top-up checkout stays off per instance until that instance's payments are confirmed.
 - Scheduled delivery runs in-database via pg_cron `process_scheduled_posts` (25-post cap, SKIP LOCKED, runs logged in `publish_runs`) and only stages attempts; live dispatch is reserved for the inactive `dispatch-scheduled-posts` function so no platform call happens without approved apps.
+- Non-profit eligibility goes through `isNonprofitEligible`/`nonprofitDisplay` in `src/lib/pricing.ts` (and the same exclusion in stripe-checkout and `review_nonprofit_application`), so excluded tiers never show or sell a non-profit price.
+- Non-profit decisions append to `nonprofit_decision_log` via `review_nonprofit_application`; the yearly re-check is the pg_cron `nonprofit-annual-recheck` calling `nonprofit_annual_recheck()`, logged in `nonprofit_recheck_runs`, so verification lifecycle is auditable.
+- Legal document versions live in `LEGAL_VERSIONS` (`src/pages/Legal.tsx`); acceptances are rows in `legal_acceptances`, and `LegalReacceptGate` asks again whenever a version changes.
+- Back navigation uses `BackLink` (session history, then `PARENT_ROUTE`) rendered by `PageHeader`, so every page has a way back.
 - Subdirectories (e.g. `src/`, `supabase/functions/`) have their own `AGENTS.md`; read it before changing files there.
 

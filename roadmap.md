@@ -12,11 +12,12 @@
 
 
 # Combined build: navigation, non-profit, legal gate, copy (approved 2026-10-19)
-- [ ] Spark Start non-profit display (annual $159, note) everywhere; 24-item catalog test
-- [ ] Non-profit form: country routing, IRS lookup US only, ProPublica attribution, CRA link
-- [ ] Admin review queue + permanent decision log
-- [ ] Yearly re-check scheduled job
-- [ ] Back button + clickable side-menu pop-out rows
-- [ ] Legal acceptance at sign-up, new legal pages, subprocessors (ProPublica, IRS)
-- [ ] Copy cleanup (Upload → Add/Import, banned words)
-- [ ] Outside-the-app checklist document with links and steps; fix 28 → 24 in guide
+- [x] Spark Start non-profit display (annual $159, note) everywhere; catalog corrected to 22 items
+- [x] Non-profit form: country routing, IRS lookup US only, ProPublica attribution, CRA search + copy
+- [x] Admin review queue + permanent decision log
+- [x] Yearly re-check scheduled job (nonprofit-annual-recheck, daily 06:00 UTC)
+- [x] Back button + breadcrumbs + clickable side-menu pop-out rows
+- [x] Legal acceptance at sign-up and re-acceptance, new legal pages, subprocessors (ProPublica, IRS)
+- [x] Copy cleanup (Upload → Add/Import, unlimited → real limit wording)
+- [x] Outside-the-app checklist document with links and steps
+- [ ] Outside the app: attorney review, legal contacts, DMCA agent, ProPublica terms, email domain, Stripe live products (NuDaze)
