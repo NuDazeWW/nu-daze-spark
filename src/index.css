@@ -2756,8 +2756,6 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 
 /* PlatformIcon — approved full-color brand standard (matches Dashboard Weekly Cadence) */
 .sm-pfi { display: inline-flex; align-items: center; justify-content: center; padding: 3px; border-radius: 6px; color: #fff; flex: none; line-height: 0; }
-.sm-pfi > svg { width: 1em; height: 1em; }
-.sm-pfi > svg[class*="h-"] { width: revert; height: revert; }
 .sm-pfi-linkedin { background: linear-gradient(150deg, #3fa9f5 0%, #0a66c2 58%, #084d94 100%); }
 .sm-pfi-instagram { background: linear-gradient(45deg, #feda75 0%, #fa7e1e 28%, #d62976 55%, #962fbf 80%, #4f5bd5 100%); }
 .sm-pfi-facebook { background: linear-gradient(150deg, #4a9bf5 0%, #1877f2 58%, #0f5ecf 100%); }
