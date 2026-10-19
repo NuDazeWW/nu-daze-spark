@@ -29,7 +29,7 @@ export function LegalScrollBox({ checked, onChecked }: { checked: boolean; onChe
       <div className="flex flex-wrap gap-x-3 text-xs">
         {KEYS.map((k) => <Link key={k} to={LEGAL_DOCS[k].path} target="_blank" className="sm-auth-link underline">{LEGAL_DOCS[k].title}</Link>)}
       </div>
-      <div ref={ref} onScroll={onScroll} tabIndex={0} aria-label="Legal documents" className="max-h-48 overflow-y-auto rounded-md border p-3">
+      <div ref={ref} onScroll={onScroll} tabIndex={0} aria-label="Legal documents" className="max-h-48 overflow-y-auto rounded-md border bg-card p-3 text-card-foreground">
         {KEYS.map((k) => (
           <section key={k} className="mb-4">
             <h3 className="text-sm font-semibold">{LEGAL_DOCS[k].title} <span className="font-mono text-[10px] font-normal text-muted-foreground">v{LEGAL_DOCS[k].version} · Draft — pending legal review</span></h3>

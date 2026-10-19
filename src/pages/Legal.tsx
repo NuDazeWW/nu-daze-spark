@@ -16,13 +16,13 @@ export const LEGAL_VERSION = Object.values(LEGAL_VERSIONS).join("|");
 
 export function LegalText({ text }: { text: string }) {
   return (
-    <div className="space-y-3 text-sm leading-relaxed text-foreground">
+    <div className="space-y-3 text-sm leading-relaxed">
       {text.split(/\n\s*\n/).map((block, i) => {
         const lines = block.trim().split("\n");
         const isHeading = /^(\d+\.\s+)?[A-Z ,&()—-]+$/.test(lines[0]) && lines[0].length > 3;
         return (
           <div key={i}>
-            {isHeading && <h2 className="mt-4 font-semibold text-foreground">{lines[0]}</h2>}
+            {isHeading && <h2 className="mt-4 font-semibold">{lines[0]}</h2>}
             {(isHeading ? lines.slice(1) : lines).map((l, j) => (
               <p key={j} className="mt-1 text-muted-foreground">{l}</p>
             ))}
