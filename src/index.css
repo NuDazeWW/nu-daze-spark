@@ -2666,3 +2666,29 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-strategy { padding-top: 32px; }
 .sm-setup { padding-top: 0 !important; }
 @media (min-width: 1024px) { .pub-stage { padding-left: 32px !important; padding-right: 32px !important; } }
+
+/* Strategy starter kits: wrapping reading copy and colored luminous edges. */
+.sm-strategy-builder .sm-starter-kit-grid { grid-auto-rows: 1fr; padding: 4px; }
+.sm-strategy-builder .sm-starter-kit {
+  --kit-tone: var(--ds-cyan);
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
+  width: 100%; min-width: 0; height: auto; min-height: 140px; padding: 20px;
+  white-space: normal; text-align: left; border-radius: 16px;
+  color: hsl(var(--foreground)); border: 1px solid hsl(var(--kit-tone) / .55);
+  background: linear-gradient(135deg, hsl(var(--kit-tone) / .16), hsl(var(--card)) 80%);
+  box-shadow: var(--ds-inset), inset 0 0 28px -16px hsl(var(--kit-tone) / .45), 0 0 18px -9px hsl(var(--kit-tone) / .55);
+}
+.sm-strategy-builder .sm-starter-kit[data-kit="exec_thought"],
+.sm-strategy-builder .sm-starter-kit[data-kit="agency"] { --kit-tone: var(--ds-violet); }
+.sm-strategy-builder .sm-starter-kit[data-kit="pro_services"],
+.sm-strategy-builder .sm-starter-kit[data-kit="nonprofit"] { --kit-tone: var(--ds-gold); }
+.sm-strategy-builder .sm-starter-kit[data-kit="dtc"],
+.sm-strategy-builder .sm-starter-kit[data-kit="sports"] { --kit-tone: var(--ds-magenta); }
+.sm-starter-kit-title, .sm-starter-kit-description { display: block; width: 100%; min-width: 0; overflow-wrap: anywhere; white-space: normal; letter-spacing: 0; }
+.sm-starter-kit-title { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.sm-starter-kit-description { font-family: "Inter", sans-serif; font-size: 14px; font-weight: 400; line-height: 1.6; color: hsl(var(--muted-foreground)); }
+.sm-strategy-builder .sm-starter-kit:hover:not(:disabled) {
+  border-color: hsl(var(--kit-tone) / .85);
+  background: linear-gradient(135deg, hsl(var(--kit-tone) / .23), hsl(var(--card)) 80%);
+  box-shadow: var(--ds-inset), inset 0 0 28px -16px hsl(var(--kit-tone) / .6), 0 0 24px -8px hsl(var(--kit-tone) / .65);
+}
