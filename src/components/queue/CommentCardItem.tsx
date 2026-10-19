@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Copy, Pencil, Trash2, ChevronRight, ChevronLeft, MoreVertical,
-  MessageSquare, ExternalLink, Shield, AlertTriangle, ShieldOff, Eye, MoreHorizontal,
+  MessageSquare, ExternalLink, Shield, AlertTriangle, ShieldOff, Eye, MoreHorizontal, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
