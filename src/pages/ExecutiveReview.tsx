@@ -176,6 +176,37 @@ export default function ExecutiveReview() {
             </div>
           </>
         )}
+
+        {pendingComments.length > 0 && (
+          <section className="mt-8 space-y-3" aria-label="Comments awaiting review">
+            <p className="sm-xr-label"><span className="sm-xr-icon"><MessageSquareWarning className="h-4 w-4" /></span>Comments awaiting review ({pendingComments.length})</p>
+            {pendingComments.map((c) => (
+              <div key={c.id} className="sm-xr-card p-4 space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">Comment</Badge>
+                  <PlatformIcon platform={c.external_posts?.platform ?? "linkedin"} className="h-3.5 w-3.5" />
+                  <span className="text-xs text-muted-foreground capitalize">{c.external_posts?.platform ?? "post"}</span>
+                  {c.external_posts?.author_name && <span className="text-xs text-muted-foreground">· replying to {c.external_posts.author_name}</span>}
+                  {c.tone && <Badge variant="outline" className="text-[10px]">{c.tone}</Badge>}
+                  <span className="sm-status sm-status-in_review ml-auto">Pending Executive Review</span>
+                </div>
+                {c.external_posts?.content_snippet && (
+                  <p className="text-xs text-muted-foreground border-l-2 border-border pl-3 line-clamp-2">{c.external_posts.content_snippet}</p>
+                )}
+                <p className="text-sm whitespace-pre-wrap">{c.draft_copy}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {c.external_posts?.external_url && (
+                    <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => window.open(c.external_posts.external_url, "_blank", "noopener")}>View original post</Button>
+                  )}
+                  <div className="ml-auto flex gap-2">
+                    <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => actOnComment(c.id, "needs_revision")}>Request revision</Button>
+                    <Button variant="success" size="sm" className="h-8 text-xs" onClick={() => actOnComment(c.id, "approved")}><Check className="mr-1 h-3.5 w-3.5" />Approve</Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
       </main>
 
       <Dialog open={reviseOpen} onOpenChange={setReviseOpen}>
