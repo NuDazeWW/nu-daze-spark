@@ -1,5 +1,6 @@
 import type * as React from "react";
 import { Linkedin, Instagram, Facebook, Youtube, Globe } from "lucide-react";
+import { SelectItem } from "@/components/ui/select";
 
 function XLogo({ className }: { className?: string }) {
   return (
