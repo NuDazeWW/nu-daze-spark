@@ -42,9 +42,27 @@ describe("pricing rules", () => {
     expect(ALERTS).toEqual({ progressShare: 0.6, velocityShare: 0.8, velocityHours: 24, hardStopShare: 1 });
   });
   it("scheduled runs cap at 25 posts", () => expect(SCHEDULED_RUN_CAP).toBe(25));
-  it("payment catalog has 24 items", () => {
+  it("payment catalog has 11 recurring prices", () => {
+    expect(paymentCatalog(TIERS).filter((x) => x.interval).length).toBe(11);
+  });
+});
+
+import { nonprofitDisplay, isNonprofitEligible, NONPROFIT_NOTE } from "./pricing";
+describe("non-profit display", () => {
+  it("Spark Start in non-profit view shows annual $159 billed $1,908 even if billing=monthly", () => {
+    const r = nonprofitDisplay(TIERS[0], "monthly", true);
+    expect(r).toMatchObject({ perMonthCents: 15900, billedYearlyCents: 190800, note: NONPROFIT_NOTE, nonprofitApplied: false });
+  });
+  it("Spark Start is not non-profit eligible; others are", () => {
+    expect(isNonprofitEligible("starter")).toBe(false);
+    expect(["team", "pro", "enterprise"].every(isNonprofitEligible)).toBe(true);
+  });
+  it("Team Flow non-profit is $167/mo annual", () => {
+    expect(nonprofitDisplay(TIERS[1], "monthly", true).perMonthCents).toBe(16700);
+  });
+  it("payment catalog has exactly 22 items, none for Spark Start non-profit", () => {
     const c = paymentCatalog(TIERS);
-    expect(c).toHaveLength(24);
-    expect(c.filter((x) => x.interval).length).toBe(12);
+    expect(c).toHaveLength(22);
+    expect(c.some((i) => i.sku.startsWith("starter_nonprofit"))).toBe(false);
   });
 });

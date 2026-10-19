@@ -9,7 +9,7 @@ type Sub = { heading: string; paragraphs?: string[]; steps?: string[]; bullets?:
 type Section = { title: string; route?: string; intro: string; subs: Sub[] };
 
 const fmtNum = (n: number | undefined | null) =>
-  n == null ? "—" : n >= 999999 ? "Unlimited" : n.toLocaleString();
+  n == null ? "—" : n >= 999999 ? "No set limit" : n.toLocaleString();
 
 export default function UserGuide() {
   const { entityPlural, entitySingular, settings } = useWorkspace() as ReturnType<typeof useWorkspace> & {
@@ -131,7 +131,7 @@ export default function UserGuide() {
       route: "/assets",
       intro: "Where approved source material lives.",
       subs: [
-        { heading: "Adding assets", steps: ["Upload images, videos, PDFs, decks, testimonials, case studies, links or text snippets.", "Or open Connected Folders to browse OneDrive, SharePoint or Google Drive.", "Set a permission state and optional expiry date."] },
+        { heading: "Adding assets", steps: ["Add images, videos, PDFs, decks, testimonials, case studies, links or text snippets.", "Or open Connected Folders to browse OneDrive, SharePoint or Google Drive.", "Set a permission state and optional expiry date."] },
         { heading: "Permission states", bullets: ["Usable for generation — feeds AI drafts.", "Summarization only — summarized, never quoted directly.", "Blocked — never used.", "Archived — retired from use."] },
         { heading: "Connected Sources", paragraphs: ["Connect cloud drives once in Connected Sources. If a connection expires, reconnect it there. Storage counts toward your " + (a ? `${a.storage_gb} GB` : "plan") + " limit."] },
       ],
@@ -190,7 +190,7 @@ export default function UserGuide() {
       title: "Brand Kit Studio",
       route: "/settings/brand-kit",
       intro: `Logo, colors, typography and visual tone per ${ent}.`,
-      subs: [{ heading: "Setting it up", steps: ["Upload a logo.", "Add brand colors and fonts.", "Describe the visual tone.", "Choose watermark position and save."] }],
+      subs: [{ heading: "Setting it up", steps: ["Add a logo.", "Add brand colors and fonts.", "Describe the visual tone.", "Choose watermark position and save."] }],
     },
     {
       title: "Comment Generator",

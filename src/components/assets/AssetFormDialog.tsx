@@ -187,7 +187,7 @@ export function AssetFormDialog({
             <Label className="text-xs text-muted-foreground mb-1.5 block">What are you adding? <span className="text-destructive">*</span></Label>
             <div className="flex gap-2">
               {([
-                { value: "file" as UploadMode, label: "File Upload" },
+                { value: "file" as UploadMode, label: "Add file" },
                 { value: "link" as UploadMode, label: "Link / URL" },
                 { value: "text" as UploadMode, label: "Text Snippet" },
               ]).map((opt) => (

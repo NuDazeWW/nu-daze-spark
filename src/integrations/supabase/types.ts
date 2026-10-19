@@ -1398,6 +1398,39 @@ export type Database = {
           },
         ]
       }
+      legal_acceptances: {
+        Row: {
+          accepted_at: string
+          doc: string
+          id: string
+          marketing_email: boolean
+          marketing_sms: boolean
+          user_agent: string | null
+          user_id: string
+          version: string
+        }
+        Insert: {
+          accepted_at?: string
+          doc: string
+          id?: string
+          marketing_email?: boolean
+          marketing_sms?: boolean
+          user_agent?: string | null
+          user_id: string
+          version: string
+        }
+        Update: {
+          accepted_at?: string
+          doc?: string
+          id?: string
+          marketing_email?: boolean
+          marketing_sms?: boolean
+          user_agent?: string | null
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       master_content_objects: {
         Row: {
           brief_id: string
@@ -1472,55 +1505,165 @@ export type Database = {
       }
       nonprofit_applications: {
         Row: {
+          address: string | null
+          consent_at: string | null
           contact_email: string
           contact_name: string
+          corroboration: Json | null
+          country: string
+          cra_number: string | null
           created_at: string
           decided_at: string | null
+          document_paths: Json
           ein: string
+          grace_until: string | null
           id: string
           intended_tier: string | null
+          last_recheck_at: string | null
           legal_name: string
           letter_path: string
+          matched_name: string | null
           reverification_due: string | null
           review_notes: string | null
+          review_route: string | null
           reviewer_id: string | null
           status: string
           submitted_by: string
           verification_method: string
+          verified_until: string | null
         }
         Insert: {
+          address?: string | null
+          consent_at?: string | null
           contact_email: string
           contact_name: string
+          corroboration?: Json | null
+          country?: string
+          cra_number?: string | null
           created_at?: string
           decided_at?: string | null
+          document_paths?: Json
           ein: string
+          grace_until?: string | null
           id?: string
           intended_tier?: string | null
+          last_recheck_at?: string | null
           legal_name: string
           letter_path: string
+          matched_name?: string | null
           reverification_due?: string | null
           review_notes?: string | null
+          review_route?: string | null
           reviewer_id?: string | null
           status?: string
           submitted_by: string
           verification_method?: string
+          verified_until?: string | null
         }
         Update: {
+          address?: string | null
+          consent_at?: string | null
           contact_email?: string
           contact_name?: string
+          corroboration?: Json | null
+          country?: string
+          cra_number?: string | null
           created_at?: string
           decided_at?: string | null
+          document_paths?: Json
           ein?: string
+          grace_until?: string | null
           id?: string
           intended_tier?: string | null
+          last_recheck_at?: string | null
           legal_name?: string
           letter_path?: string
+          matched_name?: string | null
           reverification_due?: string | null
           review_notes?: string | null
+          review_route?: string | null
           reviewer_id?: string | null
           status?: string
           submitted_by?: string
           verification_method?: string
+          verified_until?: string | null
+        }
+        Relationships: []
+      }
+      nonprofit_decision_log: {
+        Row: {
+          application_id: string
+          created_at: string
+          id: string
+          irs_result: string | null
+          matched_name: string | null
+          notes: string | null
+          outcome: string
+          plan_applied: string | null
+          reviewer_id: string | null
+          source: string | null
+          source_citation: string | null
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          id?: string
+          irs_result?: string | null
+          matched_name?: string | null
+          notes?: string | null
+          outcome: string
+          plan_applied?: string | null
+          reviewer_id?: string | null
+          source?: string | null
+          source_citation?: string | null
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          id?: string
+          irs_result?: string | null
+          matched_name?: string | null
+          notes?: string | null
+          outcome?: string
+          plan_applied?: string | null
+          reviewer_id?: string | null
+          source?: string | null
+          source_citation?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nonprofit_decision_log_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "nonprofit_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nonprofit_recheck_runs: {
+        Row: {
+          checked: number
+          id: string
+          lapsed: number
+          notices_sent: number
+          ran_at: string
+          sent_to_review: number
+        }
+        Insert: {
+          checked?: number
+          id?: string
+          lapsed?: number
+          notices_sent?: number
+          ran_at?: string
+          sent_to_review?: number
+        }
+        Update: {
+          checked?: number
+          id?: string
+          lapsed?: number
+          notices_sent?: number
+          ran_at?: string
+          sent_to_review?: number
         }
         Relationships: []
       }
@@ -1728,6 +1871,7 @@ export type Database = {
       }
       post_cards: {
         Row: {
+          ai_assisted: boolean | null
           apply_ai_disclosure: boolean
           approval_status: Database["public"]["Enums"]["approval_status"]
           assigned_to: string | null
@@ -1771,6 +1915,7 @@ export type Database = {
           voice_profile_id: string | null
         }
         Insert: {
+          ai_assisted?: boolean | null
           apply_ai_disclosure?: boolean
           approval_status?: Database["public"]["Enums"]["approval_status"]
           assigned_to?: string | null
@@ -1814,6 +1959,7 @@ export type Database = {
           voice_profile_id?: string | null
         }
         Update: {
+          ai_assisted?: boolean | null
           apply_ai_disclosure?: boolean
           approval_status?: Database["public"]["Enums"]["approval_status"]
           assigned_to?: string | null
@@ -3084,6 +3230,7 @@ export type Database = {
         Args: { _action: string; _details: Json; _target: string }
         Returns: undefined
       }
+      nonprofit_annual_recheck: { Args: never; Returns: Json }
       prepare_blank_copy: { Args: { _confirm: string }; Returns: undefined }
       process_scheduled_posts: { Args: { _cap?: number }; Returns: Json }
       publishing_credentials_status: {

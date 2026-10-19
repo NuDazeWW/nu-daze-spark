@@ -25,7 +25,7 @@ export function IdentityDialog({ open, onOpenChange }: { open: boolean; onOpenCh
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Your profile picture</DialogTitle>
-          <DialogDescription>Pick an icon or upload a photo. If you skip this, your initials are shown.</DialogDescription>
+          <DialogDescription>Pick an icon or add a photo. If you skip this, your initials are shown.</DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-6 gap-2" role="radiogroup" aria-label="Identity icons">
           {Object.entries(IDENTITY_ICONS).map(([key, Icon]) => {
@@ -46,7 +46,7 @@ export function IdentityDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         <DialogFooter className="gap-2 sm:justify-between">
           <Button variant="ghost" disabled={busy || !stored} onClick={() => run(() => save(null), `Showing ${initials}`)}>Use initials</Button>
           <Button variant="outline" disabled={busy} onClick={() => input.current?.click()}>
-            {busy ? <Loader2 className="animate-spin" /> : <Upload />}Upload photo
+            {busy ? <Loader2 className="animate-spin" /> : <Upload />}Add photo
           </Button>
         </DialogFooter>
       </DialogContent>

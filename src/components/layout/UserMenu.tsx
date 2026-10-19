@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { BarChart3, CreditCard, ImageIcon, LogOut } from "lucide-react";
+import { BarChart3, CreditCard, ImageIcon, LogOut, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspace } from "@/hooks/useWorkspace";
@@ -74,6 +76,16 @@ export function UserMenu() {
             </>
           )}
           <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={async () => {
+            if (!window.confirm("Delete your account?\n\nYour sign-in and profile are removed now. Posts and files you created stay with the workspace and are kept for the subscription term plus 30 days for export. Non-profit documents are kept while subscribed plus 1 year, and decision records for 7 years. This can't be undone.")) return;
+            if (window.prompt('Type DELETE to confirm') !== "DELETE") return;
+            const { error } = await supabase.functions.invoke("delete-account", { body: { confirm: "DELETE" } });
+            if (error) { toast.error(error.message); return; }
+            toast.success("Account deleted"); await handleLogout();
+          }} className="text-destructive focus:text-destructive">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete account
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
             <LogOut className="mr-2 h-4 w-4" />
             Log out

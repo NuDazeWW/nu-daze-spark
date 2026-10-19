@@ -48,7 +48,7 @@ function UsageInner() {
   return (
     <div className="animate-fade-in space-y-6">
       <PageHeader title="Usage & activity" description="This month's activity and a log of important workspace changes.">
-        <Badge variant="outline">{s?.plan_name ?? "Unlimited"} plan</Badge>
+        <Badge variant="outline">{s?.plan_name ?? "Custom"} plan</Badge>
       </PageHeader>
       <UsageMetersPanel />
       <div className="grid gap-4 md:grid-cols-2">

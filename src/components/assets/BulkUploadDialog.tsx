@@ -59,7 +59,7 @@ export function BulkUploadDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Film className="h-5 w-5 text-primary" />
-            Bulk Upload & Create Reels
+            Bulk Add & Create Reels
           </DialogTitle>
         </DialogHeader>
 
@@ -147,7 +147,7 @@ export function BulkUploadDialog({
           disabled={files.length === 0 || isPending}
           className="w-full"
         >
-          {isPending ? "Processing…" : `Upload & Create Reels (${files.length})`}
+          {isPending ? "Processing…" : `Add & Create Reels (${files.length})`}
         </Button>
       </DialogContent>
     </Dialog>

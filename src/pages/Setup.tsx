@@ -475,12 +475,12 @@ function PlanLimitsCard() {
   const save = async () => {
     setSaving(true);
     try {
-      await updateWorkspaceSettings({ plan_name: planName.trim() || "Unlimited", seat_limit: seatLimit ? Number(seatLimit) : null, client_limit: clientLimit ? Number(clientLimit) : null } as never);
+      await updateWorkspaceSettings({ plan_name: planName.trim() || "Custom", seat_limit: seatLimit ? Number(seatLimit) : null, client_limit: clientLimit ? Number(clientLimit) : null } as never);
       ws.refresh(); toast.success("Plan and limits saved");
     } catch (e) { toast.error((e as Error).message); } finally { setSaving(false); }
   };
   return (
-    <GridCard title="Plan and limits" desc="Leave a limit blank for unlimited." icon={ShieldCheck}>
+    <GridCard title="Plan and limits" desc="Leave a limit blank for no set limit." icon={ShieldCheck}>
       <div className="grid grid-cols-3 gap-2">
         <div className="space-y-1"><Label className="text-xs">Plan name</Label><Input disabled={!ws.isOwner} value={planName} onChange={(e) => setPlanName(e.target.value)} /></div>
         <div className="space-y-1"><Label className="text-xs">Seats</Label><Input disabled={!ws.isOwner} type="number" min={1} placeholder="∞" value={seatLimit} onChange={(e) => setSeatLimit(e.target.value)} /></div>

@@ -188,7 +188,7 @@ export default function AssetLibrary() {
   if (isLoading) {
     return (
       <div className="sm-reference sm-assets animate-fade-in">
-        <PageHeader title="Asset Library" description="Manage uploaded source assets, permissions, and summaries." />
+        <PageHeader title="Asset Library" description="Manage added source assets, permissions, and summaries." />
         <div className="space-y-3 py-6">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full rounded-lg" />)}</div>
       </div>
     );
@@ -197,7 +197,7 @@ export default function AssetLibrary() {
   if (error) {
     return (
       <div className="sm-reference sm-assets animate-fade-in">
-        <PageHeader title="Asset Library" description="Manage uploaded source assets, permissions, and summaries." />
+        <PageHeader title="Asset Library" description="Manage added source assets, permissions, and summaries." />
         <Alert variant="destructive" className="mt-4"><AlertCircle className="h-4 w-4" /><AlertDescription>Failed to load assets: {error.message}</AlertDescription></Alert>
       </div>
     );
@@ -207,7 +207,7 @@ export default function AssetLibrary() {
 
   return (
     <div className="sm-reference sm-assets animate-fade-in">
-      <PageHeader title="Asset Library" description="Manage uploaded source assets, permissions, and summaries." />
+      <PageHeader title="Asset Library" description="Manage added source assets, permissions, and summaries." />
       <ExpirationAlerts />
 
       {/* Toolbar */}
@@ -358,7 +358,7 @@ export default function AssetLibrary() {
           <EmptyState
             icon={FolderOpen}
             title={assets.length === 0 ? "No assets yet" : "No matching assets"}
-            description={assets.length === 0 ? "Upload images, PDFs, videos, links, and text snippets to build your content library." : "Try adjusting your search or filters."}
+            description={assets.length === 0 ? "Add images, PDFs, videos, links, and text snippets to build your content library." : "Try adjusting your search or filters."}
             action={assets.length === 0 && isAdmin ? <Button onClick={openCreate}><Plus className="mr-2 h-4 w-4" />Add Asset</Button> : undefined}
           />
         ) : (

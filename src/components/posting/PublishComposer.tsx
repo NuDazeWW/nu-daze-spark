@@ -109,7 +109,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
 
   const save = async (patch: Record<string, unknown>) => {
     const { error } = await supabase.from("post_cards").update({
-      target_account_ids: targets, timezone: tz, apply_ai_disclosure: disclosure, ...patch,
+      target_account_ids: targets, timezone: tz, apply_ai_disclosure: disclosure, ai_assisted: disclosure, ...patch,
     } as never).eq("id", card.id);
     if (error) throw error;
     qc.invalidateQueries({ queryKey: ["post_cards"] });

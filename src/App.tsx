@@ -39,6 +39,16 @@ import Pricing from "./pages/Pricing";
 import Billing from "./pages/settings/Billing";
 import ExecutiveReview from "./pages/ExecutiveReview";
 import Legal from "./pages/Legal";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { recordNav } from "@/components/shared/BackLink";
+import { LegalReacceptGate } from "@/components/auth/LegalReacceptGate";
+
+function NavRecorder() {
+  const { pathname, search } = useLocation();
+  useEffect(() => { recordNav(pathname + search); }, [pathname, search]);
+  return null;
+}
 import { CreditGateProvider } from "@/components/billing/CreditGate";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
@@ -51,12 +61,15 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
         <CreditGateProvider>
+          <NavRecorder />
+          <LegalReacceptGate />
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/terms" element={<Legal />} />
             <Route path="/privacy" element={<Legal />} />
+            {["/acceptable-use", "/cookies", "/subprocessors", "/dmca", "/security", "/accessibility"].map((p) => <Route key={p} path={p} element={<Legal />} />)}
             <Route
               element={
                 <ProtectedRoute>

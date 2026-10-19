@@ -1,4 +1,4 @@
-import { ADDONS } from "@/lib/pricing";
+import { ADDONS, nonprofitDisplay, isNonprofitEligible } from "@/lib/pricing";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -109,7 +109,7 @@ export default function Pricing() {
   };
 
   const choose = (t: TierDefinition) => {
-    const q = `tier=${t.tier_slug}&billing=${billing}${nonprofit ? "&nonprofit=true" : ""}`;
+    const q = `tier=${t.tier_slug}&billing=${billing}${nonprofit && isNonprofitEligible(t.tier_slug) ? "&nonprofit=true" : ""}`;
     if (t.tier_slug === "enterprise") return (window.location.href = "mailto:hello@nudaze.com?subject=SocialMotive%20Force%20Enterprise");
     nav(user ? `/settings/billing?${q}` : `/auth?next=${encodeURIComponent(`/settings/billing?${q}`)}`);
   };
@@ -149,14 +149,16 @@ export default function Pricing() {
           <label htmlFor="np" className="cursor-pointer">Non-profit program — 40% off annual plans</label>
           <Switch id="np" checked={nonprofit} onCheckedChange={(v) => setParam("nonprofit", v ? "true" : null)} />
         </div>
-        {nonprofit && <p className="mt-2 text-xs text-muted-foreground">The non-profit program is annual only, so monthly billing is turned off. Prices apply once your 501(c)(3) is verified. The subscription discount reflects your mission. Setup covers the work we do — configuration, connector wiring, social account setup, strategy import and team training — so white-glove setup is 25% off, or choose self-guided setup at 50% off and configure your own brand, connectors and accounts with our orientation guide.</p>}
+        {nonprofit && <p className="mt-2 text-xs text-muted-foreground">The non-profit program is annual only, so monthly billing is turned off. Prices apply once your 501(c)(3) or Canadian registered charity status is verified. Non-profit pricing starts at Team Flow. The subscription discount reflects your mission. Setup covers the work we do — configuration, connector wiring, social account setup, strategy import and team training — so white-glove setup is 25% off, or choose self-guided setup at 50% off and configure your own brand, connectors and accounts with our orientation guide.</p>}
       </section>
 
       <section className="sm-price-grid mx-auto grid items-stretch gap-4 px-6 md:grid-cols-2 lg:grid-cols-4">
         {(tiers.data ?? []).map((t) => {
           const hero = t.tier_slug === "pro";
-          const perMonth = nonprofit ? t.nonprofit_annual_price_cents : billing === "annual" ? t.annual_price_cents : t.monthly_price_cents;
-          const fee = nonprofit ? t.nonprofit_implementation_fee_cents : t.implementation_fee_cents;
+          const disp = nonprofitDisplay(t, billing, nonprofit);
+          const perMonth = disp.perMonthCents;
+          const npApplies = disp.nonprofitApplied;
+          const fee = npApplies ? t.nonprofit_implementation_fee_cents : t.implementation_fee_cents;
           const a = t.allowances;
           return (
             <article key={t.id} data-tier={t.tier_slug} className={cn("sm-price-card flex flex-col rounded-xl border bg-card p-6 text-card-foreground",
@@ -173,9 +175,10 @@ export default function Pricing() {
               <p className="mt-1 text-sm text-muted-foreground">{AUDIENCE[t.tier_slug]}</p>
               <p className="mt-5"><span className="font-display text-4xl font-semibold">{fmtUsd(perMonth)}</span><span className="text-sm text-muted-foreground"> / month</span></p>
               <p className="text-xs text-muted-foreground">
-                {billing === "annual" ? `Billed ${fmtUsd(perMonth * 12)} yearly` : "Billed monthly"}
+                {disp.billedYearlyCents ? `Billed ${fmtUsd(disp.billedYearlyCents)} yearly` : "Billed monthly"}
                 {!nonprofit && billing === "annual" && ` · ${fmtUsd(t.monthly_price_cents)} month-to-month`}
               </p>
+              {disp.note && <p className="mt-1 text-xs font-medium text-foreground">{disp.note}</p>}
               <p className="mt-1 font-mono text-[11px] text-muted-foreground">{fmtUsd(Math.round(perMonth / a.seats), 2)} per seat</p>
 
               <ul className="mt-5 space-y-1.5 text-sm">
@@ -190,10 +193,10 @@ export default function Pricing() {
               <div className="mt-auto pt-6">
                 <Collapsible className="rounded-lg border p-3">
                   <div className="flex items-baseline justify-between text-sm">
-                    <span className="font-medium">{nonprofit ? "White-glove setup" : "One-time setup"}</span>
+                    <span className="font-medium">{npApplies ? "White-glove setup" : "One-time setup"}</span>
                     <span className="font-display font-semibold">{fmtUsd(fee)}</span>
                   </div>
-                  {nonprofit && a.self_guided_setup_cents ? (
+                  {npApplies && a.self_guided_setup_cents ? (
                     <div className="mt-1 flex items-baseline justify-between text-sm">
                       <span className="font-medium">Self-guided setup</span>
                       <span className="font-display font-semibold">{fmtUsd(a.self_guided_setup_cents)}</span>
@@ -229,7 +232,7 @@ export default function Pricing() {
       {nonprofit && (
         <section className="mx-auto mt-10 max-w-3xl rounded-xl border bg-card p-6 text-center">
           <h3 className="font-display text-lg font-semibold">Apply for non-profit pricing</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Upload your IRS determination letter and EIN. Invoice and grant-funded billing is available once verified.</p>
+          <p className="mt-1 text-sm text-muted-foreground">US 501(c)(3) organizations and Canadian registered charities, starting at Team Flow. Add your IRS or CRA documents. Invoice and grant-funded billing is available once you are verified.</p>
           <Button className="mt-4" onClick={() => setIntake(true)}>Start verification</Button>
         </section>
       )}

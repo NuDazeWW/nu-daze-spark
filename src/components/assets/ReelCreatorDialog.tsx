@@ -138,7 +138,7 @@ export function ReelCreatorDialog({ open, onOpenChange }: ReelCreatorDialogProps
         </DialogHeader>
 
         <p className="text-sm text-muted-foreground">
-          Upload 2+ images to stitch them into a 9:16 video reel with Ken Burns effect and crossfade transitions.
+          Add 2+ images to stitch them into a 9:16 video reel with Ken Burns effect and crossfade transitions.
         </p>
 
         {/* Result view */}

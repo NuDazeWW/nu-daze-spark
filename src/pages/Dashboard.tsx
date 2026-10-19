@@ -158,7 +158,7 @@ export default function Dashboard() {
         {[
           { label: "Generate Posts", icon: Sparkles, path: "/generator", tone: "cyan" },
           { label: "Find Comments", icon: MessageSquare, path: "/comments", tone: "coral" },
-          { label: "Upload Asset", icon: Upload, path: "/assets", tone: "gold" },
+          { label: "Add Asset", icon: Upload, path: "/assets", tone: "gold" },
           { label: "View Queue", icon: CalendarDays, path: "/queue", tone: "violet" },
         ].map((a) => (
           <Button

@@ -1,3 +1,5 @@
+import { routeLabel, SourceAttribution } from "@/components/billing/NonprofitIntakeDialog";
+import { nonprofitDisplay, isNonprofitEligible } from "@/lib/pricing";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -43,8 +45,11 @@ function BillingInner() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const subscribe = async (t: TierDefinition) => {
+    { const d = nonprofitDisplay(t, (npVerified ? "annual" : cycle) as "monthly" | "annual", npVerified);
+      const amount = d.billedYearlyCents ? `${fmtUsd(d.billedYearlyCents)} every year` : `${fmtUsd(d.perMonthCents)} every month`;
+      if (!window.confirm(`Billing authorization\n\nYour ${t.name} plan renews automatically at ${amount}, plus the one-time setup fee, until you cancel. We give at least 30 days' notice before any price change.\n\nAuthorize this charge?`)) return; }
     setBusy(t.tier_slug);
-    try { await startCheckout({ action: "subscribe", tier: t.tier_slug, cycle: npVerified ? "annual" : cycle, nonprofit: npVerified }); }
+    try { await startCheckout({ action: "subscribe", tier: t.tier_slug, cycle: npVerified ? "annual" : cycle, nonprofit: npVerified && isNonprofitEligible(t.tier_slug) }); }
     catch (e) { toast.error((e as Error).message); } finally { setBusy(null); }
   };
 
@@ -75,13 +80,14 @@ function BillingInner() {
           </CardHeader>
           <CardContent className="grid gap-3 md:grid-cols-4">
             {(tiers.data ?? []).map((t) => {
-              const price = npVerified ? t.nonprofit_annual_price_cents : cycle === "annual" ? t.annual_price_cents : t.monthly_price_cents;
+              const disp = nonprofitDisplay(t, cycle as "monthly" | "annual", npVerified); const price = disp.perMonthCents;
               const current = t.tier_slug === b.tier_slug;
               return (
                 <div key={t.id} className={cn("rounded-lg border p-4", preTier === t.tier_slug && "border-primary ring-1 ring-primary", t.tier_slug === "pro" && "border-primary/60")}>
                   <p className="font-display font-semibold">{t.name}</p>
                   <p className="mt-1 text-2xl font-semibold">{fmtUsd(price)}<span className="text-xs text-muted-foreground"> /mo</span></p>
-                  <p className="text-xs text-muted-foreground">+ {fmtUsd(npVerified ? t.nonprofit_implementation_fee_cents : t.implementation_fee_cents)} one-time setup</p>
+                  {disp.note && <p className="text-xs font-medium">{disp.note}</p>}
+                  <p className="text-xs text-muted-foreground">+ {fmtUsd(disp.nonprofitApplied ? t.nonprofit_implementation_fee_cents : t.implementation_fee_cents)} one-time setup</p>
                   <Button className="mt-3 w-full" size="sm" variant={current ? "outline" : "default"} disabled={current || busy === t.tier_slug} onClick={() => subscribe(t)}>
                     {busy === t.tier_slug ? <Loader2 className="h-4 w-4 animate-spin" /> : current ? "Current plan" : "Choose"}
                   </Button>
@@ -108,51 +114,88 @@ function NonprofitCard({ onApply, status, highlight, cycle }: { onApply: () => v
     queryKey: ["nonprofit_applications"],
     queryFn: async () => { const { data } = await supabase.from("nonprofit_applications").select("*").order("created_at", { ascending: false }); return data ?? []; },
   });
+  const log = useQuery({
+    queryKey: ["nonprofit_decision_log"],
+    queryFn: async () => { const { data } = await supabase.from("nonprofit_decision_log").select("*").order("created_at", { ascending: false }).limit(50); return data ?? []; },
+  });
+  const runs = useQuery({
+    queryKey: ["nonprofit_recheck_runs"],
+    queryFn: async () => { const { data } = await supabase.from("nonprofit_recheck_runs").select("*").order("ran_at", { ascending: false }).limit(1); return data ?? []; },
+  });
   const qc = useQueryClient();
-  const review = async (id: string, decision: "verified" | "rejected") => {
-    const notes = window.prompt(`Notes for this ${decision} decision (IRS Tax Exempt Organization Search result):`) ?? "";
+  const review = async (id: string, decision: "verified" | "rejected" | "more_info") => {
+    const label = decision === "verified" ? "approval" : decision === "rejected" ? "rejection (reason required)" : "request for more information (what's needed)";
+    const notes = window.prompt(`Notes for this ${label}:`);
+    if (notes === null) return;
     const { error } = await supabase.rpc("review_nonprofit_application", { _id: id, _decision: decision, _notes: notes });
     if (error) return toast.error(error.message);
-    toast.success(`Application ${decision}`); qc.invalidateQueries();
+    toast.success("Decision recorded"); qc.invalidateQueries();
   };
-  const viewLetter = async (path: string) => {
+  const recheck = async (a: { id: string; ein: string; country: string; legal_name: string }) => {
+    const { error } = await supabase.functions.invoke("verify-nonprofit", { body: { application_id: a.id, ein: a.ein, country: a.country, legal_name: a.legal_name } });
+    if (error) return toast.error(error.message);
+    toast.success("IRS check re-run"); qc.invalidateQueries();
+  };
+  const viewDoc = async (path: string) => {
     const { data, error } = await supabase.storage.from("nonprofit-letters").createSignedUrl(path, 120);
     if (error) return toast.error(error.message);
     window.open(data.signedUrl, "_blank", "noopener");
   };
+  const open = (s: string) => ["pending", "more_info", "recheck_due"].includes(s);
   return (
     <Card className={cn(highlight && "border-primary")}>
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle>Non-profit program</CardTitle>
-          <CardDescription>40% off annual plans, 25% off setup. Status: <b>{status === "none" ? "not applied" : status === "pending" ? "verification pending" : status}</b>
+          <CardDescription>40% off annual plans and 25% off setup, starting at Team Flow. Status: <b>{status === "none" ? "not applied" : status === "pending" ? "verification pending (standard pricing until approved)" : status}</b>
+            {status === "verified" && <Badge variant="outline" className="ml-2">Verified 501(c)(3)</Badge>}
             {status === "verified" && cycle !== "annual" && " — switch to annual billing to receive the non-profit rate."}</CardDescription>
-
         </div>
         {status !== "verified" && <Button variant="outline" onClick={onApply}>{status === "pending" ? "Submit another" : "Apply"}</Button>}
       </CardHeader>
       {!!apps.data?.length && (
-        <CardContent>
+        <CardContent className="space-y-4">
           <Table>
-            <TableHeader><TableRow><TableHead>Organization</TableHead><TableHead>EIN</TableHead><TableHead>Status</TableHead><TableHead>Re-verify by</TableHead><TableHead /></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Organization</TableHead><TableHead>ID</TableHead><TableHead>Check</TableHead><TableHead>Status</TableHead><TableHead>Verified until</TableHead><TableHead /></TableRow></TableHeader>
             <TableBody>
-              {apps.data.map((a) => (
+              {apps.data.map((a) => {
+                const c = (a.corroboration ?? null) as { result: string; route: string; matched_name?: string; citation?: string; source_url?: string } | null;
+                const docs = ((a.document_paths as string[] | null)?.length ? a.document_paths as string[] : [a.letter_path]).filter(Boolean);
+                return (
                 <TableRow key={a.id}>
-                  <TableCell>{a.legal_name}<p className="text-xs text-muted-foreground">{a.contact_name} · {a.contact_email}</p></TableCell>
-                  <TableCell className="font-mono">{a.ein}</TableCell>
+                  <TableCell>{a.legal_name}<p className="text-xs text-muted-foreground">{a.contact_name} · {a.contact_email} · {a.country}</p></TableCell>
+                  <TableCell className="font-mono text-xs">{a.country === "CA" ? a.cra_number : a.ein}</TableCell>
+                  <TableCell className="max-w-[16rem] text-xs">{routeLabel(a.review_route ?? c?.route)}{c?.matched_name && <p>IRS name: {c.matched_name}</p>}<SourceAttribution check={c} /></TableCell>
                   <TableCell>{a.status}</TableCell>
-                  <TableCell>{a.reverification_due ?? "—"}</TableCell>
+                  <TableCell>{a.verified_until ?? a.reverification_due ?? "—"}{a.grace_until && <p className="text-xs">grace to {a.grace_until}</p>}</TableCell>
                   <TableCell className="space-x-1 whitespace-nowrap text-right">
-                    <Button size="sm" variant="ghost" onClick={() => viewLetter(a.letter_path)}>Letter</Button>
-                    <Button size="sm" variant="ghost" asChild><a href="https://apps.irs.gov/app/eos/" target="_blank" rel="noopener noreferrer">IRS search</a></Button>
-                    {a.status === "pending" && <><Button size="sm" onClick={() => review(a.id, "verified")}>Approve</Button><Button size="sm" variant="outline" onClick={() => review(a.id, "rejected")}>Reject</Button></>}
+                    {docs.map((d, i) => <Button key={d} size="sm" variant="ghost" onClick={() => viewDoc(d)}>Doc {i + 1}</Button>)}
+                    {a.country === "CA" ? <>
+                      <Button size="sm" variant="ghost" asChild><a href="https://apps.cra-arc.gc.ca/ebci/hacc/srch/pub/dsplyBscSrch?request_locale=en" target="_blank" rel="noopener noreferrer">CRA search</a></Button>
+                      <Button size="sm" variant="ghost" onClick={() => { navigator.clipboard.writeText(a.cra_number ?? ""); toast.success("CRA number copied. Paste it into the search."); }}>Copy number</Button>
+                    </> : a.country === "US" ? <>
+                      <Button size="sm" variant="ghost" asChild><a href={`https://apps.irs.gov/app/eos/allSearch?ein1=${a.ein.replace("-", "")}&isDescending=false&dispatchMethod=searchAll`} target="_blank" rel="noopener noreferrer">IRS search</a></Button>
+                      <Button size="sm" variant="ghost" onClick={() => recheck(a)}>Re-run check</Button>
+                    </> : null}
+                    {open(a.status) && <><Button size="sm" onClick={() => review(a.id, "verified")}>Approve</Button><Button size="sm" variant="outline" onClick={() => review(a.id, "more_info")}>Ask for more</Button><Button size="sm" variant="outline" onClick={() => review(a.id, "rejected")}>Reject</Button></>}
                   </TableCell>
-                </TableRow>
-              ))}
+                </TableRow>);
+              })}
             </TableBody>
           </Table>
+          <div>
+            <p className="text-sm font-medium">Decision record (permanent, can't be edited)</p>
+            {log.data?.length ? (
+              <ul className="mt-1 space-y-1 text-xs text-muted-foreground">
+                {log.data.map((l) => <li key={l.id} className="font-mono">{new Date(l.created_at).toLocaleString()} · {l.outcome} · IRS: {l.irs_result ?? "n/a"}{l.matched_name ? ` (${l.matched_name})` : ""} · source: {l.source ?? "manual"} · plan: {l.plan_applied ?? "—"}{l.notes ? ` · ${l.notes}` : ""}</li>)}
+              </ul>
+            ) : <p className="mt-1 text-xs text-muted-foreground">No decisions yet.</p>}
+          </div>
         </CardContent>
       )}
+      <CardContent className="pt-0 text-xs text-muted-foreground">
+        Yearly re-check runs every day at 06:00 UTC.{runs.data?.[0] ? ` Last run ${new Date(runs.data[0].ran_at).toLocaleString()}: ${runs.data[0].checked} checked, ${runs.data[0].sent_to_review} sent to review, ${runs.data[0].notices_sent} notices, ${runs.data[0].lapsed} lapsed.` : " No runs yet."}
+      </CardContent>
     </Card>
   );
 }

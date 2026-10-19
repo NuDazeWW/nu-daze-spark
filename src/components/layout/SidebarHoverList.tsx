@@ -54,13 +54,13 @@ export type HoverListItem = { icon: LucideIcon; label: string; description?: str
 /** What's inside each sidebar page — informational rows, or links when a real destination exists. */
 export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
   "/": [
-    { icon: Gauge, label: "Today at a glance", description: "Decisions needed, ready to post, at risk" },
+    { icon: Gauge, label: "Today at a glance", description: "Decisions needed, ready to post, at risk", to: "/" },
     { icon: CalendarDays, label: "Pipeline overview", description: "Where every post sits this week", to: "/queue" },
     { icon: CheckCircle2, label: "Approved library", description: "Everything cleared to publish", to: "/approved" },
     { icon: Sparkles, label: "New campaign brief", description: "Start the next content set", to: "/briefs" },
   ],
   "/assets": [
-    { icon: Upload, label: "Uploads & bulk upload", description: "Images, video, PDFs, decks" },
+    { icon: Upload, label: "Add files in bulk", description: "Images, video, PDFs, decks" },
     { icon: ShieldCheck, label: "Permission states", description: "Usable, summarization-only, blocked, archived" },
     { icon: Clock, label: "Freshness & expiry", description: "Outdated assets stop resurfacing" },
     { icon: Video, label: "Reel creator", description: "Assemble Reels from cleared media" },
@@ -107,7 +107,7 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
   ],
   "/comments": [
     { icon: MessageSquare, label: "Comment drafts", description: "Genuine, informed engagement" },
-    { icon: Target, label: "Engagement targets", description: "Relevant industry posts" },
+    { icon: Target, label: "Engagement targets", description: "Relevant industry posts", to: "/strategy?tab=engagement" },
     { icon: Globe, label: "External posts", description: "Author context and risk checks" },
   ],
   "/approved": [
@@ -124,10 +124,10 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
     { icon: ListChecks, label: "Setup checklist", description: "Everything before first use" },
     { icon: Wand2, label: "Starter tools", description: "Presets, brand import, voice synth" },
     { icon: Building2, label: "Company profile", description: "Name, logo, org type" },
-    { icon: Shield, label: "Plan & limits", description: "Seats and generation limits" },
+    { icon: Shield, label: "Plan & limits", description: "Seats and generation limits", to: "/settings/billing" },
   ],
   "/settings/clients": [
-    { icon: Building2, label: "Organizations", description: "Client workspaces" },
+    { icon: Building2, label: "Organizations", description: "Client workspaces", to: "/settings/clients" },
     { icon: UserPlus, label: "Social accounts", description: "Profile links used everywhere" },
   ],
   "/settings/tags": [
@@ -139,7 +139,7 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
     { icon: ShieldCheck, label: "Roles & permissions", description: "Server-enforced limits" },
   ],
   "/settings/usage": [
-    { icon: BarChart3, label: "Usage & activity", description: "Generation counts and audit log" },
+    { icon: BarChart3, label: "Usage & activity", description: "Generation counts and audit log", to: "/settings/usage" },
   ],
   "/settings/notifications": [
     { icon: Bell, label: "Digest & went-out emails", description: "Daily digest and post notifications" },
@@ -271,18 +271,14 @@ function NavHoverPanel() {
                   </span>
                 )}
               </span>
-              {it.to && <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-sidebar-foreground/40" />}
+              {<ChevronRight className="mt-0.5 size-3.5 shrink-0 text-sidebar-foreground/40" />}
             </>
           );
           const cls = "sm-hover-item flex w-full gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-sidebar-accent focus-visible:bg-sidebar-accent";
-          return it.to ? (
-            <Link key={it.label} to={it.to} onClick={closeNow} className={cls}>
+          return (
+            <Link key={it.label} to={it.to ?? open.key} onClick={closeNow} className={cls}>
               {row}
             </Link>
-          ) : (
-            <div key={it.label} className={cls}>
-              {row}
-            </div>
           );
         })}
       </div>

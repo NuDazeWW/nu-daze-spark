@@ -14,3 +14,8 @@
 - Page surface selection is centralized in `contentPresentation.ts` and applied by AppLayout to body-level semantic tokens so portalled controls inherit the reading theme; command/navigation surfaces explicitly retain dark tokens.
 - Content type and lifecycle status are independent presentation attributes; shared status classes drive cards, badges, calendar chips, filters, and pipeline charts so colors stay consistent across screens.
 - External-post author context is optional structured data with manual/source provenance; shared presentation validates platform profile links, while discovery retains only details grounded in retrieved evidence to prevent inferred identities.
+
+- Non-profit eligibility goes through `isNonprofitEligible`/`nonprofitDisplay` in `src/lib/pricing.ts` (and the same exclusion in stripe-checkout and `review_nonprofit_application`), so excluded tiers never show or sell a non-profit price.
+- Non-profit decisions append to `nonprofit_decision_log` via `review_nonprofit_application`; the yearly re-check is the pg_cron `nonprofit-annual-recheck` calling `nonprofit_annual_recheck()`, logged in `nonprofit_recheck_runs`, so verification lifecycle is auditable.
+- Legal document versions live in `LEGAL_VERSIONS` (`src/pages/Legal.tsx`); acceptances are rows in `legal_acceptances`, and `LegalReacceptGate` asks again whenever a version changes.
+- Back navigation uses `BackLink` (session history, then `PARENT_ROUTE`) rendered by `PageHeader`, so every page has a way back.
