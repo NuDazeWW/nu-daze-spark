@@ -69,14 +69,16 @@ function EngagementBadge({ engagement }: { engagement: number }) {
   );
 }
 
-function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRegenerating, postUrl }: {
+function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRegenerating, postUrl, onSendForReview, isSendingForReview }: {
   postUrl?: string | null;
-  comment: { id: string; draft_copy: string; tone: string | null };
+  comment: { id: string; draft_copy: string; tone: string | null; approval_status?: string };
   onSave: (id: string, text: string) => void;
   isSaving: boolean;
   onCopied?: () => void;
   onRegenerate?: () => void;
   isRegenerating?: boolean;
+  onSendForReview?: () => void;
+  isSendingForReview?: boolean;
 }) {
   const [text, setText] = useState(comment.draft_copy);
   const [copied, setCopied] = useState(false);
@@ -140,6 +142,20 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
         <Button variant="outline" size="sm" className="h-7 text-[11px]" disabled={!dirty || isSaving} onClick={handleSave}>
           Save draft
         </Button>
+        {onSendForReview && (
+          comment.approval_status === "in_review" ? (
+            <Badge variant="secondary" className="h-7 px-2 text-[11px] gap-1 whitespace-nowrap">
+              <ShieldCheck className="h-3 w-3" />Pending Executive Review
+            </Badge>
+          ) : (
+            <Button variant="outline" size="sm" className="h-7 text-[11px] whitespace-nowrap"
+              disabled={isSendingForReview || dirty}
+              title={dirty ? "Save your edits first" : "Send this comment to the Executive Review queue"}
+              onClick={(e) => { e.stopPropagation(); onSendForReview(); }}>
+              <Send className="h-3 w-3 mr-1" />{isSendingForReview ? "Sending…" : "Send for Executive Review"}
+            </Button>
+          )
+        )}
         <Button size="sm" className="h-7 text-[11px] sm-cg-approve" disabled={!postUrl}
           title={postUrl ? "Copy the comment and open the original post" : "No link saved for this post"}
           onClick={(e) => { e.stopPropagation(); if (!postUrl) return; copyThenOpen(text, postUrl).then((ok) => { if (ok) toast.success("Comment copied — paste it on the post"); }); onCopied?.(); }}>
