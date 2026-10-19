@@ -10,7 +10,7 @@ import {
 import {
   Copy, Pencil, Trash2, ChevronRight, ChevronLeft, MoreVertical,
   Users, Hash, Building2, Target, Megaphone, BookOpen, Eye, ShieldCheck,
-  Mic, Lightbulb, AlertTriangle, MoreHorizontal, Play,
+  Mic, Lightbulb, AlertTriangle, MoreHorizontal, Play, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
