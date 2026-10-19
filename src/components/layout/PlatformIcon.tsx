@@ -1,5 +1,6 @@
 import type * as React from "react";
 import { Linkedin, Instagram, Facebook, Youtube, Globe } from "lucide-react";
+import { SelectItem } from "@/components/ui/select";
 
 function XLogo({ className }: { className?: string }) {
   return (
@@ -13,7 +14,47 @@ const MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   linkedin: Linkedin, instagram: Instagram, facebook: Facebook, youtube: Youtube, x: XLogo,
 };
 
-export function PlatformIcon({ platform, className }: { platform: string; className?: string }) {
+const LABELS: Record<string, string> = {
+  linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook", youtube: "YouTube", x: "X",
+};
+
+/**
+ * Single source of truth for social platform icons.
+ * Default ("brand") renders the approved full-color badge from the Dashboard
+ * Weekly Cadence panel: brand-gradient rounded tile, white glyph.
+ * Use tone="mono" only where a plain single-color glyph is required.
+ */
+export function PlatformIcon({
+  platform,
+  className,
+  tone = "brand",
+}: {
+  platform: string;
+  className?: string;
+  tone?: "brand" | "mono";
+}) {
   const Icon = MAP[platform] ?? Globe;
-  return <Icon className={className} />;
+  if (tone === "mono") return <Icon className={className} />;
+  return (
+    <span
+      className={`sm-pfi sm-pfi-${MAP[platform] ? platform : "other"}`}
+      role="img"
+      aria-label={LABELS[platform] ?? platform}
+      title={LABELS[platform] ?? platform}
+    >
+      <Icon className={className} />
+    </span>
+  );
+}
+
+/** Dropdown option showing the brand icon next to the platform name — the standard for every platform picker. */
+export function PlatformOption({ value, label }: { value: string; label?: string }) {
+  return (
+    <SelectItem value={value}>
+      <span className="flex items-center gap-2">
+        <PlatformIcon platform={value} className="h-3.5 w-3.5" />
+        <span>{label ?? LABELS[value] ?? value}</span>
+      </span>
+    </SelectItem>
+  );
 }

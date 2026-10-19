@@ -22,6 +22,7 @@ import {
   Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar, Copy, Check,
   CheckCircle2, Trash2, RefreshCw, TrendingUp, ArrowUpDown, Inbox, Clock,
   Star, AtSign, PenSquare, ChevronRight, Target, Gauge, Users, UsersRound,
+  Send, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
@@ -69,14 +70,16 @@ function EngagementBadge({ engagement }: { engagement: number }) {
   );
 }
 
-function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRegenerating, postUrl }: {
+function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRegenerating, postUrl, onSendForReview, isSendingForReview }: {
   postUrl?: string | null;
-  comment: { id: string; draft_copy: string; tone: string | null };
+  comment: { id: string; draft_copy: string; tone: string | null; approval_status?: string };
   onSave: (id: string, text: string) => void;
   isSaving: boolean;
   onCopied?: () => void;
   onRegenerate?: () => void;
   isRegenerating?: boolean;
+  onSendForReview?: () => void;
+  isSendingForReview?: boolean;
 }) {
   const [text, setText] = useState(comment.draft_copy);
   const [copied, setCopied] = useState(false);
@@ -140,6 +143,20 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
         <Button variant="outline" size="sm" className="h-7 text-[11px]" disabled={!dirty || isSaving} onClick={handleSave}>
           Save draft
         </Button>
+        {onSendForReview && (
+          comment.approval_status === "in_review" ? (
+            <Badge variant="secondary" className="h-7 px-2 text-[11px] gap-1 whitespace-nowrap">
+              <ShieldCheck className="h-3 w-3" />Pending Executive Review
+            </Badge>
+          ) : (
+            <Button variant="outline" size="sm" className="h-7 text-[11px] whitespace-nowrap"
+              disabled={isSendingForReview || dirty}
+              title={dirty ? "Save your edits first" : "Send this comment to the Executive Review queue"}
+              onClick={(e) => { e.stopPropagation(); onSendForReview(); }}>
+              <Send className="h-3 w-3 mr-1" />{isSendingForReview ? "Sending…" : "Send for Executive Review"}
+            </Button>
+          )
+        )}
         <Button size="sm" className="h-7 text-[11px] sm-cg-approve" disabled={!postUrl}
           title={postUrl ? "Copy the comment and open the original post" : "No link saved for this post"}
           onClick={(e) => { e.stopPropagation(); if (!postUrl) return; copyThenOpen(text, postUrl).then((ok) => { if (ok) toast.success("Comment copied — paste it on the post"); }); onCopied?.(); }}>
@@ -181,7 +198,7 @@ export default function CommentGenerator() {
   const {
     posts, isLoading, error,
     addPost, generateComments, scrapePosts, updateAuthorContext,
-    commentsMap, updateComment,
+    commentsMap, updateComment, sendCommentForReview,
     markCommented, unmarkCommented,
     deletePost, bulkDelete, bulkMarkCommented,
     dailyTarget,
@@ -706,6 +723,8 @@ export default function CommentGenerator() {
                     onCopied={() => !activePost.is_commented && markCommented.mutate(activePost.id)}
                     onRegenerate={() => handleRegenerate(activePost.id)}
                     isRegenerating={generateComments.isPending}
+                    onSendForReview={() => sendCommentForReview.mutate(activeComment.id)}
+                    isSendingForReview={sendCommentForReview.isPending}
                   />
                 ) : activePost.risk_flag === "blocked" ? (
                   <p className="text-xs text-muted-foreground">This post is blocked from comment generation.</p>

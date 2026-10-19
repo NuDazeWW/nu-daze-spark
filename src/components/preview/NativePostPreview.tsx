@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Bookmark, ChevronLeft, ChevronRight, Globe2, Heart, ImageOff, Linkedin, Instagram, Maximize, MessageCircle, MoreHorizontal, Repeat2, Send, ThumbsUp, Volume2, X } from "lucide-react";
+import { Bookmark, ChevronLeft, ChevronRight, Globe2, Heart, ImageOff, Maximize, MessageCircle, MoreHorizontal, Repeat2, Send, ThumbsUp, Volume2, X } from "lucide-react";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -76,7 +77,7 @@ export function NativePostPreview({ card, enabled = true, firstComment }: { card
 
   return <section className="space-y-3 min-w-0" aria-label={`${isLinkedIn ? "LinkedIn" : "Instagram"} ${card.content_type} preview`}>
     <div className="flex items-center justify-between gap-2 flex-wrap">
-      <div className="flex items-center gap-2 text-sm font-medium">{isLinkedIn ? <Linkedin className="h-4 w-4" /> : <Instagram className="h-4 w-4" />}
+      <div className="flex items-center gap-2 text-sm font-medium"><PlatformIcon platform={isLinkedIn ? "linkedin" : "instagram"} className="h-4 w-4" />
         {isLinkedIn ? "LinkedIn" : "Instagram"} <span className="text-muted-foreground capitalize">{card.content_type === "post" ? "Feed" : card.content_type}</span>
       </div>
       <ToggleGroup type="single" value={fill ? "fill" : "fit"} onValueChange={(v) => { if (v) setFill(v === "fill"); }} aria-label="Media crop">

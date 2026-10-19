@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Copy, Pencil, Trash2, ChevronRight, ChevronLeft, MoreVertical,
-  MessageSquare, ExternalLink, Shield, AlertTriangle, ShieldOff, Eye, MoreHorizontal,
+  MessageSquare, ExternalLink, Shield, AlertTriangle, ShieldOff, Eye, MoreHorizontal, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -85,6 +85,19 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
             {canRevert && prevStatus && (
               <DropdownMenuItem onClick={() => onStatusChange(prevStatus)} disabled={isUpdating}>
                 <ChevronLeft className="mr-2 h-3.5 w-3.5" />Back to {STATUS_META[prevStatus].label}
+              </DropdownMenuItem>
+            )}
+            {["draft", "needs_revision"].includes(comment.approval_status) && (
+              <DropdownMenuItem
+                disabled={isUpdating}
+                onClick={() => {
+                  onStatusChange("in_review");
+                  toast.success("Comment sent for Executive Review", {
+                    description: "It now shows as Pending Executive Review in the review queue.",
+                  });
+                }}
+              >
+                <Send className="mr-2 h-3.5 w-3.5" />Send for Executive Review
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />

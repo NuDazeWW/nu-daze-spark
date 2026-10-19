@@ -15,6 +15,7 @@ import { MotiveScore, type MotiveBreakdown } from "@/components/preflight/Motive
 import { postLabel } from "@/components/tracking/PostTracking";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
 
 type Chip = { label: string; instruction: string };
 /** Structured note stored on the post and in approval_log, which generation reads back as reviewer feedback. */
@@ -40,6 +41,31 @@ export default function ExecutiveReview() {
       return data as PostCard[];
     },
   });
+
+  // Generated comments submitted for executive review, with the original post for context.
+  const { data: pendingComments = [] } = useQuery({
+    queryKey: ["exec_review_comments"],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("comments")
+        .select("*, external_posts(platform, author_name, external_url, post_content)")
+        .eq("approval_status", "in_review")
+        .order("updated_at", { ascending: true });
+      if (error) throw error;
+      return data as any[];
+    },
+  });
+
+  const actOnComment = async (id: string, status: "approved" | "needs_revision") => {
+    if (!user) return;
+    const { error } = await supabase.from("comments").update({ approval_status: status, updated_by: user.id } as never).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(status === "approved" ? "Comment approved" : "Revision requested on comment");
+    qc.invalidateQueries({ queryKey: ["exec_review_comments"] });
+    qc.invalidateQueries({ queryKey: ["comments_queue"] });
+    qc.invalidateQueries({ queryKey: ["external_post_comments"] });
+  };
 
   const { data: single } = useQuery({
     queryKey: ["exec_review_post", postId],
@@ -81,7 +107,7 @@ export default function ExecutiveReview() {
 
   return (
     <div className="text-foreground">
-      <PageHeader title="Executive Review" description={`${pending.length} awaiting your sign-off`} />
+      <PageHeader title="Executive Review" description={`${pending.length + pendingComments.length} awaiting your sign-off`} />
 
       <main className="sm-xr pb-8">
         {isLoading ? (
@@ -150,6 +176,37 @@ export default function ExecutiveReview() {
               </div>
             </div>
           </>
+        )}
+
+        {pendingComments.length > 0 && (
+          <section className="mt-8 space-y-3" aria-label="Comments awaiting review">
+            <p className="sm-xr-label"><span className="sm-xr-icon"><MessageSquareWarning className="h-4 w-4" /></span>Comments awaiting review ({pendingComments.length})</p>
+            {pendingComments.map((c) => (
+              <div key={c.id} className="sm-xr-card p-4 space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">Comment</Badge>
+                  <PlatformIcon platform={c.external_posts?.platform ?? "linkedin"} className="h-3.5 w-3.5" />
+                  <span className="text-xs text-muted-foreground capitalize">{c.external_posts?.platform ?? "post"}</span>
+                  {c.external_posts?.author_name && <span className="text-xs text-muted-foreground">· replying to {c.external_posts.author_name}</span>}
+                  {c.tone && <Badge variant="outline" className="text-[10px]">{c.tone}</Badge>}
+                  <span className="sm-status sm-status-in_review ml-auto">Pending Executive Review</span>
+                </div>
+                {c.external_posts?.post_content && (
+                  <p className="text-xs text-muted-foreground border-l-2 border-border pl-3 line-clamp-2">{c.external_posts.post_content}</p>
+                )}
+                <p className="text-sm whitespace-pre-wrap">{c.draft_copy}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {c.external_posts?.external_url && (
+                    <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => window.open(c.external_posts.external_url, "_blank", "noopener")}>View original post</Button>
+                  )}
+                  <div className="ml-auto flex gap-2">
+                    <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => actOnComment(c.id, "needs_revision")}>Request revision</Button>
+                    <Button variant="success" size="sm" className="h-8 text-xs" onClick={() => actOnComment(c.id, "approved")}><Check className="mr-1 h-3.5 w-3.5" />Approve</Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </section>
         )}
       </main>
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PlatformOption } from "@/components/layout/PlatformIcon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,8 +71,8 @@ export function ScrapePostsDialog({ open, onOpenChange, onScrape, isPending }: S
             <Select value={platform} onValueChange={setPlatform}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem>
-                <SelectItem value="instagram">Instagram</SelectItem>
+                <PlatformOption value="linkedin" /><PlatformOption value="facebook" />
+                <PlatformOption value="instagram" />
               </SelectContent>
             </Select>
           </div>

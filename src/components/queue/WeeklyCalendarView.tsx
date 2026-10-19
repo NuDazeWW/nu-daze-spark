@@ -4,7 +4,8 @@ import { addDays, addWeeks, endOfWeek, format, isSameDay, startOfWeek } from "da
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, Instagram, Linkedin, Facebook, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, FileText, MessageSquare, ExternalLink } from "lucide-react";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { useClientSocialAccounts, postingUrl } from "@/hooks/useClientSocialAccounts";
 import { STATUS_META, type QueueItem } from "@/hooks/usePostCards";
 import { postLabel } from "@/components/tracking/PostTracking";
@@ -18,9 +19,9 @@ interface WeeklyCalendarViewProps {
 }
 
 const PLATFORMS = [
-  { value: "instagram", label: "Instagram", icon: Instagram },
-  { value: "linkedin", label: "LinkedIn", icon: Linkedin },
-  { value: "facebook", label: "Facebook", icon: Facebook },
+  { value: "instagram", label: "Instagram" },
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "facebook", label: "Facebook" },
 ];
 
 function itemDate(item: QueueItem): Date {
@@ -80,11 +81,11 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
         </div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {PLATFORMS.map((p) => {
-            const Icon = p.icon;
+
             const t = weekTotals[p.value] ?? { post: 0, comment: 0 };
             return (
               <div key={p.value} className="flex items-center gap-1.5 rounded-full border px-2.5 py-1">
-                <Icon className="h-3 w-3" />
+                <PlatformIcon platform={p.value} className="h-3 w-3" />
                 <span>{p.label}</span>
                 <Badge variant="secondary" className="h-4 min-w-[16px] px-1 text-[10px]">
                   {t.post}p · {t.comment}c
@@ -120,14 +121,14 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
 
           {/* Platform rows */}
           {PLATFORMS.map((p) => {
-            const Icon = p.icon;
+
             return (
               <div
                 key={p.value}
                 className="grid grid-cols-[120px_repeat(7,minmax(0,1fr))] gap-2 mb-2"
               >
                 <div className="flex items-center gap-2 px-2 py-2 text-sm font-medium">
-                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  <PlatformIcon platform={p.value} className="h-4 w-4" />
                   {p.label}
                 </div>
                 {days.map((d) => {

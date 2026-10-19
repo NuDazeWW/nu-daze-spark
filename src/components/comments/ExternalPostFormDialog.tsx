@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PlatformOption } from "@/components/layout/PlatformIcon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,8 +87,8 @@ export function ExternalPostFormDialog({ open, onOpenChange, onSave, isPending }
               <Select value={platform} onValueChange={(v) => { setPlatform(v as PlatformType); setAuthorContext({}); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem>
-                  <SelectItem value="instagram">Instagram</SelectItem>
+                  <PlatformOption value="linkedin" /><PlatformOption value="facebook" />
+                  <PlatformOption value="instagram" />
                 </SelectContent>
               </Select>
             </div>

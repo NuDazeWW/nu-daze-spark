@@ -464,11 +464,8 @@ input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { b
   background: hsl(var(--sm-fx-turquoise) / .12); box-shadow: inset 0 0 0 1px hsl(var(--sm-fx-turquoise) / .35), 0 0 14px -6px hsl(var(--sm-fx-turquoise) / .7); }
 .sm-dashboard .sm-dashboard-panels [role="progressbar"] { height: 7px; background: hsl(var(--sm-fx-lavender) / .1); box-shadow: inset 0 1px 2px hsl(0 0% 0% / .5); }
 .sm-dashboard .sm-dashboard-panels [role="progressbar"] > div { background: linear-gradient(90deg, hsl(var(--sm-fx-coral)), hsl(var(--sm-fx-magenta))); }
-.sm-dashboard .sm-dashboard-panels .lucide-linkedin { width: 22px; height: 22px; padding: 3px; border-radius: 5px; color: hsl(0 0% 100%); background: hsl(210 90% 42%); }
-.sm-dashboard .sm-dashboard-panels .lucide-instagram { width: 22px; height: 22px; padding: 3px; border-radius: 6px; color: hsl(0 0% 100%);
-  background: linear-gradient(45deg, hsl(40 100% 55%), hsl(340 85% 55%) 55%, hsl(280 75% 55%)); }
 .sm-dashboard .sm-dashboard-panels .grid > div.rounded-lg, .sm-dashboard .sm-dashboard-panels .grid > div.rounded-md {
-  border-color: hsl(var(--sm-fx-lavender) / .16); background: hsl(var(--sm-fx-lavender) / .04); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .05); }
+  background: hsl(var(--sm-fx-lavender) / .04); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .05); }
 .sm-dashboard .sm-dashboard-panels .grid > div.rounded-lg > svg { width: 40px; height: 40px; padding: 10px; border-radius: 10px; background: currentColor; background: hsl(var(--sm-fx-lavender) / .08); box-shadow: inset 0 0 0 1px currentColor; }
 .sm-dashboard .sm-dashboard-panels .rounded-full.overflow-hidden { height: 18px; box-shadow: inset 0 1px 2px hsl(0 0% 0% / .5), 0 0 16px -6px hsl(var(--sm-fx-turquoise) / .5); }
 .sm-insights-heading > p { margin-top: 10px; margin-left: 64px; }
@@ -2753,3 +2750,12 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
   box-shadow: var(--ds-inset), 0 0 22px -8px hsl(var(--ds-violet) / .5);
 }
 @media (prefers-reduced-motion: reduce) { .sm-generator .sm-card { transition: none; } }
+
+/* PlatformIcon — approved full-color brand standard (matches Dashboard Weekly Cadence) */
+.sm-pfi { display: inline-flex; align-items: center; justify-content: center; padding: 3px; border-radius: 6px; color: #fff; flex: none; line-height: 0; }
+.sm-pfi-linkedin { background: linear-gradient(150deg, #3fa9f5 0%, #0a66c2 58%, #084d94 100%); }
+.sm-pfi-instagram { background: linear-gradient(45deg, #feda75 0%, #fa7e1e 28%, #d62976 55%, #962fbf 80%, #4f5bd5 100%); }
+.sm-pfi-facebook { background: linear-gradient(150deg, #4a9bf5 0%, #1877f2 58%, #0f5ecf 100%); }
+.sm-pfi-x { background: linear-gradient(160deg, #2c2c38 0%, #101017 55%, #000 100%); }
+.sm-pfi-youtube { background: linear-gradient(150deg, #ff5a4f 0%, #e62117 58%, #b3120b 100%); }
+.sm-pfi-other { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }

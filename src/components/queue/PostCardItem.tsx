@@ -10,7 +10,7 @@ import {
 import {
   Copy, Pencil, Trash2, ChevronRight, ChevronLeft, MoreVertical,
   Users, Hash, Building2, Target, Megaphone, BookOpen, Eye, ShieldCheck,
-  Mic, Lightbulb, AlertTriangle, MoreHorizontal, Play,
+  Mic, Lightbulb, AlertTriangle, MoreHorizontal, Play, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -138,6 +138,20 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
             <DropdownMenuItem onClick={() => { setGateIntent(null); setPreflightOpen(true); }}>
               <ShieldCheck className="mr-2 h-3.5 w-3.5" />Preflight check
             </DropdownMenuItem>
+            {["draft", "needs_revision"].includes(card.approval_status) && (
+              <DropdownMenuItem
+                disabled={isUpdating}
+                onClick={() => {
+                  changeStatus("in_review");
+                  toast.success(`${postLabel(card)} sent for Executive Review`, {
+                    description: "It now shows as Pending Executive Review in the review queue.",
+                    action: { label: "Open review", onClick: () => navigate(`/review?post=${card.id}`) },
+                  });
+                }}
+              >
+                <Send className="mr-2 h-3.5 w-3.5" />Send for Executive Review
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => copyToClipboard(card.draft_copy, "Post copy")}>
               <Copy className="mr-2 h-3.5 w-3.5" />Copy Post

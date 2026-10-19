@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { PlatformOption } from "@/components/layout/PlatformIcon";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -106,9 +107,9 @@ export function BulkExportDialog({ open, onOpenChange, cards, preselected, canMa
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All platforms</SelectItem>
-                      <SelectItem value="linkedin">LinkedIn</SelectItem>
-                      <SelectItem value="instagram">Instagram</SelectItem>
-                      <SelectItem value="facebook">Facebook</SelectItem>
+                      <PlatformOption value="linkedin" />
+                      <PlatformOption value="instagram" />
+                      <PlatformOption value="facebook" />
                     </SelectContent>
                   </Select>
                 </div>
