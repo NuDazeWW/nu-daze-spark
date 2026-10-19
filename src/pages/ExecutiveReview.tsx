@@ -41,6 +41,31 @@ export default function ExecutiveReview() {
     },
   });
 
+  // Generated comments submitted for executive review, with the original post for context.
+  const { data: pendingComments = [] } = useQuery({
+    queryKey: ["exec_review_comments"],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("comments")
+        .select("*, external_posts(platform, author_name, external_url, content_snippet)")
+        .eq("approval_status", "in_review")
+        .order("updated_at", { ascending: true });
+      if (error) throw error;
+      return data as any[];
+    },
+  });
+
+  const actOnComment = async (id: string, status: "approved" | "needs_revision") => {
+    if (!user) return;
+    const { error } = await supabase.from("comments").update({ approval_status: status, updated_by: user.id } as never).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(status === "approved" ? "Comment approved" : "Revision requested on comment");
+    qc.invalidateQueries({ queryKey: ["exec_review_comments"] });
+    qc.invalidateQueries({ queryKey: ["comments_queue"] });
+    qc.invalidateQueries({ queryKey: ["external_post_comments"] });
+  };
+
   const { data: single } = useQuery({
     queryKey: ["exec_review_post", postId],
     enabled: !!postId && !!user,
