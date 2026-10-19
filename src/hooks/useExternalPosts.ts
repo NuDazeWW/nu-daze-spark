@@ -89,6 +89,27 @@ export function useExternalPosts() {
     onError: (e) => toast({ title: "Update failed", description: e.message, variant: "destructive" }),
   });
 
+  // Send a generated comment to the Executive Review queue (status → in_review).
+  const sendCommentForReview = useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from("comments")
+        .update({ approval_status: "in_review", updated_by: user!.id, updated_at: new Date().toISOString() } as never)
+        .eq("id", id)
+        .neq("approval_status", "in_review")
+        .select("id");
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error("This comment is already waiting for executive review.");
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
+      qc.invalidateQueries({ queryKey: ["comments_queue"] });
+      qc.invalidateQueries({ queryKey: ["exec_review_comments"] });
+      toast({ title: "Sent for Executive Review", description: "The comment now shows as Pending Executive Review." });
+    },
+    onError: (e) => toast({ title: "Could not send for review", description: e.message, variant: "destructive" }),
+  });
+
   const markCommented = useMutation({
     mutationFn: async (postId: string) => {
       const { error } = await supabase
