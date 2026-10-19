@@ -62,7 +62,9 @@ describe("non-profit display", () => {
   it("Team Flow non-profit is $167/mo annual", () => {
     expect(nonprofitDisplay(TIERS[1], "monthly", true).perMonthCents).toBe(16700);
   });
-  it("payment catalog has exactly 24 items", () => {
-    expect(paymentCatalog(TIERS)).toHaveLength(24);
+  it("payment catalog has exactly 22 items, none for Spark Start non-profit", () => {
+    const c = paymentCatalog(TIERS);
+    expect(c).toHaveLength(22);
+    expect(c.some((i) => i.sku.startsWith("starter_nonprofit"))).toBe(false);
   });
 });

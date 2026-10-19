@@ -26,14 +26,15 @@ export const discountPct = (full: number, discounted: number) => ((full - discou
 /** The reusable 24-item payment catalog. */
 export function paymentCatalog(tiers: { tier_slug: string; name: string; monthly_price_cents: number; annual_price_cents: number;
   nonprofit_annual_price_cents: number; implementation_fee_cents: number; nonprofit_implementation_fee_cents: number }[]) {
+  // Spark Start has no non-profit price, so it gets no non-profit items.
   const recurring = tiers.flatMap((t) => [
     { sku: `${t.tier_slug}_monthly`, name: `${t.name} monthly`, cents: t.monthly_price_cents, interval: "month" },
     { sku: `${t.tier_slug}_annual`, name: `${t.name} annual`, cents: t.annual_price_cents * 12, interval: "year" },
-    { sku: `${t.tier_slug}_nonprofit_annual`, name: `${t.name} non-profit annual`, cents: t.nonprofit_annual_price_cents * 12, interval: "year" },
+    ...(isNonprofitEligible(t.tier_slug) ? [{ sku: `${t.tier_slug}_nonprofit_annual`, name: `${t.name} non-profit annual`, cents: t.nonprofit_annual_price_cents * 12, interval: "year" }] : []),
   ]);
   const setup = tiers.flatMap((t) => [
     { sku: `${t.tier_slug}_setup`, name: `${t.name} setup`, cents: t.implementation_fee_cents, interval: null },
-    { sku: `${t.tier_slug}_nonprofit_setup`, name: `${t.name} non-profit setup`, cents: t.nonprofit_implementation_fee_cents, interval: null },
+    ...(isNonprofitEligible(t.tier_slug) ? [{ sku: `${t.tier_slug}_nonprofit_setup`, name: `${t.name} non-profit setup`, cents: t.nonprofit_implementation_fee_cents, interval: null }] : []),
   ]);
   const addons = Object.entries(ADDONS).map(([k, a]) => ({ sku: `addon_${k}`, name: a.label, cents: a.price_cents, interval: null }));
   return [...recurring, ...setup, ...addons];
