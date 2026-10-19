@@ -147,7 +147,7 @@ export function BulkUploadDialog({
           disabled={files.length === 0 || isPending}
           className="w-full"
         >
-          {isPending ? "Processing…" : `Upload & Create Reels (${files.length})`}
+          {isPending ? "Processing…" : `Add & Create Reels (${files.length})`}
         </Button>
       </DialogContent>
     </Dialog>

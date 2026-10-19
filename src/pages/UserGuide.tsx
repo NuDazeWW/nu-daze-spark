@@ -9,7 +9,7 @@ type Sub = { heading: string; paragraphs?: string[]; steps?: string[]; bullets?:
 type Section = { title: string; route?: string; intro: string; subs: Sub[] };
 
 const fmtNum = (n: number | undefined | null) =>
-  n == null ? "—" : n >= 999999 ? "Unlimited" : n.toLocaleString();
+  n == null ? "—" : n >= 999999 ? "No set limit" : n.toLocaleString();
 
 export default function UserGuide() {
   const { entityPlural, entitySingular, settings } = useWorkspace() as ReturnType<typeof useWorkspace> & {

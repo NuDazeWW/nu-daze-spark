@@ -46,7 +46,7 @@ export function IdentityDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         <DialogFooter className="gap-2 sm:justify-between">
           <Button variant="ghost" disabled={busy || !stored} onClick={() => run(() => save(null), `Showing ${initials}`)}>Use initials</Button>
           <Button variant="outline" disabled={busy} onClick={() => input.current?.click()}>
-            {busy ? <Loader2 className="animate-spin" /> : <Upload />}Upload photo
+            {busy ? <Loader2 className="animate-spin" /> : <Upload />}Add photo
           </Button>
         </DialogFooter>
       </DialogContent>
