@@ -1,5 +1,5 @@
 import { PipelineNav } from "@/components/queue/PipelineNav";
-import { PlatformOption } from "@/components/layout/PlatformIcon";
+import { PlatformIcon, PlatformOption } from "@/components/layout/PlatformIcon";
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { PostNumber, StatusProgress, WhereIsIt, PostHistoryButton, useStatusDates, postLabel, matchesPostNumber } from "@/components/tracking/PostTracking";

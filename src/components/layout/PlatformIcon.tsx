@@ -46,3 +46,15 @@ export function PlatformIcon({
     </span>
   );
 }
+
+/** Dropdown option showing the brand icon next to the platform name — the standard for every platform picker. */
+export function PlatformOption({ value, label }: { value: string; label?: string }) {
+  return (
+    <SelectItem value={value}>
+      <span className="flex items-center gap-2">
+        <PlatformIcon platform={value} className="h-3.5 w-3.5" />
+        <span>{label ?? LABELS[value] ?? value}</span>
+      </span>
+    </SelectItem>
+  );
+}
