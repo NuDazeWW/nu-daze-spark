@@ -59,7 +59,7 @@ export function BulkUploadDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Film className="h-5 w-5 text-primary" />
-            Bulk Upload & Create Reels
+            Bulk Add & Create Reels
           </DialogTitle>
         </DialogHeader>
 
