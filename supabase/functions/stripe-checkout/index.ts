@@ -75,7 +75,8 @@ Deno.serve(async (req) => {
       if (Deno.env.get("SELF_SERVE_TOPUPS") !== "true") return json({ error: "Add-on packs are granted by your workspace admin for now." }, 409);
       const s = await stripe.checkout.sessions.create({
         mode: "payment", customer,
-        line_items: [{ quantity: b.packs, price_data: { currency: "usd", unit_amount: 2500, product_data: { name: "SocialMotive 500-credit pack" } } }],
+        // Same pack as the pricing page and limit screen (src/lib/pricing.ts ADDONS.media_credits).
+        line_items: [{ quantity: b.packs, price_data: { currency: "usd", unit_amount: 400, product_data: { name: "SocialMotive 100 media credits" } } }],
         metadata: { kind: "topup", packs: String(b.packs) },
         payment_intent_data: { setup_future_usage: "off_session" },
         success_url: `${b.return_url}?checkout=success`, cancel_url: `${b.return_url}?checkout=cancel`,

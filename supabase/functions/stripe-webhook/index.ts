@@ -39,8 +39,8 @@ Deno.serve(async (req) => {
         if (s.payment_status !== "paid" && s.mode === "payment") break;
         if (s.metadata?.kind === "topup") {
           const packs = Number(s.metadata.packs ?? 1);
-          await db.from("workspace_billing").update({ bonus_credits: (bill?.bonus_credits ?? 0) + 500 * packs, payment_method_status: internal ? "internal" : "valid", updated_at: new Date().toISOString() }).eq("id", true);
-          await db.from("usage_events").insert({ bucket: "credits", capability: "topup", quantity: packs, credits: -500 * packs, cost_cents: 0 });
+          await db.from("workspace_billing").update({ bonus_credits: (bill?.bonus_credits ?? 0) + 100 * packs, payment_method_status: internal ? "internal" : "valid", updated_at: new Date().toISOString() }).eq("id", true);
+          await db.from("usage_events").insert({ bucket: "credits", capability: "topup", quantity: packs, credits: -100 * packs, cost_cents: 0 });
           await log("credits_topped_up", { packs });
         } else if (s.metadata?.kind === "subscription" && !internal) {
           await db.from("workspace_billing").update({
