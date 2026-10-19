@@ -20,13 +20,9 @@ import { PostingPackageDrawer } from "@/components/queue/PostingPackageDrawer";
 import { BulkExportDialog } from "@/components/export/BulkExportDialog";
 import {
   CheckCircle2, Search, AlertCircle, Copy, Hash, AtSign, Users,
-  ArrowRight, Linkedin, Instagram, Download, Check, Package,
+  ArrowRight, Download, Check, Package,
 } from "lucide-react";
 
-const PLATFORM_ICON: Record<string, React.ElementType> = {
-  linkedin: Linkedin,
-  instagram: Instagram,
-};
 
 const VISIBLE_STATUSES: ApprovalStatus[] = ["approved", "exported", "posted"];
 
@@ -293,7 +289,6 @@ function ApprovedCard({
   onOpenPackage: () => void;
   statusDates?: Partial<Record<ApprovalStatus, string>>;
 }) {
-  const PlatformIcon = PLATFORM_ICON[card.platform];
   const meta = STATUS_META[card.approval_status];
   const hashtags = (card.hashtags ?? []).join(" ");
   const peopleTags = (card.people_tags ?? []).join(", ");
@@ -334,7 +329,7 @@ function ApprovedCard({
             <div className="flex items-center gap-2 flex-wrap">
               <PostNumber card={card} />
               <Badge variant="outline" className="sm-type sm-type-post">Post</Badge>
-              {PlatformIcon && <PlatformIcon className="h-4 w-4 text-muted-foreground" />}
+              <PlatformIcon platform={card.platform} className="h-4 w-4" />
               <span className="text-xs text-muted-foreground capitalize">{card.content_type}</span>
               <Badge variant="outline" className={`text-[10px] ${meta.color}`}>{meta.label}</Badge>
               {card.campaign_pillar && <Badge variant="secondary" className="text-[10px]">{card.campaign_pillar}</Badge>}
