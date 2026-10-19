@@ -22,6 +22,7 @@ import {
   Shield, AlertTriangle, ShieldOff, Loader2, ArrowRight, Radar, Copy, Check,
   CheckCircle2, Trash2, RefreshCw, TrendingUp, ArrowUpDown, Inbox, Clock,
   Star, AtSign, PenSquare, ChevronRight, Target, Gauge, Users, UsersRound,
+  Send, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
