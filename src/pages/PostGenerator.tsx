@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useActiveClient } from "@/contexts/ClientContext";
 import { PenLine } from "lucide-react";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { prepareAssetMedia } from "@/lib/prepareAssetMedia";
 import {
   Sparkles, FolderOpen, Image, Video, FileText, X, Loader2, Info, ExternalLink, AtSign, Users, Eye,
@@ -321,10 +322,18 @@ export default function PostGenerator() {
               <div className="space-y-2">
                 <Label className="text-xs">Platform</Label>
                 <Select value={platform} onValueChange={(v) => setPlatform(v as "instagram" | "linkedin" | "facebook" | "x")}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger aria-label="Platform">
+                    <PlatformIcon platform={platform} className="h-4 w-4" />
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="instagram">Instagram</SelectItem>
-                    <SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="facebook">Facebook</SelectItem><SelectItem value="x">X</SelectItem>
+                    {(["instagram", "linkedin", "facebook", "x"] as const).map((p) => (
+                      <SelectItem key={p} value={p} aria-label={p}>
+                        <span className="flex items-center gap-2">
+                          <PlatformIcon platform={p} className="h-4 w-4" />
+                          <span className="sr-only">{p}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
