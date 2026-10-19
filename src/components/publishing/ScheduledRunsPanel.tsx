@@ -16,7 +16,9 @@ export function ScheduledRunsPanel() {
     <section className="rounded-xl border bg-card p-4 text-card-foreground">
       <h2 className="font-display text-lg font-semibold">Scheduled delivery jobs</h2>
       <p className="text-xs text-muted-foreground">Checks every five minutes and moves up to 25 due posts per run. Live sending stays off until this instance connects its own approved platform apps; channels without a connected account are marked skipped.</p>
-      {runs.data?.length ? (
+      {runs.isLoading ? <p className="mt-3 text-sm text-muted-foreground">Loading run history…</p>
+      : runs.isError ? <p className="mt-3 text-sm text-destructive">Couldn't load run history. Refresh to try again.</p>
+      : runs.data?.length ? (
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-left text-xs text-muted-foreground"><tr><th className="py-1 pr-3">Run</th><th className="pr-3">Status</th><th className="pr-3">Posts</th><th className="pr-3">Staged</th><th className="pr-3">Skipped</th><th>Still due</th></tr></thead>
