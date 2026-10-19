@@ -91,7 +91,7 @@ export function StrategyBuilderDialog({ mode, open, onOpenChange }: { mode: Buil
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="sm-strategy-builder max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><M.icon className="h-5 w-5 text-primary" />{M.title}</DialogTitle>
           <DialogDescription>{draft ? "Review, edit, and untick anything you don't want. Nothing is saved until you click Add to strategy." : M.desc}</DialogDescription>
@@ -126,12 +126,12 @@ export function StrategyBuilderDialog({ mode, open, onOpenChange }: { mode: Buil
         )}
 
         {!draft && mode === "preset" && (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="sm-starter-kit-grid grid gap-4 sm:grid-cols-2">
             {STRATEGY_PRESETS.map((p) => (
-              <button key={p.key} onClick={() => load(structuredClone(p.draft), p.name)} className="rounded-lg border p-4 text-left transition-colors hover:border-primary hover:bg-muted/50">
-                <p className="font-semibold">{p.name}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
-              </button>
+              <Button key={p.key} variant="ghost" onClick={() => load(structuredClone(p.draft), p.name)} className="sm-starter-kit" data-kit={p.key}>
+                <span className="sm-starter-kit-title">{p.name}</span>
+                <span className="sm-starter-kit-description">{p.description}</span>
+              </Button>
             ))}
           </div>
         )}
