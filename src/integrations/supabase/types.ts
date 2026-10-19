@@ -1398,6 +1398,39 @@ export type Database = {
           },
         ]
       }
+      legal_acceptances: {
+        Row: {
+          accepted_at: string
+          doc: string
+          id: string
+          marketing_email: boolean
+          marketing_sms: boolean
+          user_agent: string | null
+          user_id: string
+          version: string
+        }
+        Insert: {
+          accepted_at?: string
+          doc: string
+          id?: string
+          marketing_email?: boolean
+          marketing_sms?: boolean
+          user_agent?: string | null
+          user_id: string
+          version: string
+        }
+        Update: {
+          accepted_at?: string
+          doc?: string
+          id?: string
+          marketing_email?: boolean
+          marketing_sms?: boolean
+          user_agent?: string | null
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       master_content_objects: {
         Row: {
           brief_id: string
@@ -1838,6 +1871,7 @@ export type Database = {
       }
       post_cards: {
         Row: {
+          ai_assisted: boolean | null
           apply_ai_disclosure: boolean
           approval_status: Database["public"]["Enums"]["approval_status"]
           assigned_to: string | null
@@ -1881,6 +1915,7 @@ export type Database = {
           voice_profile_id: string | null
         }
         Insert: {
+          ai_assisted?: boolean | null
           apply_ai_disclosure?: boolean
           approval_status?: Database["public"]["Enums"]["approval_status"]
           assigned_to?: string | null
@@ -1924,6 +1959,7 @@ export type Database = {
           voice_profile_id?: string | null
         }
         Update: {
+          ai_assisted?: boolean | null
           apply_ai_disclosure?: boolean
           approval_status?: Database["public"]["Enums"]["approval_status"]
           assigned_to?: string | null

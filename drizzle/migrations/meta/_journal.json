@@ -204,6 +204,13 @@
       "when": 1792379974400,
       "tag": "0028_nonprofit_recheck_fix_notices",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792380184069,
+      "tag": "0029_legal_acceptances",
+      "breakpoints": true
     }
   ]
 }
