@@ -2694,7 +2694,7 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 }
 
 /* Connected Sources: luminous color-tinted cards with depth (visual only). */
-.sm-src-card, .sm-src-cloud, .sm-src-empty {
+.sm-src-card, .sm-src-cloud, .sm-rep-card, .sm-src-empty {
   --src-tone: 186 85% 45%;
   border: 1px solid hsl(var(--src-tone) / .38);
   background: linear-gradient(165deg, hsl(var(--src-tone) / .07), hsl(0 0% 100%) 46%);
