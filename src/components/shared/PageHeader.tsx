@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BackLink, Breadcrumb } from "./BackLink";
+import { LocalNav } from "./LocalNav";
 import headerBirdUrl from "@/assets/brand/socialmotive-header-bird.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -39,6 +40,7 @@ export function PageHeader({ title, description, children, linksMenu: _linksMenu
           {pathname !== "/" && <div className="mb-2 flex flex-wrap items-center gap-3"><BackLink /><Breadcrumb /></div>}
           <h1 className="text-3xl md:text-4xl font-semibold leading-tight text-foreground break-words">{title}</h1>
           {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+          <LocalNav />
           {children && <div className="sm-page-actions mt-4 flex flex-wrap items-center gap-2">{children}</div>}
         </div>
         {showArt && (
