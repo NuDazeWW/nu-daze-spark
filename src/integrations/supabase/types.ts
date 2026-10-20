@@ -3396,6 +3396,7 @@ export type Database = {
         }
         Returns: Json
       }
+      corrective_confirmation_checks: { Args: never; Returns: Json }
       corrective_regression_checks: { Args: never; Returns: Json }
       create_reporting_key: { Args: { _provider: string }; Returns: string }
       current_draft_checksum: {

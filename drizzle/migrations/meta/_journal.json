@@ -260,6 +260,13 @@
       "when": 1792472195294,
       "tag": "0036_delivery_schedule_and_confirmation_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1792472231968,
+      "tag": "0037_rollback_confirmation_schedule_regressions",
+      "breakpoints": true
     }
   ]
 }
