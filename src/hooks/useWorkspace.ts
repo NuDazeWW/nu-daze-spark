@@ -44,7 +44,8 @@ export function useWorkspace() {
     queryKey: ["workspace_role", user?.id],
     enabled: Boolean(user),
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("workspace_role", { _user_id: user!.id });
+      if (!user) return null;
+      const { data, error } = await supabase.rpc("workspace_role", { _user_id: user.id });
       if (error) throw error;
       return (data as WorkspaceRole | null) ?? null;
     },

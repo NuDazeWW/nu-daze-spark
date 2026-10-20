@@ -27,6 +27,7 @@ import { Split } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { SplitPlatformsDialog } from "./SplitPlatformsDialog";
 import { PlatformIcon } from "@/components/layout/PlatformIcon";
+import { ReadinessBadge } from "@/components/preflight/ReadinessBadge";
 import { usePreviewMedia } from "@/hooks/usePreviewMedia";
 
 interface PostCardItemProps {
@@ -144,7 +145,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
                 disabled={isUpdating}
                 onClick={() => {
                   changeStatus("in_review");
-                  toast.success(`${postLabel(card)} sent for Executive Review`, {
+                  toast.info(`Submitting ${postLabel(card)} for Executive Review`, {
                     description: "It now shows as Pending Executive Review in the review queue.",
                     action: { label: "Open review", onClick: () => navigate(`/review?post=${card.id}`) },
                   });
@@ -223,6 +224,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         </div>
       </div>
 
+      <div className="px-3 pb-2"><ReadinessBadge card={card} /></div>
       {/* Footer: preview · edit · copy · more */}
       <div className="sm-qcard-foot">
         <Tooltip><TooltipTrigger asChild>

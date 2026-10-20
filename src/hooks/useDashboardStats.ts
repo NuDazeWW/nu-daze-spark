@@ -45,14 +45,14 @@ export function useDashboardStats() {
 
       const { data: cards, error: cErr } = await supabase
         .from("post_cards").select("platform, content_type")
-        .in("approval_status", approvedStatuses)
+        .eq("is_sample", false).in("approval_status", approvedStatuses)
         .gte("created_at", weekStart).lte("created_at", weekEnd)
         .eq("client_id", cid);
       if (cErr) throw cErr;
 
       const { data: lastCards, error: lErr } = await supabase
         .from("post_cards").select("platform, content_type")
-        .in("approval_status", approvedStatuses)
+        .eq("is_sample", false).in("approval_status", approvedStatuses)
         .gte("created_at", lastWeekStart).lte("created_at", lastWeekEnd)
         .eq("client_id", cid);
       if (lErr) throw lErr;
@@ -76,7 +76,7 @@ export function useDashboardStats() {
       for (const status of statuses) {
         const { count, error } = await supabase
           .from("post_cards").select("*", { count: "exact", head: true })
-          .eq("approval_status", status).eq("client_id", cid);
+          .eq("is_sample", false).eq("approval_status", status).eq("client_id", cid);
         if (error) throw error;
         results.push({ status, count: count ?? 0 });
       }
@@ -93,16 +93,12 @@ export function useDashboardStats() {
         .eq("is_active", true).eq("client_id", cid);
       if (tErr) throw tErr;
 
-      const { data: posts, error: pErr } = await supabase
-        .from("external_posts").select("platform")
-        .eq("is_commented", true).gte("updated_at", dayStart).lte("updated_at", dayEnd)
-        .eq("client_id", cid);
+      const { data: counts, error: pErr } = await supabase.rpc("comment_counts", { _client: cid });
       if (pErr) throw pErr;
-
       return (targets ?? []).map((t) => ({
         platform: t.platform,
         daily_target: t.daily_target,
-        current_count: (posts ?? []).filter((p) => p.platform === t.platform).length,
+        current_count: (counts as Record<string, number> | null)?.[t.platform] ?? 0,
       }));
     },
     enabled: !!user && !!cid,
@@ -113,7 +109,7 @@ export function useDashboardStats() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("post_cards")
-        .select("id, platform, content_type, approval_status, draft_copy, updated_at")
+        .select("id, platform, content_type, approval_status, draft_copy, updated_at").eq("is_sample", false)
         .eq("client_id", cid)
         .order("updated_at", { ascending: false }).limit(5);
       if (error) throw error;
@@ -144,14 +140,13 @@ export function useDashboardStats() {
     queryFn: async (): Promise<TotalStats> => {
       const { count: postsCount, error: pErr } = await supabase
         .from("post_cards").select("*", { count: "exact", head: true })
-        .in("approval_status", approvedStatuses)
+        .eq("is_sample", false).in("approval_status", approvedStatuses)
         .gte("created_at", weekStart).lte("created_at", weekEnd).eq("client_id", cid);
       if (pErr) throw pErr;
 
-      const { count: commentsCount, error: cErr } = await supabase
-        .from("external_posts").select("*", { count: "exact", head: true })
-        .eq("is_commented", true).gte("updated_at", dayStart).lte("updated_at", dayEnd).eq("client_id", cid);
+      const { data: commentCounts, error: cErr } = await supabase.rpc("comment_counts", { _client: cid });
       if (cErr) throw cErr;
+      const commentsCount = Object.values((commentCounts ?? {}) as Record<string, number>).reduce((a, b) => a + b, 0);
 
       const { count: assetsCount, error: aErr } = await supabase
         .from("source_assets").select("*", { count: "exact", head: true })

@@ -1,3 +1,4 @@
+import { ReadinessBadge } from "@/components/preflight/ReadinessBadge";
 import { formatHashtags } from "@/lib/contentPresentation";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -98,10 +99,10 @@ export function ReadinessPanel() {
           {decisions.length > 6 && <More n={decisions.length - 6} onClick={() => navigate("/queue?status=in_review")} />}
         </Column>
 
-        <Column icon={Rocket} title="Ready to post · today & tomorrow" count={ready.length} empty="Nothing approved is scheduled for today or tomorrow.">
+        <Column icon={Rocket} title="Approved plans · today & tomorrow" count={ready.length} empty="Nothing approved is scheduled for today or tomorrow.">
           {ready.map((c) => (
             <Row key={c.id} card={c} sub={when(c.scheduled_for!)}>
-              <OpenPlatformButton clientId={c.client_id} platform={c.platform} copyText={fullCopy(c)} label="Copy & post" />
+              <Button size="sm" variant="outline" onClick={() => navigate(`/approved?post=${c.id}&section=publish`)}>Publish / Schedule</Button>
             </Row>
           ))}
         </Column>
@@ -156,6 +157,7 @@ function Row({ card, sub, children }: { card: PostCard; sub: string; children: R
         <span className="text-[11px] text-muted-foreground">{cap(card.platform)} · {card.content_type}</span>
       </div>
       <p className="text-sm line-clamp-2">{card.draft_copy}</p>
+      <ReadinessBadge card={card} />
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] text-muted-foreground">{sub}</span>
         {children}

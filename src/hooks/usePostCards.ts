@@ -74,7 +74,7 @@ export function usePostCards() {
 
   // Build unified queue
   const queueItems: QueueItem[] = [
-    ...cards.map((c): QueueItem => ({
+    ...cards.filter(c => !c.is_sample).map((c): QueueItem => ({
       type: "post",
       id: c.id,
       approval_status: c.approval_status,

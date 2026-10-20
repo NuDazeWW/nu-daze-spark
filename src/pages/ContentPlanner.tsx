@@ -66,7 +66,7 @@ export default function ContentPlanner() {
     queryFn: async () => {
       const { data, error } = await supabase.from("post_cards")
         .select("id,post_number,platform,content_type,approval_status,scheduled_for,draft_copy,source_references")
-        .eq("client_id", activeClientId!).neq("approval_status", "archived").neq("content_type", "comment");
+        .eq("is_sample", false).eq("client_id", activeClientId!).neq("approval_status", "archived").neq("content_type", "comment");
       if (error) throw error;
       return data as Row[];
     },
@@ -187,7 +187,7 @@ export default function ContentPlanner() {
     <div className="sm-reference sm-planner">
       <img src={plannerBackground} alt="" aria-hidden="true" className="sm-planner-background" width={1536} height={1024} />
       <PageHeader title="Content Planner"
-        description="Stock approved posts months ahead and see where your cadence has gaps. Nothing publishes automatically.">
+        description="Stock approved posts months ahead and see where your cadence has gaps. Planning a date does not schedule a send. Use the Posting Package to schedule delivery.">
         {undo && canEdit && (
           <Button variant="outline" size="sm" disabled={busy} onClick={() => { const u = undo; setUndo(null); writeDates(u, "post_schedule_undo").then(() => setUndo(null)); }}>
             <Undo2 className="h-4 w-4 mr-1" /> Undo last change

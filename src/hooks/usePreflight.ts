@@ -65,25 +65,21 @@ export function usePreflight(card: PostCard | null) {
 
   const acknowledge = useMutation({
     mutationFn: async () => {
-      const now = new Date().toISOString();
-      const { error } = await supabase.from("preflight_reviews")
-        .update({ acknowledged_by: user!.id, acknowledged_at: now }).eq("id", review!.id);
+      if (!review || !card || !user) throw new Error("Select a post and run checks first");
+      const { error } = await supabase.rpc("acknowledge_preflight", { _review: review.id });
       if (error) throw error;
-      await log(`Preflight warnings acknowledged (${review!.findings.length} finding(s))`);
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: key }); toast.success("Warnings acknowledged"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: key }); qc.invalidateQueries({ queryKey: ["authoritative_readiness"] }); toast.success("Warnings acknowledged"); },
     onError: (e: Error) => toast.error("Could not acknowledge", { description: e.message }),
   });
 
   const override = useMutation({
     mutationFn: async (reason: string) => {
-      const now = new Date().toISOString();
-      const { error } = await supabase.from("preflight_reviews")
-        .update({ override_reason: reason, overridden_by: user!.id, overridden_at: now }).eq("id", review!.id);
+      if (!review) throw new Error("Run checks first");
+      const { error } = await supabase.rpc("acknowledge_preflight", { _review: review.id, _reason: reason });
       if (error) throw error;
-      await log(`Preflight override: ${reason}`);
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: key }); toast.success("Preflight overridden and logged"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: key }); qc.invalidateQueries({ queryKey: ["authoritative_readiness"] }); toast.success("Preflight overridden and logged"); },
     onError: (e: Error) => toast.error("Could not override", { description: e.message }),
   });
 
@@ -139,8 +135,7 @@ export function usePreflight(card: PostCard | null) {
     },
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["post_cards"] });
-      toast.success("Draft updated", { description: "Review the changes. Checks are running again now." });
-      run.mutate();
+      toast.success("Draft updated", { description: "Review the changes and run checks again." });
     },
     onError: (e: Error) => toast.error("Could not save", { description: e.message }),
   });
