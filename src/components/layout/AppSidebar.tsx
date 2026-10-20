@@ -27,6 +27,7 @@ import {
   ImagePlus, Palette, Send, PieChart,
   CreditCard,
 } from "lucide-react";
+import { NAV_GROUPS, type NavItem } from "@/lib/navigation";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { APP_VERSION } from "@/lib/appVersion";
 import {
@@ -51,45 +52,6 @@ import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 import { SidebarPostTo } from "./SidebarPostTo";
 import { CollapsibleNavGroup } from "./CollapsibleNavGroup";
 
-type NavItem = { title: string; icon: typeof Bell; href: string };
-const NAV_GROUPS: { id: string; label: string; items: NavItem[] }[] = [
-  { id: "core", label: "Core & Insights", items: [
-    { title: "Dashboard", icon: LayoutDashboard, href: "/" },
-    { title: "Portfolio Insights", icon: PieChart, href: "/insights" },
-  ] },
-  { id: "strategy", label: "Strategy & Sources", items: [
-    { title: "Brand & Strategy Studio", icon: Settings2, href: "/strategy" },
-    { title: "Asset Library", icon: FolderOpen, href: "/assets" },
-    { title: "Connected Sources", icon: Link2, href: "/sources" },
-  ] },
-  { id: "create", label: "Create & Repurpose", items: [
-    { title: "Campaign Briefs", icon: FileText, href: "/briefs" },
-    { title: "Social Post Generator", icon: Sparkles, href: "/generator" },
-    { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
-    { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
-    { title: "Motive Media Studio", icon: ImagePlus, href: "/media-studio" },
-  ] },
-  { id: "plan", label: "Plan & Review", items: [
-    { title: "Content Planner", icon: CalendarRange, href: "/planner" },
-    { title: "Executive Review", icon: Megaphone, href: "/review" },
-  ] },
-  { id: "pipeline", label: "Pipeline & Publishing", items: [
-    { title: "Daily Queue", icon: CalendarDays, href: "/queue" },
-    { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
-    { title: "Publishing Status", icon: Send, href: "/publishing" },
-  ] },
-  { id: "settings", label: "Workspace Settings", items: [
-    { title: "Setup & Onboarding", icon: ListChecks, href: "/setup" },
-    { title: "Team", icon: Users, href: "/settings/team" },
-    { title: "Social Connections", icon: AtSign, href: "/settings/connections" },
-    { title: "Email Provider", icon: Mail, href: "/settings/email-provider" },
-    { title: "Brand Profiles", icon: Palette, href: "/settings/brand-kit" },
-    { title: "Account Tags", icon: Building2, href: "/settings/tags" },
-    { title: "Notifications", icon: Bell, href: "/settings/notifications" },
-    { title: "Usage & Billing", icon: CreditCard, href: "/settings/usage" },
-  ] },
-];
-
 export function AppSidebar() {
   const location = useLocation();
   useAuth();
@@ -97,7 +59,7 @@ export function AppSidebar() {
   const renderItems = (items: NavItem[]) => items.map((item) => (
     <SidebarMenuItem key={item.href}>
       <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
-        <SidebarMenuButton asChild isActive={location.pathname === item.href} tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}>
+        <SidebarMenuButton asChild isActive={location.pathname + location.hash === item.href || (location.pathname === item.href && !location.hash)} tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}>
           <Link to={item.href}>
             <item.icon className="size-4" />
             <span>{item.title}</span>

@@ -20,7 +20,7 @@ const RELATED: Record<string, { to: string; label: string }[]> = {
   "/queue": [{ to: "/planner", label: "Content Planner" }, { to: "/approved", label: "Approved Content" }],
   "/approved": [{ to: "/queue", label: "Daily Queue" }, { to: "/publishing", label: "Publishing Status" }],
   "/generator": [{ to: "/briefs", label: "Campaign Briefs" }, { to: "/queue", label: "Daily Queue" }],
-  "/briefs": [{ to: "/generator", label: "Social Post Generator" }],
+  "/briefs": [{ to: "/generator", label: "Post Office" }],
   "/planner": [{ to: "/queue", label: "Daily Queue" }],
   "/strategy": [{ to: "/setup", label: "Workspace setup" }],
   "/assets": [{ to: "/media-studio", label: "Create with AI" }],
