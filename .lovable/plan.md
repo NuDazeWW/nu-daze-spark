@@ -64,7 +64,19 @@ Posts are always published from one place, the Posting Package drawer. No other 
   - Pipeline & Publishing: Daily Queue, Approved Content, Publishing Status
   - Workspace Settings: Setup Checklist, Team, Social Connections, Email Provider, Account Tags, Usage & Billing
 
-## 6. Verification
+## 6. Copy and trust fixes
+- **One readiness answer**: never show "Ready to post" while required Preflight checks remain.
+  - Blocked: amber banner "Approved · 3 required Preflight checks remain", linking to the Preflight tab.
+  - Advisory only: neutral pill "Approved · Advisory notes available".
+  - Cleared or acknowledged: green "Ready to publish".
+- **Staged vs. live**: until a platform is connected, the drawer's main button reads **Stage Publishing** ("Staged locally for team review. Live platform dispatch connects in Workspace Settings."). Once connected it reads **Publish Live Now** ("Dispatches immediately to your connected LinkedIn and Instagram accounts."). Entry buttons on Approved Content and Daily Queue keep their names from section 1.
+  - Publishing Status shows "Staged — Not Dispatched" for practice runs; "Published Live" only for confirmed platform deliveries.
+- **Comment Generator labels**: "Safe" becomes "No brand risks flagged"; "High Impact" becomes "High relevance"; "Hot · 120" becomes "High velocity · 120 interactions". Each gets a short explanation on hover.
+- **Preflight wording**: "Bypass all & continue" becomes "Override & acknowledge warnings", with a note that it's recorded under the user's name. "Fix all with AI" becomes "Revise draft with AI", followed by "Draft updated. Review suggestions below to verify tone and accuracy."
+- **Generate buttons**: no more "(0)". A chip shows "0 posts selected", the button reads "Generate Post Cards" / "Generate Comment Drafts", and a hint says "Select one or more posts above to generate drafts."
+- **Plain language**: replace the repeated slogan on work pages with a plain description (e.g. Content Planner: "Plan and balance multi-channel publishing cadence"). "Source provenance" becomes "Sources used"; "Scheduled delivery jobs" becomes "Scheduled publishing runs". Checksum stays hidden (section 2).
+
+## 7. Verification
 - Click through every item above on screen at 887px wide and at desktop size.
 - Work through the brief's 12-point checklist.
 - Run the tests, plus a new test for hashtag formatting.
