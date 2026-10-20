@@ -1,3 +1,4 @@
+import { deliveryLabel } from "@/lib/deliveryPresentation";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { readPackageDraft, writePackageDraft } from "@/lib/packageDrafts";
@@ -167,7 +168,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
         </div>
         <Badge className={`capitalize ${STATUS_STYLE[status] ?? STATUS_STYLE.idle}`}>
           {status === "publishing" && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-          {status === "idle" ? "Not scheduled" : status === "published" ? "Delivery recorded · verification unavailable" : status.replace(/_/g, " ")}
+          {status === "idle" ? "Not scheduled" : status === "published" ? "Delivery recorded · verification unavailable" : deliveryLabel(status)}
         </Badge>
       </div>
 
@@ -183,20 +184,8 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
         {mode === "now" ? allLive ? "Sends immediately to the accounts you picked." : "Saves this post for delivery. It will not be sent to a platform." : mode === "schedule" ? "Queues the post for the date and time you pick." : "Copy the post and open the platform to post it yourself."}
       </p>
 
-      {false && justPublished && status === "published" && (
-        <div className="space-y-2 rounded-lg border border-primary/40 bg-primary/5 p-3">
-          <p className="flex items-center gap-2 text-sm font-semibold"><CheckCircle2 className="h-4 w-4 text-primary" /> Staged for {justPublished.length} channel{justPublished.length > 1 ? "s" : ""} — not sent to any platform</p>
-          <div className="flex flex-wrap gap-2">
-            {[...new Set(justPublished)].map((p) => (
-              <OpenPlatformButton key={p} clientId={card.client_id} platform={p} label={`View on ${LIMITS[p]?.label ?? p}`} />
-            ))}
-            <PostResultsButton postId={card.id} clientId={card.client_id ?? null} />
-          </div>
-        </div>
-      )}
-
       <p className="text-xs text-muted-foreground">{readiness.isError ? "Checks unavailable" : readiness.data?.label ?? "Checks pending"}</p>
-      {outcomes.data?.map(o => <div key={o.id} className="rounded-md border p-3 text-xs"><b>{o.platform}</b> · {o.status.replace(/_/g, " ")}<p className="text-muted-foreground">{o.reason}</p></div>)}
+      {outcomes.data?.map(o => <div key={o.id} className="rounded-md border p-3 text-xs"><b>{o.platform}</b> · {o.deliveryLabel(status)}<p className="text-muted-foreground">{o.reason}</p></div>)}
       {mode === "manual" ? (
         <div className="space-y-3">
         <div className="flex flex-wrap gap-2">
@@ -295,7 +284,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
             </p>
           )}
 
-          <Button className="w-full" disabled={!canPublish || card.is_sample || !isApproved || !selected.length || blocking || running || readiness.data?.canDeliver === false}
+          <Button className="w-full" disabled={!canPublish || card.is_sample || !isApproved || !selected.length || blocking || running || !readiness.data?.canDeliver}
             onClick={() => setConfirm(mode === "schedule" ? "schedule" : "now")}>
             {running ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : mode === "schedule" ? <CalendarClock className="h-4 w-4 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
             {mode === "schedule" ? "Schedule post" : actionLabel}

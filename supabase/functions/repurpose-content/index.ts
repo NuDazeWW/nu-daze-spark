@@ -43,7 +43,8 @@ serve(async (req) => {
 
     let sourceText = "", clientId: string | null = null, sourcePlatform = "", label = "";
     if (kind === "post") {
-      const { data: p } = await sb.from("post_cards").select("id,client_id,platform,content_type,draft_copy,hashtags,approval_status,post_number").eq("id", id).maybeSingle();
+      const { data: p } = await sb.from("post_cards").select("id,client_id,platform,content_type,draft_copy,hashtags,approval_status,post_number,is_sample").eq("id", id).maybeSingle();
+      if (p?.is_sample) return json({ error: "Samples cannot consume AI drafts." }, 400);
       if (!p) return json({ error: "Post not found" }, 404);
       if (!["approved", "exported", "posted"].includes(p.approval_status)) return json({ error: "Only approved content can be repurposed." }, 400);
       clientId = p.client_id; sourcePlatform = p.platform;

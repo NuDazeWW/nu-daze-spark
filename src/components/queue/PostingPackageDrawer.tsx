@@ -49,7 +49,7 @@ function buildPackageText(card: PostCard, firstComment: string, notes: string, a
     card.scheduled_for ? `Scheduled: ${new Date(card.scheduled_for).toLocaleString()}` : `Scheduled: not set`,
     "",
     "=== FINAL COPY ===",
-    card.draft_copy,
+    card.draft_copy + (card.apply_ai_disclosure ? "\n\n#AIassisted" : ""),
     "",
     "=== HASHTAGS ===",
     formatHashtags(card.hashtags) || "(none)",
@@ -165,7 +165,7 @@ export function PostingPackageDrawer({
 
   const pf = usePreflight(card);
   const preflightFail = card && !pf.gate.clear ? 1 : 0;
-  const failCount = checks.filter((c) => c.level === "fail").length + preflightFail;
+  const failCount = checks.filter((c) => c.level === "fail").length + (authoritative.data?.canDeliver === false ? 1 : preflightFail);
 
   if (!card) return null;
   const readiness = authoritative.data ?? { label: authoritative.isError ? "Checks unavailable" : "Checks pending", tone: "pending", required: 0, advisory: 0, canDeliver: false };
@@ -174,8 +174,8 @@ export function PostingPackageDrawer({
     ? "Approve first"
     : failCount > 0 ? `Fix ${failCount} blocking issue${failCount === 1 ? "" : "s"} first` : null;
 
-  const copy = (text: string, key: string) => {
-    navigator.clipboard.writeText(text).catch(() => toast({ title: "Copy failed", description: "Try again or select the text manually.", variant: "destructive" }));
+  const copy = async (text: string, key: string) => {
+    try { await navigator.clipboard.writeText(text); } catch { toast({ title: "Copy failed", description: "Try again or select the text manually.", variant: "destructive" }); return; }
     setCopied(key);
     setTimeout(() => setCopied(null), 1500);
     toast({ title: "Copied" });
@@ -377,7 +377,7 @@ export function PostingPackageDrawer({
             <span title={postReason ?? "Copies caption + hashtags and opens the platform. You post it yourself."}>
               <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="default"
                 disabled={!!postReason}
-                copyText={outboundText(card.draft_copy, card.hashtags)}
+                copyText={outboundText(card.draft_copy, card.hashtags, card.apply_ai_disclosure)}
                 onOpened={() => setOpenedPlatform(true)} />
             </span>
             <Button variant="ghost" size="sm" onClick={save} disabled={saving || !["owner", "admin", "editor", "reviewer"].includes(role ?? "")}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>

@@ -36,7 +36,7 @@ export default function PortfolioInsights() {
 
   const s = useMemo(() => {
     const since = Date.now() - 30 * DAY;
-    const recent = cards.filter((c) => new Date(c.created_at).getTime() >= since);
+    const recent = cards.filter((c) => !c.is_sample && new Date(c.created_at).getTime() >= since);
     const count = (key: (c: typeof cards[number]) => string | null | undefined) => {
       const m = new Map<string, number>();
       recent.forEach((c) => { const k = key(c) || "Unassigned"; m.set(k, (m.get(k) ?? 0) + 1); });
@@ -49,7 +49,7 @@ export default function PortfolioInsights() {
     const weekStart = Date.now() - 7 * DAY;
     const nextWeek = Date.now() + 7 * DAY;
     const gaps = targets.map((t) => {
-      const have = cards.filter((c) => c.platform === t.platform && c.content_type === t.content_type && LIVE.includes(c.approval_status) &&
+      const have = cards.filter((c) => !c.is_sample && c.platform === t.platform && c.content_type === t.content_type && LIVE.includes(c.approval_status) &&
         ((c.scheduled_for && new Date(c.scheduled_for).getTime() <= nextWeek && new Date(c.scheduled_for).getTime() >= Date.now()) || new Date(c.updated_at).getTime() >= weekStart)).length;
       return { ...t, have, short: Math.max(0, t.weekly_target - have) };
     }).sort((a, b) => b.short - a.short);

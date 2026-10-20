@@ -51,6 +51,7 @@ export function usePreflight(card: PostCard | null) {
     },
     onSuccess: (r) => {
       qc.setQueryData(key, r);
+      qc.invalidateQueries({ queryKey: ["authoritative_readiness"] });
       if (r.ai_error) toast.warning("Rule checks ran, but the AI review was unavailable", { description: r.ai_error });
       else toast.success(r.overall_status === "pass" ? "Preflight passed" : r.overall_status === "blocked" ? "Preflight found blocking issues" : "Preflight found warnings");
     },
@@ -79,7 +80,7 @@ export function usePreflight(card: PostCard | null) {
       const { error } = await supabase.rpc("acknowledge_preflight", { _review: review.id, _reason: reason });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: key }); qc.invalidateQueries({ queryKey: ["authoritative_readiness"] }); toast.success("Preflight overridden and logged"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: key }); qc.invalidateQueries({ queryKey: ["authoritative_readiness"] }); toast.success("Advisory acknowledgment logged"); },
     onError: (e: Error) => toast.error("Could not override", { description: e.message }),
   });
 

@@ -14,7 +14,7 @@ export function useAssetUsage() {
       // Get all post cards' source_references arrays
       const { data, error } = await supabase
         .from("post_cards")
-        .select("source_references");
+        .select("source_references").eq("is_sample", false);
       if (error) throw error;
 
       const counts = new Map<string, number>();

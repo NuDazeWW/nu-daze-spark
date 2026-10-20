@@ -125,7 +125,7 @@ export default function ContentPlanner() {
     const before = changes.map((c) => ({ id: c.id, scheduled_for: posts.find((p) => p.id === c.id)?.scheduled_for ?? null }));
     try {
       const results = await Promise.all(changes.map((c) =>
-        supabase.from("post_cards").update({ scheduled_for: c.scheduled_for }).eq("id", c.id)));
+        supabase.rpc("plan_post_date", { _post: c.id, _when: c.scheduled_for as string })));
       const err = results.find((r) => r.error)?.error;
       if (err) throw err;
       await Promise.all(changes.map((c) => {

@@ -54,13 +54,15 @@ export default function RepurposeCenter() {
     enabled: !!activeClientId,
     queryFn: async () => {
       const [posts, assets] = await Promise.all([
-        supabase.from("post_cards").select("id,post_number,platform,content_type,draft_copy,approval_status,created_at")
-          .eq("client_id", activeClientId!).in("approval_status", ["approved", "exported", "posted"]).neq("content_type", "comment")
+        supabase.from("post_cards").select("id,post_number,platform,content_type,draft_copy,approval_status,created_at,source_references")
+          .eq("is_sample", false).eq("client_id", activeClientId!).in("approval_status", ["approved", "exported", "posted"]).neq("content_type", "comment")
           .order("created_at", { ascending: false }).limit(60),
         supabase.from("source_assets").select("id,title,asset_type,description,created_at")
           .eq("client_id", activeClientId!).eq("permission_state", "generation_allowed").is("deleted_at", null)
           .order("created_at", { ascending: false }).limit(60),
       ]);
+      if (posts.error) throw posts.error;
+      if (assets.error) throw assets.error;
       return { posts: posts.data ?? [], assets: assets.data ?? [] };
     },
   });
@@ -112,9 +114,10 @@ export default function RepurposeCenter() {
 
   const sendToQueue = useMutation({
     mutationFn: async (s: Suggestion) => {
+      if (!user || !canCreate) throw new Error("Your role cannot create a draft");
       const src = s.source_post_card_id ? postById[s.source_post_card_id] : null;
       const asset = s.source_asset_id ? assetById[s.source_asset_id] : null;
-      const refs = asset ? [asset.id] : [];
+      const refs = asset ? [asset.id] : src?.source_references ?? [];
       const { data: card, error } = await supabase.from("post_cards").insert({
         client_id: activeClientId, created_by: user!.id, platform: s.target_platform as any,
         content_type: s.target_content_type as any, draft_copy: draft, approval_status: "draft",
