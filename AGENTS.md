@@ -19,4 +19,5 @@
 - Launch add-ons are admin-granted through idempotent `grant_addon` (unique request key); self-serve top-up checkout stays off per instance until that instance's payments are confirmed.
 - Scheduled delivery runs in-database via pg_cron `process_scheduled_posts` (25-post cap, SKIP LOCKED, runs logged in `publish_runs`) and only stages attempts; live dispatch is reserved for the inactive `dispatch-scheduled-posts` function so no platform call happens without approved apps.
 - Subdirectories (e.g. `src/`, `supabase/functions/`) have their own `AGENTS.md`; read it before changing files there.
+- Route opening scroll resets are centralized in the router and overlay opening resets in shared UI primitives via `openingScroll`; this covers new views without clearing drafts or resetting scroll on ordinary renders.
 

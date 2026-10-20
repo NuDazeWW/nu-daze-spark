@@ -40,12 +40,18 @@ import Billing from "./pages/settings/Billing";
 import ExecutiveReview from "./pages/ExecutiveReview";
 import Legal from "./pages/Legal";
 import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
+import { resetOpeningScroll } from "@/lib/openingScroll";
 import { recordNav } from "@/components/shared/BackLink";
 import { LegalReacceptGate } from "@/components/auth/LegalReacceptGate";
 
 function NavRecorder() {
   const { pathname, search } = useLocation();
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    const main = document.querySelector("main.sm-page");
+    if (main instanceof HTMLElement) resetOpeningScroll(main);
+  }, [pathname]);
   useEffect(() => { recordNav(pathname + search); }, [pathname, search]);
   return null;
 }
