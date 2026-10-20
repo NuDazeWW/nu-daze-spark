@@ -1,41 +1,53 @@
-# Fix all outstanding demo issues
+# Fix all outstanding issues + platform-wide UX brief
 
-## 1. Post live from anywhere (simulated)
-- **Publishing Status**: add a "Publish Live Now" button on every approved/scheduled row. It runs the same channel-by-channel simulation that already exists, then moves the post to Published.
-- **Approved Content drawer + Posting Package**: put "Publish Live Now" in the main Posting Package tab's action row, so it isn't hidden in the Publish tab.
-- **Daily Queue / Approved cards**: add a "Publish Live Now" item to approved cards.
-- Every button or menu item that starts live posting, including the existing "Publish now" in the Publish tab, is renamed **Publish Live Now**.
-- Every button is labelled as a demo: nothing is sent to the platforms until the platform apps are approved.
+## 1. Publish Live Now everywhere
+- **Wording**: every button or menu item that starts live posting ("Auto Post", "Publish now", and the like) is renamed **Publish Live Now**.
+- **Publishing Status**: add Publish Live Now on every approved or scheduled row. It runs the existing channel-by-channel delivery, then moves the post to Published.
+- **Posting Package drawer**: Publish Live Now sits in the main action bar, not hidden in the Publish tab.
+- **Daily Queue / Approved cards**: add Publish Live Now to approved cards.
+- **Comments**: add Publish Live Now next to "Copy & open post" in the Comment Generator and on approved comment cards. It marks the comment Commented and adds it to today's count.
+- Until the platform apps are approved, the confirmation says the item was staged for delivery, not that it went live.
 
-## 2. Auto-post for comments
-- **Comment Generator**: add "Auto-post" next to "Copy & open post". It plays the same short sending animation, shows "Comment auto-posted — live sending turns on once platform comment access is connected", marks the comment Commented, and adds it to today's comment count.
-- Also add Auto-post to approved comment cards in the Daily Queue.
-
-## 3. Posting Package drawer fixes
-- **Button text overflow**: buttons wrap onto two rows cleanly, with shorter labels and no text spilling out. Tabs scroll sideways instead of squeezing six labels into a narrow drawer. Checked at your screen size (887px) and at desktop size.
-- **Checksum**: the "Checksum fd1c…" line is removed from view. The fingerprint is still saved in the background for the export audit trail, and the downloaded file still includes it.
-- **Hashtags**: show and copy them with "#" (for example #ThoughtLeadership), everywhere: the drawer, copy buttons, package text, the open-platform copy, previews, and cards. Stored tags without "#" get it added when they're shown or copied.
-- **Drawer redesign to match the rest of the app**:
-  - Header uses the same dark branded style as the other page headers, with the platform badge and the post's SM number.
-  - Final copy, Hashtags, First comment, Media and Posting notes each sit in their own glowing, color-tinted card with a clear title and copy button. Text no longer floats on the background.
-  - The "Ready to post" checklist uses the same colored status icons as the Dashboard (green check, amber warning, coral stop) inside tinted circles.
-  - Tagging instructions become a collapsible section with a better look: people and organizations shown as tag chips with copy buttons.
-  - The action buttons sit in a fixed bar at the bottom of the drawer.
+## 2. Posting Package drawer
+- Redesigned to match the other pages: a dark branded header with the platform badge and SM number.
+- Final copy, Hashtags, First comment, Media and Posting notes each sit in their own glowing, color-tinted card with a title and copy button.
+- The "Ready to post" checklist uses the Dashboard's colored status icons in tinted circles.
+- Tagging instructions become a collapsible section, with people and organizations shown as chips you can copy.
+- Action buttons sit in a fixed bottom bar and never spill out of their edges. Tabs scroll sideways.
+- **Checksum** hidden from view. It's still saved for the audit trail and still included in the downloaded file.
+- **Hashtags** always show and copy with "#" everywhere.
+- **Mark as posted** shows whenever the Posting package tab is open, with an optional box for the live post link.
+- **Send for Executive Review** button: greyed out with a note pointing to Setup when Executive Review is off. It's switched on in this NuDaze copy, so it works here.
 - **Approved Content cards**: the button that opens the drawer is renamed **Post**.
-- **Mark as posted**: shows in the drawer whenever the Posting package tab is open, with an optional box for the live post link. You no longer need to open the platform first.
-- **Send for Executive Review in the drawer**: a new button in the drawer's action bar. It's greyed out, with a note pointing to Setup, when Executive Review is turned off in the Setup options. It's switched on for this demo copy, so the button works here.
 
-## 4. Reporting connector tiles
-- Add the missing hover effect: the tile lifts, the border brightens and the shadow deepens.
-- Give each connector its own colour (Tableau blue, Power BI gold, SAP cyan, QuickSight teal, Sigma violet) and the same tile art and spacing as the cloud storage tiles.
+## 3. Reporting connector tiles
+- Add the hover effect, a color for each connector (Tableau blue, Power BI gold, SAP cyan, QuickSight teal, Sigma violet), and the same tile art as the cloud storage tiles.
+
+## 4. Platform-wide brief
+- **Remove demo labels**: hide "Demo", "Demo environment" and similar badges and banners. No features are removed.
+- **Spelling**: proofread every page, all in US English.
+- **Drawers** close when you click outside them, without losing what you typed. Pop-up forms keep the rule that they don't close by accident.
+- **Typed text stays**: switching tabs, opening drawers or picking options on a page never clears what you've entered.
+- **Readability pass**: fix invisible or low-contrast text, button text that overflows, text overlapping icons, and misaligned controls, at desktop and tablet sizes.
+- **Publishing Status**: add three realistic NuDaze records (one published, one scheduled, one needing attention) with real-looking dates. They're marked as sample records, not as verified live posts.
+- **Repurpose Center**:
+  - Buttons match the Dashboard.
+  - Fix the error behind **Find Ideas**, confirm real ideas come back, and add clear loading, empty and error states.
+  - Redesign the Review Ideas cards and every other card on the page so the title, description, details and actions are clearly separated.
+- **Content Planner**: use the dark header from the Dashboard and Campaign Briefs, keeping all its controls.
+- **Consistency sweep**: fix cards, buttons, headers and status markers that don't match the Dashboard. Pages that already match are left alone.
 
 ## 5. Verification
-- Click through each of these on screen: Publishing row, Approved drawer, Comment Generator, Connected Sources, and the drawer at 887px wide.
-- Run the tests, plus one new test for hashtag formatting.
+- Click through every item above on screen at 887px wide and at desktop size.
+- Work through the brief's 12-point checklist.
+- Run the tests, plus a new test for hashtag formatting.
 
 ## Technical section
-- Shared `formatHashtag`/`formatHashtags` in `src/lib/contentPresentation.ts` (with test), used in PostingPackageDrawer, PostCardItem, NativePostPreview, bulkExport and OpenPlatformButton copy text.
-- Extract the simulation from PublishComposer into a `useSimulatedPublish` hook, reused by a `PublishNowButton` in PublishingStatus, PostingPackageDrawer and PostCardItem.
-- CommentGenerator/CommentCardItem: Auto-post updates the `comments` status to posted/commented and invalidates the cadence stats.
-- index.css: add `.sm-rep-card:hover` to the hover rule; add tone classes; ReportingConnectors applies the tone and ribbon art per provider.
-- Drawer: `flex-wrap` buttons with `whitespace-normal`, and a scrollable TabsList.
+- `formatHashtags` in `src/lib/contentPresentation.ts` (tested), used by the drawer, cards, previews, bulk export and OpenPlatformButton.
+- Extract the PublishComposer simulation into a `useSimulatedPublish` hook plus a shared `PublishLiveNowButton`.
+- Comments: the publish action updates the `comments` status and invalidates cadence stats.
+- index.css: `.sm-rep-card:hover` plus per-provider tone classes; ReportingConnectors applies the tone and art.
+- Sheets dismiss on outside click while Dialogs keep the save-guard; drawer form state lives above the Sheet.
+- Demo badges: hide the visuals only; `environment='demo'` stays for billing and QA logic.
+- Find Ideas: diagnose from the `repurpose-content` logs before changing anything.
+- Publishing seed: a migration adds three records flagged as samples, which are excluded from real delivery counts.
