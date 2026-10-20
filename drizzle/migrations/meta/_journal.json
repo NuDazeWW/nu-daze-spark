@@ -253,6 +253,13 @@
       "when": 1792472079495,
       "tag": "0035_expand_rollback_delivery_regressions",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1792472195294,
+      "tag": "0036_delivery_schedule_and_confirmation_hardening",
+      "breakpoints": true
     }
   ]
 }

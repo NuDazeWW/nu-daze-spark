@@ -3449,6 +3449,14 @@ export type Database = {
         Returns: Json
       }
       nonprofit_annual_recheck: { Args: never; Returns: Json }
+      plan_post_date: {
+        Args: {
+          _platform?: Database["public"]["Enums"]["platform_type"]
+          _post: string
+          _when: string
+        }
+        Returns: undefined
+      }
       post_readiness: { Args: { _post: string }; Returns: Json }
       prepare_blank_copy: { Args: { _confirm: string }; Returns: undefined }
       process_scheduled_posts: { Args: { _cap?: number }; Returns: Json }
