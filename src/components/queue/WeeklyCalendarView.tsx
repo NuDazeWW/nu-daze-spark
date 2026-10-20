@@ -171,9 +171,10 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                           const TypeIcon = item.type === "comment" ? MessageSquare : FileText;
                           const draggable = item.type === "post" && !!onReschedule;
                           return (
-                            <Button variant="ghost"
+                            <div role="button" tabIndex={0}
                               key={`${item.type}-${item.id}`}
                               onClick={() => onItemClick(item)}
+                              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onItemClick(item); } }}
                               draggable={draggable}
                               onDragStart={(e) => {
                                 if (!draggable) return;
@@ -200,7 +201,7 @@ export function WeeklyCalendarView({ items, onItemClick, onReschedule }: WeeklyC
                               <div className="line-clamp-2 text-foreground/80">
                                 {item.draft_copy || "(no copy)"}
                               </div>
-                            </Button>
+                            </div>
                           );
                         })
                       )}

@@ -75,13 +75,13 @@ export function ReportingConnectors({ isAdmin }: { isAdmin: boolean }) {
         })}
       </div>
       <Dialog open={!!issued} onOpenChange={(o) => !o && setIssued(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="w-full max-w-lg overflow-hidden [&_*]:min-w-0">
           <DialogHeader><DialogTitle>{issued?.name} key</DialogTitle><DialogDescription>Copy this now — it won't be shown again. Creating a new key replaces this one.</DialogDescription></DialogHeader>
           {issued && (
             <div className="space-y-3 text-sm">
               {[["Key", issued.key], ["CSV link", `${FEED}?format=csv&days=90&key=${issued.key}`], ["JSON link", `${FEED}?days=90&key=${issued.key}`]].map(([l, v]) => (
                 <div key={l} className="space-y-1"><p className="text-xs font-medium">{l}</p>
-                  <div className="flex gap-2"><code className="flex-1 truncate rounded bg-muted px-2 py-1.5 text-xs">{v}</code><Button size="icon" variant="outline" onClick={() => copy(v)} aria-label={`Copy ${l}`}><Copy className="h-3.5 w-3.5" /></Button></div>
+                  <div className="flex w-full min-w-0 gap-2"><code className="min-w-0 flex-1 truncate rounded bg-muted px-2 py-1.5 text-xs">{v}</code><Button size="icon" variant="outline" className="shrink-0" onClick={() => copy(v)} aria-label={`Copy ${l}`}><Copy className="h-3.5 w-3.5" /></Button></div>
                 </div>
               ))}
               <p className="text-xs text-muted-foreground">{issued.how} You can also send the key as a "Bearer" Authorization header. Change days= (up to 730) for a longer history.</p>

@@ -189,10 +189,20 @@ export default function CampaignBriefs() {
   useEffect(() => { if (linked && briefs.some((b: Brief) => b.id === linked)) setSelectedId(linked); }, [linked, briefs]);
 
   return (
-    <div>
+    <div className="sm-briefs">
       <PageHeader title="Campaign Briefs" description="Define the strategy once. Generate one master message and coordinated platform variants from it.">
         <Button onClick={() => setEditing({ ...empty })}><Plus className="h-4 w-4 mr-1" /> New brief</Button>
       </PageHeader>
+
+      <Card className="sm-briefs-intro mb-6 p-5">
+        <h2 className="font-display text-base font-semibold mb-3">From strategy to execution</h2>
+        <div className="grid gap-4 md:grid-cols-3 text-sm">
+          <div><div className="font-medium mb-1">One core message, every channel</div><p className="text-muted-foreground">Write one brief — objective, audience, core message, proof points, primary CTA and target channels — instead of disconnected posts.</p></div>
+          <div><div className="font-medium mb-1">Master content</div><p className="text-muted-foreground">Generating creates one master message plus coordinated LinkedIn and Instagram versions that go straight into the Daily Content Queue.</p></div>
+          <div><div className="font-medium mb-1">Governance and review</div><p className="text-muted-foreground">Team discussion, required-field checks, approver sign-off and an AI completeness review happen before anything is generated.</p></div>
+        </div>
+      </Card>
+
 
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <div className="space-y-2">
