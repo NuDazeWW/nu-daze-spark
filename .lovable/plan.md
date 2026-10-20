@@ -1,9 +1,10 @@
 # Fix all outstanding demo issues
 
 ## 1. Post live from anywhere (simulated)
-- **Publishing Status**: add a "Publish now" button on every approved/scheduled row. It runs the same channel-by-channel simulation that already exists, then moves the post to Published.
-- **Approved Content drawer + Posting Package**: put "Publish now" in the main Posting Package tab's action row, so it isn't hidden in the Publish tab.
-- **Daily Queue / Approved cards**: add a "Publish now" item to approved cards.
+- **Publishing Status**: add a "Publish Live Now" button on every approved/scheduled row. It runs the same channel-by-channel simulation that already exists, then moves the post to Published.
+- **Approved Content drawer + Posting Package**: put "Publish Live Now" in the main Posting Package tab's action row, so it isn't hidden in the Publish tab.
+- **Daily Queue / Approved cards**: add a "Publish Live Now" item to approved cards.
+- Every button or menu item that starts live posting, including the existing "Publish now" in the Publish tab, is renamed **Publish Live Now**.
 - Every button is labelled as a demo: nothing is sent to the platforms until the platform apps are approved.
 
 ## 2. Auto-post for comments
