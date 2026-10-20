@@ -3278,6 +3278,7 @@ export type Database = {
           entity_label_plural: string
           entity_label_singular: string
           environment: string
+          executive_review_enabled: boolean
           governance_revision: number
           id: boolean
           is_demo_master: boolean
@@ -3306,6 +3307,7 @@ export type Database = {
           entity_label_plural?: string
           entity_label_singular?: string
           environment?: string
+          executive_review_enabled?: boolean
           governance_revision?: number
           id?: boolean
           is_demo_master?: boolean
@@ -3334,6 +3336,7 @@ export type Database = {
           entity_label_plural?: string
           entity_label_singular?: string
           environment?: string
+          executive_review_enabled?: boolean
           governance_revision?: number
           id?: boolean
           is_demo_master?: boolean
@@ -3392,6 +3395,7 @@ export type Database = {
         }
         Returns: Json
       }
+      corrective_regression_checks: { Args: never; Returns: Json }
       create_reporting_key: { Args: { _provider: string }; Returns: string }
       current_draft_checksum: {
         Args: { _copy: string; _tags: string[] }
