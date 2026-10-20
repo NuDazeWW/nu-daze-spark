@@ -21,3 +21,21 @@
 - [x] Copy cleanup (Upload → Add/Import, unlimited → real limit wording)
 - [x] Outside-the-app checklist document with links and steps
 - [ ] Outside the app: attorney review, legal contacts, DMCA agent, ProPublica terms, email domain, Stripe live products (NuDaze)
+
+# Corrective update — consolidated brief (approved 2026-10-20)
+- [x] Shared hashtag formatting (one "#", no repeats) used in drawer, cards, exports, calendar, dashboard
+- [x] Shared readiness answer (`src/lib/readiness.ts`) in the Posting Package drawer; SM-0019 "Preflight cleared" mismatch fixed
+- [x] Honest staging wording: "Stage for delivery", "Staged — not sent"; past-time schedule rejected
+- [x] Drawer: Schedule opens drawer's Publish tab, checksum hidden, Mark as posted always available with link check, tabs scroll
+- [x] Approved Content "Publish / Schedule" opens drawer at Publish
+- [x] Preflight wording (Revise draft with AI, Acknowledge warnings and continue)
+- [x] Side menu groups, pipeline names, Back links only on sub-pages, Account Tags hint
+- [x] Comment labels, generate buttons without "(0)", Publishing Status empty states
+- [x] Reporting connector tones, hover, focus
+- [x] Find Ideas root cause fixed (usage metering update lacked WHERE; also affected every AI action)
+- [ ] Per-channel delivery_operations/attempts tables with stable idempotency key + server-side readiness gate
+- [ ] Comments: Mark as commented confirmation_source + timezone-aware dedupe counting
+- [ ] Drawer visual redesign (dark header, tinted cards, fixed bottom bar); draft state store across Sheet close
+- [ ] Use readiness evaluator on cards, queue, review, dashboard
+- [ ] Three sample Publishing Status records; Content Planner dark header; Repurpose card redesign; demo badge removal; US-English sweep
+- [ ] Full 12-check browser verification at 887px and 1440px
