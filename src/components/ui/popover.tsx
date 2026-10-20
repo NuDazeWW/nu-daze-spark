@@ -2,6 +2,7 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "@/lib/utils";
+import { resetOverlayOpeningScroll } from "@/lib/openingScroll";
 
 const Popover = PopoverPrimitive.Root;
 
@@ -10,7 +11,7 @@ const PopoverTrigger = PopoverPrimitive.Trigger;
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
+>(({ className, align = "center", sideOffset = 4, onOpenAutoFocus, ...props }, ref) => (
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
       ref={ref}
@@ -21,6 +22,10 @@ const PopoverContent = React.forwardRef<
         className,
       )}
       {...props}
+      onOpenAutoFocus={(event) => {
+        onOpenAutoFocus?.(event);
+        resetOverlayOpeningScroll(event);
+      }}
     />
   </PopoverPrimitive.Portal>
 ));
