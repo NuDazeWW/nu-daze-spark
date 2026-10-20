@@ -50,7 +50,21 @@ Posts are always published from one place, the Posting Package drawer. No other 
 - **Content Planner**: use the dark header from the Dashboard and Campaign Briefs, keeping all its controls.
 - **Consistency sweep**: fix cards, buttons, headers and status markers that don't match the Dashboard. Pages that already match are left alone.
 
-## 5. Verification
+## 5. Navigation and naming fixes
+- **Schedule**: the "Schedule" step in the drawer's checklist opens the drawer's own Schedule section (date, time, channels) instead of the edit dialog, which has no date controls.
+- **Publishing Status empty state**: add a "Choose an approved post" button that goes to Approved Content.
+- **Back links**: remove them from main pages (Dashboard, Daily Queue, Approved Content, Publishing Status, Strategy Studio, Asset Library). Keep them only on sub-pages, pointing to the parent (e.g. Team → "Back to Settings", User Guide → "Back to Help").
+- **Workspace Settings**: rename the "Setup" menu group to "Workspace Settings", with the checklist inside as "Setup & Onboarding". Add Account Tags as its own item there, and update generator help text to "Workspace Settings → Account Tags".
+- **Matching names**: the pipeline switcher uses the sidebar names: Daily Queue (Drafts & in review), Approved Content (Ready to publish), Publishing Status (Scheduled & published). Each shows only its own statuses.
+- **Side menu groups**:
+  - Core & Insights: Dashboard, Portfolio Insights
+  - Strategy & Sources: Brand & Strategy Studio, Asset Library, Connected Sources
+  - Create & Repurpose: Campaign Briefs, Social Post Generator, Comment Generator, Repurpose Center, Motive Media Studio
+  - Plan & Review: Content Planner, Executive Review
+  - Pipeline & Publishing: Daily Queue, Approved Content, Publishing Status
+  - Workspace Settings: Setup Checklist, Team, Social Connections, Email Provider, Account Tags, Usage & Billing
+
+## 6. Verification
 - Click through every item above on screen at 887px wide and at desktop size.
 - Work through the brief's 12-point checklist.
 - Run the tests, plus a new test for hashtag formatting.
