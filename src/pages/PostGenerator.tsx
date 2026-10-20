@@ -67,8 +67,8 @@ export default function PostGenerator() {
 
   const { hash } = useLocation();
   useEffect(() => {
-    if (hash !== "#post-connector") return;
-    const t = window.setTimeout(() => document.getElementById("post-connector")?.scrollIntoView({ block: "start" }), 60);
+    if (!["#post-connector", "#generation-station"].includes(hash)) return;
+    const t = window.setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ block: "start" }), 60);
     return () => window.clearTimeout(t);
   }, [hash]);
 
@@ -162,10 +162,10 @@ export default function PostGenerator() {
         description="Start from your media, or just an idea — text-led posts need no assets."
       />
 
-      <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)_300px]">
-        <aside className="lg:sticky lg:top-4 lg:self-start"><PostToCard /></aside>
+      <div className="sm-post-office-layout grid gap-6">
+        <aside className="sm-post-office-connector lg:sticky lg:top-4 lg:self-start"><PostToCard /></aside>
         {/* Main area */}
-        <div className="min-w-0 space-y-6">
+        <div className="sm-post-office-workspace min-w-0 space-y-6">
           <div role="tablist" aria-label="Generation mode" className="grid grid-cols-2 gap-1 rounded-lg border bg-card p-1">
             {([["media", "Media-led", FolderOpen], ["text", "Text-led / thought leadership", PenLine]] as const).map(([k, label, Icon]) => (
               <button key={k} role="tab" aria-selected={mode === k} onClick={() => switchMode(k)}
@@ -187,11 +187,11 @@ export default function PostGenerator() {
           </Card>
 
           {!textLed && (
-          <Card className="sm-generator-sources sm-lit" data-accent="gold">
+          <Card accent="gold" className="sm-generator-sources">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center justify-between">
                 Source Assets
-                <Button variant="outline" size="sm" onClick={() => setPickerOpen(true)}>
+                <Button accent="gold" variant="outline" size="sm" onClick={() => setPickerOpen(true)}>
                   <FolderOpen className="mr-2 h-4 w-4" />
                   Browse Library
                 </Button>
@@ -322,8 +322,8 @@ export default function PostGenerator() {
         </div>
 
         {/* Sidebar config */}
-        <div className="sm-generation-settings space-y-4">
-          <Card className="sm-lit" data-accent="cyan" data-emphasis="featured">
+        <aside className="sm-post-office-settings sm-generation-settings space-y-4">
+          <Card id="generation-station" accent="cyan" emphasis="featured">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Generation Station</CardTitle>
             </CardHeader>
@@ -406,6 +406,7 @@ export default function PostGenerator() {
               )}
 
               <Button
+                accent="cyan"
                 onClick={handleGenerate}
                 disabled={!canGenerate || isGenerating}
                 className="w-full"
@@ -419,7 +420,7 @@ export default function PostGenerator() {
               {!textLed && <p className="mt-2 text-center text-xs text-muted-foreground">{selectedAssetIds.length ? `${selectedAssetIds.length} source asset${selectedAssetIds.length === 1 ? "" : "s"} selected` : "Select at least one source asset."}</p>}
             </CardContent>
           </Card>
-        </div>
+        </aside>
       </div>
 
       <AssetPickerDialog

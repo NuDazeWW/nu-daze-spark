@@ -1,10 +1,32 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { accentFromClassName, type Accent } from "@/lib/cardAccents";
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("sm-card rounded-xl border bg-card text-card-foreground", className)} {...props} />
-));
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  accent?: Accent;
+  emphasis?: "subtle" | "standard" | "featured";
+  interactive?: boolean;
+  surface?: "dark" | "light";
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, accent, emphasis, interactive, surface, ...props }, ref) => {
+    const attributes = props as Record<string, unknown>;
+    const tone = accent ?? (attributes["data-accent"] as Accent | undefined) ?? accentFromClassName(className) ?? "neutral";
+    return (
+      <div
+        {...props}
+        ref={ref}
+        data-accent={tone}
+        data-emphasis={emphasis ?? attributes["data-emphasis"] ?? "standard"}
+        data-interactive={interactive ?? attributes["data-interactive"]}
+        data-sm-card-surface={surface}
+        className={cn("sm-card sm-lit rounded-xl border bg-card text-card-foreground", className)}
+      />
+    );
+  },
+);
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(

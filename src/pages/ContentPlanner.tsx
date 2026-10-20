@@ -179,7 +179,12 @@ export default function ContentPlanner() {
     return { label: `Q${Math.floor(qs.getMonth() / 3) + 1} ${format(qs, "yyyy")}`, gaps: [...gaps.entries()].sort((a, b) => b[1] - a[1]) };
   }), [stocked, targets]);
 
-  if (!activeClientId) return <p className="text-muted-foreground">Select a client to plan content.</p>;
+  if (!activeClientId) return (
+    <div className="sm-reference sm-planner">
+      <PageHeader title="Content Planner" description="Stock approved posts months ahead and see where your cadence has gaps. Planning a date does not schedule a send. Use the Posting Package to schedule delivery." />
+      <p className="text-muted-foreground">Select a client to plan content.</p>
+    </div>
+  );
 
   const loading = postsQ.isLoading || targetsQ.isLoading;
 

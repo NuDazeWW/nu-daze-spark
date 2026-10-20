@@ -182,7 +182,7 @@ export default function Dashboard() {
       ) : (
         <div className="sm-dashboard-panels grid md:grid-cols-2 gap-4">
           {/* Weekly Cadence Tracker with WoW */}
-          <Card>
+          <Card accent="violet">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -230,7 +230,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Daily Comment Progress */}
-          <Card>
+          <Card accent="magenta">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -274,7 +274,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Content Pipeline Chart */}
-          <Card>
+          <Card accent="violet">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -334,7 +334,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Asset Library Health */}
-          <Card>
+          <Card accent="gold">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -370,7 +370,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Recent Activity */}
-          <Card className="md:col-span-2">
+          <Card accent="cyan" className="md:col-span-2">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">

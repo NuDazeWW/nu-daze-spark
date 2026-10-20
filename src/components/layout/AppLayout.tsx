@@ -42,7 +42,7 @@ export function AppLayout() {
           </header>
           <main className={`sm-page relative isolate min-w-0 max-w-full flex-1 overflow-x-hidden overflow-y-auto text-foreground ${pageSurface(pathname) === "dark" ? "sm-app-bg" : "sm-light-page"} ${pathname === "/" ? "sm-route-dashboard" : "sm-route-themed"} p-4 md:p-6 lg:p-8`}>
              {pageSurface(pathname) === "dark" && <img src={ribbons} alt="" aria-hidden="true" className="sm-header-ribbons" />}
-             <div className="relative z-[1] mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
+             <div className="sm-page-content relative z-[1] mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
           </main>
         </SidebarInset>
       </SidebarProvider>
