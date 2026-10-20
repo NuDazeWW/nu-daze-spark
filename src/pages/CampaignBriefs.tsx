@@ -22,7 +22,8 @@ import { toast } from "sonner";
 import { useVoiceProfiles } from "@/hooks/useVoiceProfiles";
 import { useCreditGate } from "@/components/billing/CreditGate";
 import { printOnePager, angleOf } from "@/lib/campaignOnePager";
-import { Printer, AlertTriangle, CheckCircle2, FileText, Layers, Loader2, Plus, Sparkles, Wand2 } from "lucide-react";
+import { Printer, AlertTriangle, CheckCircle2, Circle, FileText, Layers, Loader2, Plus, Sparkles, Wand2, Target, ShieldCheck, Search, Pencil, Compass, Users, MessageSquareQuote, ListChecks, MousePointerClick, Link as LinkIcon, BarChart3, CalendarClock, Share2, ShieldAlert } from "lucide-react";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
 
 type Brief = any;
 
@@ -191,95 +192,110 @@ export default function CampaignBriefs() {
   return (
     <div className="sm-briefs">
       <PageHeader title="Campaign Briefs" description="Define the strategy once. Generate one master message and coordinated platform variants from it.">
-        <Button onClick={() => setEditing({ ...empty })}><Plus className="h-4 w-4 mr-1" /> New brief</Button>
+        <Button className="sm-lit-btn" onClick={() => setEditing({ ...empty })}><Plus className="h-4 w-4 mr-1" /> New brief</Button>
       </PageHeader>
 
-      <Card className="sm-briefs-intro mb-6 p-5">
-        <h2 className="font-display text-base font-semibold mb-3">From strategy to execution</h2>
-        <div className="grid gap-4 md:grid-cols-3 text-sm">
-          <div><div className="font-medium mb-1">One core message, every channel</div><p className="text-muted-foreground">Write one brief — objective, audience, core message, proof points, primary CTA and target channels — instead of disconnected posts.</p></div>
-          <div><div className="font-medium mb-1">Master content</div><p className="text-muted-foreground">Generating creates one master message plus coordinated LinkedIn and Instagram versions that go straight into the Daily Content Queue.</p></div>
-          <div><div className="font-medium mb-1">Governance and review</div><p className="text-muted-foreground">Team discussion, required-field checks, approver sign-off and an AI completeness review happen before anything is generated.</p></div>
+      <Card className="sm-lit mb-6 p-5" data-accent="violet">
+        <h2 className="font-display text-base font-semibold mb-4">From strategy to execution</h2>
+        <div className="grid gap-5 md:grid-cols-3 text-sm">
+          {([
+            [Target, "cyan", "One core message, every channel", "Write one brief — objective, audience, core message, proof points, primary CTA and target channels — instead of disconnected posts."],
+            [Layers, "violet", "Master content", "Generating creates one master message plus coordinated LinkedIn and Instagram versions that go straight into the Daily Content Queue."],
+            [ShieldCheck, "gold", "Governance and review", "Team discussion, required-field checks, approver sign-off and an AI completeness review happen before anything is generated."],
+          ] as const).map(([Icon, accent, t, d]) => (
+            <div key={t} className="flex gap-3">
+              <span className="sm-lit-icon h-fit" data-accent={accent}><Icon className="h-5 w-5" /></span>
+              <div><div className="font-medium mb-1">{t}</div><p className="text-muted-foreground">{d}</p></div>
+            </div>
+          ))}
         </div>
       </Card>
 
-
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-        <div className="space-y-2">
-          {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
-          {!isLoading && briefs.length === 0 && (
-            <Card className="p-6 text-center text-sm text-muted-foreground">
-              <FileText className="h-6 w-6 mx-auto mb-2" />No briefs yet. Start one to plan a coordinated content set.
-            </Card>
-          )}
-          {briefs.map((b: Brief) => (
-            <button key={b.id} onClick={() => { setSelectedId(b.id); setReview(null); }}
-              className={`sm-brief-card w-full text-left rounded-lg border p-3 transition-colors ${selected?.id === b.id ? "border-primary bg-primary/5" : "border-border hover:bg-muted/40"}`}>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-medium text-sm truncate">{b.title}</span>
-                <StatusBadge status={b.status} />
+      <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <Card className="sm-lit h-fit p-4" data-accent="neutral">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold">Campaign briefs</h2>
+            <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          </div>
+          <div className="space-y-2">
+            {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+            {!isLoading && briefs.length === 0 && (
+              <div className="p-6 text-center text-sm text-muted-foreground">
+                <FileText className="h-6 w-6 mx-auto mb-2" />No briefs yet. Start one to plan a coordinated content set.
               </div>
-              <div className="mt-1 text-xs text-muted-foreground font-mono">{TYPES[b.campaign_type]} · v{b.version}</div>
-            </button>
-          ))}
-        </div>
+            )}
+            {briefs.map((b: Brief) => {
+              const on = selected?.id === b.id;
+              return (
+                <button key={b.id} onClick={() => { setSelectedId(b.id); setReview(null); }} aria-current={on ? "true" : undefined}
+                  className="sm-lit w-full text-left rounded-lg p-3" data-accent={on ? "cyan" : "neutral"} data-selected={on} data-interactive="true">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-medium text-sm line-clamp-2">{b.title}</span>
+                    <StatusBadge status={b.status} />
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground font-mono">{TYPES[b.campaign_type]} · v{b.version}</div>
+                </button>
+              );
+            })}
+          </div>
+        </Card>
 
         {selected && (
-          <div className="space-y-6">
-            <Card className="p-6">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div>
-                  <h2 className="text-xl font-semibold">{selected.title}</h2>
-                  <p className="text-xs text-muted-foreground font-mono mt-1">{TYPES[selected.campaign_type]} · version {selected.version}</p>
-                </div>
-                <div className="flex gap-2 flex-wrap justify-end">
-                  <Button variant="outline" size="sm" onClick={() => setEditing({ ...selected })}>Edit</Button>
-                  <Button variant="outline" size="sm" onClick={() => printOnePager(selected, masters)}><Printer className="h-4 w-4 mr-1" />Campaign one-pager</Button>
-                  <Button variant="outline" size="sm" disabled={runReview.isPending} onClick={() => runReview.mutate(selected.id)}>
-                    {runReview.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Wand2 className="h-4 w-4 mr-1" />}AI completeness review
-                  </Button>
-                  {selected.status !== "approved" ? (
-                    selected.approval_mode_enabled ? (
-                      <BriefApprovalActions brief={selected} canApprove={!!canApprove} blocked={missing.length > 0} />
-                    ) : (
-                      <Button size="sm" disabled={missing.length > 0 || setStatus.isPending} onClick={() => setStatus.mutate({ id: selected.id, status: "approved" })}>
-                        <CheckCircle2 className="h-4 w-4 mr-1" />Approve brief
-                      </Button>
-                    )
+          <div className="min-w-0 space-y-6">
+            <Card className="sm-lit p-6" data-accent="cyan">
+              <StatusBadge status={selected.status} />
+              <h2 className="mt-2 text-xl font-semibold">{selected.title}</h2>
+              <p className="text-xs text-muted-foreground font-mono mt-1">{TYPES[selected.campaign_type]} · version {selected.version}</p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => setEditing({ ...selected })}><Pencil className="h-4 w-4 mr-1" />Edit</Button>
+                <Button variant="outline" size="sm" onClick={() => printOnePager(selected, masters)}><Printer className="h-4 w-4 mr-1" />Campaign one-pager</Button>
+                <Button variant="outline" size="sm" disabled={runReview.isPending} onClick={() => runReview.mutate(selected.id)}>
+                  {runReview.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Wand2 className="h-4 w-4 mr-1" />}AI completeness review
+                </Button>
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {selected.status !== "approved" ? (
+                  selected.approval_mode_enabled ? (
+                    <BriefApprovalActions brief={selected} canApprove={!!canApprove} blocked={missing.length > 0} />
                   ) : (
-                    <>
-                      {activeVoices.length > 0 && (
-                        <Select value={voiceId || "brand"} onValueChange={(v) => setVoiceId(v === "brand" ? "" : v)}>
-                          <SelectTrigger className="h-8 w-[170px] text-xs"><SelectValue placeholder="Brand voice" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="brand">Brand voice (default)</SelectItem>
-                            {activeVoices.map((v) => (
-                              <SelectItem key={v.id} value={v.id}>Write as {v.name}{v.role_title ? ` · ${v.role_title}` : ""}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                      <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Data-Driven Insight, Founder Story and Bold Contrarian Take for every channel">
-                        <Checkbox checked={threeAngles} onCheckedChange={(c) => setThreeAngles(!!c)} />Test 3 angles · {briefDraftCost(selected.target_channels?.length ?? 1, threeAngles)} drafts{threeAngles ? ` instead of ${briefDraftCost(selected.target_channels?.length ?? 1, false)}` : ""}
-                      </label>
-                      <Button size="sm" disabled={generate.isPending || genBlocked} title={genBlocked ? "Check off every discussion comment first" : undefined} onClick={() => generate.mutate(selected.id)}>
-                        {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set
-                      </Button>
-                    </>
-                  )}
-                </div>
+                    <Button size="sm" className="sm-lit-btn" disabled={missing.length > 0 || setStatus.isPending} onClick={() => setStatus.mutate({ id: selected.id, status: "approved" })}>
+                      <CheckCircle2 className="h-4 w-4 mr-1" />Approve brief
+                    </Button>
+                  )
+                ) : (
+                  <>
+                    {activeVoices.length > 0 && (
+                      <Select value={voiceId || "brand"} onValueChange={(v) => setVoiceId(v === "brand" ? "" : v)}>
+                        <SelectTrigger className="h-8 w-[170px] text-xs"><SelectValue placeholder="Brand voice" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="brand">Brand voice (default)</SelectItem>
+                          {activeVoices.map((v) => (
+                            <SelectItem key={v.id} value={v.id}>Write as {v.name}{v.role_title ? ` · ${v.role_title}` : ""}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <label className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1.5 text-xs text-muted-foreground" title="Data-Driven Insight, Founder Story and Bold Contrarian Take for every channel">
+                      <Checkbox checked={threeAngles} onCheckedChange={(c) => setThreeAngles(!!c)} />Test 3 angles · {briefDraftCost(selected.target_channels?.length ?? 1, threeAngles)} drafts{threeAngles ? ` instead of ${briefDraftCost(selected.target_channels?.length ?? 1, false)}` : ""}
+                    </label>
+                    <Button size="sm" className="sm-lit-btn" disabled={generate.isPending || genBlocked} title={genBlocked ? "Check off every discussion comment first" : undefined} onClick={() => generate.mutate(selected.id)}>
+                      {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set
+                    </Button>
+                  </>
+                )}
               </div>
 
-              <div className="mb-5">
-                <div className="flex justify-between text-xs mb-1"><span className="text-muted-foreground">Brief completeness</span><span className="font-mono">{completeness}%</span></div>
-                <Progress value={completeness} />
+              <div className="mt-6">
+                <div className="flex justify-between text-sm mb-2"><span className="font-medium">Brief completeness</span><span className="font-mono">{completeness}%</span></div>
+                <Progress value={completeness} className="h-3" />
                 {missing.length > 0 && (
                   <p className="text-xs text-destructive mt-2 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />Missing before approval: {missing.join(", ")}</p>
                 )}
               </div>
 
               {selected.approval_mode_enabled && (
-                <div className="mb-5 rounded-lg border border-border p-3 text-xs space-y-1">
+                <div className="sm-lit mt-5 rounded-lg p-4 text-xs space-y-1.5" data-accent={missing.length === 0 && selected.status === "approved" && openComments === 0 ? "lime" : "gold"}>
                   <div className="font-medium text-sm mb-1">Ready to generate</div>
                   <Check ok={missing.length === 0} label="Required strategy fields completed" />
                   <Check ok={selected.status === "approved"} label={selected.status === "approved" ? `Brief approved by ${approverName}` : selected.status === "in_review" ? `Waiting for approval${selected.assigned_approver_id ? ` from ${assignedName}` : " from any Approver or Admin"}` : "Brief approved"} />
@@ -290,39 +306,44 @@ export default function CampaignBriefs() {
                 </div>
               )}
               {!selected.approval_mode_enabled && isAdmin && (
-                <label className="mb-5 flex items-center gap-2 text-xs text-muted-foreground"><Checkbox checked={false} onCheckedChange={() => toggleMode.mutate(true)} />Turn on approval mode for this brief</label>
+                <label className="mt-5 flex items-center gap-2 text-xs text-muted-foreground"><Checkbox checked={false} onCheckedChange={() => toggleMode.mutate(true)} />Turn on approval mode for this brief</label>
               )}
 
               {review && (
-                <div className="mb-5 rounded-lg border border-border bg-muted/30 p-4 text-sm space-y-2">
+                <div className="mt-5 rounded-lg border border-border bg-muted/30 p-4 text-sm space-y-2">
                   <div className="font-medium">AI review · readiness {Math.round(review.score)}/100</div>
                   {review.issues.length > 0 && <ul className="list-disc pl-5 text-muted-foreground">{review.issues.map((i, n) => <li key={n}>{i}</li>)}</ul>}
                   {review.questions.length > 0 && (<><div className="font-medium pt-1">Questions to resolve</div><ul className="list-disc pl-5 text-muted-foreground">{review.questions.map((q, n) => <li key={n}>{q}</li>)}</ul></>)}
                 </div>
               )}
-
-              <dl className="grid gap-4 sm:grid-cols-2 text-sm">
-                <Field label="Objective" v={selected.objective} />
-                <Field label="Target audience" v={selected.target_audience} />
-                <Field label="Core message" v={selected.core_message} wide />
-                <Field label="Proof points" v={(selected.proof_points ?? []).map((p: string) => `• ${p}`).join("\n")} wide />
-                <Field label="Primary CTA" v={selected.primary_cta} />
-                <Field label="Destination URL" v={selected.destination_url} />
-                <Field label="Success metric" v={selected.success_metric} />
-                <Field label="Timing" v={selected.timing_window} />
-                <Field label="Constraints" v={selected.constraints} wide />
-                <Field label="Channels" v={(selected.target_channels ?? []).map((c: string) => CHANNELS[c]).join(", ")} wide />
-              </dl>
             </Card>
+
+            <section aria-labelledby="brief-strategy">
+              <h3 id="brief-strategy" className="text-sm font-semibold mb-3 flex items-center gap-2"><span className="sm-lit-icon" data-accent="cyan"><Compass className="h-4 w-4" /></span>Strategy &amp; messaging</h3>
+              <dl className="grid gap-3 sm:grid-cols-2">
+                <Field icon={Target} label="Objective" v={selected.objective} />
+                <Field icon={Users} label="Target audience" v={selected.target_audience} />
+                <Field icon={MessageSquareQuote} label="Core message" v={selected.core_message} wide />
+                <Field icon={ListChecks} label="Proof points" list={(selected.proof_points ?? []).filter(Boolean)} wide />
+              </dl>
+              <dl className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <Field icon={MousePointerClick} label="Primary CTA" v={selected.primary_cta} />
+                <Field icon={LinkIcon} label="Destination URL" v={selected.destination_url} />
+                <Field icon={BarChart3} label="Success metric" v={selected.success_metric} />
+                <Field icon={CalendarClock} label="Timing" v={selected.timing_window} />
+                <Field icon={Share2} label="Channels" v={(selected.target_channels ?? []).map((c: string) => CHANNELS[c]).join(", ")} />
+                <Field icon={ShieldAlert} label="Constraints" v={selected.constraints} />
+              </dl>
+            </section>
 
             <BriefDiscussion brief={selected} />
 
-            <div>
-              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Layers className="h-4 w-4" />Master content objects</h3>
+            <section aria-labelledby="brief-masters">
+              <h3 id="brief-masters" className="text-sm font-semibold mb-3 flex items-center gap-2"><span className="sm-lit-icon" data-accent="violet"><Layers className="h-4 w-4" /></span>Master content objects</h3>
               {masters.length === 0 && <p className="text-sm text-muted-foreground">None yet. Approve the brief and generate a content set.</p>}
               <div className="space-y-4">
                 {masters.map((m: any) => (
-                  <Card key={m.id} className="p-5">
+                  <Card key={m.id} className="sm-lit p-5" data-accent="violet">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="font-medium">{m.title}</div>
@@ -334,9 +355,12 @@ export default function CampaignBriefs() {
                     {m.cta && <p className="text-xs text-muted-foreground mt-2">CTA: {m.cta}</p>}
                     <div className="grid gap-3 mt-4 md:grid-cols-2">
                       {(m.post_cards ?? []).map((p: any) => (
-                        <div key={p.id} className="rounded-md border border-border p-3">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs font-mono uppercase text-muted-foreground">{p.platform} · {p.content_type}{angleOf(p) ? ` · ${angleOf(p)}` : ""}</span>
+                        <div key={p.id} className="sm-lit rounded-md p-3" data-accent="neutral" data-emphasis="subtle">
+                          <div className="flex items-center justify-between gap-2 mb-1.5">
+                            <span className="flex min-w-0 items-center gap-1.5 text-xs font-mono uppercase text-muted-foreground">
+                              <PlatformIcon platform={p.platform} className="h-4 w-4 shrink-0" />
+                              <span className="truncate">{p.content_type}{angleOf(p) ? ` · ${angleOf(p)}` : ""}</span>
+                            </span>
                             <StatusBadge status={p.approval_status} />
                           </div>
                           <p className="text-xs line-clamp-4 whitespace-pre-line">{p.draft_copy}</p>
@@ -346,7 +370,7 @@ export default function CampaignBriefs() {
                   </Card>
                 ))}
               </div>
-            </div>
+            </section>
           </div>
         )}
       </div>
@@ -359,23 +383,31 @@ export default function CampaignBriefs() {
 function Check({ ok, label }: { ok: boolean; label: string }) {
   return (
     <div className={`flex items-center gap-2 ${ok ? "text-foreground" : "text-destructive"}`}>
-      {ok ? <CheckCircle2 className="h-3.5 w-3.5 text-primary" /> : <AlertTriangle className="h-3.5 w-3.5" />}{label}
+      {ok ? <CheckCircle2 className="h-3.5 w-3.5 text-brand-success" /> : <Circle className="h-3.5 w-3.5" />}
+      <span className="sr-only">{ok ? "Done:" : "Not done:"}</span>{label}
     </div>
   );
 }
 
-function Field({ label, v, wide }: { label: string; v?: string | null; wide?: boolean }) {
+function Field({ icon: Icon, label, v, list, wide }: { icon: React.ElementType; label: string; v?: string | null; list?: string[]; wide?: boolean }) {
+  const emptyVal = list ? list.length === 0 : !v?.trim();
   return (
-    <div className={wide ? "sm:col-span-2" : ""}>
-      <dt className="text-xs text-muted-foreground mb-0.5">{label}</dt>
-      <dd className="whitespace-pre-line">{v?.trim() ? v : <span className="text-muted-foreground/60 italic">Not set</span>}</dd>
+    <div className={`sm-lit flex gap-3 rounded-lg p-3 ${wide ? "sm:col-span-2" : ""}`} data-accent="neutral" data-emphasis="subtle">
+      <span className="sm-lit-icon h-fit" data-accent="cyan"><Icon className="h-4 w-4" /></span>
+      <div className="min-w-0 flex-1 text-sm">
+        <dt className="text-xs text-muted-foreground mb-0.5">{label}</dt>
+        <dd className="break-words whitespace-pre-line">
+          {emptyVal ? <span className="text-muted-foreground/60 italic">Not set</span>
+            : list ? <ul className="list-disc pl-4 space-y-0.5">{list.map((p, i) => <li key={i}>{p}</li>)}</ul> : v}
+        </dd>
+      </div>
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
   const variant = status === "approved" ? "default" : status === "archived" ? "outline" : "secondary";
-  return <Badge variant={variant as any} className="capitalize text-[10px]">{status.replace("_", " ")}</Badge>;
+  return <Badge variant={variant as any} className="capitalize text-[10px] shrink-0">{status.replace("_", " ")}</Badge>;
 }
 
 function BriefDialog({ brief, onClose, onSave, saving }: { brief: Brief; onClose: () => void; onSave: (b: Brief) => void; saving: boolean }) {

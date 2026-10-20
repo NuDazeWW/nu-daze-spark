@@ -17,7 +17,7 @@ export const PARENT_ROUTE: Record<string, { to: string; label: string }> = {
 
 export const ROUTE_LABEL: Record<string, string> = {
   "/": "Dashboard", "/insights": "Portfolio Insights", "/assets": "Asset Library", "/sources": "Connected Sources",
-  "/strategy": "Brand & Strategy Studio", "/briefs": "Campaign Briefs", "/generator": "Social Post Generator", "/queue": "Daily Queue",
+  "/strategy": "Brand & Strategy Studio", "/briefs": "Campaign Briefs", "/generator": "Post Office", "/queue": "Daily Queue",
   "/review": "Executive Review", "/planner": "Content Planner", "/comments": "Comment Generator", "/approved": "Approved Content",
   "/publishing": "Publishing Status", "/repurpose": "Repurpose Center", "/media-studio": "Motive Media Studio", "/setup": "Workspace Settings",
   "/settings/team": "Team", "/settings/connections": "Social Connections", "/settings/email-provider": "Email Provider",

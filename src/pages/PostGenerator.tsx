@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useLocation } from "react-router-dom";
+import { PostToCard } from "@/components/layout/PostToCard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { AssetPickerDialog } from "@/components/assets/AssetPickerDialog";
 import { useAssets } from "@/hooks/useAssets";
@@ -63,6 +64,13 @@ export default function PostGenerator() {
   const [generatedCards, setGeneratedCards] = useState<GeneratedCard[]>([]);
   const [analyzeVisually, setAnalyzeVisually] = useState(true);
   const [prepStage, setPrepStage] = useState<string>("");
+
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash !== "#post-connector") return;
+    const t = window.setTimeout(() => document.getElementById("post-connector")?.scrollIntoView({ block: "start" }), 60);
+    return () => window.clearTimeout(t);
+  }, [hash]);
 
   // Pre-select asset from URL param
   useEffect(() => {
@@ -150,13 +158,14 @@ export default function PostGenerator() {
   return (
     <div className="sm-reference sm-generator animate-fade-in">
       <PageHeader
-        title="Social Post Generator"
+        title="Post Office"
         description="Start from your media, or just an idea — text-led posts need no assets."
       />
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)_300px]">
+        <aside className="lg:sticky lg:top-4 lg:self-start"><PostToCard /></aside>
         {/* Main area */}
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <div role="tablist" aria-label="Generation mode" className="grid grid-cols-2 gap-1 rounded-lg border bg-card p-1">
             {([["media", "Media-led", FolderOpen], ["text", "Text-led / thought leadership", PenLine]] as const).map(([k, label, Icon]) => (
               <button key={k} role="tab" aria-selected={mode === k} onClick={() => switchMode(k)}
@@ -178,7 +187,7 @@ export default function PostGenerator() {
           </Card>
 
           {!textLed && (
-          <Card className="sm-generator-sources">
+          <Card className="sm-generator-sources sm-lit" data-accent="gold">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center justify-between">
                 Source Assets
@@ -314,9 +323,9 @@ export default function PostGenerator() {
 
         {/* Sidebar config */}
         <div className="sm-generation-settings space-y-4">
-          <Card>
+          <Card className="sm-lit" data-accent="cyan" data-emphasis="featured">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Generation Settings</CardTitle>
+              <CardTitle className="text-base">Generation Station</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">

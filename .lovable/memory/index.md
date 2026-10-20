@@ -11,6 +11,7 @@ DDI cross-launch: sidebar link to drift-signal-engine.lovable.app. Receiver via 
 
 ## Memories
 - [Package styling](mem://design/package-styling) — Extend package glow app-wide; visual-only redesigns
+- [Accent by purpose](mem://design/accent-by-purpose) — Luminous accent meanings, palette hex, approved layout exceptions
 - [Brand tokens](mem://design/brand-tokens) — Full NuDaze color palette, gradients, shadows, typography
 - [Database schema](mem://features/database-schema) — All 22 tables, enums, RLS policy summary
 - [Auth flow](mem://features/auth) — Email/password, auto-profile creation, has_role RPC

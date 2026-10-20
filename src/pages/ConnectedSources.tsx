@@ -197,7 +197,7 @@ export default function ConnectedSources() {
 
       {/* Quick Import Bar */}
       <div className="sm-src-import">
-        <div className="sm-src-url">
+        <div className="sm-src-url sm-search-frame">
           <Link className="sm-src-url-icon" aria-hidden="true" />
           <input
             type="url"
@@ -213,16 +213,16 @@ export default function ConnectedSources() {
           {quickScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
           Import
         </Button>
-        <Button variant="outline" onClick={() => setBulkOpen(true)} className="sm-src-btn-soft">
+        <Button variant="outline" onClick={() => setBulkOpen(true)} className="sm-src-btn-soft sm-lit-btn">
           <FileText className="h-4 w-4" />Bulk Import
         </Button>
       </div>
-      <p className="sm-src-hint">Supported: webpages, PDFs, Google Drive, SharePoint, OneDrive and more.</p>
+      <p className="sm-src-hint font-semibold">Supported: webpages, PDFs, Google Drive, SharePoint, OneDrive and more.</p>
 
       {/* Source Actions */}
       <div className="flex flex-wrap justify-end gap-3 mb-2">
-        <Button variant="outline" asChild className="sm-src-btn-soft">
-          <a href="/settings/connectors" target="_blank" rel="noopener noreferrer">
+        <Button variant="outline" asChild className="sm-src-btn-soft sm-lit-btn">
+          <a href="/settings/connections">
             <Link2 className="h-4 w-4" />Manage Connectors
           </a>
         </Button>
