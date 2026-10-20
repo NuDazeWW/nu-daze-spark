@@ -32,7 +32,6 @@ Posts are always published from one place, the Posting Package drawer. No other 
 - **Hashtags** always show and copy with "#" everywhere.
 - **Mark as posted** shows whenever the Posting package tab is open, with an optional box for the live post link.
 - **Send for Executive Review** button: greyed out with a note pointing to Setup when Executive Review is off. It's switched on in this NuDaze copy, so it works here.
-- **Approved Content cards**: the button that opens the drawer is renamed **Post**.
 
 ## 3. Reporting connector tiles
 - Add the hover effect, a color for each connector (Tableau blue, Power BI gold, SAP cyan, QuickSight teal, Sigma violet), and the same tile art as the cloud storage tiles.
