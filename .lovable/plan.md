@@ -54,10 +54,12 @@ Legend — S: shared inheritance only; P: page-specific change; LN: local naviga
 - Built from each dropdown's actual subtopics in their existing order (e.g. Strategy: Brand Voice, Voices, Guardrails, Platform Rules, Audiences, Campaigns, Hashtags, CTAs, Cadence, Engagement). It is not a repeat of the six sidebar group names.
 - Correct selected state from path, tab parameter or hash; direct links; Back/Forward and refresh restore the selection; anchors scroll with header offset; full keyboard access (Tab, Enter, visible focus, `aria-current`); wraps or scrolls on small screens. Existing controls (PipelineNav, Strategy tabs) are upgraded, not duplicated.
 
-## 5. Campaign Briefs scope
+## 5. Campaign Briefs reconstruction (approved, in scope)
 
-- The page-body redesign to match the attached reference image was separately requested by you in this conversation. It stays limited to restructuring and restyling **existing** content: intro strip, brief list, selected brief, completeness and checklist, existing strategy fields, discussion and master objects.
-- No new content, fields, labels or actions are added; action labels unchanged. If you prefer only the shared treatment on the current layout, that is a one-line change to this section.
+- The approved reconstruction is implemented in full, not reduced to styling: intro strip (one wide card, three icon columns), brief list (search, stronger selected border, status pill), selected-brief panel (status pill above title, actions on two rows), completeness bar and separate "Ready to generate" checklist with real states, "Strategy & messaging" field tiles, discussion section, and master content objects in a two-column tile grid.
+- Shared luminous card, button and non-brand icon treatments applied throughout.
+- Existing content, action labels, data, permissions and functionality preserved.
+- This reconstruction and the Post to relocation (section 6) are the two explicit exceptions to the general rule of preserving existing layouts.
 
 ## 6. Carried-forward requirements
 
