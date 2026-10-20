@@ -1,3 +1,4 @@
+import { formatHashtags } from "@/lib/contentPresentation";
 import { PipelineNav } from "@/components/queue/PipelineNav";
 import { PlatformIcon, PlatformOption } from "@/components/layout/PlatformIcon";
 import { useState, useMemo, useEffect } from "react";
@@ -123,7 +124,7 @@ export default function ApprovedContent() {
           "",
           c.draft_copy,
           "",
-          `Hashtags: ${(c.hashtags ?? []).join(" ")}`,
+          `Hashtags: ${formatHashtags(c.hashtags)}`,
           `People Tags: ${(c.people_tags ?? []).join(", ")}`,
           `Org Tags: ${(c.org_tags ?? []).join(", ")}`,
         ];
@@ -296,7 +297,7 @@ function ApprovedCard({
   statusDates?: Partial<Record<ApprovalStatus, string>>;
 }) {
   const meta = STATUS_META[card.approval_status];
-  const hashtags = (card.hashtags ?? []).join(" ");
+  const hashtags = formatHashtags(card.hashtags);
   const peopleTags = (card.people_tags ?? []).join(", ");
   const orgTags = (card.org_tags ?? []).join(", ");
 

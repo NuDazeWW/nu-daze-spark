@@ -1,3 +1,4 @@
+import { formatHashtags } from "@/lib/contentPresentation";
 import { useMemo, useState } from "react";
 import { copyThenOpen } from "@/lib/openInNewTab";
 import { addDays, addWeeks, endOfWeek, format, isSameDay, startOfWeek } from "date-fns";
@@ -224,7 +225,7 @@ function CalendarOpenIcon({ card }: { card: NonNullable<QueueItem["postCard"]> }
       className="ml-auto inline-flex rounded p-0.5 hover:bg-foreground/10"
       onClick={(e) => {
         e.stopPropagation();
-        copyThenOpen([card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n"), url);
+        copyThenOpen([card.draft_copy, formatHashtags(card.hashtags)].filter(Boolean).join("\n\n"), url);
       }}>
       <ExternalLink className="h-3 w-3" />
     </span>

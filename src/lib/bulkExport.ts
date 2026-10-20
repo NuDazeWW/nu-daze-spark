@@ -1,3 +1,4 @@
+import { formatHashtags } from "@/lib/contentPresentation";
 import JSZip from "jszip";
 import { supabase } from "@/integrations/supabase/client";
 import type { PostCard } from "@/hooks/usePostCards";
@@ -16,7 +17,7 @@ const csvCell = (v: unknown) => {
 };
 const toCsv = (rows: (string | number | null | undefined)[][]) => rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
 
-const fullCaption = (c: PostCard) => [c.draft_copy, (c.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n");
+const fullCaption = (c: PostCard) => [c.draft_copy, formatHashtags(c.hashtags)].filter(Boolean).join("\n\n");
 const safe = (s: string) => s.replace(/[^a-z0-9._-]+/gi, "-").replace(/-+/g, "-").slice(0, 60);
 
 async function sha256(input: ArrayBuffer | string) {
@@ -55,7 +56,7 @@ function rowsFor(preset: CsvPreset, cards: PostCard[], assets: Record<string, As
       return [
         ["post_id", "post_number", "platform", "content_type", "status", "scheduled_for", "objective", "audience", "campaign_pillar", "copy", "hashtags", "people_tags", "org_tags", "first_comment", "posting_notes", "media_files", "brief_id", "posted_url"],
         ...cards.map((c) => [c.id, postLabel(c), c.platform, c.content_type, c.approval_status, date(c), c.objective, c.audience, c.campaign_pillar, c.draft_copy,
-          (c.hashtags ?? []).join(" "), (c.people_tags ?? []).join(", "), (c.org_tags ?? []).join(", "), c.first_comment, c.posting_notes, media(c), c.brief_id, c.posted_url]),
+          formatHashtags(c.hashtags), (c.people_tags ?? []).join(", "), (c.org_tags ?? []).join(", "), c.first_comment, c.posting_notes, media(c), c.brief_id, c.posted_url]),
       ];
   }
 }
@@ -75,7 +76,7 @@ function copyFile(c: PostCard, media: string[]) {
     `${postLabel(c)} · ${c.platform} · ${c.content_type}`,
     c.scheduled_for ? `Scheduled: ${new Date(c.scheduled_for).toLocaleString()}` : "Scheduled: not set",
     "", "CAPTION", c.draft_copy, "",
-    `HASHTAGS: ${(c.hashtags ?? []).join(" ")}`,
+    `HASHTAGS: ${formatHashtags(c.hashtags)}`,
     `PEOPLE TAGS: ${(c.people_tags ?? []).join(", ")}`,
     `ORGANIZATION TAGS: ${(c.org_tags ?? []).join(", ")}`,
     c.first_comment ? `\nFIRST COMMENT\n${c.first_comment}` : "",

@@ -1,3 +1,4 @@
+import { formatHashtags } from "@/lib/contentPresentation";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -130,7 +131,7 @@ export default function RepurposeCenter() {
   });
 
   const openEdit = (s: Suggestion) => {
-    setEditing(s); setDraft(s.draft_copy ?? ""); setTags((s.hashtags ?? []).map((h) => `#${h}`).join(" "));
+    setEditing(s); setDraft(s.draft_copy ?? ""); setTags(formatHashtags(s.hashtags));
   };
 
   const sourceLabel = (s: Suggestion) => {
