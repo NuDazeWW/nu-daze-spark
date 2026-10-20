@@ -187,6 +187,9 @@ export function PostingPackageDrawer({
   };
 
   const markPosted = async () => {
+    const url = postedUrl.trim();
+    if (url && !/^https?:\/\/\S+\.\S+/.test(url)) return toast({ title: "That link doesn't look right", description: "Your text was kept. Paste the full post link starting with https://, or leave it blank.", variant: "destructive" });
+    if (saving) return;
     const { error } = await supabase.from("post_cards")
       .update({ approval_status: "posted", posted_url: postedUrl.trim() || null }).eq("id", card.id);
     if (error) return toast({ title: "Couldn't mark as posted", description: error.message, variant: "destructive" });

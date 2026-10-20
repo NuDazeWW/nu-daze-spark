@@ -70,11 +70,11 @@ function headline(state: GateState, blocking: number, advisory: number) {
   switch (state) {
     case "none": return { text: "Not checked yet", sub: "Run preflight to check this post before approval.", tone: "text-muted-foreground" };
     case "stale": return { text: "Post changed — check again", sub: "Re-run preflight to see where it stands now.", tone: "text-brand-warning" };
-    case "pass": return { text: "Ready to post", sub: "No issues found.", tone: "text-primary" };
-    case "acknowledged": return { text: "Cleared — warnings bypassed", sub: "You can approve and post. Edit or use Fix all with AI to improve the score.", tone: "text-primary" };
+    case "pass": return { text: "Checks passed", sub: "No issues found.", tone: "text-primary" };
+    case "acknowledged": return { text: "Warnings acknowledged", sub: "Recorded under your name for this version. Editing the post resets this.", tone: "text-primary" };
     case "overridden": return { text: "Cleared — admin override", sub: "Blocking issues were bypassed with a logged reason.", tone: "text-brand-warning" };
     case "blocked": return { text: `${blocking} thing${blocking === 1 ? "" : "s"} to fix`, sub: `Must be fixed before approval${advisory ? `, plus ${advisory} suggestion${advisory === 1 ? "" : "s"}` : ""}.`, tone: "text-destructive" };
-    default: return { text: `${advisory} suggestion${advisory === 1 ? "" : "s"}`, sub: "Fix them, or bypass to keep the post as is.", tone: "text-brand-warning" };
+    default: return { text: `${advisory} suggestion${advisory === 1 ? "" : "s"}`, sub: "Advisory only — fix them or acknowledge to continue.", tone: "text-brand-warning" };
   }
 }
 
@@ -164,12 +164,12 @@ export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin:
             {fixable && (
               <Button size="sm" onClick={fixAll} disabled={proposeRewrite.isPending || keepRewrite.isPending}>
                 {proposeRewrite.isPending ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 mr-1" />}
-                Fix all with AI
+                Revise draft with AI
               </Button>
             )}
             {!cleared && gate.state !== "stale" && (blocking.length === 0 || isAdmin) && (
               <Button size="sm" variant="outline" onClick={bypassAll} disabled={acknowledge.isPending}>
-                <ShieldCheck className="h-3.5 w-3.5 mr-1" />Bypass all & continue
+                <ShieldCheck className="h-3.5 w-3.5 mr-1" />Acknowledge warnings and continue
               </Button>
             )}
             {!cleared && blocking.length > 0 && !isAdmin && (

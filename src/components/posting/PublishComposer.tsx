@@ -15,6 +15,7 @@ import { precheckUsage, URL_RE } from "@/hooks/useBilling";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { PostResultsButton } from "@/components/publishing/PostResultsButton";
+import { formatHashtags, outboundText } from "@/lib/contentPresentation";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -100,7 +101,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
 
   const checks = selected.map((a) => {
     const lim = LIMITS[a.platform] ?? LIMITS.linkedin;
-    const full = copy.length + (card.hashtags ?? []).join(" ").length + 1;
+    const full = outboundText(card.draft_copy, card.hashtags, disclosure).length;
     return { a, lim, full, overChars: full > lim.chars, overTags: tagCount > lim.tags };
   });
   const blocking = checks.some((x) => x.overChars);
@@ -121,6 +122,8 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
     try {
       if (kind === "schedule") {
         const when = new Date(`${date}T${time}:00`);
+        if (isNaN(when.getTime())) throw new Error("Pick a valid date and time. Nothing was saved.");
+        if (when.getTime() < Date.now() + 60000) throw new Error("That time has already passed. Pick a later time; your channels are still selected.");
         await save({ scheduled_for: when.toISOString(), publishing_status: "scheduled" });
         toast({ title: "Scheduled", description: `${selected.length} channel(s) · ${when.toLocaleString()} (${tz})` });
         return;
@@ -142,7 +145,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
       }
       await save({ publishing_status: "published" });
       setJustPublished(selected.map((a) => a.platform));
-      toast({ title: "Published", description: `Recorded for ${selected.length} channel(s). Live sending turns on once platform apps are connected.` });
+      toast({ title: "Staged for delivery", description: `Saved for ${selected.length} channel(s). Nothing was sent to a platform — live sending needs approved platform apps.` });
     } catch (e) {
       toast({ title: "Couldn't save", description: (e as Error).message, variant: "destructive" });
     } finally {
@@ -164,12 +167,12 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         </div>
         <Badge className={`capitalize ${STATUS_STYLE[status] ?? STATUS_STYLE.idle}`}>
           {status === "publishing" && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-          {status === "idle" ? "Not scheduled" : status}
+          {status === "idle" ? "Not scheduled" : status === "published" ? "Staged — not sent" : status}
         </Badge>
       </div>
 
       <div role="tablist" aria-label="How to post" className="grid grid-cols-3 gap-1 rounded-lg border p-1">
-        {([["now", "Publish now", Send], ["schedule", "Schedule", CalendarClock], ["manual", "Manual handoff", Copy]] as const).map(([m, label, Icon]) => (
+        {([["now", "Stage for delivery", Send], ["schedule", "Schedule", CalendarClock], ["manual", "Manual handoff", Copy]] as const).map(([m, label, Icon]) => (
           <button key={m} role="tab" aria-selected={mode === m} onClick={() => setMode(m)}
             className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2 py-2 text-xs font-medium transition-colors sm:text-sm ${mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
             <Icon className="h-3.5 w-3.5" />{label}
@@ -177,12 +180,12 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         ))}
       </div>
       <p className="-mt-2 text-xs text-muted-foreground">
-        {mode === "now" ? "Sends to the selected channels right away." : mode === "schedule" ? "Queues the post for the date and time you pick." : "Copy the post and open the platform to post it yourself."}
+        {mode === "now" ? "Saves this post for delivery. It will not be sent to a platform." : mode === "schedule" ? "Queues the post for the date and time you pick." : "Copy the post and open the platform to post it yourself."}
       </p>
 
       {justPublished && status === "published" && (
         <div className="space-y-2 rounded-lg border border-primary/40 bg-primary/5 p-3">
-          <p className="flex items-center gap-2 text-sm font-semibold"><CheckCircle2 className="h-4 w-4 text-primary" /> Published to {justPublished.length} channel{justPublished.length > 1 ? "s" : ""}</p>
+          <p className="flex items-center gap-2 text-sm font-semibold"><CheckCircle2 className="h-4 w-4 text-primary" /> Staged for {justPublished.length} channel{justPublished.length > 1 ? "s" : ""} — not sent to any platform</p>
           <div className="flex flex-wrap gap-2">
             {[...new Set(justPublished)].map((p) => (
               <OpenPlatformButton key={p} clientId={card.client_id} platform={p} label={`View on ${LIMITS[p]?.label ?? p}`} />
@@ -196,7 +199,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         <div className="space-y-3">
         <div className="flex flex-wrap gap-2">
           <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="default" size="default"
-            copyText={`${copy}${tagCount ? "\n\n" + (card.hashtags ?? []).map((h) => "#" + h.replace(/^#/, "")).join(" ") : ""}`}
+            copyText={outboundText(card.draft_copy, card.hashtags, disclosure)}
             label={`Copy post & open ${LIMITS[card.platform]?.label ?? card.platform}`} />
         </div>
         <p className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
@@ -292,23 +295,23 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
           <Button className="w-full" disabled={!canPublish || !isApproved || !selected.length || blocking || running}
             onClick={() => setConfirm(mode === "schedule" ? "schedule" : "now")}>
             {running ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : mode === "schedule" ? <CalendarClock className="h-4 w-4 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-            {mode === "schedule" ? "Schedule post" : "Publish now"}
+            {mode === "schedule" ? "Schedule post" : "Stage for delivery"}
           </Button>
           {status !== "idle" && !running && (
             <button onClick={reset} className="text-xs text-muted-foreground underline">
               {status === "scheduled" ? "Cancel schedule" : "Reset publishing status"}
             </button>
           )}
-          <p className="text-xs text-muted-foreground">Live sending activates once each platform app is connected in Setup → Social connections.</p>
+          <p className="text-xs text-muted-foreground">Live sending isn't available yet: it needs approved platform apps, connected in Workspace Settings → Social Connections. Scheduled posts are staged, not sent.</p>
         </>
       )}
 
       <Dialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{confirm === "now" ? "Publish now?" : "Schedule this post?"}</DialogTitle>
+            <DialogTitle>{confirm === "now" ? "Stage for delivery?" : "Schedule this post?"}</DialogTitle>
             <DialogDescription>
-              {confirm === "now" ? "This post will go out to:" : `Goes out ${new Date(`${date}T${time}:00`).toLocaleString()} (${tz}) on:`}
+              {confirm === "now" ? "This saves the post for these channels. Nothing is sent to a platform:" : `Goes out ${new Date(`${date}T${time}:00`).toLocaleString()} (${tz}) on:`}
             </DialogDescription>
           </DialogHeader>
           <ul className="space-y-1 text-sm">
@@ -319,7 +322,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
           </ul>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirm(null)}>Cancel</Button>
-            <Button onClick={run}>{confirm === "now" ? "Publish" : "Schedule"}</Button>
+            <Button onClick={run} disabled={running}>{confirm === "now" ? "Stage" : "Schedule"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
