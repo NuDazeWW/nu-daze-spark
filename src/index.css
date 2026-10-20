@@ -2884,3 +2884,4 @@ body:not([data-sm-surface="reading"]) [role="dialog"]:not(.sm-light) :is(input, 
 .sm-studio-tabs [role="tab"][data-state="active"] { border-color: hsl(var(--lit-cyan) / .75); text-decoration: underline; text-underline-offset: 4px; box-shadow: 0 0 18px -6px hsl(var(--lit-cyan) / .7); }
 
 @media (prefers-reduced-motion: reduce) { .sm-lit, .sm-lit-btn, .sm-localnav a { transition: none !important; transform: none !important; } }
+@media (min-width: 768px) { .sm-localnav { flex-wrap: wrap; overflow: visible; } }
