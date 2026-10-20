@@ -322,7 +322,7 @@ function Chip({ p, draggable, selected, onToggle, stale }: {
   return (
     <div
       draggable={draggable}
-      onDragStart={(e) => e.dataTransfer.setData("text/plain", p.id)}
+      onDragStart={(e) => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", p.id); }}
       onClick={onToggle}
       title={`${STATUS_META[p.approval_status].label} · ${p.draft_copy.slice(0, 140)}`}
       className={cn("rounded border px-1.5 py-1 text-[11px] leading-tight", STATUS_META[p.approval_status].color,
@@ -342,6 +342,7 @@ function MonthGrid({ month, byDay, stocked, targets, canEdit, selected, onToggle
   month: Date; byDay: Map<string, Row[]>; stocked: Row[]; targets: CadenceTarget[]; canEdit: boolean;
   selected: Set<string>; onToggle: (id: string) => void; onDrop: (d: Date, id: string) => void; staleFor: (p: Row, w: string | null) => string | null;
 }) {
+  const [overKey, setOverKey] = useState<string | null>(null);
   const weeks: Date[] = [];
   for (let w = weekStart(startOfMonth(month)); w <= endOfMonth(month); w = addDays(w, 7)) weeks.push(w);
   return (
@@ -359,9 +360,11 @@ function MonthGrid({ month, byDay, stocked, targets, canEdit, selected, onToggle
               const list = byDay.get(format(day, "yyyy-MM-dd")) ?? [];
               return (
                 <div key={day.toISOString()}
-                  onDragOver={(e) => canEdit && e.preventDefault()}
-                  onDrop={(e) => { e.preventDefault(); const id = e.dataTransfer.getData("text/plain"); if (id) onDrop(day, id); }}
-                  className={cn("sm-planner-day min-h-24 rounded border bg-card p-1", !isSameMonth(day, month) && "sm-planner-day-outside opacity-50", isToday(day) && "sm-planner-day-today border-primary")}>
+                  onDragEnter={(e) => { if (canEdit) { e.preventDefault(); setOverKey(day.toISOString()); } }}
+                  onDragOver={(e) => { if (!canEdit) return; e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (overKey !== day.toISOString()) setOverKey(day.toISOString()); }}
+                  onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOverKey((k) => (k === day.toISOString() ? null : k)); }}
+                  onDrop={(e) => { e.preventDefault(); setOverKey(null); const id = e.dataTransfer.getData("text/plain"); if (id) onDrop(day, id); }}
+                  className={cn("sm-planner-day min-h-24 rounded border bg-card p-1 transition-colors", !isSameMonth(day, month) && "sm-planner-day-outside opacity-50", isToday(day) && "sm-planner-day-today border-primary", overKey === day.toISOString() && "ring-2 ring-primary bg-primary/10 opacity-100")}>
                   <div className="mb-1 font-mono text-[10px] text-muted-foreground">{format(day, "d")}</div>
                   <div className="space-y-1">
                     {list.map((p) => (
