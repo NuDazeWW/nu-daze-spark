@@ -27,7 +27,7 @@ export function AppLayout() {
           <header className="sm-dark sm-command-bar flex h-14 min-w-0 shrink-0 items-center gap-2 overflow-hidden border-b border-border bg-background text-foreground px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            {env && <Badge variant="outline" title="Which environment this instance is" className="shrink-0 font-mono text-[10px] uppercase tracking-wider">{env === "demo" ? "Demo environment" : env}</Badge>}
+            {env && env !== "demo" && <Badge variant="outline" title="Which environment this instance is" className="shrink-0 font-mono text-[10px] uppercase tracking-wider">{env === "demo" ? "Demo environment" : env}</Badge>}
             <div className="min-w-0 flex-1" />
             <nav aria-label="Help and updates" className="flex shrink-0 items-center gap-1">
               {[{ href: "/help", label: "Help", icon: LifeBuoy }, { href: "/whats-new", label: "What's new", icon: Megaphone }].map((l) => (

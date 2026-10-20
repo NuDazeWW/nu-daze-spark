@@ -195,7 +195,13 @@ HASHTAGS: ${(card.hashtags ?? []).join(" ") || "(none)"}`;
       campaign_pillar: card.campaign_pillar,
       recentPosts: (recentRes.data ?? []) as any[],
     }, voiceScore);
-    const { data: review, error } = await sb.from("preflight_reviews").insert({
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const serviceUrl = Deno.env.get("SUPABASE_URL");
+    if (!serviceKey || !serviceUrl) return json({ error: "Review storage unavailable" }, 503);
+    const writer = createClient(serviceUrl, serviceKey);
+    const { data: current } = await sb.from("post_cards").select("readiness_revision").eq("id", card.id).single();
+    if (current?.readiness_revision !== card.readiness_revision) return json({ error: "Post changed during review. Run checks again." }, 409);
+    const { data: review, error } = await writer.from("preflight_reviews").insert({
       post_card_id: card.id,
       client_id: cid,
       draft_checksum: draftChecksum(card),

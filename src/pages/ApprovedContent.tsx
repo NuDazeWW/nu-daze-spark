@@ -47,14 +47,14 @@ export default function ApprovedContent() {
     if (!jumpId) return;
     const c = cards.find((x) => x.id === jumpId);
     if (!c) return;
-    setPackageId(c.id); setPackageTab(params.get("section") === "publish" || params.get("section") === "schedule" ? "publish" : "package");
+    setPackageId(c.id); setPackageTab(params.get("section") === "schedule" ? "schedule" : params.get("section") === "publish" ? "publish" : "package");
     setSearch(postLabel(c)); setStatusFilter("all"); setPlatformFilter("all");
     setParams({}, { replace: true });
   }, [jumpId, cards, setParams]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [packageId, setPackageId] = useState<string | null>(null);
-  const [packageTab, setPackageTab] = useState<"package" | "publish">("package");
+  const [packageTab, setPackageTab] = useState<"package" | "publish" | "schedule">("package");
   const [exportOpen, setExportOpen] = useState(false);
   const [exportPicked, setExportPicked] = useState<string[] | undefined>();
   const packageCard = cards.find((c) => c.id === packageId) ?? null;

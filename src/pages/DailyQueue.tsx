@@ -1,3 +1,4 @@
+import { PostingPackageDrawer } from "@/components/queue/PostingPackageDrawer";
 import { PipelineNav } from "@/components/queue/PipelineNav";
 import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -46,10 +47,13 @@ export default function DailyQueue() {
   const statusDates = useStatusDates();
   const [params, setParams] = useSearchParams();
   const jumpId = params.get("post");
+  const [packageId, setPackageId] = useState<string | null>(null);
+  const [packageTab, setPackageTab] = useState<"package" | "publish" | "schedule">("package");
   useEffect(() => {
     if (!jumpId) return;
     const c = cards.find((x) => x.id === jumpId);
     if (!c) return;
+    if (!params.get("edit")) { setPackageId(c.id); setPackageTab(params.get("section") === "schedule" ? "schedule" : params.get("section") === "publish" ? "publish" : "package"); }
     setSearch(postLabel(c)); setStatusFilter("all"); setPlatformFilter("all"); setTypeFilter("all");
     if (params.get("edit")) { const qi = queueItems.find((q) => q.type === "post" && q.id === jumpId); if (qi) setEditingPostCard(qi); }
     setParams({}, { replace: true });
@@ -262,6 +266,7 @@ export default function DailyQueue() {
         <QueueTriage items={queueItems} onOpen={(i) => (i.type === "comment" ? setEditingComment(i) : setEditingPostCard(i))} />
       )}
 
+      <PostingPackageDrawer card={cards.find(c => c.id === packageId) ?? null} open={!!packageId} onOpenChange={o => { if (!o) setPackageId(null); }} canExport={isAdmin} initialTab={packageTab} onMarkExported={async id => { await updateStatus.mutateAsync({ id, status: "exported" }); }} />
       {/* Post card edit dialog */}
       {editingPostCard?.postCard && (
         <PostCardEditDialog
