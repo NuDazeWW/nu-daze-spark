@@ -185,7 +185,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
       </p>
 
       <p className="text-xs text-muted-foreground">{readiness.isError ? "Checks unavailable" : readiness.data?.label ?? "Checks pending"}</p>
-      {outcomes.data?.map(o => <div key={o.id} className="rounded-md border p-3 text-xs"><b>{o.platform}</b> · {o.deliveryLabel(status)}<p className="text-muted-foreground">{o.reason}</p></div>)}
+      {outcomes.data?.map(o => <div key={o.id} className="rounded-md border p-3 text-xs"><b>{o.platform}</b> · {deliveryLabel(o.status)}<p className="text-muted-foreground">{o.reason}</p></div>)}
       {mode === "manual" ? (
         <div className="space-y-3">
         <div className="flex flex-wrap gap-2">
