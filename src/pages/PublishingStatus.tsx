@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { ScheduledRunsPanel } from "@/components/publishing/ScheduledRunsPanel";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { PipelineNav } from "@/components/queue/PipelineNav";
@@ -162,8 +163,9 @@ export default function PublishingStatus() {
         <div className="pub-panel pub-panel-empty">
           <div className="relative z-10">
             <div className="pub-rings"><i /><i /><Send className="h-9 w-9" /></div>
-            <p className="font-display text-2xl font-semibold">Nothing here yet.</p>
-            <p className="mt-2 text-[15px]" style={{ color: "hsl(230 20% 78%)" }}>Open an approved post, go to the <b style={{ color: "hsl(0 0% 100%)" }}>Publish</b> tab, and schedule or publish it.</p>
+            <p className="font-display text-2xl font-semibold">{view === "upcoming" ? "No scheduled posts yet." : view === "published" ? "No staged or posted items yet." : "No failed deliveries."}</p>
+            <p className="mt-2 text-[15px]" style={{ color: "hsl(230 20% 78%)" }}>Open an approved post and use <b style={{ color: "hsl(0 0% 100%)" }}>Publish / Schedule</b> to set it up.</p>
+            <Link to="/approved" className="mt-4 inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90">Choose an approved post</Link>
           </div>
         </div>
       ) : (
