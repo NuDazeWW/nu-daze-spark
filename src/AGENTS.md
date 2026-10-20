@@ -18,4 +18,5 @@
 - Non-profit eligibility goes through `isNonprofitEligible`/`nonprofitDisplay` in `src/lib/pricing.ts` (and the same exclusion in stripe-checkout and `review_nonprofit_application`), so excluded tiers never show or sell a non-profit price.
 - Non-profit decisions append to `nonprofit_decision_log` via `review_nonprofit_application`; the yearly re-check is the pg_cron `nonprofit-annual-recheck` calling `nonprofit_annual_recheck()`, logged in `nonprofit_recheck_runs`, so verification lifecycle is auditable.
 - Legal document versions live in `LEGAL_VERSIONS` (`src/pages/Legal.tsx`); acceptances are rows in `legal_acceptances`, and `LegalReacceptGate` asks again whenever a version changes.
-- Back navigation uses `BackLink` (session history, then `PARENT_ROUTE`) rendered by `PageHeader`, so every page has a way back.
+- `BackLink` shows only a fixed parent link from `PARENT_ROUTE` (sub-pages); top-level pages have none, so Back never points to an unrelated page.
+- Readiness labels come from `src/lib/readiness.ts` and hashtags from `formatHashtags` in `src/lib/contentPresentation.ts`, so every screen gives the same answer.
