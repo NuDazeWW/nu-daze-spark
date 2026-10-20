@@ -267,6 +267,13 @@
       "when": 1792472231968,
       "tag": "0037_rollback_confirmation_schedule_regressions",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1792472302247,
+      "tag": "0038_logical_delivery_slot_and_reconciliation_states",
+      "breakpoints": true
     }
   ]
 }
