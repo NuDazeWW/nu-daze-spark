@@ -20,3 +20,7 @@
 - Legal document versions live in `LEGAL_VERSIONS` (`src/pages/Legal.tsx`); acceptances are rows in `legal_acceptances`, and `LegalReacceptGate` asks again whenever a version changes.
 - `BackLink` shows only a fixed parent link from `PARENT_ROUTE` (sub-pages); top-level pages have none, so Back never points to an unrelated page.
 - Readiness labels come from `src/lib/readiness.ts` and hashtags from `formatHashtags` in `src/lib/contentPresentation.ts`, so every screen gives the same answer.
+
+- Route opening scroll resets are centralized in the router and overlay opening resets in shared UI primitives via `openingScroll`; this covers new views without clearing drafts or resetting scroll on ordinary renders.
+- Sidebar and page-top local navigation both read `src/lib/navigation.ts` (typed route/anchor/tab/route-section entries), so menus never drift apart.
+- Luminous treatment is the shared `.sm-lit` / `.sm-lit-icon` / `.sm-lit-btn` CSS with accents chosen by purpose from `src/lib/cardAccents.ts`, never by position, so meaning stays consistent.
