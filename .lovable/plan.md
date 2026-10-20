@@ -20,6 +20,9 @@
   - The "Ready to post" checklist uses the same colored status icons as the Dashboard (green check, amber warning, coral stop) inside tinted circles.
   - Tagging instructions become a collapsible section with a better look: people and organizations shown as tag chips with copy buttons.
   - The action buttons sit in a fixed bar at the bottom of the drawer.
+- **Approved Content cards**: the button that opens the drawer is renamed **Post**.
+- **Mark as posted**: shows in the drawer whenever the Posting package tab is open, with an optional box for the live post link. You no longer need to open the platform first.
+- **Send for Executive Review in the drawer**: a new button in the drawer's action bar. It's greyed out, with a note pointing to Setup, when Executive Review is turned off in the Setup options. It's switched on for this demo copy, so the button works here.
 
 ## 4. Reporting connector tiles
 - Add the missing hover effect: the tile lifts, the border brightens and the shadow deepens.
