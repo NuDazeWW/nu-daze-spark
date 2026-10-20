@@ -3456,6 +3456,15 @@ export type Database = {
           updated_at: string
         }[]
       }
+      reconcile_delivery: {
+        Args: {
+          _operation: string
+          _outcome: string
+          _platform_post_id?: string
+          _reason?: string
+        }
+        Returns: undefined
+      }
       remove_workspace_user: { Args: { _user_id: string }; Returns: undefined }
       reset_demo_allowances: { Args: never; Returns: undefined }
       reset_workspace_content: {

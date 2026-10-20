@@ -232,6 +232,13 @@
       "when": 1792471689655,
       "tag": "0032_authoritative_delivery_and_confirmation",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792471863233,
+      "tag": "0033_delivery_reconciliation_and_policy_invalidation",
+      "breakpoints": true
     }
   ]
 }
