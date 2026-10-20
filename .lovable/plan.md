@@ -57,7 +57,7 @@ Posts are always published from one place, the Posting Package drawer. No other 
 
 ## Technical section
 - `formatHashtags` in `src/lib/contentPresentation.ts` (tested), used by the drawer, cards, previews, bulk export and OpenPlatformButton.
-- Extract the PublishComposer simulation into a `useSimulatedPublish` hook plus a shared `PublishLiveNowButton`.
+- The publish run stays inside the drawer (existing PublishComposer logic). Approved Content, Daily Queue and Publishing Status only open the shared PostingPackageDrawer for a post id; there are no publish handlers on rows or cards.
 - Comments: the publish action updates the `comments` status and invalidates cadence stats.
 - index.css: `.sm-rep-card:hover` plus per-provider tone classes; ReportingConnectors applies the tone and art.
 - Sheets dismiss on outside click while Dialogs keep the save-guard; drawer form state lives above the Sheet.
