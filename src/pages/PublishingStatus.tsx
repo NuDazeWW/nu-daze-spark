@@ -31,7 +31,7 @@ type View = "upcoming" | "published" | "failed";
 const STATUS_META: Record<string, { label: string; cls: string; icon: typeof Clock }> = {
   scheduled: { label: "Scheduled", cls: "border-primary text-primary", icon: Clock },
   publishing: { label: "Publishing", cls: "border-warning text-warning", icon: Loader2 },
-  published: { label: "Published", cls: "border-success text-success", icon: CheckCircle2 },
+  published: { label: "Staged — not sent", cls: "border-success text-success", icon: CheckCircle2 },
   failed: { label: "Failed", cls: "border-destructive text-destructive", icon: AlertTriangle },
 };
 
@@ -114,7 +114,7 @@ export default function PublishingStatus() {
   const Bars = ({ h }: { h: number[] }) => <span className="pub-bars" aria-hidden>{h.map((v, i) => <i key={i} style={{ height: v }} />)}</span>;
   const SUMMARY = [
     { k: "upcoming" as View, label: "Upcoming", n: groups.upcoming.length, Icon: Clock, a: "265 85% 68%", hint: "Scheduled posts waiting to be sent", bars: [14, 24, 30, 40, 34, 48] },
-    { k: "published" as View, label: "Published", n: groups.published.length, Icon: CheckCircle2, a: "172 80% 50%", hint: "Successfully sent posts across all channels", bars: [16, 28, 40, 26, 34, 44] },
+    { k: "published" as View, label: "Published", n: groups.published.length, Icon: CheckCircle2, a: "172 80% 50%", hint: "Staged deliveries and posts marked as posted", bars: [16, 28, 40, 26, 34, 44] },
     { k: "failed" as View, label: "Failed", n: groups.failed.length, Icon: AlertTriangle, a: "350 85% 62%", hint: "Posts that failed to publish", bars: [18, 28, 20, 34, 42, 50] },
   ];
   const SOON_STYLE: Record<string, { b: string; mark: JSX.Element; art: string; copy: string }> = {
@@ -152,7 +152,7 @@ export default function PublishingStatus() {
       </div>
 
       <div role="tablist" aria-label="Publishing status" className="pub-seg">
-        {([["upcoming", "Upcoming", CalendarDays], ["published", "Published", CheckCircle2], ["failed", "Failed", AlertTriangle]] as const).map(([k, label, Icon]) => (
+        {([["upcoming", "Upcoming", CalendarDays], ["published", "Staged & posted", CheckCircle2], ["failed", "Failed", AlertTriangle]] as const).map(([k, label, Icon]) => (
           <button key={k} role="tab" type="button" aria-selected={view === k} onClick={() => setView(k)}>
             <Icon className="h-4 w-4" />{label} ({groups[k].length})
           </button>
