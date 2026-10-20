@@ -384,7 +384,7 @@ export default function PostGenerator() {
                 <Info className="h-3 w-3 shrink-0" />
                 Need another account tag?{" "}
                 <Link to="/settings/tags" className="underline inline-flex items-center gap-0.5 hover:text-primary">
-                  Sidebar → Account Tags <ExternalLink className="h-2.5 w-2.5" />
+                  Workspace Settings → Account Tags <ExternalLink className="h-2.5 w-2.5" />
                 </Link>
               </p>
 
