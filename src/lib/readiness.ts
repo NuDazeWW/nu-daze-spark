@@ -27,9 +27,10 @@ export function evaluateReadiness(
   const strict = opts.preflightMode === "strict";
   if (gate.state === "none" || gate.state === "stale")
     return { ...base, label: gate.state === "stale" ? "Post changed · checks pending" : "Checks pending", tone: "pending", canDeliver: !strict };
-  if (gate.state === "overridden") return { ...base, label: "Ready to publish · Override logged", tone: "advisory", canDeliver: true };
+  if (required > 0) return { ...base, label: `Approved · ${required} required check${required === 1 ? " remains" : "s remain"}`, tone: "blocked", canDeliver: false };
+  if (review?.ai_error) return { ...base, label: "Checks unavailable", tone: "pending", canDeliver: !strict };
   if (gate.state === "acknowledged") return { ...base, label: "Ready to publish · Warnings acknowledged", tone: "advisory", canDeliver: true };
-  if (required > 0) return { ...base, label: `Approved · ${required} required check${required === 1 ? "" : "s"} remain${required === 1 ? "s" : ""}`, tone: "blocked", canDeliver: !strict };
+  if (required > 0) return { ...base, label: `Approved · ${required} required check${required === 1 ? "" : "s"} remain${required === 1 ? "s" : ""}`, tone: "blocked", canDeliver: false };
   if (advisory > 0 && gate.state === "warnings") return { ...base, label: "Approved · Advisory notes available", tone: "advisory", canDeliver: !strict };
   return { ...base, label: "Ready to publish", tone: "ready", canDeliver: true };
 }
