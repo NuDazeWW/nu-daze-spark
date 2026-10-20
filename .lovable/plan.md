@@ -14,6 +14,12 @@
 - **Button text overflow**: buttons wrap onto two rows cleanly, with shorter labels and no text spilling out. Tabs scroll sideways instead of squeezing six labels into a narrow drawer. Checked at your screen size (887px) and at desktop size.
 - **Checksum**: the "Checksum fd1c…" line is removed from view. The fingerprint is still saved in the background for the export audit trail, and the downloaded file still includes it.
 - **Hashtags**: show and copy them with "#" (for example #ThoughtLeadership), everywhere: the drawer, copy buttons, package text, the open-platform copy, previews, and cards. Stored tags without "#" get it added when they're shown or copied.
+- **Drawer redesign to match the rest of the app**:
+  - Header uses the same dark branded style as the other page headers, with the platform badge and the post's SM number.
+  - Final copy, Hashtags, First comment, Media and Posting notes each sit in their own glowing, color-tinted card with a clear title and copy button. Text no longer floats on the background.
+  - The "Ready to post" checklist uses the same colored status icons as the Dashboard (green check, amber warning, coral stop) inside tinted circles.
+  - Tagging instructions become a collapsible section with a better look: people and organizations shown as tag chips with copy buttons.
+  - The action buttons sit in a fixed bar at the bottom of the drawer.
 
 ## 4. Reporting connector tiles
 - Add the missing hover effect: the tile lifts, the border brightens and the shadow deepens.
