@@ -92,7 +92,7 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
   "/generator": [
     { icon: Sparkles, label: "Generate post cards", description: "From approved briefs and assets" },
     { icon: Users, label: "Audience & pillars", description: "Grounded in your strategy rules" },
-    { icon: FileCheck, label: "Source provenance", description: "Every draft shows its sources" },
+    { icon: FileCheck, label: "Sources used", description: "Every draft shows its sources" },
   ],
   "/queue": [
     { icon: CalendarDays, label: "Today's cards", description: "Posts and comments due today" },
