@@ -602,7 +602,7 @@ export default function CommentGenerator() {
                           {post.topic && (
                             <Badge variant="secondary" className="text-[9px]">{post.topic}</Badge>
                           )}
-                          <Badge variant="outline" className={`text-[9px] ${RISK_COLOR[post.risk_flag]}`}>
+                          <Badge variant="outline" title="Automated scan against your brand guardrails and banned phrases. Not a guarantee — read before posting." className={`text-[9px] ${RISK_COLOR[post.risk_flag]}`}>
                             <RiskIcon className="h-2.5 w-2.5 mr-1" />{RISK_LABEL[post.risk_flag]}
                           </Badge>
                           <EngagementBadge engagement={post.estimated_engagement} />
