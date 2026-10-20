@@ -1,3 +1,4 @@
+import { PlatformOption } from "@/components/layout/PlatformIcon";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -294,7 +295,7 @@ export default function ContentPlanner() {
           <div className="mb-2 grid grid-cols-2 gap-2">
             <Select value={trayPlatform} onValueChange={setTrayPlatform}>
               <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="all">All platforms</SelectItem>{PLATFORMS.map((p) => <SelectItem key={p} value={p}>{cap(p)}</SelectItem>)}</SelectContent>
+              <SelectContent><SelectItem value="all">All platforms</SelectItem>{PLATFORMS.map((p) => <PlatformOption key={p} value={p} />)}</SelectContent>
             </Select>
             <Select value={trayType} onValueChange={setTrayType}>
               <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>

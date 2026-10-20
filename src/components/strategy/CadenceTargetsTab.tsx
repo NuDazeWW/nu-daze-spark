@@ -1,3 +1,4 @@
+import { PlatformOption } from "@/components/layout/PlatformIcon";
 import { useState } from "react";
 import { useStrategyTable } from "@/hooks/useStrategyTable";
 import { StrategyTabShell } from "./StrategyTabShell";
@@ -81,7 +82,7 @@ export function CadenceTargetsTab() {
           <div><Label>Platform</Label>
             <Select value={form.platform} onValueChange={(v) => setForm((f) => ({ ...f, platform: v as "linkedin" | "instagram" | "facebook" | "youtube" | "x" }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{PLATFORMS.map((p) => <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>)}</SelectContent>
+              <SelectContent>{PLATFORMS.map((p) => <PlatformOption key={p} value={p} />)}</SelectContent>
             </Select>
           </div>
           <div><Label>Content Type</Label>
