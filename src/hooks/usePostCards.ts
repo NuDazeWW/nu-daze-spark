@@ -74,7 +74,7 @@ export function usePostCards() {
 
   // Build unified queue
   const queueItems: QueueItem[] = [
-    ...cards.map((c): QueueItem => ({
+    ...cards.filter(c => !c.is_sample).map((c): QueueItem => ({
       type: "post",
       id: c.id,
       approval_status: c.approval_status,
@@ -83,7 +83,7 @@ export function usePostCards() {
       created_at: c.created_at,
       postCard: c,
     })),
-    ...comments.map((c): QueueItem => ({
+    ...comments.filter(c => !c.is_sample).map((c): QueueItem => ({
       type: "comment",
       id: c.id,
       approval_status: c.approval_status,
@@ -159,9 +159,7 @@ export function usePostCards() {
 
   const reschedulePost = useMutation({
     mutationFn: async ({ id, scheduled_for, platform }: { id: string; scheduled_for: string; platform?: PostCard["platform"] }) => {
-      const updates: Record<string, unknown> = { scheduled_for, updated_by: user!.id };
-      if (platform) updates.platform = platform;
-      const { error } = await supabase.from("post_cards").update(updates as never).eq("id", id);
+      const { error } = await supabase.rpc("plan_post_date", { _post: id, _when: scheduled_for, _platform: platform });
       if (error) throw error;
     },
     onMutate: async ({ id, scheduled_for, platform }) => {

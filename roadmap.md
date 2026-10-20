@@ -23,6 +23,7 @@
 - [ ] Outside the app: attorney review, legal contacts, DMCA agent, ProPublica terms, email domain, Stripe live products (NuDaze)
 
 # Corrective update — consolidated brief (approved 2026-10-20)
+- [ ] Finish uploaded continuation safeguards: authoritative delivery/readiness, confirmation provenance, usage isolation regression tests, and evidence-backed 12-check report; no real publishing or notifications
 - [x] Shared hashtag formatting (one "#", no repeats) used in drawer, cards, exports, calendar, dashboard
 - [x] Shared readiness answer (`src/lib/readiness.ts`) in the Posting Package drawer; SM-0019 "Preflight cleared" mismatch fixed
 - [x] Honest staging wording: "Stage for delivery", "Staged — not sent"; past-time schedule rejected

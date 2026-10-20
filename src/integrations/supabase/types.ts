@@ -801,11 +801,15 @@ export type Database = {
         Row: {
           approval_status: Database["public"]["Enums"]["approval_status"]
           client_id: string | null
+          confirmation_source: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           created_at: string
           created_by: string
           draft_copy: string
           external_post_id: string
           id: string
+          is_sample: boolean
           rationale: string | null
           tone: string | null
           updated_at: string
@@ -814,11 +818,15 @@ export type Database = {
         Insert: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
           client_id?: string | null
+          confirmation_source?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           created_by: string
           draft_copy: string
           external_post_id: string
           id?: string
+          is_sample?: boolean
           rationale?: string | null
           tone?: string | null
           updated_at?: string
@@ -827,11 +835,15 @@ export type Database = {
         Update: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
           client_id?: string | null
+          confirmation_source?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           created_by?: string
           draft_copy?: string
           external_post_id?: string
           id?: string
+          is_sample?: boolean
           rationale?: string | null
           tone?: string | null
           updated_at?: string
@@ -984,6 +996,138 @@ export type Database = {
           },
         ]
       }
+      delivery_attempts: {
+        Row: {
+          attempt_number: number
+          attempted_at: string
+          id: string
+          operation_id: string
+          reason: string | null
+          status: string
+        }
+        Insert: {
+          attempt_number: number
+          attempted_at?: string
+          id?: string
+          operation_id: string
+          reason?: string | null
+          status: string
+        }
+        Update: {
+          attempt_number?: number
+          attempted_at?: string
+          id?: string
+          operation_id?: string
+          reason?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_attempts_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_operations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_capabilities: {
+        Row: {
+          dispatch_ready: boolean
+          live_enabled: boolean
+          platform: string
+          verified_at: string | null
+        }
+        Insert: {
+          dispatch_ready?: boolean
+          live_enabled?: boolean
+          platform: string
+          verified_at?: string | null
+        }
+        Update: {
+          dispatch_ready?: boolean
+          live_enabled?: boolean
+          platform?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      delivery_operations: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          intended_at: string | null
+          intent: string
+          platform: string
+          platform_post_id: string | null
+          post_card_id: string
+          reason: string | null
+          revision: number
+          social_account_id: string
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          intended_at?: string | null
+          intent: string
+          platform: string
+          platform_post_id?: string | null
+          post_card_id: string
+          reason?: string | null
+          revision: number
+          social_account_id: string
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          intended_at?: string | null
+          intent?: string
+          platform?: string
+          platform_post_id?: string | null
+          post_card_id?: string
+          reason?: string | null
+          revision?: number
+          social_account_id?: string
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_operations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_operations_post_card_id_fkey"
+            columns: ["post_card_id"]
+            isOneToOne: false
+            referencedRelation: "post_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_operations_social_account_id_fkey"
+            columns: ["social_account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_provider_secrets: {
         Row: {
           id: boolean
@@ -1114,11 +1258,15 @@ export type Database = {
           author_context: Json | null
           author_name: string | null
           client_id: string | null
+          confirmation_source: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           created_at: string
           estimated_engagement: number
           external_url: string
           id: string
           is_commented: boolean
+          is_sample: boolean
           platform: Database["public"]["Enums"]["platform_type"]
           post_content: string | null
           recommended_comment_angle: string | null
@@ -1132,11 +1280,15 @@ export type Database = {
           author_context?: Json | null
           author_name?: string | null
           client_id?: string | null
+          confirmation_source?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           estimated_engagement?: number
           external_url: string
           id?: string
           is_commented?: boolean
+          is_sample?: boolean
           platform: Database["public"]["Enums"]["platform_type"]
           post_content?: string | null
           recommended_comment_angle?: string | null
@@ -1150,11 +1302,15 @@ export type Database = {
           author_context?: Json | null
           author_name?: string | null
           client_id?: string | null
+          confirmation_source?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           estimated_engagement?: number
           external_url?: string
           id?: string
           is_commented?: boolean
+          is_sample?: boolean
           platform?: Database["public"]["Enums"]["platform_type"]
           post_content?: string | null
           recommended_comment_angle?: string | null
@@ -1880,15 +2036,20 @@ export type Database = {
           brief_id: string | null
           campaign_pillar: string | null
           client_id: string | null
+          confirmation_source: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           content_type: Database["public"]["Enums"]["content_type"]
           created_at: string
           created_by: string
           delivered_at: string | null
+          delivery_status: string
           draft_copy: string
           first_comment: string | null
           hashtags: string[] | null
           id: string
           import_source: string | null
+          is_sample: boolean
           master_content_id: string | null
           media_urls: string[]
           objective: string | null
@@ -1903,8 +2064,11 @@ export type Database = {
           posting_notes: string | null
           publishing_status: string
           rationale: string | null
+          readiness_changed_at: string
+          readiness_revision: number
           repurposed_from_id: string | null
           revision_notes: string | null
+          scheduled_by: string | null
           scheduled_for: string | null
           source_references: string[] | null
           suggested_asset_description: string | null
@@ -1924,15 +2088,20 @@ export type Database = {
           brief_id?: string | null
           campaign_pillar?: string | null
           client_id?: string | null
+          confirmation_source?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           content_type: Database["public"]["Enums"]["content_type"]
           created_at?: string
           created_by: string
           delivered_at?: string | null
+          delivery_status?: string
           draft_copy: string
           first_comment?: string | null
           hashtags?: string[] | null
           id?: string
           import_source?: string | null
+          is_sample?: boolean
           master_content_id?: string | null
           media_urls?: string[]
           objective?: string | null
@@ -1947,8 +2116,11 @@ export type Database = {
           posting_notes?: string | null
           publishing_status?: string
           rationale?: string | null
+          readiness_changed_at?: string
+          readiness_revision?: number
           repurposed_from_id?: string | null
           revision_notes?: string | null
+          scheduled_by?: string | null
           scheduled_for?: string | null
           source_references?: string[] | null
           suggested_asset_description?: string | null
@@ -1968,15 +2140,20 @@ export type Database = {
           brief_id?: string | null
           campaign_pillar?: string | null
           client_id?: string | null
+          confirmation_source?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           content_type?: Database["public"]["Enums"]["content_type"]
           created_at?: string
           created_by?: string
           delivered_at?: string | null
+          delivery_status?: string
           draft_copy?: string
           first_comment?: string | null
           hashtags?: string[] | null
           id?: string
           import_source?: string | null
+          is_sample?: boolean
           master_content_id?: string | null
           media_urls?: string[]
           objective?: string | null
@@ -1991,8 +2168,11 @@ export type Database = {
           posting_notes?: string | null
           publishing_status?: string
           rationale?: string | null
+          readiness_changed_at?: string
+          readiness_revision?: number
           repurposed_from_id?: string | null
           revision_notes?: string | null
+          scheduled_by?: string | null
           scheduled_for?: string | null
           source_references?: string[] | null
           suggested_asset_description?: string | null
@@ -2168,11 +2348,13 @@ export type Database = {
         Row: {
           acknowledged_at: string | null
           acknowledged_by: string | null
+          acknowledged_findings: Json | null
           ai_error: string | null
           client_id: string | null
           created_at: string
           draft_checksum: string
           findings: Json
+          governance_revision: number | null
           id: string
           model: string | null
           motive_breakdown: Json | null
@@ -2182,17 +2364,20 @@ export type Database = {
           overridden_by: string | null
           override_reason: string | null
           post_card_id: string
+          readiness_revision: number | null
           run_by: string
           voice_score: number | null
         }
         Insert: {
           acknowledged_at?: string | null
           acknowledged_by?: string | null
+          acknowledged_findings?: Json | null
           ai_error?: string | null
           client_id?: string | null
           created_at?: string
           draft_checksum: string
           findings?: Json
+          governance_revision?: number | null
           id?: string
           model?: string | null
           motive_breakdown?: Json | null
@@ -2202,17 +2387,20 @@ export type Database = {
           overridden_by?: string | null
           override_reason?: string | null
           post_card_id: string
+          readiness_revision?: number | null
           run_by: string
           voice_score?: number | null
         }
         Update: {
           acknowledged_at?: string | null
           acknowledged_by?: string | null
+          acknowledged_findings?: Json | null
           ai_error?: string | null
           client_id?: string | null
           created_at?: string
           draft_checksum?: string
           findings?: Json
+          governance_revision?: number | null
           id?: string
           model?: string | null
           motive_breakdown?: Json | null
@@ -2222,6 +2410,7 @@ export type Database = {
           overridden_by?: string | null
           override_reason?: string | null
           post_card_id?: string
+          readiness_revision?: number | null
           run_by?: string
           voice_score?: number | null
         }
@@ -3089,6 +3278,8 @@ export type Database = {
           entity_label_plural: string
           entity_label_singular: string
           environment: string
+          executive_review_enabled: boolean
+          governance_revision: number
           id: boolean
           is_demo_master: boolean
           org_type: string
@@ -3100,6 +3291,7 @@ export type Database = {
           setup_progress: Json
           updated_at: string
           updated_by: string | null
+          workspace_id: string
           x_monthly_spend_cap_cents: number
         }
         Insert: {
@@ -3115,6 +3307,8 @@ export type Database = {
           entity_label_plural?: string
           entity_label_singular?: string
           environment?: string
+          executive_review_enabled?: boolean
+          governance_revision?: number
           id?: boolean
           is_demo_master?: boolean
           org_type?: string
@@ -3126,6 +3320,7 @@ export type Database = {
           setup_progress?: Json
           updated_at?: string
           updated_by?: string | null
+          workspace_id?: string
           x_monthly_spend_cap_cents?: number
         }
         Update: {
@@ -3141,6 +3336,8 @@ export type Database = {
           entity_label_plural?: string
           entity_label_singular?: string
           environment?: string
+          executive_review_enabled?: boolean
+          governance_revision?: number
           id?: boolean
           is_demo_master?: boolean
           org_type?: string
@@ -3152,6 +3349,7 @@ export type Database = {
           setup_progress?: Json
           updated_at?: string
           updated_by?: string | null
+          workspace_id?: string
           x_monthly_spend_cap_cents?: number
         }
         Relationships: []
@@ -3161,6 +3359,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      acknowledge_preflight: {
+        Args: { _reason?: string; _review: string }
+        Returns: undefined
+      }
       addon_catalog: { Args: never; Returns: Json }
       ai_provider_status: {
         Args: never
@@ -3178,10 +3380,12 @@ export type Database = {
       can_control_spend: { Args: { _user_id: string }; Returns: boolean }
       can_create_content: { Args: { _user_id: string }; Returns: boolean }
       can_edit_content: { Args: { _user_id: string }; Returns: boolean }
+      cancel_delivery_schedule: { Args: { _post: string }; Returns: undefined }
       clear_demo_content: {
         Args: { _confirm: string; _purge_media?: boolean }
         Returns: Json
       }
+      comment_counts: { Args: { _client: string }; Returns: Json }
       consume_usage: {
         Args: {
           _bucket: string
@@ -3192,10 +3396,20 @@ export type Database = {
         }
         Returns: Json
       }
+      corrective_confirmation_checks: { Args: never; Returns: Json }
+      corrective_regression_checks: { Args: never; Returns: Json }
       create_reporting_key: { Args: { _provider: string }; Returns: string }
+      current_draft_checksum: {
+        Args: { _copy: string; _tags: string[] }
+        Returns: string
+      }
       decide_brief: {
         Args: { _brief_id: string; _decision: string; _notes: string }
         Returns: undefined
+      }
+      delivery_readiness_internal: {
+        Args: { _actor: string; _post: string }
+        Returns: Json
       }
       demo_content_counts: { Args: never; Returns: Json }
       evaluate_anomalies: { Args: { _bucket: string }; Returns: undefined }
@@ -3230,7 +3444,21 @@ export type Database = {
         Args: { _action: string; _details: Json; _target: string }
         Returns: undefined
       }
+      mark_commented: { Args: { _external_post: string }; Returns: Json }
+      mark_posted_manual: {
+        Args: { _post: string; _url?: string }
+        Returns: Json
+      }
       nonprofit_annual_recheck: { Args: never; Returns: Json }
+      plan_post_date: {
+        Args: {
+          _platform?: Database["public"]["Enums"]["platform_type"]
+          _post: string
+          _when: string
+        }
+        Returns: undefined
+      }
+      post_readiness: { Args: { _post: string }; Returns: Json }
       prepare_blank_copy: { Args: { _confirm: string }; Returns: undefined }
       process_scheduled_posts: { Args: { _cap?: number }; Returns: Json }
       publishing_credentials_status: {
@@ -3242,6 +3470,15 @@ export type Database = {
           updated_at: string
         }[]
       }
+      reconcile_delivery: {
+        Args: {
+          _operation: string
+          _outcome: string
+          _platform_post_id?: string
+          _reason?: string
+        }
+        Returns: undefined
+      }
       remove_workspace_user: { Args: { _user_id: string }; Returns: undefined }
       reset_demo_allowances: { Args: never; Returns: undefined }
       reset_workspace_content: {
@@ -3252,6 +3489,7 @@ export type Database = {
         Args: { _alert_id: string }
         Returns: undefined
       }
+      return_comment_to_queue: { Args: { _post: string }; Returns: undefined }
       review_nonprofit_application: {
         Args: { _decision: string; _id: string; _notes: string }
         Returns: undefined
@@ -3269,6 +3507,16 @@ export type Database = {
       submit_brief: {
         Args: { _approver: string; _brief_id: string; _note: string }
         Returns: undefined
+      }
+      submit_delivery: {
+        Args: {
+          _accounts: string[]
+          _disclosure?: boolean
+          _post: string
+          _timezone?: string
+          _when?: string
+        }
+        Returns: Json
       }
       transfer_ownership: { Args: { _new_owner: string }; Returns: undefined }
       update_credit_weight: {

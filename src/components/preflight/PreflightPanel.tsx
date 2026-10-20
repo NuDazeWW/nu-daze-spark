@@ -94,7 +94,7 @@ function FindingCard({ f, pf }: { f: PreflightFinding; pf: Preflight }) {
             </Button>
           )}
           <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" aria-label="Copy suggestion"
-            onClick={() => { navigator.clipboard.writeText(f.suggestion!); toast.success("Suggestion copied"); }}>
+            onClick={() => { navigator.clipboard.writeText(f.suggestion ?? ""); toast.success("Suggestion copied"); }}>
             <Copy className="h-3 w-3" />
           </Button>
         </div>
@@ -167,7 +167,7 @@ export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin:
                 Revise draft with AI
               </Button>
             )}
-            {!cleared && gate.state !== "stale" && (blocking.length === 0 || isAdmin) && (
+            {!cleared && gate.state !== "stale" && blocking.length === 0 && (
               <Button size="sm" variant="outline" onClick={bypassAll} disabled={acknowledge.isPending}>
                 <ShieldCheck className="h-3.5 w-3.5 mr-1" />Acknowledge warnings and continue
               </Button>

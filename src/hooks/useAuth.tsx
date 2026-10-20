@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { clearPackageDrafts } from "@/lib/packageDrafts";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface AuthContextType {
@@ -43,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!nextSession) clearPackageDrafts();
       applySession(nextSession);
     });
 

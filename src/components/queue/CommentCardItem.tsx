@@ -1,3 +1,4 @@
+import { useWorkspace } from "@/hooks/useWorkspace";
 import { useState } from "react";
 import { openInNewTab, copyThenOpen } from "@/lib/openInNewTab";
 import { Card } from "@/components/ui/card";
@@ -45,6 +46,7 @@ const copyToClipboard = async (text: string, label: string) => {
 };
 
 export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDelete, isUpdating }: CommentCardItemProps) {
+  const { canCreate, settings } = useWorkspace();
   const [expanded, setExpanded] = useState(false);
   const statusMeta = STATUS_META[comment.approval_status];
   const currentIndex = APPROVAL_FLOW.indexOf(comment.approval_status);
@@ -89,10 +91,10 @@ export function CommentCardItem({ comment, isAdmin, onEdit, onStatusChange, onDe
             )}
             {["draft", "needs_revision"].includes(comment.approval_status) && (
               <DropdownMenuItem
-                disabled={isUpdating}
+                disabled={isUpdating || !canCreate || !settings?.executive_review_enabled}
                 onClick={() => {
                   onStatusChange("in_review");
-                  toast.success("Comment sent for Executive Review", {
+                  toast.info("Submitting comment for Executive Review", {
                     description: "It now shows as Pending Executive Review in the review queue.",
                   });
                 }}

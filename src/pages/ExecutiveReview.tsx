@@ -15,6 +15,7 @@ import { MotiveScore, type MotiveBreakdown } from "@/components/preflight/Motive
 import { postLabel } from "@/components/tracking/PostTracking";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { ReadinessBadge } from "@/components/preflight/ReadinessBadge";
 import { PlatformIcon } from "@/components/layout/PlatformIcon";
 
 type Chip = { label: string; instruction: string };
@@ -30,7 +31,9 @@ export default function ExecutiveReview() {
   const [reviseOpen, setReviseOpen] = useState(false);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
-  const QUICK: Chip[] = useWorkspace().reviewChips;
+  const workspace = useWorkspace();
+  const canReview = ["owner", "admin", "reviewer"].includes(workspace.role ?? "");
+  const QUICK: Chip[] = workspace.reviewChips;
 
   const { data: pending = [], isLoading } = useQuery({
     queryKey: ["exec_review_queue"],
@@ -58,7 +61,7 @@ export default function ExecutiveReview() {
   });
 
   const actOnComment = async (id: string, status: "approved" | "needs_revision") => {
-    if (!user) return;
+    if (!user || !canReview || busy) return;
     const { error } = await supabase.from("comments").update({ approval_status: status, updated_by: user.id } as never).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success(status === "approved" ? "Comment approved" : "Revision requested on comment");
@@ -92,7 +95,7 @@ export default function ExecutiveReview() {
   const next = useMemo(() => pending.find((p) => p.id !== card?.id), [pending, card]);
 
   const act = async (status: "approved" | "needs_revision", note?: string) => {
-    if (!card || !user) return;
+    if (!card || !user || !canReview || busy) return;
     setBusy(true);
     const { error } = await supabase.from("post_cards").update({ approval_status: status, updated_by: user.id, ...(note ? { revision_notes: note } : {}) } as never).eq("id", card.id);
     if (!error) await supabase.from("approval_log").insert({ post_card_id: card.id, actor_id: user.id, action: status, notes: note ?? "Executive review" } as never);
@@ -139,6 +142,8 @@ export default function ExecutiveReview() {
               </section>
 
               <div className="min-w-0 space-y-5">
+                <ReadinessBadge card={card} />
+                {!canReview && <p className="text-xs text-muted-foreground">Your role can view this review but cannot approve or request revisions.</p>}
                 {review?.motive_score != null && (
                   <section className="sm-xr-card p-4">
                     <p className="sm-xr-label mb-3"><span className="sm-xr-icon"><Gauge className="h-4 w-4" /></span>Content Motive Score™</p>
@@ -159,15 +164,15 @@ export default function ExecutiveReview() {
                     <p className="sm-xr-label"><span className="sm-xr-icon"><Sparkles className="h-4 w-4" /></span>Quick revisions</p>
                     <div className="flex flex-wrap gap-2" aria-label="One-tap revision requests">
                       {QUICK.map((q) => (
-                        <button key={q.label} title={q.instruction} disabled={busy} onClick={() => act("needs_revision", chipNote(q))}
+                        <button key={q.label} title={q.instruction} disabled={busy || !canReview} onClick={() => act("needs_revision", chipNote(q))}
                           className="sm-xr-chip h-9 whitespace-nowrap rounded-full px-3 text-xs font-medium disabled:opacity-50">
                           {q.label}
                         </button>
                       ))}
                     </div>
                     <div className="flex flex-wrap gap-2 pt-1">
-                      <Button variant="outline" className="sm-xr-revise h-12 min-w-[140px] flex-1 whitespace-nowrap" disabled={busy} onClick={() => setReviseOpen(true)}><MessageSquareWarning className="mr-2 h-4 w-4" />Revise…</Button>
-                      <Button variant="success" className="sm-xr-approve h-12 min-w-[160px] flex-[1.4] whitespace-nowrap text-base" disabled={busy} onClick={() => act("approved")}><Check className="mr-2 h-5 w-5" />Approve</Button>
+                      <Button variant="outline" className="sm-xr-revise h-12 min-w-[140px] flex-1 whitespace-nowrap" disabled={busy || !canReview} onClick={() => setReviseOpen(true)}><MessageSquareWarning className="mr-2 h-4 w-4" />Revise…</Button>
+                      <Button variant="success" className="sm-xr-approve h-12 min-w-[160px] flex-[1.4] whitespace-nowrap text-base" disabled={busy || !canReview} onClick={() => act("approved")}><Check className="mr-2 h-5 w-5" />Approve</Button>
                     </div>
                   </section>
                 ) : (
@@ -200,8 +205,8 @@ export default function ExecutiveReview() {
                     <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => window.open(c.external_posts.external_url, "_blank", "noopener")}>View original post</Button>
                   )}
                   <div className="ml-auto flex gap-2">
-                    <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => actOnComment(c.id, "needs_revision")}>Request revision</Button>
-                    <Button variant="success" size="sm" className="h-8 text-xs" onClick={() => actOnComment(c.id, "approved")}><Check className="mr-1 h-3.5 w-3.5" />Approve</Button>
+                    <Button variant="outline" size="sm" className="h-8 text-xs" disabled={busy || !canReview} onClick={() => actOnComment(c.id, "needs_revision")}>Request revision</Button>
+                    <Button variant="success" size="sm" className="h-8 text-xs" disabled={busy || !canReview} onClick={() => actOnComment(c.id, "approved")}><Check className="mr-1 h-3.5 w-3.5" />Approve</Button>
                   </div>
                 </div>
               </div>
@@ -222,7 +227,7 @@ export default function ExecutiveReview() {
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="What should change?" />
           <DialogFooter>
             <Button variant="outline" onClick={() => setReviseOpen(false)}>Cancel</Button>
-            <Button disabled={!notes.trim() || busy} onClick={() => act("needs_revision", notes.trim())}>Send to team</Button>
+            <Button disabled={!notes.trim() || busy || !canReview} onClick={() => act("needs_revision", notes.trim())}>Send to team</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -58,16 +58,10 @@ export function useExternalPosts() {
       const { data } = await tq;
       const total = (data || []).reduce((sum: number, t: any) => sum + (t.daily_target || 0), 0);
 
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      let cq = supabase
-        .from("external_posts")
-        .select("id", { count: "exact", head: true })
-        .eq("is_commented", true)
-        .gte("updated_at", todayStart.toISOString());
-      if (activeClientId) cq = cq.eq("client_id", activeClientId);
-      const { count } = await cq;
-
+      if (!activeClientId) return { target: total, completed: 0 };
+      const { data: counts, error } = await supabase.rpc("comment_counts", { _client: activeClientId });
+      if (error) throw error;
+      const count = Object.values(counts as Record<string, number>).reduce((n, x) => n + x, 0);
       return { target: total, completed: count || 0 };
     },
     enabled: !!user && !!activeClientId,
@@ -112,30 +106,30 @@ export function useExternalPosts() {
 
   const markCommented = useMutation({
     mutationFn: async (postId: string) => {
-      const { error } = await supabase
-        .from("external_posts")
-        .update({ is_commented: true } as never)
-        .eq("id", postId);
+      const { error } = await supabase.rpc("mark_commented", { _external_post: postId });
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["external_posts"] });
       qc.invalidateQueries({ queryKey: ["engagement_daily_target"] });
+      qc.invalidateQueries({ queryKey: ["dashboard_comments"] });
+      qc.invalidateQueries({ queryKey: ["dashboard_totals"] });
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
     },
     onError: (e) => toast({ title: "Failed to mark as commented", description: e.message, variant: "destructive" }),
   });
 
   const unmarkCommented = useMutation({
     mutationFn: async (postId: string) => {
-      const { error } = await supabase
-        .from("external_posts")
-        .update({ is_commented: false } as never)
-        .eq("id", postId);
+      const { error } = await supabase.rpc("return_comment_to_queue", { _post: postId });
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["external_posts"] });
       qc.invalidateQueries({ queryKey: ["engagement_daily_target"] });
+      qc.invalidateQueries({ queryKey: ["dashboard_comments"] });
+      qc.invalidateQueries({ queryKey: ["dashboard_totals"] });
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
       toast({ title: "Post returned to active queue" });
     },
     onError: (e) => toast({ title: "Failed to unmark", description: e.message, variant: "destructive" }),
@@ -175,15 +169,17 @@ export function useExternalPosts() {
 
   const bulkMarkCommented = useMutation({
     mutationFn: async (postIds: string[]) => {
-      const { error } = await supabase
-        .from("external_posts")
-        .update({ is_commented: true } as never)
-        .in("id", postIds);
-      if (error) throw error;
+      for (const postId of postIds) {
+        const { error } = await supabase.rpc("mark_commented", { _external_post: postId });
+        if (error) throw error;
+      }
     },
     onSuccess: (_d, postIds) => {
       qc.invalidateQueries({ queryKey: ["external_posts"] });
       qc.invalidateQueries({ queryKey: ["engagement_daily_target"] });
+      qc.invalidateQueries({ queryKey: ["dashboard_comments"] });
+      qc.invalidateQueries({ queryKey: ["dashboard_totals"] });
+      qc.invalidateQueries({ queryKey: ["external_post_comments"] });
       toast({ title: `${postIds.length} post(s) marked as commented` });
     },
     onError: (e) => toast({ title: "Bulk action failed", description: e.message, variant: "destructive" }),

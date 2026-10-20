@@ -131,11 +131,11 @@ async function runDue() {
           const { start, end } = dayRangeUtc(date, pref.time_zone);
           const { data: posts } = await admin.from("post_cards")
             .select("id,post_number,platform,content_type,scheduled_for,approval_status,client_id,draft_copy")
-            .gte("scheduled_for", start).lt("scheduled_for", end).neq("approval_status", "archived").order("scheduled_for");
+            .eq("is_sample", false).gte("scheduled_for", start).lt("scheduled_for", end).neq("approval_status", "archived").order("scheduled_for");
           const list = (posts ?? []).filter((p) => inScope(p.client_id));
           const yStart = new Date(new Date(start).getTime() - 86400000).toISOString();
           const { data: missed } = await admin.from("post_cards").select("id,post_number,platform,client_id")
-            .gte("scheduled_for", yStart).lt("scheduled_for", start).in("approval_status", ["approved", "exported"]);
+            .eq("is_sample", false).gte("scheduled_for", yStart).lt("scheduled_for", start).in("approval_status", ["approved", "exported"]);
           const missedList = (missed ?? []).filter((p) => inScope(p.client_id));
           if (list.length || missedList.length) {
             const fmt = (iso: string) => new Date(iso).toLocaleTimeString("en-US", { timeZone: pref.time_zone, hour: "numeric", minute: "2-digit" });
@@ -170,9 +170,9 @@ async function runDue() {
           const wStart = new Date(new Date(start).getTime() - 7 * 86400000).toISOString();
           const wNext = new Date(new Date(start).getTime() + 7 * 86400000).toISOString();
           const [{ data: posted }, { data: approvals }, { data: upcoming }, { data: results }] = await Promise.all([
-            admin.from("post_cards").select("id,post_number,platform,client_id").eq("approval_status", "posted").gte("posted_at", wStart).lt("posted_at", start),
-            admin.from("approval_log").select("action,post_cards!inner(client_id)").gte("created_at", wStart).lt("created_at", start),
-            admin.from("post_cards").select("id,client_id").gte("scheduled_for", start).lt("scheduled_for", wNext).neq("approval_status", "archived"),
+            admin.from("post_cards").select("id,post_number,platform,client_id").eq("is_sample", false).eq("approval_status", "posted").gte("posted_at", wStart).lt("posted_at", start),
+            admin.from("approval_log").select("action,post_cards!inner(client_id)").eq("post_cards.is_sample", false).gte("created_at", wStart).lt("created_at", start),
+            admin.from("post_cards").select("id,client_id").eq("is_sample", false).gte("scheduled_for", start).lt("scheduled_for", wNext).neq("approval_status", "archived"),
             admin.from("post_results").select("post_card_id,client_id,impressions,reactions,comments,shares,clicks,saves").gte("recorded_at", wStart).lt("recorded_at", start),
           ]);
           const P = (posted ?? []).filter((p) => inScope(p.client_id));
@@ -213,12 +213,12 @@ async function runDue() {
           const { start } = dayRangeUtc(date, pref.time_zone);
           const from = new Date(new Date(start).getTime() - (monthly ? 30 : 7) * 86400000).toISOString();
           const [{ data: posts }, { data: results }] = await Promise.all([
-            admin.from("post_cards").select("id,post_number,platform,client_id,publishing_status,approval_status,posted_at,scheduled_for")
-              .or(`and(posted_at.gte.${from},posted_at.lt.${start}),and(scheduled_for.gte.${from},scheduled_for.lt.${start})`),
+            admin.from("post_cards").select("id,post_number,platform,client_id,publishing_status,delivery_status,approval_status,posted_at,scheduled_for")
+              .eq("is_sample", false).or(`and(posted_at.gte.${from},posted_at.lt.${start}),and(scheduled_for.gte.${from},scheduled_for.lt.${start})`),
             admin.from("post_results").select("post_card_id,client_id,impressions,reactions,comments,shares,clicks,saves,recorded_at").gte("recorded_at", from).lt("recorded_at", start).order("recorded_at", { ascending: false }),
           ]);
           const P = (posts ?? []).filter((p) => inScope(p.client_id));
-          const published = P.filter((p) => p.publishing_status === "published" || p.approval_status === "posted");
+          const published = P.filter((p) => p.delivery_status === "platform_confirmed" || p.delivery_status === "manual_confirmed");
           const failed = P.filter((p) => p.publishing_status === "failed");
           const latest = new Map<string, any>();
           for (const r of (results ?? []).filter((r) => inScope(r.client_id))) if (!latest.has(r.post_card_id)) latest.set(r.post_card_id, r);
@@ -229,7 +229,7 @@ async function runDue() {
           const row = (l: string, v: string | number) => `<tr><td style="padding:6px 8px">${esc(l)}</td><td style="padding:6px 8px;font-weight:bold;text-align:right">${esc(v)}</td></tr>`;
           const label = monthly ? "last 30 days" : "last 7 days";
           const html = shell(`Publishing report — ${label}`, `<table style="border-collapse:collapse;font-size:14px;width:100%">${
-            row("Published", published.length) + row("Failed", failed.length) +
+            row("Confirmed live or by hand", published.length) + row("Failed", failed.length) +
             [...byPlat].map(([k, v]) => row(`  ${k}`, v)).join("") +
             row("Impressions", sum("impressions")) + row("Reactions", sum("reactions")) + row("Comments", sum("comments")) +
             row("Shares", sum("shares")) + row("Clicks", sum("clicks")) + row("Saves", sum("saves"))}</table>
@@ -250,7 +250,7 @@ async function runDue() {
     if (pref.post_went_out) {
       const since = new Date(Math.max(Date.now() - 86400000, new Date(pref.created_at).getTime())).toISOString();
       const { data: posted } = await admin.from("post_cards").select("id,post_number,platform,content_type,client_id,posted_url,posted_at")
-        .eq("approval_status", "posted").gte("posted_at", since);
+        .eq("is_sample", false).eq("confirmation_source", "platform").eq("approval_status", "posted").gte("posted_at", since);
       for (const p of (posted ?? []).filter((x) => inScope(x.client_id))) {
         const key = `posted:${pref.id}:${p.id}`;
         const { data: done } = await admin.from("notification_log").select("id").eq("dedupe_key", key).maybeSingle();

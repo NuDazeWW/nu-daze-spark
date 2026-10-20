@@ -82,6 +82,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
   isSendingForReview?: boolean;
 }) {
   const [text, setText] = useState(comment.draft_copy);
+  const workspace = useWorkspace();
   const [copied, setCopied] = useState(false);
   const dirty = text !== comment.draft_copy;
 
@@ -150,7 +151,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
             </Badge>
           ) : (
             <Button variant="outline" size="sm" className="h-7 text-[11px] whitespace-nowrap"
-              disabled={isSendingForReview || dirty}
+              disabled={isSendingForReview || dirty || !workspace.canCreate || !workspace.settings?.executive_review_enabled}
               title={dirty ? "Save your edits first" : "Send this comment to the Executive Review queue"}
               onClick={(e) => { e.stopPropagation(); onSendForReview(); }}>
               <Send className="h-3 w-3 mr-1" />{isSendingForReview ? "Sending…" : "Send for Executive Review"}
@@ -499,7 +500,7 @@ export default function CommentGenerator() {
                     className="text-xs h-7"
                   >
                     <CheckCircle2 className="mr-1.5 h-3 w-3" />
-                    Mark Done
+                    Mark as commented
                   </Button>
                   <Button
                     variant="outline"
@@ -682,7 +683,7 @@ export default function CommentGenerator() {
                   </span>
                 </div>
                 <div className="sm-cg-signal">
-                  <span className="sm-cg-signal-label">Engagement</span>
+                  <span className="sm-cg-signal-label" title="Estimated likes, comments and shares recorded at import; not a live count.">Estimated interactions</span>
                   <span className="flex items-center gap-1 text-xs font-medium">
                     <TrendingUp className="h-3.5 w-3.5 text-brand-warning" />
                     {activePost.estimated_engagement || "—"}
@@ -721,7 +722,7 @@ export default function CommentGenerator() {
                     comment={activeComment}
                     onSave={handleCommentSave}
                     isSaving={updateComment.isPending}
-                    onCopied={() => !activePost.is_commented && markCommented.mutate(activePost.id)}
+                    onCopied={() => toast.info("Copying does not post this comment. Confirm it separately after posting.")}
                     onRegenerate={() => handleRegenerate(activePost.id)}
                     isRegenerating={generateComments.isPending}
                     onSendForReview={() => sendCommentForReview.mutate(activeComment.id)}
@@ -752,8 +753,8 @@ export default function CommentGenerator() {
                   <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => unmarkCommented.mutate(activePost.id)}>
                     <RefreshCw className="mr-1.5 h-3 w-3" />Return to queue
                   </Button>
-                ) : activePost.risk_flag !== "blocked" && !activeComment ? (
-                  <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => markCommented.mutate(activePost.id)}>
+                ) : activePost.risk_flag !== "blocked" && !!activeComment ? (
+                  <Button variant="outline" size="sm" className="text-xs h-7" disabled={markCommented.isPending || !canCreate} onClick={() => markCommented.mutate(activePost.id)}>
                     <CheckCircle2 className="mr-1.5 h-3 w-3" />Mark as commented
                   </Button>
                 ) : null}

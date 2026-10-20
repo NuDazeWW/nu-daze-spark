@@ -1,4 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useReadiness } from "@/hooks/useReadiness";
+import { readPackageDraft, writePackageDraft } from "@/lib/packageDrafts";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
+import { postLabel } from "@/components/tracking/PostTracking";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,7 +49,7 @@ function buildPackageText(card: PostCard, firstComment: string, notes: string, a
     card.scheduled_for ? `Scheduled: ${new Date(card.scheduled_for).toLocaleString()}` : `Scheduled: not set`,
     "",
     "=== FINAL COPY ===",
-    card.draft_copy,
+    card.draft_copy + (card.apply_ai_disclosure ? "\n\n#AIassisted" : ""),
     "",
     "=== HASHTAGS ===",
     formatHashtags(card.hashtags) || "(none)",
@@ -68,7 +73,7 @@ function buildPackageText(card: PostCard, firstComment: string, notes: string, a
 export function PostingPackageDrawer({
   card, open, onOpenChange, canExport, onMarkExported, initialTab,
 }: {
-  initialTab?: "package" | "publish" | "preflight";
+  initialTab?: "package" | "publish" | "schedule" | "preflight";
   card: PostCard | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -76,7 +81,11 @@ export function PostingPackageDrawer({
   onMarkExported: (id: string) => Promise<void>;
 }) {
   const { toast } = useToast();
-  const { canCreate, approvalRequired, preflightMode } = useWorkspace();
+  const { user } = useAuth();
+  const authoritative = useReadiness(card);
+  const draftKey = `${user?.id}:${card?.client_id}:${card?.id}:package`;
+  const [publishMode, setPublishMode] = useState<"now" | "schedule" | "manual">("now");
+  const { canCreate, canManage, role, approvalRequired, preflightMode, settings } = useWorkspace();
   const [splitOpen, setSplitOpen] = useState(false);
   const qc = useQueryClient();
   const [firstComment, setFirstComment] = useState("");
@@ -88,13 +97,16 @@ export function PostingPackageDrawer({
   const [tab, setTab] = useState("package");
   const [postedUrl, setPostedUrl] = useState("");
 
-  useEffect(() => { if (open) setTab(initialTab ?? "package"); }, [open, card?.id, initialTab]);
+  useEffect(() => { if (open) { setTab(initialTab === "schedule" ? "publish" : initialTab ?? "package"); setPublishMode(initialTab === "schedule" ? "schedule" : "now"); } }, [open, card?.id, initialTab]);
 
   useEffect(() => {
-    setFirstComment(card?.first_comment ?? "");
-    setNotes(card?.posting_notes ?? "");
+    const saved = readPackageDraft<{ firstComment?: string; notes?: string; postedUrl?: string }>(draftKey, {});
+    setFirstComment(saved.firstComment ?? card?.first_comment ?? "");
+    setNotes(saved.notes ?? card?.posting_notes ?? "");
+    setPostedUrl(saved.postedUrl ?? "");
   }, [card?.id]);
 
+  useEffect(() => { if (card) writePackageDraft(draftKey, { firstComment, notes, postedUrl }); }, [firstComment, notes, postedUrl]);
   const refs = card?.source_references ?? [];
   const { data: assets = [] } = useQuery({
     queryKey: ["package_assets", card?.id, refs.join(",")],
@@ -153,17 +165,17 @@ export function PostingPackageDrawer({
 
   const pf = usePreflight(card);
   const preflightFail = card && !pf.gate.clear ? 1 : 0;
-  const failCount = checks.filter((c) => c.level === "fail").length + preflightFail;
+  const failCount = checks.filter((c) => c.level === "fail").length + (authoritative.data?.canDeliver === false ? 1 : preflightFail);
 
   if (!card) return null;
-  const readiness = evaluateReadiness(card, pf.review, { approvalRequired, preflightMode, reviewLoading: pf.isLoading });
+  const readiness = authoritative.data ?? { label: authoritative.isError ? "Checks unavailable" : "Checks pending", tone: "pending", required: 0, advisory: 0, canDeliver: false };
   const otherFails = checks.filter((c) => c.level === "fail").length;
   const postReason = approvalRequired && !["approved", "exported", "posted"].includes(card.approval_status)
     ? "Approve first"
     : failCount > 0 ? `Fix ${failCount} blocking issue${failCount === 1 ? "" : "s"} first` : null;
 
-  const copy = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
+  const copy = async (text: string, key: string) => {
+    try { await navigator.clipboard.writeText(text); } catch { toast({ title: "Copy failed", description: "Try again or select the text manually.", variant: "destructive" }); return; }
     setCopied(key);
     setTimeout(() => setCopied(null), 1500);
     toast({ title: "Copied" });
@@ -193,8 +205,9 @@ export function PostingPackageDrawer({
     const url = postedUrl.trim();
     if (url && !/^https?:\/\/\S+\.\S+/.test(url)) return toast({ title: "That link doesn't look right", description: "Your text was kept. Paste the full post link starting with https://, or leave it blank.", variant: "destructive" });
     if (saving) return;
-    const { error } = await supabase.from("post_cards")
-      .update({ approval_status: "posted", posted_url: postedUrl.trim() || null }).eq("id", card.id);
+    setSaving(true);
+    const { error } = await supabase.rpc("mark_posted_manual", { _post: card.id, _url: postedUrl.trim() || undefined });
+    setSaving(false);
     if (error) return toast({ title: "Couldn't mark as posted", description: error.message, variant: "destructive" });
     toast({ title: "Marked as posted" });
     setOpenedPlatform(false);
@@ -212,7 +225,7 @@ export function PostingPackageDrawer({
   };
 
   const Section = ({ title, copyText, k, children }: { title: string; copyText?: string; k: string; children: React.ReactNode }) => (
-    <div className="space-y-2">
+    <div className="sm-package-section space-y-2" data-section={k}>
       <div className="flex items-center justify-between">
         <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h4>
         {copyText ? (
@@ -227,15 +240,23 @@ export function PostingPackageDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2"><Package className="h-5 w-5 text-primary" /> Posting Package</SheetTitle>
+      <SheetContent className="sm-package-drawer w-full sm:max-w-2xl overflow-y-auto">
+        <SheetHeader className="sm-package-header">
+          <SheetTitle className="flex items-center gap-2"><PlatformIcon platform={card.platform} className="h-5 w-5" /> Posting Package · {postLabel(card)}</SheetTitle>
           <SheetDescription className="capitalize">{card.platform} · {card.content_type}
             {card.scheduled_for && ` · ${new Date(card.scheduled_for).toLocaleString()}`}</SheetDescription>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/review?post=${card.id}`); toast({ title: "Executive review link copied" }); }}>
               Copy executive review link
             </Button>
+            <Button variant="outline" size="sm" className="mt-2 w-fit" disabled={!settings?.executive_review_enabled || !["owner", "admin", "editor"].includes(role ?? "") || saving || card.is_sample || ["in_review", "posted", "archived"].includes(card.approval_status)} title={!settings?.executive_review_enabled ? "Executive Review is off in Setup" : card.approval_status === "in_review" ? "Already sent for review" : "Send this post for Executive Review"} onClick={async () => {
+              if (saving) return; setSaving(true);
+              const { error } = await supabase.from("post_cards").update({ approval_status: "in_review", updated_by: user?.id }).eq("id", card.id).neq("approval_status", "in_review");
+              setSaving(false);
+              if (error) toast({ title: "Could not send for review", description: error.message, variant: "destructive" });
+              else { toast({ title: "Sent for Executive Review" }); qc.invalidateQueries({ queryKey: ["post_cards"] }); }
+            }}>Send for Executive Review</Button>
+            {!settings?.executive_review_enabled && <Link className="text-xs underline" to="/setup">Executive Review is off · Setup</Link>}
             {canCreate && (
               <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => setSplitOpen(true)}>
                 <Split className="mr-2 h-4 w-4" /> Split across platforms
@@ -258,10 +279,10 @@ export function PostingPackageDrawer({
             <ChangeView card={card} />
           </TabsContent>
           <TabsContent value="media" className="mt-4">
-            <MediaStudio key={card.id} clientId={card.client_id} postCardId={card.id} platform={card.platform} canCreate={canCreate} defaultPrompt={card.suggested_asset_description ?? ""} />
+            <MediaStudio key={card.id} clientId={card.client_id} postCardId={card.id} platform={card.platform} canCreate={canCreate && !card.is_sample} defaultPrompt={card.suggested_asset_description ?? ""} />
           </TabsContent>
           <TabsContent value="publish" className="mt-4">
-            <PublishComposer key={card.id} card={card} canPublish={canExport} />
+            <PublishComposer key={card.id} card={card} canPublish={canExport && ["owner", "admin", "editor", "reviewer"].includes(role ?? "")} initialMode={publishMode} />
           </TabsContent>
           <TabsContent value="preflight" className="mt-4">
             <PreflightPanel pf={pf} isAdmin={canExport} draft={card.draft_copy} />
@@ -286,7 +307,7 @@ export function PostingPackageDrawer({
                     <XCircle className="h-3.5 w-3.5 text-destructive" />}
                 <span className={c.level === "pass" ? "text-muted-foreground" : ""}>{c.label}</span>
                 {c.level !== "pass" && c.fix?.map((f) => f.to === "#schedule" ? (
-                  <button key={f.label} type="button" onClick={() => setTab("publish")} className="text-primary underline underline-offset-2 hover:no-underline">{f.label}</button>
+                  <button key={f.label} type="button" onClick={() => { setPublishMode("schedule"); setTab("publish"); }} className="text-primary underline underline-offset-2 hover:no-underline">{f.label}</button>
                 ) : (
                   <Link key={f.label} to={f.to} onClick={() => onOpenChange(false)} className="text-primary underline underline-offset-2 hover:no-underline">{f.label}</Link>
                 ))}
@@ -307,7 +328,8 @@ export function PostingPackageDrawer({
               placeholder="Optional — e.g. link, extra context, or hashtags to post as the first comment" />
           </Section>
 
-          <Section title="Tagging instructions" k="tagging"
+          <details><summary className="text-sm font-semibold cursor-pointer">Tagging instructions</summary>
+          <Section title="Tags" k="tagging"
             copyText={[...(card.people_tags ?? []), ...(card.org_tags ?? [])].join(" ") || undefined}>
             <div className="text-sm space-y-1">
               <p><span className="text-muted-foreground">People:</span> {(card.people_tags ?? []).join(", ") || "—"}</p>
@@ -316,6 +338,7 @@ export function PostingPackageDrawer({
             </div>
           </Section>
 
+          </details>
           <Section title="Media" k="media">
             {assets.length ? (
               <div className="space-y-1.5">
@@ -346,7 +369,7 @@ export function PostingPackageDrawer({
             <p className="text-xs text-muted-foreground">This package changed since it was last exported.</p>
           )}
 
-          <div className="flex flex-wrap gap-2">
+          <div className="sm-package-actions flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={() => copy(packageText, "all")}>
               <Copy className="h-3.5 w-3.5 mr-1" /> Copy full package
             </Button>
@@ -354,10 +377,10 @@ export function PostingPackageDrawer({
             <span title={postReason ?? "Copies caption + hashtags and opens the platform. You post it yourself."}>
               <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="default"
                 disabled={!!postReason}
-                copyText={outboundText(card.draft_copy, card.hashtags)}
+                copyText={outboundText(card.draft_copy, card.hashtags, card.apply_ai_disclosure)}
                 onOpened={() => setOpenedPlatform(true)} />
             </span>
-            <Button variant="ghost" size="sm" onClick={save} disabled={saving}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>
+            <Button variant="ghost" size="sm" onClick={save} disabled={saving || !["owner", "admin", "editor", "reviewer"].includes(role ?? "")}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>
             {canExport && card.approval_status === "approved" && (
               <Button size="sm" className="ml-auto" disabled={failCount > 0} onClick={markExported}>
                 <ArrowRight className="h-3.5 w-3.5 mr-1" /> Mark exported
@@ -365,14 +388,14 @@ export function PostingPackageDrawer({
             )}
           </div>
 
-          {canExport && !["posted", "archived"].includes(card.approval_status) && (
+          {canExport && !card.is_sample && ["approved", "exported"].includes(card.approval_status) && (
             <div className="rounded-md border p-3 space-y-2">
               <p className="text-sm font-medium">{openedPlatform ? "Posted it?" : "Already posted it yourself?"}</p>
               <p className="text-xs text-muted-foreground">Marking as posted records your confirmation. It doesn't publish anything or verify delivery.</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Input className="h-8 flex-1 min-w-[200px]" placeholder="Live post link (optional)"
                   value={postedUrl} onChange={(e) => setPostedUrl(e.target.value)} />
-                <Button size="sm" variant="outline" onClick={markPosted}>
+                <Button size="sm" variant="outline" disabled={saving} onClick={markPosted}>
                   <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Mark as posted
                 </Button>
               </div>

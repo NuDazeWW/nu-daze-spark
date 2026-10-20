@@ -27,6 +27,7 @@ import { Split } from "lucide-react";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { SplitPlatformsDialog } from "./SplitPlatformsDialog";
 import { PlatformIcon } from "@/components/layout/PlatformIcon";
+import { ReadinessBadge } from "@/components/preflight/ReadinessBadge";
 import { usePreviewMedia } from "@/hooks/usePreviewMedia";
 
 interface PostCardItemProps {
@@ -50,7 +51,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [preflightOpen, setPreflightOpen] = useState(false);
   const [splitOpen, setSplitOpen] = useState(false);
-  const { canCreate } = useWorkspace();
+  const { canCreate, settings } = useWorkspace();
   const [gateIntent, setGateIntent] = useState<string | null>(null);
   const pf = usePreflight(card);
   const { profiles: voices } = useVoiceProfiles();
@@ -74,8 +75,8 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   };
   const currentIndex = APPROVAL_FLOW.indexOf(card.approval_status);
 
-  const canAdvance = currentIndex < APPROVAL_FLOW.indexOf("archived") && card.approval_status !== "archived";
-  const canRevert = currentIndex > 0 && card.approval_status !== "archived";
+  const canAdvance = canCreate && currentIndex < APPROVAL_FLOW.indexOf("archived") && card.approval_status !== "archived";
+  const canRevert = canCreate && currentIndex > 0 && card.approval_status !== "archived";
 
   const nextStatus = canAdvance ? APPROVAL_FLOW[currentIndex + 1] : null;
   const prevStatus = canRevert ? APPROVAL_FLOW[currentIndex - 1] : null;
@@ -141,10 +142,10 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
             </DropdownMenuItem>
             {["draft", "needs_revision"].includes(card.approval_status) && (
               <DropdownMenuItem
-                disabled={isUpdating}
+                disabled={isUpdating || !canCreate || !settings?.executive_review_enabled}
                 onClick={() => {
                   changeStatus("in_review");
-                  toast.success(`${postLabel(card)} sent for Executive Review`, {
+                  toast.info(`Submitting ${postLabel(card)} for Executive Review`, {
                     description: "It now shows as Pending Executive Review in the review queue.",
                     action: { label: "Open review", onClick: () => navigate(`/review?post=${card.id}`) },
                   });
@@ -223,6 +224,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
         </div>
       </div>
 
+      <div className="px-3 pb-2"><ReadinessBadge card={card} /></div>
       {/* Footer: preview · edit · copy · more */}
       <div className="sm-qcard-foot">
         <Tooltip><TooltipTrigger asChild>

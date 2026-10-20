@@ -1,4 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { deliveryLabel } from "@/lib/deliveryPresentation";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { readPackageDraft, writePackageDraft } from "@/lib/packageDrafts";
+import { useReadiness } from "@/hooks/useReadiness";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,8 +55,13 @@ const STATUS_STYLE: Record<string, string> = {
 
 function pad(n: number) { return String(n).padStart(2, "0"); }
 
-export function PublishComposer({ card, canPublish }: { card: PostCard; canPublish: boolean }) {
+export function PublishComposer({ card, canPublish, initialMode = "now" }: { card: PostCard; canPublish: boolean; initialMode?: "now" | "schedule" | "manual" }) {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const draftKey = `${user?.id}:${card.client_id}:${card.id}:publish`;
+  const locked = useRef(false);
+  const readiness = useReadiness(card);
+  const outcomes = useQuery({ queryKey: ["delivery_operations", card.id, card.updated_at], queryFn: async () => { const { data, error } = await supabase.from("delivery_operations").select("*").eq("post_card_id", card.id).order("created_at"); if (error) throw error; return data ?? []; } });
   const qc = useQueryClient();
   const c = card as PostCard & { target_account_ids?: string[]; publishing_status?: string; timezone?: string; apply_ai_disclosure?: boolean };
 
@@ -61,13 +70,14 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
     enabled: !!card.client_id,
     queryFn: async () => {
       const { data, error } = await supabase.from("social_accounts")
-        .select("id,platform,account_name,handle,connection_status").eq("client_id", card.client_id!).eq("is_active", true).order("platform");
+        .select("id,platform,account_name,handle,connection_status").eq("client_id", card.client_id ?? "").eq("is_active", true).order("platform");
       if (error) throw error;
       return (data ?? []) as Account[];
     },
   });
 
-  const [mode, setMode] = useState<"now" | "schedule" | "manual">("now");
+  const [mode, setMode] = useState<"now" | "schedule" | "manual">(initialMode);
+  useEffect(() => setMode(initialMode), [initialMode]);
   const [justPublished, setJustPublished] = useState<string[] | null>(null);
   const [targets, setTargets] = useState<string[]>([]);
   const [date, setDate] = useState("");
@@ -77,10 +87,13 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
   const [confirm, setConfirm] = useState<null | "now" | "schedule">(null);
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [running, setRunning] = useState(false);
-  const status = c.publishing_status || "idle";
+  const status = card.delivery_status !== "idle" ? card.delivery_status : c.publishing_status || "idle";
+  const capabilities = useQuery({ queryKey: ["delivery_capabilities"], queryFn: async () => { const { data, error } = await supabase.from("delivery_capabilities").select("*"); if (error) throw error; return data ?? []; } });
 
   useEffect(() => {
-    setTargets(c.target_account_ids ?? []);
+    const saved = readPackageDraft<{ targets?: string[]; date?: string; time?: string; tz?: string; disclosure?: boolean }>(draftKey, {});
+    setTargets(saved.targets ?? c.target_account_ids ?? []);
+    if (saved.date) { setDate(saved.date); setTime(saved.time ?? "09:00"); setTz(saved.tz ?? "UTC"); setDisclosure(saved.disclosure ?? false); return; }
     const d = card.scheduled_for ? new Date(card.scheduled_for) : new Date(Date.now() + 86400000);
     setDate(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
     if (card.scheduled_for) setTime(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
@@ -88,12 +101,17 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
   }, [card.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!c.target_account_ids?.length && accounts.data) {
+    if (!readPackageDraft<{ targets?: string[] }>(draftKey, {}).targets?.length && !c.target_account_ids?.length && accounts.data) {
       setTargets(accounts.data.filter((a) => a.platform === card.platform && a.connection_status === "connected").map((a) => a.id));
     }
   }, [accounts.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => { if (date) writePackageDraft(draftKey, { targets, date, time, tz, disclosure }); }, [draftKey, targets, date, time, tz, disclosure]);
+
   const selected = useMemo(() => (accounts.data ?? []).filter((a) => targets.includes(a.id)), [accounts.data, targets]);
+  const canSend = (platform: string) => capabilities.data?.some(c => c.platform === platform && c.live_enabled && c.dispatch_ready && c.verified_at) ?? false;
+  const allLive = selected.length > 0 && selected.every(a => canSend(a.platform));
+  const actionLabel = allLive ? "Publish live now" : "Stage for delivery";
   const copy = card.draft_copy + (disclosure ? "\n\n#AIassisted" : "");
   const tagCount = (card.hashtags ?? []).length;
   const { approvalRequired } = useWorkspace();
@@ -108,54 +126,37 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
 
   const toggle = (id: string) => setTargets((t) => (t.includes(id) ? t.filter((x) => x !== id) : [...t, id]));
 
-  const save = async (patch: Record<string, unknown>) => {
-    const { error } = await supabase.from("post_cards").update({
-      target_account_ids: targets, timezone: tz, apply_ai_disclosure: disclosure, ai_assisted: disclosure, ...patch,
-    } as never).eq("id", card.id);
-    if (error) throw error;
-    qc.invalidateQueries({ queryKey: ["post_cards"] });
-  };
-
   const run = async () => {
+    if (locked.current) return;
+    locked.current = true;
     const kind = confirm;
-    setConfirm(null);
+    setConfirm(null); setRunning(true);
     try {
+      // Convert wall-clock input in the selected timezone, not the browser's timezone.
+      let when: string | null = null;
       if (kind === "schedule") {
-        const when = new Date(`${date}T${time}:00`);
-        if (isNaN(when.getTime())) throw new Error("Pick a valid date and time. Nothing was saved.");
-        if (when.getTime() < Date.now() + 60000) throw new Error("That time has already passed. Pick a later time; your channels are still selected.");
-        await save({ scheduled_for: when.toISOString(), publishing_status: "scheduled" });
-        toast({ title: "Scheduled", description: `${selected.length} channel(s) · ${when.toLocaleString()} (${tz})` });
-        return;
-      }
-      const xCount = selected.filter((a) => a.platform === "x").length;
-      if (xCount) {
-        const cap = URL_RE.test(copy) ? "x_link_post" : "x_text_post";
-        const pre = await precheckUsage("x_spend", cap, xCount, card.client_id ?? null, true);
-        if (!pre.ok) throw new Error(pre.reason === "not_in_tier" ? "X isn't included in your plan." : pre.reason === "paused" ? "X spend is paused by a usage alert." : "This post would cross your monthly X cap.");
-        await precheckUsage("x_spend", cap, xCount, card.client_id ?? null, false);
-      }
-      setRunning(true);
-      await save({ publishing_status: "publishing" });
-      for (const a of selected) {
-        for (let p = 0; p <= 100; p += 20) {
-          setProgress((s) => ({ ...s, [a.id]: p }));
-          await new Promise((r) => setTimeout(r, 180));
+        const local = new Date(`${date}T${time}:00Z`);
+        if (!Number.isFinite(local.getTime())) throw new Error("Pick a valid date and time. Your input was kept.");
+        let epoch = local.getTime();
+        for (let i = 0; i < 3; i++) {
+          const parts = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(epoch));
+          const part = (type: string) => parts.find(p => p.type === type)?.value ?? "";
+          const wall = Date.parse(`${part("year")}-${part("month")}-${part("day")}T${part("hour")}:${part("minute")}:00Z`);
+          epoch += local.getTime() - wall;
         }
+        if (epoch <= Date.now() + 60000) throw new Error("That time has passed. Pick a future time; your input was kept.");
+        when = new Date(epoch).toISOString();
       }
-      await save({ publishing_status: "published" });
-      setJustPublished(selected.map((a) => a.platform));
-      toast({ title: "Staged for delivery", description: `Saved for ${selected.length} channel(s). Nothing was sent to a platform — live sending needs approved platform apps.` });
+      const { data, error } = await supabase.rpc("submit_delivery", { _post: card.id, _accounts: targets, _when: when ?? undefined, _timezone: tz, _disclosure: disclosure });
+      if (error) throw error;
+      const result = data as { status?: string };
+      toast({ title: result.status === "scheduled" ? "Scheduled" : result.status === "partial" ? "Channel results differ" : "Staged — not sent", description: "Saved channel outcomes. No content was sent to a platform." });
+      await qc.invalidateQueries({ queryKey: ["post_cards"] });
+      qc.invalidateQueries({ queryKey: ["delivery_operations"] });
+      qc.invalidateQueries({ queryKey: ["authoritative_readiness"] });
     } catch (e) {
-      toast({ title: "Couldn't save", description: (e as Error).message, variant: "destructive" });
-    } finally {
-      setRunning(false);
-    }
-  };
-
-  const reset = async () => {
-    await save({ publishing_status: "idle" });
-    setProgress({});
+      toast({ title: "Delivery was not saved", description: `${(e as Error).message}. Your input was kept.`, variant: "destructive" });
+    } finally { locked.current = false; setRunning(false); }
   };
 
   return (
@@ -167,12 +168,12 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         </div>
         <Badge className={`capitalize ${STATUS_STYLE[status] ?? STATUS_STYLE.idle}`}>
           {status === "publishing" && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-          {status === "idle" ? "Not scheduled" : status === "published" ? "Staged — not sent" : status}
+          {status === "idle" ? "Not scheduled" : status === "published" ? "Delivery recorded · verification unavailable" : deliveryLabel(status)}
         </Badge>
       </div>
 
-      <div role="tablist" aria-label="How to post" className="grid grid-cols-3 gap-1 rounded-lg border p-1">
-        {([["now", "Stage for delivery", Send], ["schedule", "Schedule", CalendarClock], ["manual", "Manual handoff", Copy]] as const).map(([m, label, Icon]) => (
+      <div role="tablist" aria-label="How to post" className="flex flex-wrap gap-1 rounded-lg border p-1">
+        {([["now", actionLabel, Send], ["schedule", "Schedule", CalendarClock], ["manual", "Manual handoff", Copy]] as const).map(([m, label, Icon]) => (
           <button key={m} role="tab" aria-selected={mode === m} onClick={() => setMode(m)}
             className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2 py-2 text-xs font-medium transition-colors sm:text-sm ${mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
             <Icon className="h-3.5 w-3.5" />{label}
@@ -180,21 +181,11 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
         ))}
       </div>
       <p className="-mt-2 text-xs text-muted-foreground">
-        {mode === "now" ? "Saves this post for delivery. It will not be sent to a platform." : mode === "schedule" ? "Queues the post for the date and time you pick." : "Copy the post and open the platform to post it yourself."}
+        {mode === "now" ? allLive ? "Sends immediately to the accounts you picked." : "Saves this post for delivery. It will not be sent to a platform." : mode === "schedule" ? "Queues the post for the date and time you pick." : "Copy the post and open the platform to post it yourself."}
       </p>
 
-      {justPublished && status === "published" && (
-        <div className="space-y-2 rounded-lg border border-primary/40 bg-primary/5 p-3">
-          <p className="flex items-center gap-2 text-sm font-semibold"><CheckCircle2 className="h-4 w-4 text-primary" /> Staged for {justPublished.length} channel{justPublished.length > 1 ? "s" : ""} — not sent to any platform</p>
-          <div className="flex flex-wrap gap-2">
-            {[...new Set(justPublished)].map((p) => (
-              <OpenPlatformButton key={p} clientId={card.client_id} platform={p} label={`View on ${LIMITS[p]?.label ?? p}`} />
-            ))}
-            <PostResultsButton postId={card.id} clientId={card.client_id ?? null} />
-          </div>
-        </div>
-      )}
-
+      <p className="text-xs text-muted-foreground">{readiness.isError ? "Checks unavailable" : readiness.data?.label ?? "Checks pending"}</p>
+      {outcomes.data?.map(o => <div key={o.id} className="rounded-md border p-3 text-xs"><b>{o.platform}</b> · {deliveryLabel(o.status)}<p className="text-muted-foreground">{o.reason}</p></div>)}
       {mode === "manual" ? (
         <div className="space-y-3">
         <div className="flex flex-wrap gap-2">
@@ -224,6 +215,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
                         className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors disabled:opacity-50 ${on ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted"}`}>
                         <span className={`h-2 w-2 rounded-full ${connected ? "bg-primary" : "bg-muted-foreground/40"}`} />
                         <span className="font-semibold">{LIMITS[a.platform]?.label ?? a.platform}</span>
+                        <span>{canSend(a.platform) ? "Live sending verified" : "Staging only"}</span>
                         <span className="text-muted-foreground">{a.handle ? `@${a.handle.replace(/^@/, "")}` : a.account_name}</span>
                       </button>
                     );
@@ -261,7 +253,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
 
           {mode === "schedule" && <section className="space-y-2">
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">When</Label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid gap-2 sm:grid-cols-3">
               <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
               <select value={tz} onChange={(e) => setTz(e.target.value)} className="h-10 rounded-md border bg-background px-2 text-sm">
@@ -292,16 +284,12 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
             </p>
           )}
 
-          <Button className="w-full" disabled={!canPublish || !isApproved || !selected.length || blocking || running}
+          <Button className="w-full" disabled={!canPublish || card.is_sample || !isApproved || !selected.length || blocking || running || !readiness.data?.canDeliver}
             onClick={() => setConfirm(mode === "schedule" ? "schedule" : "now")}>
             {running ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : mode === "schedule" ? <CalendarClock className="h-4 w-4 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-            {mode === "schedule" ? "Schedule post" : "Stage for delivery"}
+            {mode === "schedule" ? "Schedule post" : actionLabel}
           </Button>
-          {status !== "idle" && !running && (
-            <button onClick={reset} className="text-xs text-muted-foreground underline">
-              {status === "scheduled" ? "Cancel schedule" : "Reset publishing status"}
-            </button>
-          )}
+          {status === "scheduled" && canPublish && <Button variant="outline" onClick={async () => { const { error } = await supabase.rpc("cancel_delivery_schedule", { _post: card.id }); if (error) toast({ title: "Could not cancel schedule", description: error.message, variant: "destructive" }); else { toast({ title: "Schedule canceled" }); qc.invalidateQueries({ queryKey: ["post_cards"] }); } }}>Cancel schedule</Button>}
           <p className="text-xs text-muted-foreground">Live sending isn't available yet: it needs approved platform apps, connected in Workspace Settings → Social Connections. Scheduled posts are staged, not sent.</p>
         </>
       )}
@@ -311,7 +299,7 @@ export function PublishComposer({ card, canPublish }: { card: PostCard; canPubli
           <DialogHeader>
             <DialogTitle>{confirm === "now" ? "Stage for delivery?" : "Schedule this post?"}</DialogTitle>
             <DialogDescription>
-              {confirm === "now" ? "This saves the post for these channels. Nothing is sent to a platform:" : `Goes out ${new Date(`${date}T${time}:00`).toLocaleString()} (${tz}) on:`}
+              {confirm === "now" ? "This saves the post for these channels. Nothing is sent to a platform:" : `Scheduled for ${date} ${time} (${tz}). Staged only; not sent. Channels:`}
             </DialogDescription>
           </DialogHeader>
           <ul className="space-y-1 text-sm">

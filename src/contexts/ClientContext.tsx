@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
+import { clearPackageDrafts } from "@/lib/packageDrafts";
 import { useClients, type Client } from "@/hooks/useClients";
 
 interface ClientContextType {
@@ -39,6 +40,7 @@ export function ClientProvider({ children }: { children: ReactNode }) {
   }, [isLoading, clients, activeClientId]);
 
   const setActiveClientId = (id: string) => {
+    clearPackageDrafts();
     setActiveClientIdState(id);
     localStorage.setItem(STORAGE_KEY, id);
   };

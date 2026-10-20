@@ -361,11 +361,15 @@ function GovernanceCard() {
         <Select value={ws.preflightMode} onValueChange={(v) => save({ preflight_mode: v })}>
           <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="advisory">Advisory — show issues, never block</SelectItem>
+            <SelectItem value="advisory">Advisory — suggestions optional; required fixes block</SelectItem>
             <SelectItem value="strict">Strict — block until cleared</SelectItem>
             <SelectItem value="off">Off</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+      <div className="flex items-center justify-between gap-2">
+        <div><Label className="text-[13px]">Executive Review</Label><p className="text-xs text-muted-foreground">Allow the team to send posts and comments for review.</p></div>
+        <Switch checked={ws.settings?.executive_review_enabled ?? true} disabled={!ws.canManage} onCheckedChange={v => save({ executive_review_enabled: v })} />
       </div>
       <ReviewChipsEditor />
     </GridCard>

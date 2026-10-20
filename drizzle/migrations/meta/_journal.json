@@ -225,6 +225,55 @@
       "when": 1792470628906,
       "tag": "0031_fix_workspace_billing_updates_without_where",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792471689655,
+      "tag": "0032_authoritative_delivery_and_confirmation",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792471863233,
+      "tag": "0033_delivery_reconciliation_and_policy_invalidation",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792472044124,
+      "tag": "0034_executive_review_setting_and_regression_runner",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1792472079495,
+      "tag": "0035_expand_rollback_delivery_regressions",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1792472195294,
+      "tag": "0036_delivery_schedule_and_confirmation_hardening",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1792472231968,
+      "tag": "0037_rollback_confirmation_schedule_regressions",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1792472302247,
+      "tag": "0038_logical_delivery_slot_and_reconciliation_states",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,4 @@
+import { ReadinessBadge } from "@/components/preflight/ReadinessBadge";
 import { formatHashtags } from "@/lib/contentPresentation";
 import { PipelineNav } from "@/components/queue/PipelineNav";
 import { PlatformIcon, PlatformOption } from "@/components/layout/PlatformIcon";
@@ -46,20 +47,21 @@ export default function ApprovedContent() {
     if (!jumpId) return;
     const c = cards.find((x) => x.id === jumpId);
     if (!c) return;
+    setPackageId(c.id); setPackageTab(params.get("section") === "schedule" ? "schedule" : params.get("section") === "publish" ? "publish" : "package");
     setSearch(postLabel(c)); setStatusFilter("all"); setPlatformFilter("all");
     setParams({}, { replace: true });
   }, [jumpId, cards, setParams]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [packageId, setPackageId] = useState<string | null>(null);
-  const [packageTab, setPackageTab] = useState<"package" | "publish">("package");
+  const [packageTab, setPackageTab] = useState<"package" | "publish" | "schedule">("package");
   const [exportOpen, setExportOpen] = useState(false);
   const [exportPicked, setExportPicked] = useState<string[] | undefined>();
   const packageCard = cards.find((c) => c.id === packageId) ?? null;
 
   // Only approved, exported, posted cards
   const approvedCards = useMemo(() => {
-    let result = cards.filter((c) => VISIBLE_STATUSES.includes(c.approval_status));
+    let result = cards.filter((c) => (VISIBLE_STATUSES.includes(c.approval_status) || c.id === packageId) && !c.is_sample);
     if (statusFilter !== "all") result = result.filter((c) => c.approval_status === statusFilter);
     if (platformFilter !== "all") result = result.filter((c) => c.platform === platformFilter);
     if (search.trim()) {
@@ -74,7 +76,7 @@ export default function ApprovedContent() {
       );
     }
     return result;
-  }, [cards, statusFilter, platformFilter, search]);
+  }, [cards, statusFilter, platformFilter, search, packageId]);
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -200,7 +202,7 @@ export default function ApprovedContent() {
         key={exportOpen ? "open" : "closed"}
         open={exportOpen}
         onOpenChange={setExportOpen}
-        cards={cards.filter((c) => VISIBLE_STATUSES.includes(c.approval_status))}
+        cards={cards.filter((c) => (VISIBLE_STATUSES.includes(c.approval_status) || c.id === packageId) && !c.is_sample)}
         preselected={exportPicked}
         canMarkExported={isAdmin}
         onMarkExported={async (ids) => { for (const id of ids) await updateStatus.mutateAsync({ id, status: "exported", itemType: "post" }); setSelected(new Set()); }}
@@ -345,6 +347,7 @@ function ApprovedCard({
               <WhereIsIt card={card} here="approved" />
             </div>
             <StatusProgress card={card} dates={statusDates} />
+            <ReadinessBadge card={card} />
 
             {/* Copy text */}
             <p className="text-sm whitespace-pre-wrap leading-relaxed">{card.draft_copy}</p>
@@ -352,7 +355,7 @@ function ApprovedCard({
             {/* Tags preview */}
             {hashtags && (
               <div className="flex flex-wrap gap-1">
-                {(card.hashtags ?? []).slice(0, 8).map((h) => (
+                {hashtags.split(" ").slice(0, 8).map((h) => (
                   <span key={h} className="text-[11px] text-primary/70">{h}</span>
                 ))}
                 {(card.hashtags ?? []).length > 8 && (
@@ -387,7 +390,7 @@ function ApprovedCard({
                   size="sm"
                   variant="outline"
                   className="h-7 text-xs gap-1"
-                  onClick={() => onStatusChange(card.id, nextStatus)}
+                  onClick={() => nextStatus === "posted" ? onOpenPackage() : onStatusChange(card.id, nextStatus)}
                 >
                   <ArrowRight className="h-3 w-3" />
                   Mark {STATUS_META[nextStatus].label}

@@ -54,13 +54,15 @@ export default function RepurposeCenter() {
     enabled: !!activeClientId,
     queryFn: async () => {
       const [posts, assets] = await Promise.all([
-        supabase.from("post_cards").select("id,post_number,platform,content_type,draft_copy,approval_status,created_at")
-          .eq("client_id", activeClientId!).in("approval_status", ["approved", "exported", "posted"]).neq("content_type", "comment")
+        supabase.from("post_cards").select("id,post_number,platform,content_type,draft_copy,approval_status,created_at,source_references")
+          .eq("is_sample", false).eq("client_id", activeClientId!).in("approval_status", ["approved", "exported", "posted"]).neq("content_type", "comment")
           .order("created_at", { ascending: false }).limit(60),
         supabase.from("source_assets").select("id,title,asset_type,description,created_at")
           .eq("client_id", activeClientId!).eq("permission_state", "generation_allowed").is("deleted_at", null)
           .order("created_at", { ascending: false }).limit(60),
       ]);
+      if (posts.error) throw posts.error;
+      if (assets.error) throw assets.error;
       return { posts: posts.data ?? [], assets: assets.data ?? [] };
     },
   });
@@ -112,9 +114,10 @@ export default function RepurposeCenter() {
 
   const sendToQueue = useMutation({
     mutationFn: async (s: Suggestion) => {
+      if (!user || !canCreate) throw new Error("Your role cannot create a draft");
       const src = s.source_post_card_id ? postById[s.source_post_card_id] : null;
       const asset = s.source_asset_id ? assetById[s.source_asset_id] : null;
-      const refs = [src ? `Repurposed from ${postLabel(src as any)}` : null, asset ? `Asset: ${asset.title}` : null].filter(Boolean) as string[];
+      const refs = asset ? [asset.id] : src?.source_references ?? [];
       const { data: card, error } = await supabase.from("post_cards").insert({
         client_id: activeClientId, created_by: user!.id, platform: s.target_platform as any,
         content_type: s.target_content_type as any, draft_copy: draft, approval_status: "draft",
@@ -196,7 +199,7 @@ export default function RepurposeCenter() {
           {open.length === 0 ? (
             <EmptyState icon={Repeat2} title="No ideas waiting" description="Click “Find ideas” on any approved post or asset to get 3–5 ready-to-edit repurpose drafts." />
           ) : open.map((s) => (
-            <Card key={s.id} className="p-4 space-y-2">
+            <Card key={s.id} className="sm-content-card p-5 space-y-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Badge variant="outline">{TYPE_LABEL[s.repurpose_type] ?? s.repurpose_type}</Badge>
@@ -207,7 +210,8 @@ export default function RepurposeCenter() {
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="text-sm text-muted-foreground">{s.rationale}</p>
+              <h3 className="font-display text-lg font-semibold">{TYPE_LABEL[s.repurpose_type] ?? "Repurpose idea"}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.rationale}</p>
               <p className="text-sm whitespace-pre-line line-clamp-4">{s.draft_copy}</p>
               {s.source_excerpt && <p className="text-xs border-l-2 border-border pl-2 text-muted-foreground italic line-clamp-2">Source: “{s.source_excerpt}”</p>}
               <div className="flex justify-end">
@@ -270,7 +274,7 @@ function SourceRow({ icon: Icon, title, meta, text, count, busy, disabled, onSca
       {text && <p className="text-xs text-muted-foreground line-clamp-2">{text}</p>}
       <div className="flex items-center justify-between">
         <span className="text-[11px] text-muted-foreground">{count ? `${count} idea${count === 1 ? "" : "s"} waiting` : ""}</span>
-        <Button size="sm" variant="outline" disabled={disabled} onClick={onScan}>
+        <Button size="sm" variant="ai" disabled={disabled} onClick={onScan}>
           {busy ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 mr-1" />}
           {busy ? "Thinking…" : "Find ideas"}
         </Button>
