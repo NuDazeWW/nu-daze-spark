@@ -66,8 +66,9 @@ function buildPackageText(card: PostCard, firstComment: string, notes: string, a
 }
 
 export function PostingPackageDrawer({
-  card, open, onOpenChange, canExport, onMarkExported,
+  card, open, onOpenChange, canExport, onMarkExported, initialTab,
 }: {
+  initialTab?: "package" | "publish" | "preflight";
   card: PostCard | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -86,6 +87,8 @@ export function PostingPackageDrawer({
   const [openedPlatform, setOpenedPlatform] = useState(false);
   const [tab, setTab] = useState("package");
   const [postedUrl, setPostedUrl] = useState("");
+
+  useEffect(() => { if (open) setTab(initialTab ?? "package"); }, [open, card?.id, initialTab]);
 
   useEffect(() => {
     setFirstComment(card?.first_comment ?? "");
