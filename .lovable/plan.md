@@ -87,12 +87,30 @@ This brief replaces any parts of the earlier plan that conflict with it. It's on
 - **Demo labels**: "Demo" badges removed. Labels for limits, samples and staged sends stay.
 - **Sample records**: exactly three NuDaze samples in Publishing Status (published, scheduled, needs attention), each marked "Sample". They're left out of totals, Dashboard and cadence counts, billing, scheduled sends, notifications and retries.
 
-## 13. Checks before calling it done
-The 12 acceptance checks from the brief, tested at 887px and 1440px wide, using test data only, with nothing posted for real. Also: the existing tests, new tests (hashtags, readiness, comment counting, delivery results), type checks and the production build. The final report marks each check Passed, Failed or Blocked, with evidence and anything that needs outside action.
+## 13. What stays protected
+Current branding, content, working features, integrations, workspace separation, roles and permissions all stay as they are. Existing components are reused. Real problems are fixed at the source, never hidden behind a new label, made-up data or a premature success message. No tables are dropped, no content is reset, and access rules are never loosened.
+
+## 14. The 12 checks before calling it done
+Each is tested at 887px and 1440px wide, with test data only and nothing posted for real.
+1. **Same drawer**: Approved Content, Daily Queue and Publishing Status open the same drawer for the right post. Opening it changes nothing.
+2. **Honest delivery**: live, unavailable, mixed, partly successful, failed and waiting-for-confirmation results. Staged and hand-confirmed posts never look platform-confirmed.
+3. **No duplicates, and comments**: double-clicks and retries never send or count twice. Failed or staged comments never become Commented.
+4. **Readiness**: required, advisory, pending, cleared and acknowledged results read the same on every screen and are enforced when publishing. Editing resets checks. Scores never override required fixes.
+5. **Scheduling**: checklist links open real date, time and channel controls. Saving, rescheduling, invalid times, time zones and planner drag-and-drop all work without creating a second slot.
+6. **Review and permissions**: the setting being on or off, and each role, give the right buttons and explanations. No double submissions and no way around permissions.
+7. **Handoff and hashtags**: what's shown, copied, previewed, exported and sent all match and are formatted correctly (existing "#", repeats, blanks). Manual actions never claim a post was sent.
+8. **Navigation**: every side-menu item and old link works. No misleading "Back" links, no hidden settings, and no approved items, comments or history that can't be reached.
+9. **Copy and errors**: buttons say what they do, greyed-out buttons say how to fix it, numbers say what they count, and errors keep your work. Nothing claims success that didn't happen.
+10. **Saved typing and layout**: switching tabs, clicking outside a drawer, reopening, switching posts, changing pages, save/discard and switching workspaces. At both widths, tabs, cards, fields and bottom buttons stay readable and usable.
+11. **Repurpose and visuals**: Find Ideas returns real ideas with valid input and handles failures and no-results honestly. Connector tiles, headers, cards, focus outlines and buttons match the design.
+12. **Samples and everything else**: exactly three labeled samples, with no effect on real counts or scheduled sends. Existing features, data, integrations, billing and test-login safeguards, and roles all still work.
+
+Also: the existing tests, new tests (hashtags, readiness, delivery operations, comment counting), type checks, lint and the production build. The final report marks each check Passed, Failed or Blocked, with evidence, says what was tested versus assumed, and names any outside step needed.
 
 ## Technical section
 - Readiness: new shared `evaluateReadiness(card, review, workspace, channels)` in `src/lib/`, built on `preflightGate` and used everywhere the readiness label shows. Acknowledgments store the checksum and the IDs of the acknowledged findings.
-- Delivery: an additive table (or JSON on the existing run row) for per-channel outcomes, with an idempotency key per post+channel+attempt. Live capability comes from integration config, not `connection_status`. `post_cards.publishing_status` is derived as an aggregate (`partial` added). Approval status stays separate.
+- Delivery: an additive `delivery_operations` table with one row per logical delivery, under a stable unique key (workspace + post + content checksum + channel/account + intended send time). Repeat submissions reuse that row. Attempts go in a separate `delivery_attempts` table. Retries skip channels that already succeeded. A timeout with an unknown result is marked `awaiting_confirmation` and checked before any retry. Rescheduling updates the pending operation. Live capability comes from integration config, not `connection_status`. `post_cards.publishing_status` is derived as an aggregate (`partial` added). Approval status stays separate.
+- Readiness is enforced, not just displayed: the same rules live in `supabase/functions/_shared/` and run inside the database function or edge function that stages, publishes or schedules, which rejects the request when not ready. Acknowledgments are checked server-side against the current checksum, the finding IDs, governance settings (strict/advisory, non-overridable checks) and the user's role. Edits that affect readiness (copy, hashtags, media, channels) mark earlier clearance stale.
 - PublishComposer stays inside PostingPackageDrawer. Callers open it via `?post=<id>&section=publish|schedule`. Row and card publish handlers are removed.
 - Comments: `mark_commented` sets a `confirmation_source` (`manual`|`platform`). Cadence counting dedupes and uses the reporting timezone, excluding sample and staged records.
 - `formatHashtags` in `contentPresentation.ts`, tested, replaces inline `#` mapping in ReadinessPanel, PublishComposer, OpenPlatformButton, bulkExport and previews.
