@@ -2759,3 +2759,16 @@ li[data-sonner-toast], ol[data-sonner-toaster] li, [data-state][class*="toast"] 
 .sm-pfi-x { background: linear-gradient(160deg, #2c2c38 0%, #101017 55%, #000 100%); }
 .sm-pfi-youtube { background: linear-gradient(150deg, #ff5a4f 0%, #e62117 58%, #b3120b 100%); }
 .sm-pfi-other { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+
+/* Surface-aware form fields: text and fill always contrast, native date/time pickers match */
+body[data-sm-surface="reading"] [role="dialog"]:not(.sm-light) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, button[role="combobox"]),
+.sm-light-page :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, button[role="combobox"]),
+.sm-light :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, button[role="combobox"]) {
+  background-color: hsl(0 0% 100%); color: hsl(233 45% 13%); border-color: hsl(233 20% 80%);
+  box-shadow: inset 0 1px 2px hsl(233 40% 20% / .08); color-scheme: light;
+}
+.sm-app-bg :is(input, textarea, button[role="combobox"]),
+body:not([data-sm-surface="reading"]) [role="dialog"]:not(.sm-light) :is(input, textarea, button[role="combobox"]) {
+  color: hsl(0 0% 96%); color-scheme: dark;
+}
+:is(input, textarea)::placeholder { color: currentColor; opacity: .5; }
