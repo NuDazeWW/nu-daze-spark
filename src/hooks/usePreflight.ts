@@ -14,7 +14,7 @@ export type GateState = "none" | "stale" | "pass" | "warnings" | "blocked" | "ac
 export function preflightGate(review: PreflightReview | null | undefined, card: Pick<PostCard, "draft_copy" | "hashtags">) {
   if (!review) return { state: "none" as GateState, clear: false };
   if (review.draft_checksum !== draftChecksum(card)) return { state: "stale" as GateState, clear: false };
-  if (review.overridden_at) return { state: "overridden" as GateState, clear: true };
+  if (review.findings.some(f => f.severity === "blocking")) return { state: "blocked" as GateState, clear: false };
   if (review.overall_status === "pass") return { state: "pass" as GateState, clear: true };
   if (review.overall_status === "warnings")
     return review.acknowledged_at ? { state: "acknowledged" as GateState, clear: true } : { state: "warnings" as GateState, clear: false };
@@ -25,7 +25,7 @@ export function usePreflight(card: PostCard | null) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const key = ["preflight", card?.id];
-  const { preflightMode } = useWorkspace();
+  const { preflightMode, settings } = useWorkspace();
 
   const { data: review, isLoading } = useQuery({
     queryKey: key,
@@ -140,8 +140,9 @@ export function usePreflight(card: PostCard | null) {
     onError: (e: Error) => toast.error("Could not save", { description: e.message }),
   });
 
-  const raw = card ? preflightGate(review, card) : { state: "none" as GateState, clear: false };
+  const staleRevision = card && review && (new Date(review.created_at) < new Date(card.readiness_changed_at) || (review.governance_revision != null && review.governance_revision !== settings?.governance_revision));
+  const raw = staleRevision ? { state: "stale" as GateState, clear: false } : card ? preflightGate(review, card) : { state: "none" as GateState, clear: false };
   // Only "strict" mode blocks; "advisory" and "off" show findings but never block.
-  const gate = preflightMode === "strict" ? raw : { ...raw, clear: true };
+  const gate = preflightMode === "off" ? { ...raw, clear: true } : raw.state === "blocked" || preflightMode === "strict" ? raw : { ...raw, clear: true };
   return { review, isLoading, gate, run, acknowledge, override, apply, canApply, proposeRewrite, keepRewrite };
 }

@@ -51,7 +51,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [preflightOpen, setPreflightOpen] = useState(false);
   const [splitOpen, setSplitOpen] = useState(false);
-  const { canCreate } = useWorkspace();
+  const { canCreate, settings } = useWorkspace();
   const [gateIntent, setGateIntent] = useState<string | null>(null);
   const pf = usePreflight(card);
   const { profiles: voices } = useVoiceProfiles();
@@ -75,8 +75,8 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   };
   const currentIndex = APPROVAL_FLOW.indexOf(card.approval_status);
 
-  const canAdvance = currentIndex < APPROVAL_FLOW.indexOf("archived") && card.approval_status !== "archived";
-  const canRevert = currentIndex > 0 && card.approval_status !== "archived";
+  const canAdvance = canCreate && currentIndex < APPROVAL_FLOW.indexOf("archived") && card.approval_status !== "archived";
+  const canRevert = canCreate && currentIndex > 0 && card.approval_status !== "archived";
 
   const nextStatus = canAdvance ? APPROVAL_FLOW[currentIndex + 1] : null;
   const prevStatus = canRevert ? APPROVAL_FLOW[currentIndex - 1] : null;
@@ -142,7 +142,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
             </DropdownMenuItem>
             {["draft", "needs_revision"].includes(card.approval_status) && (
               <DropdownMenuItem
-                disabled={isUpdating}
+                disabled={isUpdating || !canCreate || !settings?.executive_review_enabled}
                 onClick={() => {
                   changeStatus("in_review");
                   toast.info(`Submitting ${postLabel(card)} for Executive Review`, {

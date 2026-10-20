@@ -87,6 +87,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [running, setRunning] = useState(false);
   const status = card.delivery_status !== "idle" ? card.delivery_status : c.publishing_status || "idle";
+  const capabilities = useQuery({ queryKey: ["delivery_capabilities"], queryFn: async () => { const { data, error } = await supabase.from("delivery_capabilities").select("*"); if (error) throw error; return data ?? []; } });
 
   useEffect(() => {
     const saved = readPackageDraft<{ targets?: string[]; date?: string; time?: string; tz?: string; disclosure?: boolean }>(draftKey, {});
@@ -99,7 +100,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
   }, [card.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!readPackageDraft<{ targets?: string[] }>(draftKey, {}).targets && !c.target_account_ids?.length && accounts.data) {
+    if (!readPackageDraft<{ targets?: string[] }>(draftKey, {}).targets?.length && !c.target_account_ids?.length && accounts.data) {
       setTargets(accounts.data.filter((a) => a.platform === card.platform && a.connection_status === "connected").map((a) => a.id));
     }
   }, [accounts.data]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -107,6 +108,9 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
   useEffect(() => { if (date) writePackageDraft(draftKey, { targets, date, time, tz, disclosure }); }, [draftKey, targets, date, time, tz, disclosure]);
 
   const selected = useMemo(() => (accounts.data ?? []).filter((a) => targets.includes(a.id)), [accounts.data, targets]);
+  const canSend = (platform: string) => capabilities.data?.some(c => c.platform === platform && c.live_enabled && c.dispatch_ready && c.verified_at) ?? false;
+  const allLive = selected.length > 0 && selected.every(a => canSend(a.platform));
+  const actionLabel = allLive ? "Publish live now" : "Stage for delivery";
   const copy = card.draft_copy + (disclosure ? "\n\n#AIassisted" : "");
   const tagCount = (card.hashtags ?? []).length;
   const { approvalRequired } = useWorkspace();
@@ -168,7 +172,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
       </div>
 
       <div role="tablist" aria-label="How to post" className="flex flex-wrap gap-1 rounded-lg border p-1">
-        {([["now", "Stage for delivery", Send], ["schedule", "Schedule", CalendarClock], ["manual", "Manual handoff", Copy]] as const).map(([m, label, Icon]) => (
+        {([["now", actionLabel, Send], ["schedule", "Schedule", CalendarClock], ["manual", "Manual handoff", Copy]] as const).map(([m, label, Icon]) => (
           <button key={m} role="tab" aria-selected={mode === m} onClick={() => setMode(m)}
             className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2 py-2 text-xs font-medium transition-colors sm:text-sm ${mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}>
             <Icon className="h-3.5 w-3.5" />{label}
@@ -176,7 +180,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
         ))}
       </div>
       <p className="-mt-2 text-xs text-muted-foreground">
-        {mode === "now" ? "Saves this post for delivery. It will not be sent to a platform." : mode === "schedule" ? "Queues the post for the date and time you pick." : "Copy the post and open the platform to post it yourself."}
+        {mode === "now" ? allLive ? "Sends immediately to the accounts you picked." : "Saves this post for delivery. It will not be sent to a platform." : mode === "schedule" ? "Queues the post for the date and time you pick." : "Copy the post and open the platform to post it yourself."}
       </p>
 
       {false && justPublished && status === "published" && (
@@ -222,6 +226,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
                         className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors disabled:opacity-50 ${on ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted"}`}>
                         <span className={`h-2 w-2 rounded-full ${connected ? "bg-primary" : "bg-muted-foreground/40"}`} />
                         <span className="font-semibold">{LIMITS[a.platform]?.label ?? a.platform}</span>
+                        <span>{canSend(a.platform) ? "Live sending verified" : "Staging only"}</span>
                         <span className="text-muted-foreground">{a.handle ? `@${a.handle.replace(/^@/, "")}` : a.account_name}</span>
                       </button>
                     );
@@ -293,8 +298,9 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
           <Button className="w-full" disabled={!canPublish || card.is_sample || !isApproved || !selected.length || blocking || running || readiness.data?.canDeliver === false}
             onClick={() => setConfirm(mode === "schedule" ? "schedule" : "now")}>
             {running ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : mode === "schedule" ? <CalendarClock className="h-4 w-4 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-            {mode === "schedule" ? "Schedule post" : "Stage for delivery"}
+            {mode === "schedule" ? "Schedule post" : actionLabel}
           </Button>
+          {status === "scheduled" && canPublish && <Button variant="outline" onClick={async () => { const { error } = await supabase.rpc("cancel_delivery_schedule", { _post: card.id }); if (error) toast({ title: "Could not cancel schedule", description: error.message, variant: "destructive" }); else { toast({ title: "Schedule canceled" }); qc.invalidateQueries({ queryKey: ["post_cards"] }); } }}>Cancel schedule</Button>}
           <p className="text-xs text-muted-foreground">Live sending isn't available yet: it needs approved platform apps, connected in Workspace Settings → Social Connections. Scheduled posts are staged, not sent.</p>
         </>
       )}

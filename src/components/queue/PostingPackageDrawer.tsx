@@ -85,7 +85,7 @@ export function PostingPackageDrawer({
   const authoritative = useReadiness(card);
   const draftKey = `${user?.id}:${card?.client_id}:${card?.id}:package`;
   const [publishMode, setPublishMode] = useState<"now" | "schedule" | "manual">("now");
-  const { canCreate, canManage, role, approvalRequired, preflightMode } = useWorkspace();
+  const { canCreate, canManage, role, approvalRequired, preflightMode, settings } = useWorkspace();
   const [splitOpen, setSplitOpen] = useState(false);
   const qc = useQueryClient();
   const [firstComment, setFirstComment] = useState("");
@@ -249,14 +249,14 @@ export function PostingPackageDrawer({
             <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/review?post=${card.id}`); toast({ title: "Executive review link copied" }); }}>
               Copy executive review link
             </Button>
-            <Button variant="outline" size="sm" className="mt-2 w-fit" disabled={!approvalRequired || !["owner", "admin", "editor"].includes(role ?? "") || saving || card.is_sample || ["in_review", "posted", "archived"].includes(card.approval_status)} title={!approvalRequired ? "Executive Review is off in Setup" : card.approval_status === "in_review" ? "Already sent for review" : "Send this post for Executive Review"} onClick={async () => {
+            <Button variant="outline" size="sm" className="mt-2 w-fit" disabled={!settings?.executive_review_enabled || !["owner", "admin", "editor"].includes(role ?? "") || saving || card.is_sample || ["in_review", "posted", "archived"].includes(card.approval_status)} title={!settings?.executive_review_enabled ? "Executive Review is off in Setup" : card.approval_status === "in_review" ? "Already sent for review" : "Send this post for Executive Review"} onClick={async () => {
               if (saving) return; setSaving(true);
               const { error } = await supabase.from("post_cards").update({ approval_status: "in_review", updated_by: user?.id }).eq("id", card.id).neq("approval_status", "in_review");
               setSaving(false);
               if (error) toast({ title: "Could not send for review", description: error.message, variant: "destructive" });
               else { toast({ title: "Sent for Executive Review" }); qc.invalidateQueries({ queryKey: ["post_cards"] }); }
             }}>Send for Executive Review</Button>
-            {!approvalRequired && <Link className="text-xs underline" to="/setup">Executive Review is off · Setup</Link>}
+            {!settings?.executive_review_enabled && <Link className="text-xs underline" to="/setup">Executive Review is off · Setup</Link>}
             {canCreate && (
               <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => setSplitOpen(true)}>
                 <Split className="mr-2 h-4 w-4" /> Split across platforms
@@ -279,7 +279,7 @@ export function PostingPackageDrawer({
             <ChangeView card={card} />
           </TabsContent>
           <TabsContent value="media" className="mt-4">
-            <MediaStudio key={card.id} clientId={card.client_id} postCardId={card.id} platform={card.platform} canCreate={canCreate} defaultPrompt={card.suggested_asset_description ?? ""} />
+            <MediaStudio key={card.id} clientId={card.client_id} postCardId={card.id} platform={card.platform} canCreate={canCreate && !card.is_sample} defaultPrompt={card.suggested_asset_description ?? ""} />
           </TabsContent>
           <TabsContent value="publish" className="mt-4">
             <PublishComposer key={card.id} card={card} canPublish={canExport && ["owner", "admin", "editor", "reviewer"].includes(role ?? "")} initialMode={publishMode} />

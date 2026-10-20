@@ -82,6 +82,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
   isSendingForReview?: boolean;
 }) {
   const [text, setText] = useState(comment.draft_copy);
+  const workspace = useWorkspace();
   const [copied, setCopied] = useState(false);
   const dirty = text !== comment.draft_copy;
 
@@ -150,7 +151,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
             </Badge>
           ) : (
             <Button variant="outline" size="sm" className="h-7 text-[11px] whitespace-nowrap"
-              disabled={isSendingForReview || dirty}
+              disabled={isSendingForReview || dirty || !workspace.canCreate || !workspace.settings?.executive_review_enabled}
               title={dirty ? "Save your edits first" : "Send this comment to the Executive Review queue"}
               onClick={(e) => { e.stopPropagation(); onSendForReview(); }}>
               <Send className="h-3 w-3 mr-1" />{isSendingForReview ? "Sending…" : "Send for Executive Review"}

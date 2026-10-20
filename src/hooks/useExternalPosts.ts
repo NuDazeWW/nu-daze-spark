@@ -121,10 +121,7 @@ export function useExternalPosts() {
 
   const unmarkCommented = useMutation({
     mutationFn: async (postId: string) => {
-      const { error } = await supabase
-        .from("external_posts")
-        .update({ is_commented: false } as never)
-        .eq("id", postId);
+      const { error } = await supabase.rpc("return_comment_to_queue", { _post: postId });
       if (error) throw error;
     },
     onSuccess: () => {

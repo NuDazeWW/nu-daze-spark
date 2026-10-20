@@ -116,6 +116,8 @@ Deno.serve(async (req) => {
 
     const { data: card } = await sb.from("post_cards").select("*").eq("id", parsed.data.post_card_id).maybeSingle();
     if (!card) return json({ error: "Post not found" }, 404);
+    if (card.is_sample) return json({ error: "Samples cannot use AI credits" }, 400);
+    const { data: governance } = await sb.from("workspace_settings").select("governance_revision").eq("id", true).single();
     const cid = card.client_id;
     const blocked = await chargeDrafts(sb, "preflight_review", cid, corsHeaders);
     if (blocked) return blocked;
@@ -200,7 +202,8 @@ HASHTAGS: ${(card.hashtags ?? []).join(" ") || "(none)"}`;
     if (!serviceKey || !serviceUrl) return json({ error: "Review storage unavailable" }, 503);
     const writer = createClient(serviceUrl, serviceKey);
     const { data: current } = await sb.from("post_cards").select("readiness_revision").eq("id", card.id).single();
-    if (current?.readiness_revision !== card.readiness_revision) return json({ error: "Post changed during review. Run checks again." }, 409);
+    const { data: currentGovernance } = await sb.from("workspace_settings").select("governance_revision").eq("id", true).single();
+    if (current?.readiness_revision !== card.readiness_revision || currentGovernance?.governance_revision !== governance?.governance_revision) return json({ error: "Post changed during review. Run checks again." }, 409);
     const { data: review, error } = await writer.from("preflight_reviews").insert({
       post_card_id: card.id,
       client_id: cid,
