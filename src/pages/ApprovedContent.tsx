@@ -1,3 +1,4 @@
+import { formatHashtags } from "@/lib/contentPresentation";
 import { PipelineNav } from "@/components/queue/PipelineNav";
 import { PlatformIcon, PlatformOption } from "@/components/layout/PlatformIcon";
 import { useState, useMemo, useEffect } from "react";
@@ -21,7 +22,7 @@ import { PostingPackageDrawer } from "@/components/queue/PostingPackageDrawer";
 import { BulkExportDialog } from "@/components/export/BulkExportDialog";
 import {
   CheckCircle2, Search, AlertCircle, Copy, Hash, AtSign, Users,
-  ArrowRight, Download, Check, Package,
+  ArrowRight, Download, Check, Package, Send,
 } from "lucide-react";
 
 
@@ -51,6 +52,7 @@ export default function ApprovedContent() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [packageId, setPackageId] = useState<string | null>(null);
+  const [packageTab, setPackageTab] = useState<"package" | "publish">("package");
   const [exportOpen, setExportOpen] = useState(false);
   const [exportPicked, setExportPicked] = useState<string[] | undefined>();
   const packageCard = cards.find((c) => c.id === packageId) ?? null;
@@ -122,7 +124,7 @@ export default function ApprovedContent() {
           "",
           c.draft_copy,
           "",
-          `Hashtags: ${(c.hashtags ?? []).join(" ")}`,
+          `Hashtags: ${formatHashtags(c.hashtags)}`,
           `People Tags: ${(c.people_tags ?? []).join(", ")}`,
           `Org Tags: ${(c.org_tags ?? []).join(", ")}`,
         ];
@@ -251,7 +253,8 @@ export default function ApprovedContent() {
                 copiedId={copiedId}
                 onStatusChange={handleStatusChange}
                 isAdmin={isAdmin}
-                onOpenPackage={() => setPackageId(card.id)}
+                onOpenPackage={() => { setPackageTab("package"); setPackageId(card.id); }}
+                onOpenPublish={() => { setPackageTab("publish"); setPackageId(card.id); }}
                 statusDates={allDates[card.id]}
               />
             ))}
@@ -259,6 +262,7 @@ export default function ApprovedContent() {
         </>
       )}
       <PostingPackageDrawer
+        initialTab={packageTab}
         card={packageCard}
         open={!!packageCard}
         onOpenChange={(o) => !o && setPackageId(null)}
@@ -278,6 +282,7 @@ function ApprovedCard({
   onStatusChange,
   isAdmin,
   onOpenPackage,
+  onOpenPublish,
   statusDates,
 }: {
   card: PostCard;
@@ -288,10 +293,11 @@ function ApprovedCard({
   onStatusChange: (id: string, status: ApprovalStatus) => void;
   isAdmin: boolean;
   onOpenPackage: () => void;
+  onOpenPublish: () => void;
   statusDates?: Partial<Record<ApprovalStatus, string>>;
 }) {
   const meta = STATUS_META[card.approval_status];
-  const hashtags = (card.hashtags ?? []).join(" ");
+  const hashtags = formatHashtags(card.hashtags);
   const peopleTags = (card.people_tags ?? []).join(", ");
   const orgTags = (card.org_tags ?? []).join(", ");
 
@@ -369,7 +375,10 @@ function ApprovedCard({
 
               <div className="flex-1" />
 
-              <Button size="sm" className="h-7 text-xs gap-1" onClick={onOpenPackage}>
+              <Button size="sm" className="h-7 text-xs gap-1" onClick={onOpenPublish}>
+                <Send className="h-3 w-3" /> Publish / Schedule
+              </Button>
+              <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={onOpenPackage}>
                 <Package className="h-3 w-3" /> Posting package
               </Button>
 

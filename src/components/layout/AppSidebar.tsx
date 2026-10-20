@@ -51,46 +51,50 @@ import socialMotiveLogo from "@/assets/socialmotive-logo.jpg";
 import { SidebarPostTo } from "./SidebarPostTo";
 import { CollapsibleNavGroup } from "./CollapsibleNavGroup";
 
-const mainNav = [
-  { title: "Dashboard", icon: LayoutDashboard, href: "/" },
-  { title: "Portfolio Insights", icon: PieChart, href: "/insights" },
-  { title: "Asset Library", icon: FolderOpen, href: "/assets" },
-  { title: "Connected Sources", icon: Link2, href: "/sources" },
-  { title: "Brand & Strategy Studio", icon: Settings2, href: "/strategy" },
-];
-
-const contentNav = [
-  { title: "Campaign Briefs", icon: FileText, href: "/briefs" },
-  { title: "Social Post Generator", icon: Sparkles, href: "/generator" },
-  { title: "Daily Queue", icon: CalendarDays, href: "/queue" },
-  { title: "Executive Review", icon: CalendarDays, href: "/review" },
-  { title: "Content Planner", icon: CalendarRange, href: "/planner" },
-  { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
-  { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
-  { title: "Publishing Status", icon: Send, href: "/publishing" },
-  { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
-  { title: "Motive Media Studio", icon: ImagePlus, href: "/media-studio" },
-];
-
-const adminWorkspaceTop = [
-  { title: "Setup", icon: ListChecks, href: "/setup" },
-  { title: "Team", icon: Users, href: "/settings/team" },
-];
-const adminWorkspaceBottom = [
-  { title: "Social Connections", icon: Link2, href: "/settings/connections" },
-  { title: "Email Provider", icon: Mail, href: "/settings/email-provider" },
-  { title: "Workspace", icon: Briefcase, href: "/setup" },
+type NavItem = { title: string; icon: typeof Bell; href: string };
+const NAV_GROUPS: { id: string; label: string; items: NavItem[] }[] = [
+  { id: "core", label: "Core & Insights", items: [
+    { title: "Dashboard", icon: LayoutDashboard, href: "/" },
+    { title: "Portfolio Insights", icon: PieChart, href: "/insights" },
+  ] },
+  { id: "strategy", label: "Strategy & Sources", items: [
+    { title: "Brand & Strategy Studio", icon: Settings2, href: "/strategy" },
+    { title: "Asset Library", icon: FolderOpen, href: "/assets" },
+    { title: "Connected Sources", icon: Link2, href: "/sources" },
+  ] },
+  { id: "create", label: "Create & Repurpose", items: [
+    { title: "Campaign Briefs", icon: FileText, href: "/briefs" },
+    { title: "Social Post Generator", icon: Sparkles, href: "/generator" },
+    { title: "Comment Generator", icon: MessageSquare, href: "/comments" },
+    { title: "Repurpose Center", icon: Repeat2, href: "/repurpose" },
+    { title: "Motive Media Studio", icon: ImagePlus, href: "/media-studio" },
+  ] },
+  { id: "plan", label: "Plan & Review", items: [
+    { title: "Content Planner", icon: CalendarRange, href: "/planner" },
+    { title: "Executive Review", icon: Megaphone, href: "/review" },
+  ] },
+  { id: "pipeline", label: "Pipeline & Publishing", items: [
+    { title: "Daily Queue", icon: CalendarDays, href: "/queue" },
+    { title: "Approved Content", icon: CheckCircle2, href: "/approved" },
+    { title: "Publishing Status", icon: Send, href: "/publishing" },
+  ] },
+  { id: "settings", label: "Workspace Settings", items: [
+    { title: "Setup & Onboarding", icon: ListChecks, href: "/setup" },
+    { title: "Team", icon: Users, href: "/settings/team" },
+    { title: "Social Connections", icon: AtSign, href: "/settings/connections" },
+    { title: "Email Provider", icon: Mail, href: "/settings/email-provider" },
+    { title: "Brand Profiles", icon: Palette, href: "/settings/brand-kit" },
+    { title: "Account Tags", icon: Building2, href: "/settings/tags" },
+    { title: "Notifications", icon: Bell, href: "/settings/notifications" },
+    { title: "Usage & Billing", icon: CreditCard, href: "/settings/usage" },
+  ] },
 ];
 
 export function AppSidebar() {
   const location = useLocation();
   useAuth();
   const ws = useWorkspace();
-  void adminWorkspaceTop; void adminWorkspaceBottom;
-  const workspaceTop = [{ title: "Setup", icon: ListChecks, href: "/setup" }];
-  const workspaceBottom: typeof workspaceTop = [];
-  const workspaceLabel = `${ws.settings?.company_name?.trim() || "Your"} Workspace`;
-  const renderItems = (items: { title: string; icon: typeof Bell; href: string }[]) => items.map((item) => (
+  const renderItems = (items: NavItem[]) => items.map((item) => (
     <SidebarMenuItem key={item.href}>
       <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
         <SidebarMenuButton asChild isActive={location.pathname === item.href} tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}>
@@ -127,56 +131,19 @@ export function AppSidebar() {
 
 
       <SidebarContent>
-        <CollapsibleNavGroup id="overview" label="Overview">
-          <SidebarMenu>
-            {mainNav.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.href}
-                    tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}
-                  >
-                    <Link to={item.href}>
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </NavHoverWrapper>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </CollapsibleNavGroup>
-
+        {NAV_GROUPS.map((g, i) => (
+          <div key={g.id}>
+            {i > 0 && <SidebarSeparator />}
+            <CollapsibleNavGroup id={g.id} label={g.label}>
+              <SidebarMenu>{renderItems(g.items)}</SidebarMenu>
+            </CollapsibleNavGroup>
+          </div>
+        ))}
         <SidebarSeparator />
-
-        <CollapsibleNavGroup id="settings" label={workspaceLabel}>
-          <SidebarMenu>{renderItems(workspaceTop)}</SidebarMenu>
-          {workspaceBottom.length > 0 && <SidebarMenu>{renderItems(workspaceBottom)}</SidebarMenu>}
-        </CollapsibleNavGroup>
-
-        <SidebarSeparator />
-
-        <CollapsibleNavGroup id="content" label="Content">
-          <SidebarMenu>
-            {contentNav.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <NavHoverWrapper href={item.href} title={item.title} icon={item.icon}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.href}
-                    tooltip={NAV_HOVER_LISTS[item.href] ? undefined : item.title}
-                  >
-                    <Link to={item.href}>
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </NavHoverWrapper>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </CollapsibleNavGroup>
+        <SidebarMenu className="px-2">{renderItems([
+          { title: "Help", icon: LifeBuoy, href: "/help" },
+          { title: "What's new", icon: BarChart3, href: "/whats-new" },
+        ])}</SidebarMenu>
       </SidebarContent>
 
       <SidebarFooter className="px-3 py-3">

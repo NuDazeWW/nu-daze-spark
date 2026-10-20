@@ -218,6 +218,13 @@
       "when": 1792380907188,
       "tag": "0030_grant_legal_acceptances",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792470628906,
+      "tag": "0031_fix_workspace_billing_updates_without_where",
+      "breakpoints": true
     }
   ]
 }

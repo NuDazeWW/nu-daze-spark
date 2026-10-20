@@ -1,3 +1,4 @@
+import { formatHashtags } from "@/lib/contentPresentation";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { addDays, endOfDay, format, isToday, isTomorrow, startOfDay } from "date-fns";
@@ -16,7 +17,7 @@ import { postLabel } from "@/components/tracking/PostTracking";
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const READY = ["approved", "exported"];
 const fullCopy = (c: PostCard) =>
-  [c.draft_copy, (c.hashtags ?? []).map((h) => `#${h.replace(/^#/, "")}`).join(" ")].filter(Boolean).join("\n\n");
+  [c.draft_copy, formatHashtags(c.hashtags)].filter(Boolean).join("\n\n");
 
 /** Decision-first daily view: what needs a decision, what goes out next, what's at risk. */
 export function ReadinessPanel() {

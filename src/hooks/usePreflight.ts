@@ -139,7 +139,7 @@ export function usePreflight(card: PostCard | null) {
     },
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["post_cards"] });
-      toast.success("New version saved", { description: "Re-checking now…" });
+      toast.success("Draft updated", { description: "Review the changes. Checks are running again now." });
       run.mutate();
     },
     onError: (e: Error) => toast.error("Could not save", { description: e.message }),

@@ -14,7 +14,7 @@ export function ScheduledRunsPanel() {
   });
   return (
     <section className="rounded-xl border bg-card p-4 text-card-foreground">
-      <h2 className="font-display text-lg font-semibold">Scheduled delivery jobs</h2>
+      <h2 className="font-display text-lg font-semibold">Scheduled publishing runs</h2>
       <p className="text-xs text-muted-foreground">Checks every five minutes and moves up to 25 due posts per run. Live sending stays off until this instance connects its own approved platform apps; channels without a connected account are marked skipped.</p>
       {runs.isLoading ? <p className="mt-3 text-sm text-muted-foreground">Loading run history…</p>
       : runs.isError ? <p className="mt-3 text-sm text-destructive">Couldn't load run history. Refresh to try again.</p>

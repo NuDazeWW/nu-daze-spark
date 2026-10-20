@@ -3,14 +3,15 @@ import { ArrowLeft } from "lucide-react";
 
 /** Where "Back" goes when a page was opened directly. */
 export const PARENT_ROUTE: Record<string, { to: string; label: string }> = {
-  "/settings/email-provider": { to: "/setup", label: "Setup" },
-  "/settings/connections": { to: "/setup", label: "Setup" },
-  "/settings/team": { to: "/setup", label: "Setup" },
-  "/settings/notifications": { to: "/setup", label: "Setup" },
-  "/settings/usage": { to: "/setup", label: "Setup" },
-  "/settings/billing": { to: "/setup", label: "Setup" },
-  "/settings/tags": { to: "/setup", label: "Setup" },
-  "/settings/clients": { to: "/setup", label: "Setup" },
+  "/settings/email-provider": { to: "/setup", label: "Workspace Settings" },
+  "/settings/connections": { to: "/setup", label: "Workspace Settings" },
+  "/settings/team": { to: "/setup", label: "Workspace Settings" },
+  "/settings/notifications": { to: "/setup", label: "Workspace Settings" },
+  "/settings/usage": { to: "/setup", label: "Workspace Settings" },
+  "/settings/billing": { to: "/setup", label: "Workspace Settings" },
+  "/settings/tags": { to: "/setup", label: "Workspace Settings" },
+  "/settings/clients": { to: "/setup", label: "Workspace Settings" },
+  "/settings/brand-kit": { to: "/setup", label: "Workspace Settings" },
   "/help/guide": { to: "/help", label: "Help" },
 };
 
@@ -18,7 +19,7 @@ export const ROUTE_LABEL: Record<string, string> = {
   "/": "Dashboard", "/insights": "Portfolio Insights", "/assets": "Asset Library", "/sources": "Connected Sources",
   "/strategy": "Brand & Strategy Studio", "/briefs": "Campaign Briefs", "/generator": "Social Post Generator", "/queue": "Daily Queue",
   "/review": "Executive Review", "/planner": "Content Planner", "/comments": "Comment Generator", "/approved": "Approved Content",
-  "/publishing": "Publishing Status", "/repurpose": "Repurpose Center", "/media-studio": "Motive Media Studio", "/setup": "Setup",
+  "/publishing": "Publishing Status", "/repurpose": "Repurpose Center", "/media-studio": "Motive Media Studio", "/setup": "Workspace Settings",
   "/settings/team": "Team", "/settings/connections": "Social Connections", "/settings/email-provider": "Email Provider",
   "/settings/notifications": "Notifications", "/settings/usage": "Usage", "/settings/billing": "Billing", "/settings/tags": "Account Tags",
   "/settings/clients": "Clients", "/help": "Help", "/help/guide": "User Guide", "/whats-new": "What's new", "/pricing": "Pricing", "/auth": "Sign in",
@@ -41,16 +42,14 @@ export function previousPath(current: string): string | null {
   return null;
 }
 
-export function BackLink({ fallback = "/", fallbackLabel }: { fallback?: string; fallbackLabel?: string }) {
+/** Stable parent link for sub-pages only; top-level pages get none (no history-based false parents). */
+export function BackLink({ fallback, fallbackLabel }: { fallback?: string; fallbackLabel?: string }) {
   const { pathname } = useLocation();
-  if (pathname === "/") return null;
-  const prev = previousPath(pathname);
-  const parent = PARENT_ROUTE[pathname];
-  const to = prev ?? parent?.to ?? fallback;
-  const label = ROUTE_LABEL[to.split("?")[0]] ?? (prev ? "previous page" : parent?.label ?? fallbackLabel ?? "Dashboard");
+  const parent = PARENT_ROUTE[pathname] ?? (fallback ? { to: fallback, label: fallbackLabel ?? ROUTE_LABEL[fallback] ?? "Dashboard" } : null);
+  if (!parent) return null;
   return (
-    <Link to={to} className="sm-back-link inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded">
-      <ArrowLeft className="h-4 w-4" aria-hidden />Back to {label}
+    <Link to={parent.to} className="sm-back-link inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded">
+      <ArrowLeft className="h-4 w-4" aria-hidden />Back to {parent.label}
     </Link>
   );
 }

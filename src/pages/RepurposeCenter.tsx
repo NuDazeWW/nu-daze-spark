@@ -1,3 +1,4 @@
+import { formatHashtags } from "@/lib/contentPresentation";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -86,10 +87,17 @@ export default function RepurposeCenter() {
     open.filter((s) => (kind === "post" ? s.source_post_card_id : s.source_asset_id) === id).length;
 
   const scan = async (kind: "post" | "asset", id: string) => {
+    if (scanning) return;
     setScanning(id);
     const { data, error } = await supabase.functions.invoke("repurpose-content", { body: { source_kind: kind, source_id: id } });
     setScanning(null);
-    if (error || data?.error) { toast.error(data?.error ?? "Could not create ideas"); return; }
+    if (error || data?.error) {
+      let msg = data?.error as string | undefined;
+      try { msg = msg ?? (await (error as any)?.context?.json())?.error; } catch { /* ignore */ }
+      toast.error("Couldn't find ideas", { description: `${msg ?? "The idea service didn't respond."} Nothing was changed — try again in a moment.` });
+      return;
+    }
+    if (!data?.created) { toast.info("No new ideas for this source", { description: "Try a different post or asset." }); return; }
     toast.success(`${data.created} repurpose idea${data.created === 1 ? "" : "s"} ready to review`);
     qc.invalidateQueries({ queryKey: ["repurpose_suggestions", activeClientId] });
   };
@@ -130,7 +138,7 @@ export default function RepurposeCenter() {
   });
 
   const openEdit = (s: Suggestion) => {
-    setEditing(s); setDraft(s.draft_copy ?? ""); setTags((s.hashtags ?? []).map((h) => `#${h}`).join(" "));
+    setEditing(s); setDraft(s.draft_copy ?? ""); setTags(formatHashtags(s.hashtags));
   };
 
   const sourceLabel = (s: Suggestion) => {

@@ -1,3 +1,4 @@
+import { formatHashtags } from "@/lib/contentPresentation";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -79,7 +80,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
   const nextStatus = canAdvance ? APPROVAL_FLOW[currentIndex + 1] : null;
   const prevStatus = canRevert ? APPROVAL_FLOW[currentIndex - 1] : null;
 
-  const hashtagString = (card.hashtags ?? []).map((h) => `#${h.replace(/^#/, "")}`).join(" ");
+  const hashtagString = formatHashtags(card.hashtags);
   const peopleString = (card.people_tags ?? []).join(" ");
   const orgString = (card.org_tags ?? []).join(" ");
 
@@ -102,7 +103,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
     { show: !!card.revision_notes, icon: AlertTriangle, label: "Revision notes", text: card.revision_notes, warn: true },
   ].filter((d) => d.show);
 
-  const tags = (card.hashtags ?? []).map((h) => `#${h.replace(/^#/, "")}`);
+  const tags = formatHashtags(card.hashtags).split(" ").filter(Boolean);
   const captionText = card.draft_copy.replace(/#[\w-]+/g, "").replace(/\s+\n/g, "\n").trim();
   // Text tile fallback: the post's own opening words, like a native text graphic.
   const hookWords = captionText.split(/[\s—–]+/).slice(0, 3).join(" ").replace(/[—–,:;.!?]+$/, "");
@@ -251,7 +252,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
               <PostHistoryButton card={card} className="w-full justify-start h-8 text-xs gap-2" />
               {["approved", "exported"].includes(card.approval_status) && (
                 <OpenPlatformButton clientId={card.client_id} platform={card.platform} className="w-full justify-start h-8 text-xs"
-                  copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")} />
+                  copyText={[card.draft_copy, formatHashtags(card.hashtags)].filter(Boolean).join("\n\n")} />
               )}
             </div>
             {details.map((d) => (

@@ -21,6 +21,8 @@ import { ChangeView } from "@/components/review/ChangeView";
 import { Input } from "@/components/ui/input";
 import { Split } from "lucide-react";
 import { SplitPlatformsDialog } from "./SplitPlatformsDialog";
+import { formatHashtags, outboundText } from "@/lib/contentPresentation";
+import { evaluateReadiness } from "@/lib/readiness";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
 } from "lucide-react";
@@ -45,7 +47,7 @@ function buildPackageText(card: PostCard, firstComment: string, notes: string, a
     card.draft_copy,
     "",
     "=== HASHTAGS ===",
-    (card.hashtags ?? []).join(" ") || "(none)",
+    formatHashtags(card.hashtags) || "(none)",
     "",
     "=== FIRST COMMENT ===",
     firstComment || "(none)",
@@ -64,8 +66,9 @@ function buildPackageText(card: PostCard, firstComment: string, notes: string, a
 }
 
 export function PostingPackageDrawer({
-  card, open, onOpenChange, canExport, onMarkExported,
+  card, open, onOpenChange, canExport, onMarkExported, initialTab,
 }: {
+  initialTab?: "package" | "publish" | "preflight";
   card: PostCard | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -73,7 +76,7 @@ export function PostingPackageDrawer({
   onMarkExported: (id: string) => Promise<void>;
 }) {
   const { toast } = useToast();
-  const { canCreate, approvalRequired } = useWorkspace();
+  const { canCreate, approvalRequired, preflightMode } = useWorkspace();
   const [splitOpen, setSplitOpen] = useState(false);
   const qc = useQueryClient();
   const [firstComment, setFirstComment] = useState("");
@@ -84,6 +87,8 @@ export function PostingPackageDrawer({
   const [openedPlatform, setOpenedPlatform] = useState(false);
   const [tab, setTab] = useState("package");
   const [postedUrl, setPostedUrl] = useState("");
+
+  useEffect(() => { if (open) setTab(initialTab ?? "package"); }, [open, card?.id, initialTab]);
 
   useEffect(() => {
     setFirstComment(card?.first_comment ?? "");
@@ -142,7 +147,7 @@ export function PostingPackageDrawer({
       c.push({ level: "pass", label: "Approved through review" });
     else if (!approvalRequired) c.push({ level: "pass", label: "Approval optional in this workspace" });
     else c.push({ level: "fail", label: "Not yet approved", fix: [{ label: "Review in Daily Queue", to: `/queue?post=${card.id}` }] });
-    if (!card.scheduled_for) c.push({ level: "warn", label: "No scheduled time set", fix: [{ label: "Schedule", to: `/queue?post=${card.id}&edit=1` }] });
+    if (!card.scheduled_for) c.push({ level: "warn", label: "No scheduled time set", fix: [{ label: "Schedule", to: "#schedule" }] });
     return c;
   }, [card, assets]);
 
@@ -151,6 +156,8 @@ export function PostingPackageDrawer({
   const failCount = checks.filter((c) => c.level === "fail").length + preflightFail;
 
   if (!card) return null;
+  const readiness = evaluateReadiness(card, pf.review, { approvalRequired, preflightMode, reviewLoading: pf.isLoading });
+  const otherFails = checks.filter((c) => c.level === "fail").length;
   const postReason = approvalRequired && !["approved", "exported", "posted"].includes(card.approval_status)
     ? "Approve first"
     : failCount > 0 ? `Fix ${failCount} blocking issue${failCount === 1 ? "" : "s"} first` : null;
@@ -183,6 +190,9 @@ export function PostingPackageDrawer({
   };
 
   const markPosted = async () => {
+    const url = postedUrl.trim();
+    if (url && !/^https?:\/\/\S+\.\S+/.test(url)) return toast({ title: "That link doesn't look right", description: "Your text was kept. Paste the full post link starting with https://, or leave it blank.", variant: "destructive" });
+    if (saving) return;
     const { error } = await supabase.from("post_cards")
       .update({ approval_status: "posted", posted_url: postedUrl.trim() || null }).eq("id", card.id);
     if (error) return toast({ title: "Couldn't mark as posted", description: error.message, variant: "destructive" });
@@ -236,13 +246,13 @@ export function PostingPackageDrawer({
         {splitOpen && <SplitPlatformsDialog card={card} open={splitOpen} onOpenChange={setSplitOpen} />}
 
         <Tabs value={tab} onValueChange={setTab} className="mt-5">
-          <TabsList className="w-full">
-            <TabsTrigger value="package" className="flex-1">Posting package</TabsTrigger>
-            <TabsTrigger value="preview" className="flex-1">Native preview</TabsTrigger>
-            <TabsTrigger value="preflight" className="flex-1">Preflight</TabsTrigger>
-            <TabsTrigger value="changes" className="flex-1">Changes</TabsTrigger>
-            <TabsTrigger value="media" className="flex-1">AI media</TabsTrigger>
-            <TabsTrigger value="publish" className="flex-1">Publish</TabsTrigger>
+          <TabsList className="w-full justify-start overflow-x-auto overflow-y-hidden">
+            <TabsTrigger value="package" className="flex-1 shrink-0">Posting package</TabsTrigger>
+            <TabsTrigger value="preview" className="flex-1 shrink-0">Native preview</TabsTrigger>
+            <TabsTrigger value="preflight" className="flex-1 shrink-0">Preflight</TabsTrigger>
+            <TabsTrigger value="changes" className="flex-1 shrink-0">Changes</TabsTrigger>
+            <TabsTrigger value="media" className="flex-1 shrink-0">AI media</TabsTrigger>
+            <TabsTrigger value="publish" className="flex-1 shrink-0">Publish</TabsTrigger>
           </TabsList>
           <TabsContent value="changes" className="mt-4">
             <ChangeView card={card} />
@@ -262,18 +272,22 @@ export function PostingPackageDrawer({
           <TabsContent value="package" className="space-y-5 mt-5">
           <div className={`rounded-lg border p-3 space-y-1.5 ${failCount ? "border-destructive/40 bg-destructive/5" : "border-primary/30 bg-primary/5"}`}>
             <div className="flex items-center gap-2 text-sm font-medium">
-              <ShieldCheck className="h-4 w-4" /> {failCount ? `${failCount} blocking issue${failCount > 1 ? "s" : ""}` : "Ready to post"}
+              <ShieldCheck className="h-4 w-4" /> {otherFails ? `${readiness.label} · ${otherFails} other issue${otherFails > 1 ? "s" : ""} to fix` : readiness.label}
             </div>
-            {card && (pf.gate.clear
-              ? <div className="flex items-center gap-2 text-xs"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /><span className="text-muted-foreground">Preflight cleared</span></div>
-              : <div className="flex items-center gap-2 text-xs"><XCircle className="h-3.5 w-3.5 text-destructive" /><span>Preflight not cleared ({pf.gate.state})</span><Button size="sm" variant="link" className="h-auto p-0 text-xs" onClick={() => setTab("preflight")}>Fix in Preflight</Button></div>)}
+            {readiness.tone === "ready"
+              ? <div className="flex items-center gap-2 text-xs"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /><span className="text-muted-foreground">Preflight checks passed for this version</span></div>
+              : <div className="flex flex-wrap items-center gap-2 text-xs">{readiness.tone === "blocked" ? <XCircle className="h-3.5 w-3.5 text-destructive" /> : <AlertTriangle className="h-3.5 w-3.5 text-accent" />}
+                  <span>{readiness.tone === "blocked" ? `${readiness.required} required Preflight check${readiness.required === 1 ? "" : "s"} remain. A good Motive Score doesn't replace them.` : readiness.tone === "pending" ? "Preflight hasn't checked this version yet." : readiness.tone === "advisory" ? "Advisory notes only — they don't block publishing." : "Not approved yet."}</span>
+                  <Button size="sm" variant="link" className="h-auto p-0 text-xs" onClick={() => setTab("preflight")}>Open Preflight</Button></div>}
             {checks.map((c, i) => (
               <div key={i} className="flex items-center gap-2 text-xs">
                 {c.level === "pass" ? <CheckCircle2 className="h-3.5 w-3.5 text-primary" /> :
                   c.level === "warn" ? <AlertTriangle className="h-3.5 w-3.5 text-accent" /> :
                     <XCircle className="h-3.5 w-3.5 text-destructive" />}
                 <span className={c.level === "pass" ? "text-muted-foreground" : ""}>{c.label}</span>
-                {c.level !== "pass" && c.fix?.map((f) => (
+                {c.level !== "pass" && c.fix?.map((f) => f.to === "#schedule" ? (
+                  <button key={f.label} type="button" onClick={() => setTab("publish")} className="text-primary underline underline-offset-2 hover:no-underline">{f.label}</button>
+                ) : (
                   <Link key={f.label} to={f.to} onClick={() => onOpenChange(false)} className="text-primary underline underline-offset-2 hover:no-underline">{f.label}</Link>
                 ))}
               </div>
@@ -284,21 +298,21 @@ export function PostingPackageDrawer({
             <p className="text-sm whitespace-pre-wrap leading-relaxed rounded-md bg-muted/30 p-3 max-h-72 overflow-y-auto">{card.draft_copy}</p>
           </Section>
 
-          <Section title="Hashtags" copyText={(card.hashtags ?? []).join(" ")} k="tags">
-            <p className="text-sm text-primary/80">{(card.hashtags ?? []).join(" ") || <span className="text-muted-foreground">None</span>}</p>
+          <Section title="Hashtags" copyText={formatHashtags(card.hashtags) || undefined} k="tags">
+            <p className="text-sm text-primary/80">{formatHashtags(card.hashtags) || <span className="text-muted-foreground">None</span>}</p>
           </Section>
 
-          <Section title="First comment" copyText={firstComment} k="first">
+          <Section title="First comment" copyText={firstComment || undefined} k="first">
             <Textarea value={firstComment} onChange={(e) => setFirstComment(e.target.value)} rows={3}
               placeholder="Optional — e.g. link, extra context, or hashtags to post as the first comment" />
           </Section>
 
           <Section title="Tagging instructions" k="tagging"
-            copyText={[...(card.people_tags ?? []), ...(card.org_tags ?? [])].join(" ")}>
+            copyText={[...(card.people_tags ?? []), ...(card.org_tags ?? [])].join(" ") || undefined}>
             <div className="text-sm space-y-1">
               <p><span className="text-muted-foreground">People:</span> {(card.people_tags ?? []).join(", ") || "—"}</p>
               <p><span className="text-muted-foreground">Organizations:</span> {(card.org_tags ?? []).join(", ") || "—"}</p>
-              <p className="text-xs text-muted-foreground">Type each tag manually in the post so the platform links the profile.</p>
+              <p className="text-xs text-muted-foreground">Copied names may need to be re-selected on the platform to become linked mentions.</p>
             </div>
           </Section>
 
@@ -328,10 +342,9 @@ export function PostingPackageDrawer({
 
           <Separator />
 
-          <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
-            <span>Checksum {checksum}</span>
-            {card.package_checksum && <span>Last exported {card.package_checksum}{card.package_checksum !== checksum && " · changed since"}</span>}
-          </div>
+          {card.package_checksum && card.package_checksum !== checksum && (
+            <p className="text-xs text-muted-foreground">This package changed since it was last exported.</p>
+          )}
 
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={() => copy(packageText, "all")}>
@@ -341,7 +354,7 @@ export function PostingPackageDrawer({
             <span title={postReason ?? "Copies caption + hashtags and opens the platform. You post it yourself."}>
               <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="default"
                 disabled={!!postReason}
-                copyText={[card.draft_copy, (card.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n")}
+                copyText={outboundText(card.draft_copy, card.hashtags)}
                 onOpened={() => setOpenedPlatform(true)} />
             </span>
             <Button variant="ghost" size="sm" onClick={save} disabled={saving}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>
@@ -352,9 +365,10 @@ export function PostingPackageDrawer({
             )}
           </div>
 
-          {openedPlatform && (
+          {canExport && !["posted", "archived"].includes(card.approval_status) && (
             <div className="rounded-md border p-3 space-y-2">
-              <p className="text-sm font-medium">Posted it?</p>
+              <p className="text-sm font-medium">{openedPlatform ? "Posted it?" : "Already posted it yourself?"}</p>
+              <p className="text-xs text-muted-foreground">Marking as posted records your confirmation. It doesn't publish anything or verify delivery.</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Input className="h-8 flex-1 min-w-[200px]" placeholder="Live post link (optional)"
                   value={postedUrl} onChange={(e) => setPostedUrl(e.target.value)} />

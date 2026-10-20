@@ -57,7 +57,7 @@ export function ReportingConnectors({ isAdmin }: { isAdmin: boolean }) {
           const r = byKey.get(p.key);
           const on = !!r?.key_prefix && r.enabled;
           return (
-            <article key={p.key} className="sm-rep-card">
+            <article key={p.key} className={`sm-rep-card sm-rep-tone-${p.key}`}>
               <div className="sm-rep-head">
                 <span className="sm-rep-logo">{LOGOS[p.key] ? <img src={LOGOS[p.key]} alt={`${p.name} logo`} /> : <Sigma aria-label={`${p.name} logo unavailable`} />}</span>
                 <p className="sm-rep-name">{p.name}</p>
