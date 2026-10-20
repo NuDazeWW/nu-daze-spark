@@ -3380,6 +3380,7 @@ export type Database = {
       can_control_spend: { Args: { _user_id: string }; Returns: boolean }
       can_create_content: { Args: { _user_id: string }; Returns: boolean }
       can_edit_content: { Args: { _user_id: string }; Returns: boolean }
+      cancel_delivery_schedule: { Args: { _post: string }; Returns: undefined }
       clear_demo_content: {
         Args: { _confirm: string; _purge_media?: boolean }
         Returns: Json
@@ -3479,6 +3480,7 @@ export type Database = {
         Args: { _alert_id: string }
         Returns: undefined
       }
+      return_comment_to_queue: { Args: { _post: string }; Returns: undefined }
       review_nonprofit_application: {
         Args: { _decision: string; _id: string; _notes: string }
         Returns: undefined
