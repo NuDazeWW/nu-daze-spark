@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useReadiness } from "@/hooks/useReadiness";
 import { readPackageDraft, writePackageDraft } from "@/lib/packageDrafts";
@@ -27,7 +27,6 @@ import { Input } from "@/components/ui/input";
 import { Split } from "lucide-react";
 import { SplitPlatformsDialog } from "./SplitPlatformsDialog";
 import { formatHashtags, outboundText } from "@/lib/contentPresentation";
-import { evaluateReadiness } from "@/lib/readiness";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
 } from "lucide-react";
@@ -70,6 +69,21 @@ function buildPackageText(card: PostCard, firstComment: string, notes: string, a
   return lines.join("\n");
 }
 
+const PackageSection = ({ title, copyText, k, children, copied, onCopy }: { title: string; copyText?: string; k: string; children: React.ReactNode; copied: string | null; onCopy: (text: string, key: string) => void }) => (
+    <div className="sm-package-section space-y-2" data-section={k}>
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h4>
+        {copyText ? (
+          <Button size="sm" variant="ghost" className="h-6 px-2 text-xs gap-1" onClick={() => onCopy(copyText, k)}>
+            {copied === k ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />} Copy
+          </Button>
+        ) : null}
+      </div>
+      {children}
+    </div>
+  );
+
+
 export function PostingPackageDrawer({
   card, open, onOpenChange, canExport, onMarkExported, initialTab,
 }: {
@@ -96,17 +110,19 @@ export function PostingPackageDrawer({
   const [openedPlatform, setOpenedPlatform] = useState(false);
   const [tab, setTab] = useState("package");
   const [postedUrl, setPostedUrl] = useState("");
+  const skipDraftWrite = useRef(true);
 
   useEffect(() => { if (open) { setTab(initialTab === "schedule" ? "publish" : initialTab ?? "package"); setPublishMode(initialTab === "schedule" ? "schedule" : "now"); } }, [open, card?.id, initialTab]);
 
   useEffect(() => {
+    skipDraftWrite.current = true;
     const saved = readPackageDraft<{ firstComment?: string; notes?: string; postedUrl?: string }>(draftKey, {});
     setFirstComment(saved.firstComment ?? card?.first_comment ?? "");
     setNotes(saved.notes ?? card?.posting_notes ?? "");
     setPostedUrl(saved.postedUrl ?? "");
-  }, [card?.id]);
+  }, [draftKey]);
 
-  useEffect(() => { if (card) writePackageDraft(draftKey, { firstComment, notes, postedUrl }); }, [firstComment, notes, postedUrl]);
+  useEffect(() => { if (skipDraftWrite.current) { skipDraftWrite.current = false; return; } if (card) writePackageDraft(draftKey, { firstComment, notes, postedUrl }); }, [draftKey, firstComment, notes, postedUrl]);
   const refs = card?.source_references ?? [];
   const { data: assets = [] } = useQuery({
     queryKey: ["package_assets", card?.id, refs.join(",")],
@@ -138,11 +154,11 @@ export function PostingPackageDrawer({
     const c: Check[] = [];
     const edit = { label: "Fix in Daily Queue", to: `/queue?post=${card.id}&edit=1` };
     const limit = LIMITS[card.platform] ?? 3000;
-    const len = card.draft_copy.length;
+    const len = outboundText(card.draft_copy, card.hashtags, card.apply_ai_disclosure).length;
     c.push(len > limit
       ? { level: "fail", label: `Copy is ${len}/${limit} characters — over the ${card.platform} limit`, fix: [edit] }
       : { level: "pass", label: `Copy length ${len}/${limit}` });
-    const tags = card.hashtags?.length ?? 0;
+    const tags = formatHashtags(card.hashtags).split(" ").filter(Boolean).length;
     const maxTags = MAX_HASHTAGS[card.platform] ?? 30;
     c.push(tags > maxTags
       ? { level: "warn", label: `${tags} hashtags — recommended max ${maxTags}`, fix: [edit] }
@@ -161,7 +177,7 @@ export function PostingPackageDrawer({
     else c.push({ level: "fail", label: "Not yet approved", fix: [{ label: "Review in Daily Queue", to: `/queue?post=${card.id}` }] });
     if (!card.scheduled_for) c.push({ level: "warn", label: "No scheduled time set", fix: [{ label: "Schedule", to: "#schedule" }] });
     return c;
-  }, [card, assets]);
+  }, [card, assets, approvalRequired]);
 
   const pf = usePreflight(card);
   const preflightFail = card && !pf.gate.clear ? 1 : 0;
@@ -224,19 +240,6 @@ export function PostingPackageDrawer({
     onOpenChange(false);
   };
 
-  const Section = ({ title, copyText, k, children }: { title: string; copyText?: string; k: string; children: React.ReactNode }) => (
-    <div className="sm-package-section space-y-2" data-section={k}>
-      <div className="flex items-center justify-between">
-        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h4>
-        {copyText ? (
-          <Button size="sm" variant="ghost" className="h-6 px-2 text-xs gap-1" onClick={() => copy(copyText, k)}>
-            {copied === k ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />} Copy
-          </Button>
-        ) : null}
-      </div>
-      {children}
-    </div>
-  );
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -246,18 +249,18 @@ export function PostingPackageDrawer({
           <SheetDescription className="capitalize">{card.platform} · {card.content_type}
             {card.scheduled_for && ` · ${new Date(card.scheduled_for).toLocaleString()}`}</SheetDescription>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/review?post=${card.id}`); toast({ title: "Executive review link copied" }); }}>
+            <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => copy(`${window.location.origin}/review?post=${card.id}`, "review-link")}>
               Copy executive review link
             </Button>
             <Button variant="outline" size="sm" className="mt-2 w-fit" disabled={!settings?.executive_review_enabled || !["owner", "admin", "editor"].includes(role ?? "") || saving || card.is_sample || ["in_review", "posted", "archived"].includes(card.approval_status)} title={!settings?.executive_review_enabled ? "Executive Review is off in Setup" : card.approval_status === "in_review" ? "Already sent for review" : "Send this post for Executive Review"} onClick={async () => {
               if (saving) return; setSaving(true);
-              const { error } = await supabase.from("post_cards").update({ approval_status: "in_review", updated_by: user?.id }).eq("id", card.id).neq("approval_status", "in_review");
+              const { error } = await supabase.from("post_cards").update({ approval_status: "in_review", updated_by: user?.id }).eq("id", card.id).neq("approval_status", "in_review").select("id").single();
               setSaving(false);
               if (error) toast({ title: "Could not send for review", description: error.message, variant: "destructive" });
               else { toast({ title: "Sent for Executive Review" }); qc.invalidateQueries({ queryKey: ["post_cards"] }); }
             }}>Send for Executive Review</Button>
             {!settings?.executive_review_enabled && <Link className="text-xs underline" to="/setup">Executive Review is off · Setup</Link>}
-            {canCreate && (
+            {canCreate && !card.is_sample && (
               <Button variant="outline" size="sm" className="mt-2 w-fit" onClick={() => setSplitOpen(true)}>
                 <Split className="mr-2 h-4 w-4" /> Split across platforms
               </Button>
@@ -315,31 +318,31 @@ export function PostingPackageDrawer({
             ))}
           </div>
 
-          <Section title="Final copy" copyText={card.draft_copy} k="copy">
-            <p className="text-sm whitespace-pre-wrap leading-relaxed rounded-md bg-muted/30 p-3 max-h-72 overflow-y-auto">{card.draft_copy}</p>
-          </Section>
+          <PackageSection copied={copied} onCopy={copy} title="Final copy" copyText={card.draft_copy + (card.apply_ai_disclosure ? "\n\n#AIassisted" : "")} k="copy">
+            <p className="text-sm whitespace-pre-wrap leading-relaxed rounded-md bg-muted/30 p-3 max-h-72 overflow-y-auto">{card.draft_copy}{card.apply_ai_disclosure ? "\n\n#AIassisted" : ""}</p>
+          </PackageSection>
 
-          <Section title="Hashtags" copyText={formatHashtags(card.hashtags) || undefined} k="tags">
+          <PackageSection copied={copied} onCopy={copy} title="Hashtags" copyText={formatHashtags(card.hashtags) || undefined} k="tags">
             <p className="text-sm text-primary/80">{formatHashtags(card.hashtags) || <span className="text-muted-foreground">None</span>}</p>
-          </Section>
+          </PackageSection>
 
-          <Section title="First comment" copyText={firstComment || undefined} k="first">
+          <PackageSection copied={copied} onCopy={copy} title="First comment" copyText={firstComment || undefined} k="first">
             <Textarea value={firstComment} onChange={(e) => setFirstComment(e.target.value)} rows={3}
               placeholder="Optional — e.g. link, extra context, or hashtags to post as the first comment" />
-          </Section>
+          </PackageSection>
 
           <details><summary className="text-sm font-semibold cursor-pointer">Tagging instructions</summary>
-          <Section title="Tags" k="tagging"
+          <PackageSection copied={copied} onCopy={copy} title="Tags" k="tagging"
             copyText={[...(card.people_tags ?? []), ...(card.org_tags ?? [])].join(" ") || undefined}>
             <div className="text-sm space-y-1">
               <p><span className="text-muted-foreground">People:</span> {(card.people_tags ?? []).join(", ") || "—"}</p>
               <p><span className="text-muted-foreground">Organizations:</span> {(card.org_tags ?? []).join(", ") || "—"}</p>
               <p className="text-xs text-muted-foreground">Copied names may need to be re-selected on the platform to become linked mentions.</p>
             </div>
-          </Section>
+          </PackageSection>
 
           </details>
-          <Section title="Media" k="media">
+          <PackageSection copied={copied} onCopy={copy} title="Media" k="media">
             {assets.length ? (
               <div className="space-y-1.5">
                 {assets.map((a) => (
@@ -356,12 +359,12 @@ export function PostingPackageDrawer({
             ) : (
               <p className="text-sm text-muted-foreground italic">{card.suggested_asset_description || "No media attached."}</p>
             )}
-          </Section>
+          </PackageSection>
 
-          <Section title="Posting notes" k="notes">
+          <PackageSection copied={copied} onCopy={copy} title="Posting notes" k="notes">
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2}
               placeholder="Anything the person posting should know (timing, crop, who to notify)" />
-          </Section>
+          </PackageSection>
 
           <Separator />
 
@@ -380,8 +383,8 @@ export function PostingPackageDrawer({
                 copyText={outboundText(card.draft_copy, card.hashtags, card.apply_ai_disclosure)}
                 onOpened={() => setOpenedPlatform(true)} />
             </span>
-            <Button variant="ghost" size="sm" onClick={save} disabled={saving || !["owner", "admin", "editor", "reviewer"].includes(role ?? "")}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>
-            {canExport && card.approval_status === "approved" && (
+            <Button variant="ghost" size="sm" onClick={save} disabled={saving || card.is_sample || !["owner", "admin", "editor", "reviewer"].includes(role ?? "")}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>
+            {canExport && !card.is_sample && card.approval_status === "approved" && (
               <Button size="sm" className="ml-auto" disabled={failCount > 0} onClick={markExported}>
                 <ArrowRight className="h-3.5 w-3.5 mr-1" /> Mark exported
               </Button>

@@ -18,7 +18,7 @@ const GATE_META: Record<GateState, { label: string; cls: string; Icon: typeof Sh
   none: { label: "Preflight not run", cls: "border-border text-muted-foreground", Icon: Shield },
   stale: { label: "Preflight out of date", cls: "border-brand-warning/40 text-brand-warning", Icon: ShieldAlert },
   pass: { label: "Preflight pass", cls: "border-primary/40 text-primary", Icon: ShieldCheck },
-  acknowledged: { label: "Warnings bypassed", cls: "border-primary/40 text-primary", Icon: ShieldCheck },
+  acknowledged: { label: "Warnings acknowledged", cls: "border-primary/40 text-primary", Icon: ShieldCheck },
   overridden: { label: "Preflight overridden", cls: "border-brand-warning/40 text-brand-warning", Icon: ShieldAlert },
   warnings: { label: "Preflight warnings", cls: "border-brand-warning/40 text-brand-warning", Icon: ShieldAlert },
   blocked: { label: "Preflight blocked", cls: "border-destructive/50 text-destructive", Icon: ShieldX },
@@ -104,9 +104,7 @@ function FindingCard({ f, pf }: { f: PreflightFinding; pf: Preflight }) {
 }
 
 export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin: boolean; draft?: string }) {
-  const { review, gate, run, acknowledge, override, proposeRewrite, keepRewrite } = pf;
-  const [reason, setReason] = useState("");
-  const [bypassOpen, setBypassOpen] = useState(false);
+  const { review, gate, run, acknowledge, proposeRewrite, keepRewrite } = pf;
   const [proposal, setProposal] = useState<{ draft_copy: string; changes: string[] } | null>(null);
   const findings = review?.findings ?? [];
   const blocking = findings.filter((f) => f.severity === "blocking");
@@ -124,7 +122,7 @@ export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin:
     const w = (review?.motive_breakdown as any)?.weakest;
     if (w?.key) proposeRewrite.mutate({ key: w.key, hint: w.hint }, { onSuccess: (d) => setProposal(d) });
   };
-  const bypassAll = () => (blocking.length ? setBypassOpen(true) : acknowledge.mutate());
+  const bypassAll = () => acknowledge.mutate();
 
   return (
     <div className="space-y-4">
@@ -172,8 +170,8 @@ export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin:
                 <ShieldCheck className="h-3.5 w-3.5 mr-1" />Acknowledge warnings and continue
               </Button>
             )}
-            {!cleared && blocking.length > 0 && !isAdmin && (
-              <p className="text-[11px] text-muted-foreground self-center">Only an admin can bypass blocking issues.</p>
+            {!cleared && blocking.length > 0 && (
+              <p className="text-[11px] text-muted-foreground self-center">Required checks must be fixed; acknowledgment cannot bypass them.</p>
             )}
           </div>
         )}
@@ -197,20 +195,6 @@ export function PreflightPanel({ pf, isAdmin, draft }: { pf: Preflight; isAdmin:
       )}
 
       {review?.overridden_at && <p className="text-xs text-muted-foreground">Overridden {format(new Date(review.overridden_at), "MMM d, p")}: {review.override_reason}</p>}
-
-      <Dialog open={bypassOpen} onOpenChange={setBypassOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Bypass blocking issues</DialogTitle>
-            <DialogDescription>You were notified and choose to keep the draft as is. This is logged with your reason.</DialogDescription>
-          </DialogHeader>
-          <Textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is this safe to keep?" />
-          <Button size="sm" variant="destructive" disabled={reason.trim().length < 8 || override.isPending}
-            onClick={() => override.mutate(reason.trim(), { onSuccess: () => { setReason(""); setBypassOpen(false); } })}>
-            Bypass and allow
-          </Button>
-        </DialogContent>
-      </Dialog>
 
       {/* 4. Side-by-side AI fix */}
       <Dialog open={!!proposal} onOpenChange={(o) => !o && setProposal(null)}>

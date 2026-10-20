@@ -1,3 +1,4 @@
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
 import { deliveryLabel } from "@/lib/deliveryPresentation";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -108,12 +109,12 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
 
   useEffect(() => { if (date) writePackageDraft(draftKey, { targets, date, time, tz, disclosure }); }, [draftKey, targets, date, time, tz, disclosure]);
 
-  const selected = useMemo(() => (accounts.data ?? []).filter((a) => targets.includes(a.id)), [accounts.data, targets]);
+  const selected = useMemo(() => (accounts.data ?? []).filter((a) => targets.includes(a.id) && a.connection_status === "connected"), [accounts.data, targets]);
   const canSend = (platform: string) => capabilities.data?.some(c => c.platform === platform && c.live_enabled && c.dispatch_ready && c.verified_at) ?? false;
   const allLive = selected.length > 0 && selected.every(a => canSend(a.platform));
   const actionLabel = allLive ? "Publish live now" : "Stage for delivery";
   const copy = card.draft_copy + (disclosure ? "\n\n#AIassisted" : "");
-  const tagCount = (card.hashtags ?? []).length;
+  const tagCount = formatHashtags(card.hashtags).split(" ").filter(Boolean).length;
   const { approvalRequired } = useWorkspace();
   const isApproved = !approvalRequired || ["approved", "exported", "posted"].includes(card.approval_status);
 
@@ -147,7 +148,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
         if (epoch <= Date.now() + 60000) throw new Error("That time has passed. Pick a future time; your input was kept.");
         when = new Date(epoch).toISOString();
       }
-      const { data, error } = await supabase.rpc("submit_delivery", { _post: card.id, _accounts: targets, _when: when ?? undefined, _timezone: tz, _disclosure: disclosure });
+      const { data, error } = await supabase.rpc("submit_delivery", { _post: card.id, _accounts: selected.map(a => a.id), _when: when ?? undefined, _timezone: tz, _disclosure: disclosure });
       if (error) throw error;
       const result = data as { status?: string };
       toast({ title: result.status === "scheduled" ? "Scheduled" : result.status === "partial" ? "Channel results differ" : "Staged — not sent", description: "Saved channel outcomes. No content was sent to a platform." });
@@ -210,14 +211,14 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
                     const on = targets.includes(a.id);
                     const connected = a.connection_status === "connected";
                     return (
-                      <button key={a.id} disabled={!connected} onClick={() => toggle(a.id)}
+                      <Button type="button" variant="outline" key={a.id} disabled={!connected && !on} onClick={() => toggle(a.id)}
                         title={connected ? "" : "Connect this account first"}
                         className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors disabled:opacity-50 ${on ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted"}`}>
-                        <span className={`h-2 w-2 rounded-full ${connected ? "bg-primary" : "bg-muted-foreground/40"}`} />
+                        <PlatformIcon platform={a.platform} className="h-4 w-4" />
                         <span className="font-semibold">{LIMITS[a.platform]?.label ?? a.platform}</span>
                         <span>{canSend(a.platform) ? "Live sending verified" : "Staging only"}</span>
                         <span className="text-muted-foreground">{a.handle ? `@${a.handle.replace(/^@/, "")}` : a.account_name}</span>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -261,7 +262,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
               </select>
             </div>
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-              <Sparkles className="h-3 w-3" /> Best times for {LIMITS[card.platform]?.label ?? card.platform}:
+              <Sparkles className="h-3 w-3" /> Suggested times for {LIMITS[card.platform]?.label ?? card.platform}:
               {(BEST_TIMES[card.platform] ?? []).map((t) => (
                 <button key={t} onClick={() => setTime(t)} className={`rounded border px-2 py-0.5 ${time === t ? "border-primary text-primary" : "hover:bg-muted"}`}>{t}</button>
               ))}
@@ -276,7 +277,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
             <Switch checked={disclosure} onCheckedChange={setDisclosure} />
           </div>
 
-          <XLinkMeter text={copy} xChannels={selected.filter((a) => a.platform === "x").length} />
+          <XLinkMeter text={copy} xChannels={selected.filter((a) => a.platform === "x" && canSend(a.platform)).length} />
 
           {!isApproved && (
             <p className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
@@ -289,7 +290,8 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
             {running ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : mode === "schedule" ? <CalendarClock className="h-4 w-4 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
             {mode === "schedule" ? "Schedule post" : actionLabel}
           </Button>
-          {status === "scheduled" && canPublish && <Button variant="outline" onClick={async () => { const { error } = await supabase.rpc("cancel_delivery_schedule", { _post: card.id }); if (error) toast({ title: "Could not cancel schedule", description: error.message, variant: "destructive" }); else { toast({ title: "Schedule canceled" }); qc.invalidateQueries({ queryKey: ["post_cards"] }); } }}>Cancel schedule</Button>}
+          {(!canPublish || card.is_sample || !selected.length || blocking || !readiness.data?.canDeliver) && <p className="text-xs text-muted-foreground">{card.is_sample ? "Sample only — publishing and scheduling are disabled." : !canPublish ? "Your role can view this package but cannot publish or schedule." : !selected.length ? "Select a connected account above." : blocking ? "Shorten the final text for the selected channels." : readiness.isError ? "Checks unavailable. Try again before scheduling." : readiness.data?.label ?? "Wait for current checks before scheduling."}</p>}
+          {status === "scheduled" && !card.is_sample && canPublish && <Button variant="outline" onClick={async () => { const { error } = await supabase.rpc("cancel_delivery_schedule", { _post: card.id }); if (error) toast({ title: "Could not cancel schedule", description: error.message, variant: "destructive" }); else { toast({ title: "Schedule canceled" }); qc.invalidateQueries({ queryKey: ["post_cards"] }); } }}>Cancel schedule</Button>}
           <p className="text-xs text-muted-foreground">Live sending isn't available yet: it needs approved platform apps, connected in Workspace Settings → Social Connections. Scheduled posts are staged, not sent.</p>
         </>
       )}
