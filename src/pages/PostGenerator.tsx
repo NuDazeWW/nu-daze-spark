@@ -404,9 +404,10 @@ export default function PostGenerator() {
                 {isGenerating ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Generating…</>
                 ) : (
-                  <><Sparkles className="mr-2 h-4 w-4" />{textLed ? `Generate ${variants} text post${variants > 1 ? "s" : ""}` : `Generate Post Cards (${selectedAssetIds.length})`}</>
+                  <><Sparkles className="mr-2 h-4 w-4" />{textLed ? `Generate ${variants} text post${variants > 1 ? "s" : ""}` : "Generate Post Cards"}</>
                 )}
               </Button>
+              {!textLed && <p className="mt-2 text-center text-xs text-muted-foreground">{selectedAssetIds.length ? `${selectedAssetIds.length} source asset${selectedAssetIds.length === 1 ? "" : "s"} selected` : "Select at least one source asset."}</p>}
             </CardContent>
           </Card>
         </div>

@@ -44,7 +44,7 @@ const RISK_COLOR = {
 };
 
 const RISK_LABEL = {
-  safe: "Safe",
+  safe: "No brand risks flagged",
   review_needed: "Review Needed",
   blocked: "Blocked",
 };
@@ -64,8 +64,8 @@ function EngagementBadge({ engagement }: { engagement: number }) {
     color = "bg-brand-signal/15 text-brand-signal border-brand-signal/30";
   }
   return (
-    <Badge variant="outline" className={`text-[9px] ${color}`}>
-      {tier} · {engagement}
+    <Badge variant="outline" className={`text-[9px] ${color}`} title="Estimated engagement on the original post (likes, comments and shares), from the import. Not a live count.">
+      {tier} · {engagement} est. engagement
     </Badge>
   );
 }
@@ -159,7 +159,7 @@ function InlineComment({ comment, onSave, isSaving, onCopied, onRegenerate, isRe
         )}
         <Button size="sm" className="h-7 text-[11px] sm-cg-approve" disabled={!postUrl}
           title={postUrl ? "Copy the comment and open the original post" : "No link saved for this post"}
-          onClick={(e) => { e.stopPropagation(); if (!postUrl) return; copyThenOpen(text, postUrl).then((ok) => { if (ok) toast.success("Comment copied — paste it on the post"); }); onCopied?.(); }}>
+          onClick={(e) => { e.stopPropagation(); if (!postUrl) return; copyThenOpen(text, postUrl).then((ok) => { if (ok) toast.success("Comment copied — paste it on the post", { description: "Copying doesn't post it. Mark it commented once it's live." }); }); onCopied?.(); }}>
           <ExternalLink className="h-3 w-3 mr-1" />Copy & open post
         </Button>
       </div>
@@ -326,7 +326,7 @@ export default function CommentGenerator() {
   // Icon set mirrors the design mock: bubble, group, @-mention, community.
   const kpis = [
     { label: "Needs Response", value: needsResponse, icon: MessageSquare, accent: "cyan", filter: "needs_response" as InboxFilter },
-    { label: "High Impact", value: highImpact, icon: Users, accent: "lime", filter: "high_impact" as InboxFilter },
+    { label: "High relevance", value: highImpact, icon: Users, accent: "lime", filter: "high_impact" as InboxFilter },
     { label: "Review Needed", value: reviewNeeded, icon: AtSign, accent: "magenta", filter: "review_needed" as InboxFilter },
     { label: "Total Comments", value: totalComments, icon: UsersRound, accent: "gold", filter: "all" as InboxFilter },
   ];
@@ -334,7 +334,7 @@ export default function CommentGenerator() {
   const inboxItems: { key: InboxFilter; label: string; count: number; icon: typeof Inbox }[] = [
     { key: "all", label: "All Comments", count: posts.length, icon: Inbox },
     { key: "needs_response", label: "Needs Response", count: needsResponse, icon: Clock },
-    { key: "high_impact", label: "High Impact", count: highImpact, icon: Star },
+    { key: "high_impact", label: "High relevance", count: highImpact, icon: Star },
     { key: "review_needed", label: "Review Needed", count: reviewNeeded, icon: AlertTriangle },
     { key: "commented", label: "Commented", count: commentedCount, icon: CheckCircle2 },
   ];
@@ -513,6 +513,7 @@ export default function CommentGenerator() {
                   </Button>
                 </>
               )}
+              <span className="text-[11px] text-muted-foreground">{selectedIds.length ? `${selectedIds.length} post${selectedIds.length === 1 ? "" : "s"} selected` : "Select one or more posts to generate comment drafts."}</span>
               <Button
                 onClick={handleGenerate}
                 disabled={selectedIds.length === 0 || generateComments.isPending}
@@ -523,7 +524,7 @@ export default function CommentGenerator() {
                 {generateComments.isPending ? (
                   <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Generating…</>
                 ) : (
-                  <><Sparkles className="mr-2 h-3.5 w-3.5" />Generate Comments ({selectedIds.length})</>
+                  <><Sparkles className="mr-2 h-3.5 w-3.5" />Generate Comment Drafts</>
                 )}
               </Button>
               <Link to="/queue">
