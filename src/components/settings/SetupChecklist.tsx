@@ -20,13 +20,19 @@ export function SetupChecklist() {
           <Progress value={(ws.setupCompleted / ws.setupTotal) * 100} className="w-40" />
           <Button asChild size="sm" variant={done ? "outline" : "default"}><Link to="/setup">{done ? "Review setup" : "Continue setup"}</Link></Button>
         </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-1">
-          {SETUP_STEPS.map((s) => (
-            <Link key={s.key} to={`/setup?step=${s.key}`} className="flex items-center gap-1 text-xs hover:underline">
-              {ws.progress[s.key] ? <CheckCircle2 className="h-3.5 w-3.5 text-brand-success" /> : <Circle className="h-3.5 w-3.5 text-muted-foreground" />}{s.title}
-            </Link>
-          ))}
-        </div>
+        <nav aria-label="Setup steps" className="flex flex-wrap gap-2">
+          {SETUP_STEPS.map((s) => {
+            const complete = !!ws.progress[s.key];
+            const current = !done && s.key === SETUP_STEPS.find((x) => !ws.progress[x.key])?.key;
+            return (
+              <Link key={s.key} to={`/setup?step=${s.key}`} aria-current={current ? "step" : undefined}
+                className="sm-lit inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
+                data-accent={current ? "cyan" : "neutral"} data-selected={current} data-interactive="true">
+                {complete ? <CheckCircle2 className="h-3.5 w-3.5 text-brand-success" aria-label="Complete" /> : <Circle className="h-3.5 w-3.5 text-muted-foreground" aria-label="Not complete" />}{s.title}
+              </Link>
+            );
+          })}
+        </nav>
       </CardContent>
     </Card>
   );
