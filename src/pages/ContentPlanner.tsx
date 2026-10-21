@@ -147,7 +147,8 @@ export default function ContentPlanner() {
       toast.success(`${changes.length} post${changes.length === 1 ? "" : "s"} updated`);
     } catch (e) {
       qc.setQueryData(key, previous);
-      toast.error(`Couldn't move the post — it's back on its original date. ${e instanceof Error ? e.message : ""}`.trim());
+      const msg = (e as { message?: string } | null)?.message ?? "";
+      toast.error(`Couldn't move the post — it's back on its original date.${msg ? ` ${msg}.` : ""}`);
     } finally {
       setBusy(false);
     }
@@ -157,6 +158,8 @@ export default function ContentPlanner() {
     if (!canEdit) return;
     const p = posts.find((x) => x.id === id);
     if (!p) return;
+    const endOfDay = new Date(day); endOfDay.setHours(23, 59, 59, 999);
+    if (endOfDay < new Date()) { toast.error("Posts can only be moved to today or a future date."); return; }
     const base = p.scheduled_for ? new Date(p.scheduled_for) : null;
     const d = new Date(day);
     if (base) d.setHours(base.getHours(), base.getMinutes(), 0, 0);
