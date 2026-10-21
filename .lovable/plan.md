@@ -49,6 +49,14 @@ Order: items 1–4 first (demo blockers), then 5–10. Nothing in the existing t
 - The side panel shows details only: Type, Description, Origin, Created, Asset status, plus Download and Preview.
 - Preview opens the existing full-screen viewer. The panel fits a 1080px-high screen with no inner scrolling.
 
+## 11. Readable header text (every page)
+- The back link, breadcrumb and subtitle already come from the one shared page heading, so a single change reaches every page. The only exceptions are the legal and "not found" pages, which have no artwork and keep their current look.
+- Back link and breadcrumb: pure white, bold, 13–14px. The arrow matches the label. On hover the link turns cyan and gets an underline.
+- Subtitle: pure white, semibold, 15–16px. All three get a soft dark shadow behind the letters.
+- A faint dark shade sits behind the heading text so it stays readable over the brightest part of the artwork.
+- Layout, spacing and artwork stay exactly as they are.
+- Contrast is measured against the brightest part of the artwork at widths 1280, 1440 and 1920, plus phone widths from 375 to 430. Targets are 4.5:1 for small text and 3:1 for the title.
+
 ## Verification
 - Browser checks for every item at 1280, 1440 and 1920 widths, with a broken-link report for item 2.
 - Small tests for date-range math, nav search matching and auto-opening the current group.
