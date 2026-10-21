@@ -24,3 +24,4 @@
 - Route opening scroll resets are centralized in the router and overlay opening resets in shared UI primitives via `openingScroll`; this covers new views without clearing drafts or resetting scroll on ordinary renders.
 - Sidebar and page-top local navigation both read `src/lib/navigation.ts` (typed route/anchor/tab/route-section entries), so menus never drift apart.
 - Luminous treatment is the shared `.sm-lit` / `.sm-lit-icon` / `.sm-lit-btn` CSS with accents chosen by purpose from `src/lib/cardAccents.ts`, never by position, so meaning stays consistent.
+- Every publish entry point renders `src/components/posting/PublishActions.tsx` (labels in `src/lib/postingPackage.ts`); it only opens the existing staged-delivery drawer and never contacts a platform.

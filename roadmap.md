@@ -41,3 +41,10 @@
 - [ ] Use readiness evaluator on cards, queue, review, dashboard
 - [ ] Three sample Publishing Status records; Content Planner dark header; Repurpose card redesign; demo badge removal; US-English sweep
 - [ ] Full 12-check browser verification at 887px and 1440px
+
+# Demo-blocker fixes and consistency pass (approved 2026-10-21)
+- [x] Section buttons scroll + highlight (Post Office, Repurpose menu); sidebar current group opens; Find a page (Ctrl/Cmd+K)
+- [x] One publishing action set incl. Schedule (drawer, Approved, Queue cards, Dashboard); "Stage for delivery" renamed
+- [x] Planner: optimistic drop with rollback, readable errors, past-date guard; Repurpose single container; export custom range; asset panel trimmed
+- [x] Header back link / breadcrumb / subtitle readability
+- [ ] Contrast measured by eye only (not instrumented at every width); 1920 and phone widths not screenshotted
