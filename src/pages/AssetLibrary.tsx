@@ -81,6 +81,13 @@ export default function AssetLibrary() {
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
   const [bulkMode, setBulkMode] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // On screens shorter than 1080px the details list starts folded so the panel fits.
+  const [tallScreen, setTallScreen] = useState(() => typeof window === "undefined" || window.innerHeight >= 1080);
+  useEffect(() => {
+    const on = () => setTallScreen(window.innerHeight >= 1080);
+    window.addEventListener("resize", on);
+    return () => window.removeEventListener("resize", on);
+  }, []);
   const [typeGroup, setTypeGroup] = useState<TypeGroup>("all");
 
   const filtered = useMemo(() => {
