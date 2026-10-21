@@ -13,6 +13,11 @@ export function scrollToSection(id: string, attempts = 12): void {
     }
     if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
     el.focus({ preventScroll: true });
+    // Visible confirmation even when the section is already on screen.
+    el.classList.remove("sm-section-flash");
+    void el.offsetWidth;
+    el.classList.add("sm-section-flash");
+    window.setTimeout(() => el.classList.remove("sm-section-flash"), 1800);
   };
   go(attempts);
 }
