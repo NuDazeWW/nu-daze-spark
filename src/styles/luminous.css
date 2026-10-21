@@ -338,3 +338,48 @@ body[data-sm-surface="reading"], .sm-light-page, .sm-light,
   .sm-lit, .sm-lit-btn, .sm-localnav a { transition: none !important; }
   .sm-lit:hover, .sm-lit-btn:active { transform: none !important; }
 }
+
+/* Header legibility: breadcrumb, back link and subtitle stay readable over the artwork. */
+.sm-page .sm-unified-header > .sm-page-title-row > div:first-child {
+  position: relative;
+  isolation: isolate;
+}
+.sm-page .sm-unified-header > .sm-page-title-row > div:first-child::before {
+  content: "";
+  position: absolute;
+  inset: -14px -32px -14px -24px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,.32) 55%, rgba(0,0,0,0) 100%);
+}
+.sm-page .sm-unified-header .sm-page-context,
+.sm-page .sm-unified-header .sm-page-context a,
+.sm-page .sm-unified-header .sm-page-context nav,
+.sm-page .sm-unified-header .sm-page-context span,
+.sm-page .sm-unified-header .sm-page-context svg {
+  color: #fff !important;
+  opacity: 1 !important;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0,0,0,.65);
+}
+.sm-page .sm-unified-header .sm-page-context svg {
+  stroke-width: 2.75;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.65));
+}
+.sm-page .sm-unified-header .sm-page-context a:hover,
+.sm-page .sm-unified-header .sm-page-context a:hover svg,
+.sm-page .sm-unified-header .sm-page-context a:focus-visible {
+  color: hsl(var(--lit-cyan)) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.sm-page .sm-unified-header .sm-page-subtitle,
+.sm-page .sm-unified-header h1 + p {
+  color: #fff !important;
+  opacity: 1 !important;
+  font-size: 15.5px !important;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,.65);
+}

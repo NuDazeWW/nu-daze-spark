@@ -65,12 +65,6 @@ export default function PostGenerator() {
   const [analyzeVisually, setAnalyzeVisually] = useState(true);
   const [prepStage, setPrepStage] = useState<string>("");
 
-  const { hash } = useLocation();
-  useEffect(() => {
-    if (!["#post-connector", "#generation-station"].includes(hash)) return;
-    const t = window.setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ block: "start" }), 60);
-    return () => window.clearTimeout(t);
-  }, [hash]);
 
   // Pre-select asset from URL param
   useEffect(() => {

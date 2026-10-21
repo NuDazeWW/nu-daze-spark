@@ -61,7 +61,7 @@ export default function ContentPlanner() {
   const maxMonth = startOfMonth(addMonths(new Date(), 12));
 
   const postsQ = useQuery({
-    queryKey: ["planner_posts", activeClientId],
+    queryKey: ["post_cards", "planner", activeClientId],
     enabled: !!activeClientId,
     queryFn: async () => {
       const { data, error } = await supabase.from("post_cards")
@@ -123,6 +123,13 @@ export default function ContentPlanner() {
     if (!changes.length) return;
     setBusy(true);
     const before = changes.map((c) => ({ id: c.id, scheduled_for: posts.find((p) => p.id === c.id)?.scheduled_for ?? null }));
+    // Optimistic: move the posts on screen now, roll back if the save fails.
+    const key = ["post_cards", "planner", activeClientId];
+    const previous = qc.getQueryData<Row[]>(key);
+    qc.setQueryData<Row[]>(key, (rows) => rows?.map((r) => {
+      const ch = changes.find((c) => c.id === r.id);
+      return ch ? { ...r, scheduled_for: ch.scheduled_for } : r;
+    }));
     try {
       const results = await Promise.all(changes.map((c) =>
         supabase.rpc("plan_post_date", { _post: c.id, _when: c.scheduled_for as string })));
@@ -136,11 +143,11 @@ export default function ContentPlanner() {
         });
       }));
       setUndo(before);
-      qc.invalidateQueries({ queryKey: ["planner_posts"] });
       qc.invalidateQueries({ queryKey: ["post_cards"] });
       toast.success(`${changes.length} post${changes.length === 1 ? "" : "s"} updated`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Couldn't update dates");
+      qc.setQueryData(key, previous);
+      toast.error(`Couldn't move the post — it's back on its original date. ${e instanceof Error ? e.message : ""}`.trim());
     } finally {
       setBusy(false);
     }

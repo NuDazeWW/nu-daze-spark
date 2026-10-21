@@ -96,7 +96,7 @@ export function AppSidebar() {
         {NAV_GROUPS.map((g, i) => (
           <div key={g.id}>
             {i > 0 && <SidebarSeparator />}
-            <CollapsibleNavGroup id={g.id} label={g.label}>
+            <CollapsibleNavGroup id={g.id} label={g.label} containsActive={g.items.some((it) => it.href.split(/[?#]/)[0] === location.pathname)}>
               <SidebarMenu>{renderItems(g.items)}</SidebarMenu>
             </CollapsibleNavGroup>
           </div>

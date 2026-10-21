@@ -112,7 +112,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
   const selected = useMemo(() => (accounts.data ?? []).filter((a) => targets.includes(a.id) && a.connection_status === "connected"), [accounts.data, targets]);
   const canSend = (platform: string) => capabilities.data?.some(c => c.platform === platform && c.live_enabled && c.dispatch_ready && c.verified_at) ?? false;
   const allLive = selected.length > 0 && selected.every(a => canSend(a.platform));
-  const actionLabel = allLive ? "Publish live now" : "Stage for delivery";
+  const actionLabel = "Publish now";
   const copy = card.draft_copy + (disclosure ? "\n\n#AIassisted" : "");
   const tagCount = formatHashtags(card.hashtags).split(" ").filter(Boolean).length;
   const { approvalRequired } = useWorkspace();
@@ -299,7 +299,7 @@ export function PublishComposer({ card, canPublish, initialMode = "now" }: { car
       <Dialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{confirm === "now" ? "Stage for delivery?" : "Schedule this post?"}</DialogTitle>
+            <DialogTitle>{confirm === "now" ? "Publish now?" : "Schedule this post?"}</DialogTitle>
             <DialogDescription>
               {confirm === "now" ? "This saves the post for these channels. Nothing is sent to a platform:" : `Scheduled for ${date} ${time} (${tz}). Staged only; not sent. Channels:`}
             </DialogDescription>
