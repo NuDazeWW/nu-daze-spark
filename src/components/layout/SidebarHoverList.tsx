@@ -127,9 +127,9 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
     { icon: Download, label: "Export", description: "Hand off to whoever publishes" },
   ],
   "/repurpose": [
-    { icon: Repeat2, label: "Reuse types", description: "Repost, rewrite, excerpt, adaptations" },
-    { icon: FolderOpen, label: "Sources", description: "Approved posts and cleared assets" },
-    { icon: Send, label: "Send to Daily Queue", description: "Each reuse becomes a traceable draft" },
+    { icon: Repeat2, label: "Reuse types", description: "Repost, rewrite, excerpt, adaptations", to: "/repurpose#repurpose-ideas" },
+    { icon: FolderOpen, label: "Sources", description: "Approved posts and cleared assets", to: "/repurpose#repurpose-sources" },
+    { icon: Send, label: "Send to Daily Queue", description: "Each reuse becomes a traceable draft", to: "/queue" },
   ],
   "/setup": [
     { icon: ListChecks, label: "Setup checklist", description: "Everything before first use" },

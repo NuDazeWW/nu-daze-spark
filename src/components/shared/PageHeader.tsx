@@ -20,7 +20,7 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
         <div className="min-w-0 flex-1">
           {pathname !== "/" && <div className="sm-page-context mb-2 flex flex-wrap items-center gap-3"><BackLink /><Breadcrumb /></div>}
           <h1 className="text-3xl md:text-4xl font-semibold leading-tight text-foreground break-words">{title}</h1>
-          {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+          {description && <p className="sm-page-subtitle mt-1">{description}</p>}
         </div>
         {showArt && (
           <div className="sm-header-art sm-dash-art" aria-hidden="true">

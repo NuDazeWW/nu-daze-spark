@@ -2801,3 +2801,16 @@ body:not([data-sm-surface="reading"]) [role="dialog"]:not(.sm-light) :is(input, 
 .sm-package-actions button { white-space: normal; height: auto; min-height: 32px; }
 .sm-package-drawer [role="tablist"] { flex-wrap: nowrap; justify-content: start; }
 .sm-package-drawer [role="tab"] { flex: none; }
+
+/* Asset panel: no inner scroll box. Tall screens keep it pinned; short screens let it scroll with the page. */
+.sm-al-inspector { max-height: none !important; overflow: visible !important; }
+@media (max-height: 1079px) { .sm-al-inspector { position: static !important; } }
+.sm-al-insp-details > summary { list-style: none; }
+.sm-al-insp-details > summary::-webkit-details-marker { display: none; }
+.sm-al-insp-details > summary > span::after { content: " ▸"; opacity: .7; }
+.sm-al-insp-details[open] > summary > span::after { content: " ▾"; }
+
+/* Section-link arrival cue */
+@keyframes sm-section-flash { 0% { box-shadow: 0 0 0 0 hsl(186 100% 50% / .0); } 20% { box-shadow: 0 0 0 3px hsl(186 100% 50% / .85), 0 0 24px hsl(186 100% 50% / .45); } 100% { box-shadow: 0 0 0 0 hsl(186 100% 50% / 0); } }
+.sm-section-flash { animation: sm-section-flash 1.6s ease-out; border-radius: 14px; outline: none; }
+@media (prefers-reduced-motion: reduce) { .sm-section-flash { animation: none; box-shadow: 0 0 0 3px hsl(186 100% 50% / .85); } }

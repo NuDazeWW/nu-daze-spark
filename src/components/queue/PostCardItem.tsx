@@ -1,3 +1,4 @@
+import { PublishActions } from "@/components/posting/PublishActions";
 import { formatHashtags } from "@/lib/contentPresentation";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
@@ -36,6 +37,8 @@ interface PostCardItemProps {
   onEdit: () => void;
   onStatusChange: (status: ApprovalStatus, notes?: string) => void;
   onDelete: () => void;
+  /** Opens the posting drawer on its Publish or Schedule step. */
+  onPublish?: (step: "publish" | "schedule") => void;
   isUpdating: boolean;
   statusDates?: Partial<Record<ApprovalStatus, string>>;
 }
@@ -45,7 +48,7 @@ const copyToClipboard = async (text: string, label: string) => {
   toast.success(`${label} copied to clipboard`);
 };
 
-export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, isUpdating, statusDates }: PostCardItemProps) {
+export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, isUpdating, statusDates, onPublish }: PostCardItemProps) {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -225,6 +228,7 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
       </div>
 
       <div className="px-3 pb-2"><ReadinessBadge card={card} /></div>
+      {onPublish && <div className="px-3 pb-2"><PublishActions compact card={card} onPublishNow={() => onPublish("publish")} onSchedule={() => onPublish("schedule")} /></div>}
       {/* Footer: preview · edit · copy · more */}
       <div className="sm-qcard-foot">
         <Tooltip><TooltipTrigger asChild>
@@ -234,8 +238,8 @@ export function PostCardItem({ card, isAdmin, onEdit, onStatusChange, onDelete, 
           <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Edit" onClick={onEdit}><Pencil className="h-4 w-4" /></Button>
         </TooltipTrigger><TooltipContent>Edit</TooltipContent></Tooltip>
         <Tooltip><TooltipTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Copy post" onClick={() => copyToClipboard(card.draft_copy, "Post copy")}><Copy className="h-4 w-4" /></Button>
-        </TooltipTrigger><TooltipContent>Copy post</TooltipContent></Tooltip>
+          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Copy caption" onClick={() => copyToClipboard(card.draft_copy, "Caption")}><Copy className="h-4 w-4" /></Button>
+        </TooltipTrigger><TooltipContent>Copy caption</TooltipContent></Tooltip>
         <Popover>
           <Tooltip><TooltipTrigger asChild>
             <PopoverTrigger asChild>

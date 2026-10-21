@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "./AppSidebar";
 import { Separator } from "@/components/ui/separator";
 import { UserMenu } from "./UserMenu";
+import { NavSearch } from "./NavSearch";
 import { ClientSwitcher } from "./ClientSwitcher";
 import ribbons from "@/assets/strategy-studio-ribbons.jpg";
 import { ClientProvider } from "@/contexts/ClientContext";
@@ -44,6 +45,7 @@ export function AppLayout() {
              {pageSurface(pathname) === "dark" && <img src={ribbons} alt="" aria-hidden="true" className="sm-header-ribbons" />}
              <div className="sm-page-content relative z-[1] mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
           </main>
+          <NavSearch />
         </SidebarInset>
       </SidebarProvider>
     </ClientProvider>

@@ -163,7 +163,7 @@ export default function RepurposeCenter() {
 
       <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-6 items-start">
         {/* Sources */}
-        <Card className="p-4 space-y-3">
+        <Card id="repurpose-sources" className="min-w-0 p-4 space-y-3 scroll-mt-4">
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-display text-base font-semibold">1. Pick something to reuse</h2>
           </div>
@@ -194,7 +194,7 @@ export default function RepurposeCenter() {
         </Card>
 
         {/* Suggestions */}
-        <div className="space-y-3">
+        <Card id="repurpose-ideas" className="min-w-0 p-4 space-y-3 scroll-mt-4">
           <h2 className="font-display text-base font-semibold">2. Review ideas ({open.length})</h2>
           {open.length === 0 ? (
             <EmptyState icon={Repeat2} title="No ideas waiting" description="Click “Find ideas” on any approved post or asset to get 3–5 ready-to-edit repurpose drafts." />
@@ -236,7 +236,7 @@ export default function RepurposeCenter() {
               </div>
             </details>
           )}
-        </div>
+        </Card>
       </div>
 
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>

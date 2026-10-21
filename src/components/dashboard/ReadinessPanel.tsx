@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveClient } from "@/contexts/ClientContext";
 import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
+import { PublishActions } from "@/components/posting/PublishActions";
 import { postLabel } from "@/components/tracking/PostTracking";
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -102,7 +103,7 @@ export function ReadinessPanel() {
         <Column icon={Rocket} title="Approved plans · today & tomorrow" count={ready.length} empty="Nothing approved is scheduled for today or tomorrow.">
           {ready.map((c) => (
             <Row key={c.id} card={c} sub={when(c.scheduled_for!)}>
-              <Button size="sm" variant="outline" onClick={() => navigate(`/approved?post=${c.id}&section=publish`)}>Publish / Schedule</Button>
+              <PublishActions compact card={c} onPublishNow={() => navigate(`/approved?post=${c.id}&section=publish`)} onSchedule={() => navigate(`/approved?post=${c.id}&section=schedule`)} />
             </Row>
           ))}
         </Column>
