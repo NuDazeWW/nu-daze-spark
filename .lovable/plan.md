@@ -27,9 +27,10 @@ Order: items 1–4 first (demo blockers), then 5–10. Nothing in the existing t
 - It searches page titles and group names across all six groups, using the existing menu list. Picking a result opens that page and closes the panel.
 
 ## 5. One publishing standard
-- One shared action bar, with the same labels in the same order everywhere: **Publish now** | Copy full package | Download full package | Copy & open <platform>.
+- One shared action bar, with the same labels in the same order everywhere: **Publish now** | **Schedule** | Copy full package | Download full package | Copy & open <platform>.
 - Used in the Posting Package drawer, Queue cards, the details drawer and Dashboard action cards.
-- "Publish now" runs the existing staged flow and run log. "Stage for delivery" becomes "Publish now" everywhere.
+- "Publish now" runs the existing staged flow and run log. "Schedule" opens the existing date-and-time picker and books the post into the existing five-minute delivery job, the same as today's drawer. "Stage for delivery" becomes "Publish now" everywhere.
+- Constraint: the new action bar adds no platform connection of any kind. That means no sign-in with LinkedIn or Meta, no app keys and no calls to any platform. Both Publish now and Schedule only use the existing staged delivery and run log.
 - The footnote about connecting platform apps in Social Connections stays.
 
 ## 6. Content Planner
@@ -47,7 +48,10 @@ Order: items 1–4 first (demo blockers), then 5–10. Nothing in the existing t
 
 ## 9. Asset Library detail panel
 - The side panel shows details only: Type, Description, Origin, Created, Asset status, plus Download and Preview.
-- Preview opens the existing full-screen viewer. The panel fits a 1080px-high screen with no inner scrolling.
+- Preview opens the existing full-screen viewer.
+- On screens 1080px high or taller, the panel fits with no scrolling.
+- On shorter screens, such as 900px laptops, Download and Preview stay pinned at the top. The details list folds behind a "Details" toggle that is closed by default, so the panel still fits. If an open list goes past the bottom, the whole panel scrolls with the page, never as a box scrolling inside a box.
+- Checked at 1080, 900 and 768 heights.
 
 ## 11. Readable header text (every page)
 - The back link, breadcrumb and subtitle already come from the one shared page heading, so a single change reaches every page. The only exceptions are the legal and "not found" pages, which have no artwork and keep their current look.
