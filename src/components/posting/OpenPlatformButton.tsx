@@ -6,8 +6,9 @@ import { copyThenOpen } from "@/lib/openInNewTab";
 
 /** Opens the client's saved account for a platform. Optionally copies text first. Never publishes. */
 export function OpenPlatformButton({
-  clientId, platform, copyText, label, disabled, onOpened, size = "sm", variant = "outline", className,
+  clientId, platform, copyText, label, disabled, onOpened, size = "sm", variant = "outline", className, iconOnly,
 }: {
+  iconOnly?: boolean;
   className?: string;
   clientId: string | null | undefined;
   platform: string;
@@ -40,10 +41,11 @@ export function OpenPlatformButton({
       disabled={disabled || !url}
       onClick={open}
       className={className}
-      title={url ? undefined : `No ${name} profile link saved for this client`}
+      aria-label={iconOnly ? (label ?? (copyText ? `Copy & open ${name}` : `Open ${name}`)) : undefined}
+      title={url ? (iconOnly ? (label ?? `Copy & open ${name}`) : undefined) : `No ${name} profile link saved for this client`}
     >
-      <ExternalLink className="h-3.5 w-3.5 mr-1" />
-      {label ?? (copyText ? `Copy & open ${name}` : `Open ${name}`)}
+      <ExternalLink className={iconOnly ? "h-3.5 w-3.5" : "h-3.5 w-3.5 mr-1"} />
+      {!iconOnly && (label ?? (copyText ? `Copy & open ${name}` : `Open ${name}`))}
     </Button>
   );
 }

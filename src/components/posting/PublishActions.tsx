@@ -37,15 +37,15 @@ export function PublishActions({ card, onPublishNow, onSchedule, packageText, on
       { label: L.downloadPackage, icon: Download, onClick: onDownload ?? (() => downloadPackageText(text, card)) },
     ];
     return (
-      <div className="sm-publish-actions flex items-center gap-1" role="group" aria-label="Publishing actions">
+      <div className="sm-publish-actions sm-publish-compact flex flex-wrap items-center gap-0.5" role="group" aria-label="Publishing actions">
         {items.map((it) => (
-          <Button key={it.label} size="icon" variant={it.primary ? "default" : "ghost"} className="h-7 w-7"
+          <Button key={it.label} size="icon" variant="ghost" className={`h-7 w-7 ${it.primary ? "text-primary" : ""}`}
             aria-label={it.label} title={it.gated && disabledReason ? disabledReason : it.label}
             disabled={it.gated && !!disabledReason} onClick={it.onClick}>
             <it.icon className="h-3.5 w-3.5" />
           </Button>
         ))}
-        <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="ghost" className="h-7 px-2 text-xs"
+        <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="ghost" className="h-7 w-7 p-0" iconOnly
           disabled={!!disabledReason} label={`Copy & open ${name}`}
           copyText={outboundText(card.draft_copy, card.hashtags, card.apply_ai_disclosure)} onOpened={onOpened} />
       </div>
