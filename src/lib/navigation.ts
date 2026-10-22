@@ -63,6 +63,7 @@ export const DASHBOARD_LOCAL_NAV_ITEMS: NavItem[] = [
 
 /** Real Post Office section targets. Both IDs are present in the Post Office page. */
 export const POST_OFFICE_LOCAL_NAV_ITEMS: NavItem[] = [
+  { title: "Campaign Briefs", icon: FileText, href: "/briefs" },
   { title: "Generation Station", icon: Sparkles, href: "/generator#generation-station", kind: "route-section" },
   { title: "Post Connector", icon: Plug, href: "/generator#post-connector", kind: "route-section" },
 ];
