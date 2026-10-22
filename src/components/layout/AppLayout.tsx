@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { UserMenu } from "./UserMenu";
 import { NavSearch } from "./NavSearch";
 import { HeaderBackButton } from "./HeaderBackButton";
+import { BackToTopButton } from "./BackToTopButton";
 import { ClientSwitcher } from "./ClientSwitcher";
 import ribbons from "@/assets/strategy-studio-ribbons.jpg";
 import { ClientProvider } from "@/contexts/ClientContext";
@@ -47,6 +48,7 @@ export function AppLayout() {
              {pageSurface(pathname) === "dark" && <img src={ribbons} alt="" aria-hidden="true" className="sm-header-ribbons" />}
              <div className="sm-page-content relative z-[1] mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
           </main>
+          <BackToTopButton />
           <NavSearch />
         </SidebarInset>
       </SidebarProvider>
