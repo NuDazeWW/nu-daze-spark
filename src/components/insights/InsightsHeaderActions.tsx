@@ -43,7 +43,7 @@ export function InsightsHeaderActions() {
     queryFn: async () => ((await supabase.from("notification_preferences").select("*")).data ?? []) as unknown as Pref[],
   });
   const live = connectors.filter((c) => c.enabled);
-  const showDemo = !live.some((c) => c.provider === "power_bi");
+  const showDemo = true;
   const summaries = prefs.filter((p) => p.is_active !== false).flatMap((p) => {
     const who = [p.email, p.time_zone].filter(Boolean).join(" · ");
     const out: { key: string; label: string; who: string }[] = [];
