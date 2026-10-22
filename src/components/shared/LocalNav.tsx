@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { CheckCircle2 } from "lucide-react";
 import { groupForPath, isNavItemActive, splitHref } from "@/lib/navigation";
 import type { Accent } from "@/lib/cardAccents";
 
@@ -17,7 +18,12 @@ export function LocalNav() {
   if (!group) return null;
   return (
     <nav aria-label={group.label} className="sm-localnav mt-4">
-      {group.items.map((item, index) => {
+      {group.items.map((navItem) =>
+        // Page-top bar only: the sidebar keeps Asset Library.
+        group.id === "strategy" && navItem.href === "/assets"
+          ? { title: "Approved Content", icon: CheckCircle2, href: "/approved" }
+          : navItem,
+      ).map((item, index) => {
         const active = isNavItemActive(item, pathname, search, hash) ||
           (pathname === "/generator" && !hash && index === 0);
         return (
