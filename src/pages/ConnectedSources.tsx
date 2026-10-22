@@ -320,7 +320,7 @@ export default function ConnectedSources() {
         })}
       </div>
 
-      <ReportingConnectors isAdmin={isAdmin} />
+      <div id="reporting-connectors" className="scroll-mt-24"><ReportingConnectors isAdmin={isAdmin} /></div>
 
       <SourceFormDialog
         open={formOpen}
