@@ -263,7 +263,6 @@ function ClientChannels() {
           );
         })}
       </div>
-      <p className="text-xs text-muted-foreground">Demo instance: connections are simulated so the flow can be shown without platform app approval. Nothing is published.</p>
     </div>
   );
 }
