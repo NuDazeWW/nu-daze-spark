@@ -23,9 +23,11 @@ export function LocalNav() {
         group.id === "strategy" && navItem.href === "/assets"
           ? { title: "Approved Content", icon: CheckCircle2, href: "/approved" }
           : navItem,
-      ).map((item, index) => {
-        const active = isNavItemActive(item, pathname, search, hash) ||
-          (pathname === "/generator" && !hash && index === 0);
+      ).map((item) => {
+        // On a page with section entries, default to its own first section when nothing is selected.
+        const ownItems = group.items.filter((entry) => splitHref(entry.href).path === pathname);
+        const isOwnDefault = ownItems[0]?.href === item.href && !hash;
+        const active = isNavItemActive(item, pathname, search, hash) || isOwnDefault;
         return (
           <Link
             key={item.href}
