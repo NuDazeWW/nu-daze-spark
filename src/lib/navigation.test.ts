@@ -14,6 +14,7 @@ describe("page-local navigation", () => {
 
   it("uses verified Post Office section targets and avoids duplicating Strategy tabs", () => {
     expect(groupForPath("/generator")?.items.map((item) => item.href)).toEqual([
+      "/briefs",
       "/generator#generation-station",
       "/generator#post-connector",
     ]);
@@ -60,7 +61,7 @@ describe("isNavItemActive", () => {
   });
 
   it("selects each Post Office link only for its exact section hash", () => {
-    const [station, connector] = groupForPath("/generator")!.items;
+    const [, station, connector] = groupForPath("/generator")!.items;
     expect(isNavItemActive(station, "/generator", "", "#generation-station")).toBe(true);
     expect(isNavItemActive(station, "/generator", "", "#post-connector")).toBe(false);
     expect(isNavItemActive(connector, "/generator", "", "#post-connector")).toBe(true);
