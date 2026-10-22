@@ -85,7 +85,7 @@ function TeamInner() {
         <Badge variant="outline" className="font-mono">{seatsUsed} / {limit ?? "∞"} seats</Badge>
       </PageHeader>
 
-      <Card>
+      <Card accent="cyan">
         <CardHeader><CardTitle className="text-base">Invite someone</CardTitle>
           <CardDescription>They get access the moment they sign up with this email at <button className="underline" onClick={() => { navigator.clipboard.writeText(signupLink); toast.success("Link copied"); }}>{signupLink} <Copy className="inline h-3 w-3" /></button></CardDescription></CardHeader>
         <CardContent className="space-y-4">
@@ -115,7 +115,7 @@ function TeamInner() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card accent="violet">
         <CardHeader><CardTitle className="text-base">Members</CardTitle></CardHeader>
         <CardContent>
           <Table>
@@ -152,7 +152,7 @@ function TeamInner() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card accent="gold">
         <CardHeader><CardTitle className="text-base">Pending invites</CardTitle></CardHeader>
         <CardContent>
           {(invites.data ?? []).length === 0 ? <p className="text-sm text-muted-foreground">No pending invites.</p> : (

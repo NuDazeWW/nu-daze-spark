@@ -27,6 +27,8 @@ import { Input } from "@/components/ui/input";
 import { Split } from "lucide-react";
 import { SplitPlatformsDialog } from "./SplitPlatformsDialog";
 import { formatHashtags, outboundText } from "@/lib/contentPresentation";
+import { buildPackageText } from "@/lib/postingPackage";
+import { PublishActions } from "@/components/posting/PublishActions";
 import {
   Copy, Check, Download, Package, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ShieldCheck, Save, ArrowRight,
 } from "lucide-react";
@@ -39,34 +41,6 @@ type Check = { level: "pass" | "warn" | "fail"; label: string; fix?: { label: st
 async function sha256(text: string) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-function buildPackageText(card: PostCard, firstComment: string, notes: string, assets: { title: string; url: string | null }[]) {
-  const lines = [
-    `SOCIALMOTIVE POSTING PACKAGE`,
-    `Platform: ${card.platform} · ${card.content_type}`,
-    card.scheduled_for ? `Scheduled: ${new Date(card.scheduled_for).toLocaleString()}` : `Scheduled: not set`,
-    "",
-    "=== FINAL COPY ===",
-    card.draft_copy + (card.apply_ai_disclosure ? "\n\n#AIassisted" : ""),
-    "",
-    "=== HASHTAGS ===",
-    formatHashtags(card.hashtags) || "(none)",
-    "",
-    "=== FIRST COMMENT ===",
-    firstComment || "(none)",
-    "",
-    "=== TAGGING INSTRUCTIONS ===",
-    `People: ${(card.people_tags ?? []).join(", ") || "(none)"}`,
-    `Organizations: ${(card.org_tags ?? []).join(", ") || "(none)"}`,
-    "",
-    "=== MEDIA ===",
-    ...(assets.length ? assets.map((a) => `- ${a.title}${a.url ? `: ${a.url}` : ""}`) : [card.suggested_asset_description ? `Suggested: ${card.suggested_asset_description}` : "(none)"]),
-    "",
-    "=== POSTING NOTES ===",
-    notes || "(none)",
-  ];
-  return lines.join("\n");
 }
 
 const PackageSection = ({ title, copyText, k, children, copied, onCopy }: { title: string; copyText?: string; k: string; children: React.ReactNode; copied: string | null; onCopy: (text: string, key: string) => void }) => (
@@ -372,17 +346,12 @@ export function PostingPackageDrawer({
             <p className="text-xs text-muted-foreground">This package changed since it was last exported.</p>
           )}
 
+          <PublishActions card={card} packageText={packageText} onDownload={download}
+            disabledReason={postReason}
+            onPublishNow={() => { setPublishMode("now"); setTab("publish"); }}
+            onSchedule={() => { setPublishMode("schedule"); setTab("publish"); }}
+            onOpened={() => setOpenedPlatform(true)} />
           <div className="sm-package-actions flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={() => copy(packageText, "all")}>
-              <Copy className="h-3.5 w-3.5 mr-1" /> Copy full package
-            </Button>
-            <Button variant="outline" size="sm" onClick={download}><Download className="h-3.5 w-3.5 mr-1" /> Download</Button>
-            <span title={postReason ?? "Copies caption + hashtags and opens the platform. You post it yourself."}>
-              <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="default"
-                disabled={!!postReason}
-                copyText={outboundText(card.draft_copy, card.hashtags, card.apply_ai_disclosure)}
-                onOpened={() => setOpenedPlatform(true)} />
-            </span>
             <Button variant="ghost" size="sm" onClick={save} disabled={saving || card.is_sample || !["owner", "admin", "editor", "reviewer"].includes(role ?? "")}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>
             {canExport && !card.is_sample && card.approval_status === "approved" && (
               <Button size="sm" className="ml-auto" disabled={failCount > 0} onClick={markExported}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Printer, BookOpen, ChevronDown, ChevronUp, ChevronRight, CheckCircle2, Info, Lightbulb, MessageSquare } from "lucide-react";
+import { ArrowRight, Printer, BookOpen, ChevronDown, ChevronUp, ChevronRight, CheckCircle2, Info, Lightbulb, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useBilling, useCreditWeights, fmtUsd } from "@/hooks/useBilling";
@@ -268,7 +268,6 @@ export default function UserGuide() {
   return (
     <div className="sm-user-guide sm-ug animate-fade-in">
       <div className="min-w-0 space-y-5">
-        <Link to="/help" className="sm-ug-back print:hidden"><ArrowLeft className="h-4 w-4" />Back to Help</Link>
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-start gap-4 min-w-0">
             {logo && <img src={logo} alt={`${company} logo`} className="h-12 w-12 rounded object-contain" />}

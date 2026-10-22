@@ -131,6 +131,7 @@ export default function DailyQueue() {
                   onEdit={() => setEditingPostCard(item)}
                   onStatusChange={(status, notes) => updateStatus.mutate({ id: item.id, status, notes, itemType: "post" })}
                   onDelete={() => setDeletingItem({ id: item.id, type: "post" })}
+                  onPublish={(step) => { setPackageTab(step); setPackageId(item.id); }}
                   isUpdating={updateStatus.isPending}
                   statusDates={statusDates[item.id]}
                 />

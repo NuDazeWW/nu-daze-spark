@@ -94,7 +94,7 @@ export function PublishingReportDialog({ open, onOpenChange, cards, companyName 
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5"><Label className="text-xs">Period</Label>
-            <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={days} onChange={(e) => setDays(Number(e.target.value))}>
+            <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={days} onChange={(e) => setDays(Number(e.target.value) as typeof days)}>
               <option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last quarter (90 days)</option><option value={365}>Last 12 months</option>
             </select>
           </div>

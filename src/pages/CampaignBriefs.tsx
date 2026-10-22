@@ -192,10 +192,10 @@ export default function CampaignBriefs() {
   return (
     <div className="sm-briefs">
       <PageHeader title="Campaign Briefs" description="Define the strategy once. Generate one master message and coordinated platform variants from it.">
-        <Button className="sm-lit-btn" onClick={() => setEditing({ ...empty })}><Plus className="h-4 w-4 mr-1" /> New brief</Button>
+        <Button accent="cyan" className="sm-lit-btn" onClick={() => setEditing({ ...empty })}><Plus className="h-4 w-4 mr-1" /> New brief</Button>
       </PageHeader>
 
-      <Card className="sm-lit mb-6 p-5" data-accent="violet">
+      <Card accent="violet" className="mb-6 p-5">
         <h2 className="font-display text-base font-semibold mb-4">From strategy to execution</h2>
         <div className="grid gap-5 md:grid-cols-3 text-sm">
           {([
@@ -212,7 +212,7 @@ export default function CampaignBriefs() {
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <Card className="sm-lit h-fit p-4" data-accent="neutral">
+        <Card accent="neutral" className="h-fit p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold">Campaign briefs</h2>
             <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
@@ -242,24 +242,24 @@ export default function CampaignBriefs() {
 
         {selected && (
           <div className="min-w-0 space-y-6">
-            <Card className="sm-lit p-6" data-accent="cyan">
+            <Card accent="cyan" emphasis="featured" className="p-6">
               <StatusBadge status={selected.status} />
               <h2 className="mt-2 text-xl font-semibold">{selected.title}</h2>
               <p className="text-xs text-muted-foreground font-mono mt-1">{TYPES[selected.campaign_type]} · version {selected.version}</p>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => setEditing({ ...selected })}><Pencil className="h-4 w-4 mr-1" />Edit</Button>
-                <Button variant="outline" size="sm" onClick={() => printOnePager(selected, masters)}><Printer className="h-4 w-4 mr-1" />Campaign one-pager</Button>
-                <Button variant="outline" size="sm" disabled={runReview.isPending} onClick={() => runReview.mutate(selected.id)}>
+              <div className="sm-brief-actions sm-brief-actions--manage mt-4 flex w-full min-w-0 items-center gap-2 overflow-x-auto" aria-label="Brief management actions">
+                <Button accent="cyan" variant="outline" size="sm" onClick={() => setEditing({ ...selected })}><Pencil className="h-4 w-4 mr-1" />Edit</Button>
+                <Button accent="violet" variant="outline" size="sm" onClick={() => printOnePager(selected, masters)}><Printer className="h-4 w-4 mr-1" />Campaign one-pager</Button>
+                <Button accent="magenta" variant="outline" size="sm" disabled={runReview.isPending} onClick={() => runReview.mutate(selected.id)}>
                   {runReview.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Wand2 className="h-4 w-4 mr-1" />}AI completeness review
                 </Button>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
+              <div className="sm-brief-actions sm-brief-actions--workflow mt-2 flex w-full min-w-0 items-center gap-2 overflow-x-auto" aria-label="Brief approval and generation actions">
                 {selected.status !== "approved" ? (
                   selected.approval_mode_enabled ? (
                     <BriefApprovalActions brief={selected} canApprove={!!canApprove} blocked={missing.length > 0} />
                   ) : (
-                    <Button size="sm" className="sm-lit-btn" disabled={missing.length > 0 || setStatus.isPending} onClick={() => setStatus.mutate({ id: selected.id, status: "approved" })}>
+                    <Button accent="lime" size="sm" className="sm-lit-btn" disabled={missing.length > 0 || setStatus.isPending} onClick={() => setStatus.mutate({ id: selected.id, status: "approved" })}>
                       <CheckCircle2 className="h-4 w-4 mr-1" />Approve brief
                     </Button>
                   )
@@ -279,7 +279,7 @@ export default function CampaignBriefs() {
                     <label className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1.5 text-xs text-muted-foreground" title="Data-Driven Insight, Founder Story and Bold Contrarian Take for every channel">
                       <Checkbox checked={threeAngles} onCheckedChange={(c) => setThreeAngles(!!c)} />Test 3 angles · {briefDraftCost(selected.target_channels?.length ?? 1, threeAngles)} drafts{threeAngles ? ` instead of ${briefDraftCost(selected.target_channels?.length ?? 1, false)}` : ""}
                     </label>
-                    <Button size="sm" className="sm-lit-btn" disabled={generate.isPending || genBlocked} title={genBlocked ? "Check off every discussion comment first" : undefined} onClick={() => generate.mutate(selected.id)}>
+                    <Button accent="violet" size="sm" className="sm-lit-btn" disabled={generate.isPending || genBlocked} title={genBlocked ? "Check off every discussion comment first" : undefined} onClick={() => generate.mutate(selected.id)}>
                       {generate.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}Generate content set
                     </Button>
                   </>
@@ -343,7 +343,7 @@ export default function CampaignBriefs() {
               {masters.length === 0 && <p className="text-sm text-muted-foreground">None yet. Approve the brief and generate a content set.</p>}
               <div className="space-y-4">
                 {masters.map((m: any) => (
-                  <Card key={m.id} className="sm-lit p-5" data-accent="violet">
+                  <Card key={m.id} accent="violet" className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="font-medium">{m.title}</div>
@@ -451,8 +451,8 @@ function BriefDialog({ brief, onClose, onSave, saving }: { brief: Brief; onClose
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button disabled={!b.title.trim() || saving} onClick={() => onSave(b)}>{saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Save brief</Button>
+          <Button accent="neutral" variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button accent="cyan" disabled={!b.title.trim() || saving} onClick={() => onSave(b)}>{saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Save brief</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

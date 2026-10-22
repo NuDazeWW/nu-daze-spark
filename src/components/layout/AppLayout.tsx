@@ -6,6 +6,9 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "./AppSidebar";
 import { Separator } from "@/components/ui/separator";
 import { UserMenu } from "./UserMenu";
+import { NavSearch } from "./NavSearch";
+import { HeaderBackButton } from "./HeaderBackButton";
+import { BackToTopButton } from "./BackToTopButton";
 import { ClientSwitcher } from "./ClientSwitcher";
 import ribbons from "@/assets/strategy-studio-ribbons.jpg";
 import { ClientProvider } from "@/contexts/ClientContext";
@@ -26,6 +29,7 @@ export function AppLayout() {
         <SidebarInset className="min-w-0 max-w-full overflow-x-hidden">
           <header className="sm-dark sm-command-bar flex h-14 min-w-0 shrink-0 items-center gap-2 overflow-hidden border-b border-border bg-background text-foreground px-4">
             <SidebarTrigger className="-ml-1" />
+            <HeaderBackButton />
             <Separator orientation="vertical" className="mr-2 h-4" />
             {env && env !== "demo" && <Badge variant="outline" title="Which environment this instance is" className="shrink-0 font-mono text-[10px] uppercase tracking-wider">{env === "demo" ? "Demo environment" : env}</Badge>}
             <div className="min-w-0 flex-1" />
@@ -42,8 +46,10 @@ export function AppLayout() {
           </header>
           <main className={`sm-page relative isolate min-w-0 max-w-full flex-1 overflow-x-hidden overflow-y-auto text-foreground ${pageSurface(pathname) === "dark" ? "sm-app-bg" : "sm-light-page"} ${pathname === "/" ? "sm-route-dashboard" : "sm-route-themed"} p-4 md:p-6 lg:p-8`}>
              {pageSurface(pathname) === "dark" && <img src={ribbons} alt="" aria-hidden="true" className="sm-header-ribbons" />}
-             <div className="relative z-[1] mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
+             <div className="sm-page-content relative z-[1] mx-auto min-w-0 w-full max-w-[1440px]"><Outlet /></div>
           </main>
+          <BackToTopButton />
+          <NavSearch />
         </SidebarInset>
       </SidebarProvider>
     </ClientProvider>

@@ -8,3 +8,9 @@ export const ACCENT_BY_PURPOSE = {
   verifiedReady: "lime",
   supporting: "neutral",
 } as const satisfies Record<string, Accent>;
+
+/** Preserve existing named tones without assigning colors by render order. */
+export function accentFromClassName(className?: string): Accent | undefined {
+  const tone = className?.match(/(?:^|\s)sm-tone-(cyan|coral|magenta|violet|gold|lime)(?:\s|$)/)?.[1];
+  return tone === "coral" ? "magenta" : tone as Accent | undefined;
+}

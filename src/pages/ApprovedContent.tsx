@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { OpenPlatformButton } from "@/components/posting/OpenPlatformButton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,6 +19,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PostingPackageDrawer } from "@/components/queue/PostingPackageDrawer";
+import { PublishActions } from "@/components/posting/PublishActions";
 import { BulkExportDialog } from "@/components/export/BulkExportDialog";
 import {
   CheckCircle2, Search, AlertCircle, Copy, Hash, AtSign, Users,
@@ -257,6 +257,7 @@ export default function ApprovedContent() {
                 isAdmin={isAdmin}
                 onOpenPackage={() => { setPackageTab("package"); setPackageId(card.id); }}
                 onOpenPublish={() => { setPackageTab("publish"); setPackageId(card.id); }}
+                onOpenSchedule={() => { setPackageTab("schedule"); setPackageId(card.id); }}
                 statusDates={allDates[card.id]}
               />
             ))}
@@ -285,6 +286,7 @@ function ApprovedCard({
   isAdmin,
   onOpenPackage,
   onOpenPublish,
+  onOpenSchedule,
   statusDates,
 }: {
   card: PostCard;
@@ -296,6 +298,7 @@ function ApprovedCard({
   isAdmin: boolean;
   onOpenPackage: () => void;
   onOpenPublish: () => void;
+  onOpenSchedule: () => void;
   statusDates?: Partial<Record<ApprovalStatus, string>>;
 }) {
   const meta = STATUS_META[card.approval_status];
@@ -374,13 +377,9 @@ function ApprovedCard({
               <CopyBtn text={hashtags} label="Hashtags" icon={Hash} id="hashtags" />
               <CopyBtn text={peopleTags} label="People" icon={AtSign} id="people" />
               <CopyBtn text={orgTags} label="Orgs" icon={Users} id="orgs" />
-              <OpenPlatformButton clientId={card.client_id} platform={card.platform} variant="ghost" />
-
+              <div className="basis-full" />
+              <PublishActions card={card} onPublishNow={onOpenPublish} onSchedule={onOpenSchedule} />
               <div className="flex-1" />
-
-              <Button size="sm" className="h-7 text-xs gap-1" onClick={onOpenPublish}>
-                <Send className="h-3 w-3" /> Publish / Schedule
-              </Button>
               <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={onOpenPackage}>
                 <Package className="h-3 w-3" /> Posting package
               </Button>

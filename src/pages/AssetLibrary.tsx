@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAssets, type SourceAsset } from "@/hooks/useAssets";
@@ -81,6 +81,13 @@ export default function AssetLibrary() {
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
   const [bulkMode, setBulkMode] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // On screens shorter than 1080px the details list starts folded so the panel fits.
+  const [tallScreen, setTallScreen] = useState(() => typeof window === "undefined" || window.innerHeight >= 1080);
+  useEffect(() => {
+    const on = () => setTallScreen(window.innerHeight >= 1080);
+    window.addEventListener("resize", on);
+    return () => window.removeEventListener("resize", on);
+  }, []);
   const [typeGroup, setTypeGroup] = useState<TypeGroup>("all");
 
   const filtered = useMemo(() => {
@@ -415,16 +422,11 @@ export default function AssetLibrary() {
                 const usageCount = usageMap.get(a.id) ?? 0;
                 const rows: [string, React.ReactNode][] = [
                   ["Type", <span className="capitalize">{a.asset_type.replace("_", " ")}</span>],
-                  ["Description", a.description],
-                  ["Origin", a.is_nudaze_origin ? "NuDaze" : null],
-                  ["Content date", (a as any).content_date ? format(new Date((a as any).content_date), "MMM d, yyyy") : null],
-                  ["Event", (a as any).is_event ? (a as any).event_name : null],
-                  ["Contributors", (a as any).contributors?.length ? (a as any).contributors.join(", ") : null],
-                  ["Expires", a.expires_at ? <>{format(new Date(a.expires_at), "MMM d, yyyy")}{expired && " · Expired"}</> : null],
-                  ["Used in", usageCount > 0 ? `${usageCount} use${usageCount !== 1 ? "s" : ""}` : null],
+                  ["Description", a.description ? <span className="line-clamp-3">{a.description}</span> : null],
+                  ["Origin", a.is_nudaze_origin ? "NuDaze" : "Other"],
                   ["Created", format(new Date(a.created_at), "MMM d, yyyy")],
-                  ["Updated", a.updated_at !== a.created_at ? format(new Date(a.updated_at), "MMM d, yyyy") : null],
                 ];
+                void summary; void expired; void usageCount;
                 return (
                   <>
                     <div className="sm-al-insp-head">
@@ -432,11 +434,11 @@ export default function AssetLibrary() {
                       <div className="min-w-0 flex-1"><h2>{a.title}</h2><p className="capitalize">{a.asset_type.replace("_", " ")}</p></div>
                       <Button variant="ghost" size="icon" onClick={() => setSelectedId("none")} aria-label="Close details"><X className="h-4 w-4" /></Button>
                     </div>
-                    <div className="sm-al-insp-preview"><AssetThumbnail filePath={a.file_path} assetType={a.asset_type} title={a.title} onClick={() => a.file_path && setViewingAsset(a)} /></div>
-                    <section className="sm-al-insp-section">
-                      <div className="sm-al-insp-title"><span>Basic information</span>{isAdmin && <Button size="sm" variant="outline" onClick={() => openEdit(a)}><Pencil className="mr-1 h-3.5 w-3.5" />Edit</Button>}</div>
-                      <dl>{rows.filter(([, v]) => v).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
-                    </section>
+                    <div className="sm-al-insp-actions">
+                      {a.file_path && <Button className="sm-al-primary" onClick={() => downloadAsset(a.file_path!, a.asset_type)}><Download className="mr-2 h-4 w-4" />Download</Button>}
+                      {a.file_path && <Button variant="outline" onClick={() => setViewingAsset(a)}><Eye className="mr-2 h-4 w-4" />Preview</Button>}
+                      {isAdmin && <Button variant="outline" onClick={() => handleSoftDelete(a)} disabled={isDeleting} aria-label="Delete asset"><Trash2 className="h-4 w-4 text-destructive" /></Button>}
+                    </div>
                     <section className="sm-al-insp-section">
                       <div className="sm-al-insp-title"><span>Asset status</span></div>
                       {isAdmin ? (
@@ -451,18 +453,10 @@ export default function AssetLibrary() {
                         </Select>
                       ) : <span className="sm-al-status" data-tone={a.permission_state}>{perm.label}</span>}
                     </section>
-                    {summary && (
-                      <section className="sm-al-insp-section">
-                        <div className="sm-al-insp-title"><span><Sparkles className="mr-1 inline h-3.5 w-3.5" />Summary</span></div>
-                        <p className="sm-al-insp-copy">{summary.summary}</p>
-                        {summary.key_topics && summary.key_topics.length > 0 && <div className="sm-al-tags">{summary.key_topics.map((t) => <span key={t}>{t}</span>)}</div>}
-                      </section>
-                    )}
-                    <div className="sm-al-insp-actions">
-                      {a.file_path && <Button className="sm-al-primary" onClick={() => downloadAsset(a.file_path!, a.asset_type)}><Download className="mr-2 h-4 w-4" />Download</Button>}
-                      {a.file_path && <Button variant="outline" onClick={() => setViewingAsset(a)}><Eye className="mr-2 h-4 w-4" />Preview</Button>}
-                      {isAdmin && <Button variant="outline" onClick={() => handleSoftDelete(a)} disabled={isDeleting} aria-label="Delete asset"><Trash2 className="h-4 w-4 text-destructive" /></Button>}
-                    </div>
+                    <details className="sm-al-insp-section sm-al-insp-details" open={tallScreen}>
+                      <summary className="sm-al-insp-title cursor-pointer"><span>Details</span>{isAdmin && <Button size="sm" variant="outline" onClick={(e) => { e.preventDefault(); openEdit(a); }}><Pencil className="mr-1 h-3.5 w-3.5" />Edit</Button>}</summary>
+                      <dl>{rows.filter(([, v]) => v).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+                    </details>
                   </>
                 );
               })()}

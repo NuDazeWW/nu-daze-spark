@@ -48,17 +48,23 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { DASHBOARD_LOCAL_NAV_ITEMS, POST_OFFICE_LOCAL_NAV_ITEMS } from "@/lib/navigation";
 
 export type HoverListItem = { icon: LucideIcon; label: string; description?: string; to?: string };
 
 /** What's inside each sidebar page — informational rows, or links when a real destination exists. */
 export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
-  "/": [
-    { icon: Gauge, label: "Today at a glance", description: "Decisions needed, ready to post, at risk", to: "/" },
-    { icon: CalendarDays, label: "Pipeline overview", description: "Where every post sits this week", to: "/queue" },
-    { icon: CheckCircle2, label: "Approved library", description: "Everything cleared to publish", to: "/approved" },
-    { icon: Sparkles, label: "New campaign brief", description: "Start the next content set", to: "/briefs" },
-  ],
+  "/": DASHBOARD_LOCAL_NAV_ITEMS.map((item) => ({
+    icon: item.icon,
+    label: item.title,
+    description: {
+      "Today at a glance": "Decisions needed, ready to post, at risk",
+      "Pipeline overview": "Where every post sits this week",
+      "Approved library": "Everything cleared to publish",
+      "New campaign brief": "Start the next content set",
+    }[item.title],
+    to: item.href,
+  })),
   "/assets": [
     { icon: Upload, label: "Add files in bulk", description: "Images, video, PDFs, decks" },
     { icon: ShieldCheck, label: "Permission states", description: "Usable, summarization-only, blocked, archived" },
@@ -90,7 +96,12 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
     { icon: Mic, label: "Write as", description: "Generate variants in a leader's voice", to: "/strategy?tab=voices" },
   ],
   "/generator": [
-    { icon: Sparkles, label: "Generate post cards", description: "From approved briefs and assets" },
+    ...POST_OFFICE_LOCAL_NAV_ITEMS.map((item) => ({
+      icon: item.icon,
+      label: item.title,
+      description: item.title === "Generation Station" ? "Choose a platform and generate post cards" : "Open saved social profile links",
+      to: item.href,
+    })),
     { icon: Users, label: "Audience & pillars", description: "Grounded in your strategy rules" },
     { icon: FileCheck, label: "Sources used", description: "Every draft shows its sources" },
   ],
@@ -116,9 +127,9 @@ export const NAV_HOVER_LISTS: Record<string, HoverListItem[]> = {
     { icon: Download, label: "Export", description: "Hand off to whoever publishes" },
   ],
   "/repurpose": [
-    { icon: Repeat2, label: "Reuse types", description: "Repost, rewrite, excerpt, adaptations" },
-    { icon: FolderOpen, label: "Sources", description: "Approved posts and cleared assets" },
-    { icon: Send, label: "Send to Daily Queue", description: "Each reuse becomes a traceable draft" },
+    { icon: Repeat2, label: "Reuse types", description: "Repost, rewrite, excerpt, adaptations", to: "/repurpose#repurpose-ideas" },
+    { icon: FolderOpen, label: "Sources", description: "Approved posts and cleared assets", to: "/repurpose#repurpose-sources" },
+    { icon: Send, label: "Send to Daily Queue", description: "Each reuse becomes a traceable draft", to: "/queue" },
   ],
   "/setup": [
     { icon: ListChecks, label: "Setup checklist", description: "Everything before first use" },
@@ -274,9 +285,12 @@ function NavHoverPanel() {
               {<ChevronRight className="mt-0.5 size-3.5 shrink-0 text-sidebar-foreground/40" />}
             </>
           );
-          const cls = "sm-hover-item flex w-full gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-sidebar-accent focus-visible:bg-sidebar-accent";
+          const cls = "sm-hover-item flex w-full gap-2.5 rounded-lg px-2.5 py-2 text-left";
+          if (!it.to) {
+            return <div key={it.label} className={cls}>{row}</div>;
+          }
           return (
-            <Link key={it.label} to={it.to ?? open.key} onClick={closeNow} className={cls}>
+            <Link key={it.label} to={it.to} onClick={closeNow} className={`${cls} transition-colors hover:bg-sidebar-accent focus-visible:bg-sidebar-accent`}>
               {row}
             </Link>
           );
@@ -329,4 +343,3 @@ export function NavHoverWrapper({
     </div>
   );
 }
-

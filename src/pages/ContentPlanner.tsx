@@ -61,7 +61,7 @@ export default function ContentPlanner() {
   const maxMonth = startOfMonth(addMonths(new Date(), 12));
 
   const postsQ = useQuery({
-    queryKey: ["planner_posts", activeClientId],
+    queryKey: ["post_cards", "planner", activeClientId],
     enabled: !!activeClientId,
     queryFn: async () => {
       const { data, error } = await supabase.from("post_cards")
@@ -123,6 +123,13 @@ export default function ContentPlanner() {
     if (!changes.length) return;
     setBusy(true);
     const before = changes.map((c) => ({ id: c.id, scheduled_for: posts.find((p) => p.id === c.id)?.scheduled_for ?? null }));
+    // Optimistic: move the posts on screen now, roll back if the save fails.
+    const key = ["post_cards", "planner", activeClientId];
+    const previous = qc.getQueryData<Row[]>(key);
+    qc.setQueryData<Row[]>(key, (rows) => rows?.map((r) => {
+      const ch = changes.find((c) => c.id === r.id);
+      return ch ? { ...r, scheduled_for: ch.scheduled_for } : r;
+    }));
     try {
       const results = await Promise.all(changes.map((c) =>
         supabase.rpc("plan_post_date", { _post: c.id, _when: c.scheduled_for as string })));
@@ -136,11 +143,12 @@ export default function ContentPlanner() {
         });
       }));
       setUndo(before);
-      qc.invalidateQueries({ queryKey: ["planner_posts"] });
       qc.invalidateQueries({ queryKey: ["post_cards"] });
       toast.success(`${changes.length} post${changes.length === 1 ? "" : "s"} updated`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Couldn't update dates");
+      qc.setQueryData(key, previous);
+      const msg = (e as { message?: string } | null)?.message ?? "";
+      toast.error(`Couldn't move the post — it's back on its original date.${msg ? ` ${msg}.` : ""}`);
     } finally {
       setBusy(false);
     }
@@ -150,6 +158,8 @@ export default function ContentPlanner() {
     if (!canEdit) return;
     const p = posts.find((x) => x.id === id);
     if (!p) return;
+    const endOfDay = new Date(day); endOfDay.setHours(23, 59, 59, 999);
+    if (endOfDay < new Date()) { toast.error("Posts can only be moved to today or a future date."); return; }
     const base = p.scheduled_for ? new Date(p.scheduled_for) : null;
     const d = new Date(day);
     if (base) d.setHours(base.getHours(), base.getMinutes(), 0, 0);
@@ -179,7 +189,12 @@ export default function ContentPlanner() {
     return { label: `Q${Math.floor(qs.getMonth() / 3) + 1} ${format(qs, "yyyy")}`, gaps: [...gaps.entries()].sort((a, b) => b[1] - a[1]) };
   }), [stocked, targets]);
 
-  if (!activeClientId) return <p className="text-muted-foreground">Select a client to plan content.</p>;
+  if (!activeClientId) return (
+    <div className="sm-reference sm-planner">
+      <PageHeader title="Content Planner" description="Stock approved posts months ahead and see where your cadence has gaps. Planning a date does not schedule a send. Use the Posting Package to schedule delivery." />
+      <p className="text-muted-foreground">Select a client to plan content.</p>
+    </div>
+  );
 
   const loading = postsQ.isLoading || targetsQ.isLoading;
 

@@ -209,11 +209,11 @@ export default function ConnectedSources() {
             disabled={quickScraping}
           />
         </div>
-        <Button onClick={handleQuickImport} disabled={!quickUrl.trim() || quickScraping} className="sm-src-btn">
+        <Button accent="cyan" onClick={handleQuickImport} disabled={!quickUrl.trim() || quickScraping} className="sm-src-btn">
           {quickScraping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
           Import
         </Button>
-        <Button variant="outline" onClick={() => setBulkOpen(true)} className="sm-src-btn-soft sm-lit-btn">
+        <Button accent="gold" variant="outline" onClick={() => setBulkOpen(true)} className="sm-src-btn-soft sm-lit-btn">
           <FileText className="h-4 w-4" />Bulk Import
         </Button>
       </div>
@@ -221,7 +221,7 @@ export default function ConnectedSources() {
 
       {/* Source Actions */}
       <div className="flex flex-wrap justify-end gap-3 mb-2">
-        <Button variant="outline" asChild className="sm-src-btn-soft sm-lit-btn">
+        <Button accent="violet" variant="outline" asChild className="sm-src-btn-soft sm-lit-btn">
           <a href="/settings/connections">
             <Link2 className="h-4 w-4" />Manage Connectors
           </a>
@@ -320,7 +320,7 @@ export default function ConnectedSources() {
         })}
       </div>
 
-      <ReportingConnectors isAdmin={isAdmin} />
+      <div id="reporting-connectors" className="scroll-mt-24"><ReportingConnectors isAdmin={isAdmin} /></div>
 
       <SourceFormDialog
         open={formOpen}

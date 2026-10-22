@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { type DateRangePreset, inRange, localIsoDate, rangeBounds } from "@/lib/dateRange";
 import { PlatformOption } from "@/components/layout/PlatformIcon";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -11,20 +12,8 @@ import type { ApprovalStatus, PostCard } from "@/hooks/usePostCards";
 import { runBulkExport, type CsvPreset, type ExportFormat } from "@/lib/bulkExport";
 import { Loader2, PackageOpen } from "lucide-react";
 
-type Range = "all" | "week" | "next7" | "month" | "custom";
-
-const iso = (d: Date) => d.toISOString().slice(0, 10);
-
-function rangeBounds(r: Range, from: string, to: string): [Date, Date] | null {
-  const now = new Date(); now.setHours(0, 0, 0, 0);
-  if (r === "all") return null;
-  if (r === "week") { const s = new Date(now); s.setDate(now.getDate() - ((now.getDay() + 6) % 7)); const e = new Date(s); e.setDate(s.getDate() + 7); return [s, e]; }
-  if (r === "next7") { const e = new Date(now); e.setDate(now.getDate() + 7); return [now, e]; }
-  if (r === "month") return [new Date(now.getFullYear(), now.getMonth(), 1), new Date(now.getFullYear(), now.getMonth() + 1, 1)];
-  if (!from || !to) return null;
-  const e = new Date(to); e.setDate(e.getDate() + 1);
-  return [new Date(from), e];
-}
+type Range = DateRangePreset;
+const iso = localIsoDate;
 
 export function BulkExportDialog({ open, onOpenChange, cards, preselected, canMarkExported, onMarkExported }: {
   open: boolean; onOpenChange: (v: boolean) => void; cards: PostCard[]; preselected?: string[];
@@ -49,7 +38,7 @@ export function BulkExportDialog({ open, onOpenChange, cards, preselected, canMa
     return cards
       .filter((c) => statuses.includes(c.approval_status))
       .filter((c) => platform === "all" || c.platform === platform)
-      .filter((c) => !b || (c.scheduled_for && new Date(c.scheduled_for) >= b[0] && new Date(c.scheduled_for) < b[1]))
+      .filter((c) => inRange(c.scheduled_for, b))
       .sort((a, b) => (a.scheduled_for ?? "9").localeCompare(b.scheduled_for ?? "9"));
   }, [cards, usePicked, preselected, range, from, to, platform, statuses]);
 
@@ -116,8 +105,10 @@ export function BulkExportDialog({ open, onOpenChange, cards, preselected, canMa
               </div>
               {range === "custom" && (
                 <div className="grid grid-cols-2 gap-3">
-                  <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From" />
-                  <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-label="To" />
+                  <div className="space-y-1.5"><Label htmlFor="export-from">From</Label>
+                    <Input id="export-from" type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} /></div>
+                  <div className="space-y-1.5"><Label htmlFor="export-to">To</Label>
+                    <Input id="export-to" type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} /></div>
                 </div>
               )}
               <div className="flex gap-4">

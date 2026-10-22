@@ -25,16 +25,16 @@ export default function Strategy() {
   const [builder, setBuilder] = useState<BuilderMode | null>(initial && ["website", "document", "preset"].includes(initial) ? initial : null);
   const navigation = (
         <TabsList className="sm-studio-tabs">
-          <TabsTrigger value="voice" className="text-xs"><Users aria-hidden="true" />Brand Voice</TabsTrigger>
-          <TabsTrigger value="voices" className="text-xs"><AudioLines aria-hidden="true" />Voices</TabsTrigger>
-          <TabsTrigger value="guardrails" className="text-xs"><ShieldCheck aria-hidden="true" />Guardrails</TabsTrigger>
-          <TabsTrigger value="platform" className="text-xs"><PanelsTopLeft aria-hidden="true" />Platform Rules</TabsTrigger>
-          <TabsTrigger value="audiences" className="text-xs"><Users aria-hidden="true" />Audiences</TabsTrigger>
-          <TabsTrigger value="campaigns" className="text-xs"><Megaphone aria-hidden="true" />Campaigns</TabsTrigger>
-          <TabsTrigger value="hashtags" className="text-xs"><Hash aria-hidden="true" />Hashtags</TabsTrigger>
-          <TabsTrigger value="ctas" className="text-xs"><MousePointerClick aria-hidden="true" />CTAs</TabsTrigger>
-          <TabsTrigger value="cadence" className="text-xs"><Clock3 aria-hidden="true" />Cadence</TabsTrigger>
-          <TabsTrigger value="engagement" className="text-xs"><MessagesSquare aria-hidden="true" />Engagement</TabsTrigger>
+          <TabsTrigger value="voice" data-accent="cyan" className="text-xs"><Users aria-hidden="true" />Brand Voice</TabsTrigger>
+          <TabsTrigger value="voices" data-accent="cyan" className="text-xs"><AudioLines aria-hidden="true" />Voices</TabsTrigger>
+          <TabsTrigger value="guardrails" data-accent="gold" className="text-xs"><ShieldCheck aria-hidden="true" />Guardrails</TabsTrigger>
+          <TabsTrigger value="platform" data-accent="violet" className="text-xs"><PanelsTopLeft aria-hidden="true" />Platform Rules</TabsTrigger>
+          <TabsTrigger value="audiences" data-accent="magenta" className="text-xs"><Users aria-hidden="true" />Audiences</TabsTrigger>
+          <TabsTrigger value="campaigns" data-accent="violet" className="text-xs"><Megaphone aria-hidden="true" />Campaigns</TabsTrigger>
+          <TabsTrigger value="hashtags" data-accent="gold" className="text-xs"><Hash aria-hidden="true" />Hashtags</TabsTrigger>
+          <TabsTrigger value="ctas" data-accent="magenta" className="text-xs"><MousePointerClick aria-hidden="true" />CTAs</TabsTrigger>
+          <TabsTrigger value="cadence" data-accent="violet" className="text-xs"><Clock3 aria-hidden="true" />Cadence</TabsTrigger>
+          <TabsTrigger value="engagement" data-accent="magenta" className="text-xs"><MessagesSquare aria-hidden="true" />Engagement</TabsTrigger>
         </TabsList>
   );
   const tabs = (
@@ -60,9 +60,9 @@ export default function Strategy() {
       >
         {isAdmin && (
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={() => setBuilder("preset")}><LayoutTemplate className="mr-1.5 h-4 w-4" />Starter kits</Button>
-            <Button variant="outline" size="sm" onClick={() => setBuilder("document")}><FileText className="mr-1.5 h-4 w-4" />Import brand guide</Button>
-            <Button size="sm" onClick={() => setBuilder("website")}><Sparkles className="mr-1.5 h-4 w-4" />Generate brand voice</Button>
+            <Button accent="violet" variant="outline" size="sm" onClick={() => setBuilder("preset")}><LayoutTemplate className="mr-1.5 h-4 w-4" />Starter kits</Button>
+            <Button accent="gold" variant="outline" size="sm" onClick={() => setBuilder("document")}><FileText className="mr-1.5 h-4 w-4" />Import brand guide</Button>
+            <Button accent="cyan" size="sm" onClick={() => setBuilder("website")}><Sparkles className="mr-1.5 h-4 w-4" />Generate brand voice</Button>
           </div>
         )}
       </PageHeader>
