@@ -30,7 +30,7 @@ const PROVIDERS: Record<string, { name: string; logo?: string }> = {
 };
 const NOTIF = "/settings/notifications";
 
-type Pref = { id: string; email?: string; time_zone?: string; is_active?: boolean; daily_digest?: boolean; weekly_summary?: boolean; report_frequency?: string | null };
+type Pref = { id: string; recipient_email?: string; post_went_out?: boolean; publishing_report?: boolean; time_zone?: string; is_active?: boolean; daily_digest?: boolean; weekly_summary?: boolean; report_frequency?: string | null };
 
 export function InsightsHeaderActions() {
   const nav = useNavigate();
@@ -44,17 +44,20 @@ export function InsightsHeaderActions() {
       return (data ?? []) as ReportingConnection[];
     },
   });
-  const { data: prefs = [] } = useQuery({
+  const { data: prefs = [], refetch: refetchPrefs } = useQuery({
     queryKey: ["insights-summaries"],
+    refetchOnMount: "always",
     queryFn: async () => ((await supabase.from("notification_preferences").select("*")).data ?? []) as unknown as Pref[],
   });
   const live = connectors.filter(isVerifiedReportingConnection);
   const showDemo = true;
   const summaries = prefs.filter((p) => p.is_active !== false).flatMap((p) => {
-    const who = [p.email, p.time_zone].filter(Boolean).join(" · ");
+    const who = [p.recipient_email, p.time_zone].filter(Boolean).join(" · ");
     const out: { key: string; label: string; who: string }[] = [];
     if (p.daily_digest) out.push({ key: p.id + "d", label: "Daily digest", who });
     if (p.weekly_summary) out.push({ key: p.id + "w", label: "Weekly summary", who });
+    if (p.post_went_out) out.push({ key: p.id + "p", label: "Post went out", who });
+    if (p.publishing_report) out.push({ key: p.id + "pr", label: "Publishing report", who });
     if (p.report_frequency && p.report_frequency !== "off") out.push({ key: p.id + "r", label: `Scheduled report (${p.report_frequency})`, who });
     return out;
   });
@@ -88,21 +91,21 @@ export function InsightsHeaderActions() {
           <DropdownMenuLabel>Demo only · not connected</DropdownMenuLabel>
           {showDemo && <DropdownMenuItem onClick={() => toast("Power BI demo only — no connection or delivery")}>
             <img src={powerBiLogo} alt="" className="mr-2 h-4 w-4" />Power BI
-            <Badge variant="outline" className="ml-auto text-[10px]">Demo</Badge>
+            <Badge variant="outline" className="ml-auto text-[10px]">Go</Badge>
           </DropdownMenuItem>}
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild><Link to="/sources#reporting-connectors">Manage connectors</Link></DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={(o) => { if (o) refetchPrefs(); }}>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="whitespace-nowrap">
             <Mail className="mr-1.5 h-4 w-4" />Summaries<ChevronDown className="ml-1 h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-72">
-          <DropdownMenuLabel>Email summaries turned on</DropdownMenuLabel>
+          <DropdownMenuLabel>{summaries.length ? "Email summaries turned on" : "Email summaries are off"}</DropdownMenuLabel>
           {summaries.length === 0 ? (
             <div className="space-y-2 px-2 py-2">
               <p className="text-sm text-muted-foreground">No email summaries are turned on.</p>
@@ -114,8 +117,8 @@ export function InsightsHeaderActions() {
               {s.who && <span className="text-xs text-muted-foreground">{s.who}</span>}
             </DropdownMenuItem>
           ))}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild><Link to={NOTIF}>Manage summaries</Link></DropdownMenuItem>
+          {summaries.length > 0 && <><DropdownMenuSeparator />
+          <DropdownMenuItem asChild><Link to={NOTIF}>Manage summaries</Link></DropdownMenuItem></>}
         </DropdownMenuContent>
       </DropdownMenu>
 
