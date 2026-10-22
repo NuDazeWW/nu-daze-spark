@@ -76,8 +76,9 @@ export default function PortfolioInsights() {
 
   return (
     <div className="sm-reference sm-insights space-y-6">
-      <PageHeader title="Portfolio Insights" description="How your content is balanced across pillars, platforms and formats over the last 30 days — and where you're falling short this week." />
-      <InsightsHeaderActions />
+      <PageHeader title="Portfolio Insights" description="How your content is balanced across pillars, platforms and formats over the last 30 days — and where you're falling short this week.">
+        <InsightsHeaderActions />
+      </PageHeader>
       {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : (
         <>
           <div className="sm-metric-row grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -5,6 +5,8 @@ import { Activity, BarChart3, Bookmark, ChevronDown, Eye, Heart, Mail, MessageCi
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { isVerifiedReportingConnection, type ReportingConnection } from "@/lib/reportingConnection";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -35,14 +37,18 @@ export function InsightsHeaderActions() {
   const [open, setOpen] = useState(false);
   const [days, setDays] = useState(30);
   const { data: connectors = [] } = useQuery({
-    queryKey: ["insights-live-connectors"],
-    queryFn: async () => ((await supabase.from("reporting_connectors" as never).select("provider,enabled")).data ?? []) as { provider: string; enabled: boolean }[],
+    queryKey: ["reporting_connectors", "insights-verified"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("reporting_connectors" as never).select("provider,enabled,key_prefix,last_used_at");
+      if (error) throw error;
+      return (data ?? []) as ReportingConnection[];
+    },
   });
   const { data: prefs = [] } = useQuery({
     queryKey: ["insights-summaries"],
     queryFn: async () => ((await supabase.from("notification_preferences").select("*")).data ?? []) as unknown as Pref[],
   });
-  const live = connectors.filter((c) => c.enabled);
+  const live = connectors.filter(isVerifiedReportingConnection);
   const showDemo = true;
   const summaries = prefs.filter((p) => p.is_active !== false).flatMap((p) => {
     const who = [p.email, p.time_zone].filter(Boolean).join(" · ");
@@ -63,12 +69,13 @@ export function InsightsHeaderActions() {
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="whitespace-nowrap">
             <Plug className="mr-1.5 h-4 w-4" />Live Connectors
-            <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px]">{live.length + (showDemo ? 1 : 0)}</Badge>
+            <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px]">{live.length} connected</Badge>
             <ChevronDown className="ml-1 h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-64">
           <DropdownMenuLabel>Connected reporting tools</DropdownMenuLabel>
+          {live.length === 0 && <p className="px-2 py-2 text-sm text-muted-foreground">No verified live reporting connections.</p>}
           {live.map((c) => {
             const p = PROVIDERS[c.provider] ?? { name: c.provider };
             return (
@@ -77,7 +84,9 @@ export function InsightsHeaderActions() {
               </DropdownMenuItem>
             );
           })}
-          {showDemo && <DropdownMenuItem onClick={() => toast("Demo connector — not linked")}>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>Demo only · not connected</DropdownMenuLabel>
+          {showDemo && <DropdownMenuItem onClick={() => toast("Power BI demo only — no connection or delivery")}>
             <img src={powerBiLogo} alt="" className="mr-2 h-4 w-4" />Power BI
             <Badge variant="outline" className="ml-auto text-[10px]">Demo</Badge>
           </DropdownMenuItem>}
@@ -114,7 +123,7 @@ export function InsightsHeaderActions() {
         <DialogContent className="max-w-2xl border-primary/30 shadow-[var(--shadow-elevated)]">
           <DialogHeader>
             <DialogTitle>What we capture</DialogTitle>
-            <DialogDescription>Totals are summed across the last {days} days per post and platform.</DialogDescription>
+            <DialogDescription>Impressions, reactions, comments, shares, clicks and saves recorded in Results Tracking can be reviewed over {days} days. This does not automatically collect platform data; the Power BI demo is not connected.</DialogDescription>
           </DialogHeader>
           <div className="flex gap-2">
             {WINDOWS.map((w) => (
@@ -123,10 +132,10 @@ export function InsightsHeaderActions() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {METRICS.map(({ icon: Icon, name, desc }) => (
-              <div key={name} className="flex gap-3 rounded-lg border border-border bg-card p-3 shadow-sm">
+              <Card key={name} accent="cyan" emphasis="standard"><CardContent className="flex gap-3 p-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary"><Icon className="h-4 w-4" /></span>
                 <div className="min-w-0"><p className="font-medium">{name}</p><p className="text-sm text-muted-foreground">{desc}</p></div>
-              </div>
+              </CardContent></Card>
             ))}
           </div>
         </DialogContent>
