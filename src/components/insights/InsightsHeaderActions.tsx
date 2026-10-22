@@ -43,6 +43,7 @@ export function InsightsHeaderActions() {
     queryFn: async () => ((await supabase.from("notification_preferences").select("*")).data ?? []) as unknown as Pref[],
   });
   const live = connectors.filter((c) => c.enabled);
+  const showDemo = !live.some((c) => c.provider === "power_bi");
   const summaries = prefs.filter((p) => p.is_active !== false).flatMap((p) => {
     const who = [p.email, p.time_zone].filter(Boolean).join(" · ");
     const out: { key: string; label: string; who: string }[] = [];
@@ -62,7 +63,7 @@ export function InsightsHeaderActions() {
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="whitespace-nowrap">
             <Plug className="mr-1.5 h-4 w-4" />Live Connectors
-            <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px]">{live.length + 1}</Badge>
+            <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px]">{live.length + (showDemo ? 1 : 0)}</Badge>
             <ChevronDown className="ml-1 h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>
@@ -76,10 +77,10 @@ export function InsightsHeaderActions() {
               </DropdownMenuItem>
             );
           })}
-          <DropdownMenuItem onClick={() => toast("Demo connector — not linked")}>
+          {showDemo && <DropdownMenuItem onClick={() => toast("Demo connector — not linked")}>
             <img src={powerBiLogo} alt="" className="mr-2 h-4 w-4" />Power BI
             <Badge variant="outline" className="ml-auto text-[10px]">Demo</Badge>
-          </DropdownMenuItem>
+          </DropdownMenuItem>}
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild><Link to="/sources#reporting-connectors">Manage connectors</Link></DropdownMenuItem>
         </DropdownMenuContent>
