@@ -110,7 +110,7 @@ export function InsightsHeaderActions() {
       </DropdownMenu>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm-luminous-card max-w-2xl">
+        <DialogContent className="max-w-2xl border-primary/30 shadow-[var(--shadow-elevated)]">
           <DialogHeader>
             <DialogTitle>What we capture</DialogTitle>
             <DialogDescription>Totals are summed across the last {days} days per post and platform.</DialogDescription>
