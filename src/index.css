@@ -2843,3 +2843,4 @@ body:not([data-sm-surface="reading"]) [role="dialog"]:not(.sm-light) :is(input, 
 .sm-connections [role="tablist"] { background: hsl(var(--email-surface) / .9); border: 1px solid hsl(var(--email-line)); border-radius: 12px; }
 .sm-connections [role="tab"] { color: hsl(var(--email-muted)); }
 .sm-connections [role="tab"][data-state="active"] { color: hsl(var(--email-surface)); background: linear-gradient(160deg, hsl(var(--email-action)), hsl(var(--email-action-deep))); }
+.sm-connections .sm-card [class*="rounded-full"][class*="border"] { white-space: nowrap; flex-shrink: 0; }
