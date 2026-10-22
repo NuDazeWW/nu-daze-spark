@@ -1702,9 +1702,9 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 .sm-al-title-row { display: flex; align-items: center; gap: 4px; }
 .sm-al-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; font: 600 14px "Space Grotesk", sans-serif; color: hsl(var(--foreground)); }
 .sm-al-title:focus-visible { outline: 2px solid hsl(var(--ring)); border-radius: 4px; }
-.sm-al-more { width: 26px; height: 26px; }
+.sm-al-more { width: 26px; height: 26px; flex-shrink: 0; }
 .sm-al-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-.sm-al-tags span { padding: 1px 8px; border-radius: 999px; font-size: 10.5px; color: hsl(var(--muted-foreground)); border: 1px solid hsl(var(--sm-fx-lavender) / .2); }
+.sm-al-tags span { max-width: 100%; overflow-wrap: anywhere; padding: 1px 8px; border-radius: 999px; font-size: 10.5px; color: hsl(var(--muted-foreground)); border: 1px solid hsl(var(--sm-fx-lavender) / .2); }
 .sm-al-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .sm-al-date { font-size: 11px; color: hsl(var(--muted-foreground)); }
 .sm-al-date b { font-weight: 600; color: hsl(var(--foreground)); }
@@ -1717,8 +1717,10 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 .sm-al-inspector { position: sticky; top: 12px; display: grid; gap: 14px; padding: 16px; border-radius: 16px; border: 1px solid transparent; max-height: calc(100vh - 90px); overflow: auto;
   background: linear-gradient(180deg, hsl(262 40% 12%), hsl(258 46% 7%)) padding-box, linear-gradient(180deg, hsl(var(--sm-fx-turquoise) / .7), hsl(var(--sm-fx-lavender) / .14) 40%, hsl(var(--sm-fx-lavender) / .14)) border-box;
   box-shadow: inset 0 1px 0 hsl(0 0% 100% / .06), 0 24px 48px -24px hsl(0 0% 0% / .95), -8px 0 30px -24px hsl(var(--sm-fx-turquoise) / .7); }
-.sm-al-insp-head { display: flex; align-items: center; gap: 10px; }
-.sm-al-insp-head h2 { font: 600 16px "Space Grotesk", sans-serif; color: hsl(var(--foreground)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sm-al-inspector, .sm-al-inspector > * { min-width: 0; max-width: 100%; }
+.sm-al-insp-head { display: flex; align-items: flex-start; gap: 10px; }
+.sm-al-insp-head > button, .sm-al-insp-icon { flex-shrink: 0; }
+.sm-al-insp-head h2 { font: 600 16px "Space Grotesk", sans-serif; color: hsl(var(--foreground)); overflow-wrap: anywhere; white-space: normal; }
 .sm-al-insp-head p { font-size: 12px; color: hsl(var(--muted-foreground)); }
 .sm-al-insp-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; color: hsl(var(--sm-fx-coral, 340 90% 65%)); background: hsl(340 80% 60% / .12); border: 1px solid hsl(340 80% 60% / .3); }
 .sm-al-insp-icon svg { width: 18px; height: 18px; }
@@ -1730,7 +1732,7 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 .sm-al-insp-section dt { color: hsl(var(--muted-foreground)); }
 .sm-al-insp-section dd { color: hsl(var(--foreground)); overflow-wrap: anywhere; }
 .sm-al-insp-copy { font-size: 12px; line-height: 1.5; color: hsl(var(--muted-foreground)); }
-.sm-al-insp-actions { display: flex; gap: 8px; padding-top: 12px; border-top: 1px solid hsl(var(--sm-fx-lavender) / .12); }
+.sm-al-insp-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 12px; border-top: 1px solid hsl(var(--sm-fx-lavender) / .12); }
 .sm-al-insp-actions .sm-al-primary { margin-left: 0; flex: 1; }
 .sm-al-insp-actions > button { height: 44px; }
 @media (max-width: 1100px) {
@@ -1760,7 +1762,7 @@ main:has(.sm-ug) { overflow: visible clip; overflow-x: clip; overflow-y: visible
 .sm-strategy-background { filter: brightness(.72); }
 .sm-al-card, .sm-al-body { min-width: 0; }
 .sm-al-foot { flex-wrap: wrap; }
-.sm-al-title { white-space: nowrap; }
+.sm-al-title { white-space: normal; overflow-wrap: anywhere; line-height: 1.4; }
 .sm-strategy .sm-card.sm-strategy-rule { background: linear-gradient(115deg, hsl(0 0% 100%), hsl(262 70% 96%)) !important; border-color: hsl(262 60% 88%) !important; }
 .sm-al-body { grid-template-columns: minmax(0, 1fr); }
 .sm-al-title-row, .sm-al-foot { min-width: 0; }
