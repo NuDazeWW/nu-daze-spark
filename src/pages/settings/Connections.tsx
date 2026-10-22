@@ -17,6 +17,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
 import { AiProvidersPanel } from "@/components/media/AiProvidersPanel";
+import { PlatformIcon } from "@/components/layout/PlatformIcon";
+import emailBackground from "@/assets/email-provider-workspace-background.jpg";
 import { CheckCircle2, Copy, ExternalLink, KeyRound, Link2, Loader2, PlugZap, RefreshCw, ShieldCheck, Unplug } from "lucide-react";
 
 type ProviderKey = "linkedin" | "meta" | "x" | "google";
@@ -95,9 +97,12 @@ function DeveloperApps() {
           <Card key={p.key}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-2">
-                <div>
-                  <CardTitle className="text-base">{p.label}</CardTitle>
-                  <CardDescription>{p.covers}</CardDescription>
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="sm-conn-icons">{PLATFORMS.filter((x) => x.provider === p.key).map((x) => <PlatformIcon key={x.key} platform={x.key} className="h-4 w-4" />)}</span>
+                  <div className="min-w-0">
+                    <CardTitle className="text-base">{p.label}</CardTitle>
+                    <CardDescription>{p.covers}</CardDescription>
+                  </div>
                 </div>
                 {s?.configured
                   ? <Badge className="gap-1"><CheckCircle2 className="h-3 w-3" />Configured</Badge>
@@ -219,9 +224,12 @@ function ClientChannels() {
             <Card key={pl.key} className={on ? "" : "opacity-95"}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
-                  <div>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="sm-conn-icons"><PlatformIcon platform={pl.key} className="h-4 w-4" /></span>
+                    <div className="min-w-0">
                     <CardTitle className="text-base">{pl.label}</CardTitle>
                     <CardDescription>{a ? `${a.account_name}${a.handle ? ` · @${a.handle.replace(/^@/, "")}` : ""}` : "No account linked"}</CardDescription>
+                    </div>
                   </div>
                   {on
                     ? <Badge className="gap-1"><ShieldCheck className="h-3 w-3" />Connected</Badge>
@@ -264,7 +272,8 @@ export default function Connections() {
   const ws = useWorkspace();
   const [params] = useSearchParams();
   return (
-    <div className="space-y-6">
+    <div className="sm-email-provider sm-connections space-y-6">
+      <img src={emailBackground} width={1536} height={1024} alt="" aria-hidden="true" className="sm-email-background" />
       <PageHeader title="Social Connections" description={`Connect each ${ws.entitySingular.toLowerCase()}'s social accounts, manage platform developer apps, and connect your own AI image and video tools.`} />
       <AdminOnly>
         <Tabs defaultValue={params.get("tab") ?? "channels"}>

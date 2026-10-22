@@ -2834,3 +2834,13 @@ body:not([data-sm-surface="reading"]) [role="dialog"]:not(.sm-light) :is(input, 
 .sm-back-to-top[data-visible="true"] { opacity: 1; transform: none; pointer-events: auto; }
 .sm-back-to-top:hover { background: hsl(var(--background)); }
 @media (prefers-reduced-motion: reduce) { .sm-back-to-top { transition: none; transform: none; } }
+
+/* Social Connections: shares the Email Provider light-page treatment. */
+.sm-connections .sm-page-title-row { padding-right: 0; min-height: 0; }
+.sm-conn-icons { display: inline-flex; gap: 6px; flex-shrink: 0; }
+.sm-light-page.sm-route-themed .sm-connections .sm-btn-primary, .sm-light-page.sm-route-themed .sm-connections button[data-variant="default"] { border-radius: 10px; font-weight: 600; color: hsl(var(--email-surface)); border: 1px solid hsl(var(--email-cyan)); background: linear-gradient(160deg, hsl(var(--email-action)), hsl(var(--email-action-deep))); box-shadow: inset 0 0 14px hsl(var(--email-cyan) / .55), inset 0 1px 0 hsl(var(--email-surface) / .3), 0 0 16px hsl(var(--email-cyan) / .3); }
+.sm-light-page.sm-route-themed .sm-connections .sm-btn-outline { border-radius: 10px; font-weight: 600; }
+.sm-connections [role="tablist"] { background: hsl(var(--email-surface) / .9); border: 1px solid hsl(var(--email-line)); border-radius: 12px; }
+.sm-connections [role="tab"] { color: hsl(var(--email-muted)); }
+.sm-connections [role="tab"][data-state="active"] { color: hsl(var(--email-surface)); background: linear-gradient(160deg, hsl(var(--email-action)), hsl(var(--email-action-deep))); }
+.sm-connections .sm-card [class*="rounded-full"][class*="border"] { white-space: nowrap; flex-shrink: 0; }
