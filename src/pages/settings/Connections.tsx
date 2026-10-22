@@ -228,7 +228,7 @@ function ClientChannels() {
                     <span className="sm-conn-icons"><PlatformIcon platform={pl.key} className="h-4 w-4" /></span>
                     <div className="min-w-0">
                     <CardTitle className="text-base">{pl.label}</CardTitle>
-                    <CardDescription>{a ? `${a.account_name}${a.handle ? ` · @${a.handle.replace(/^@/, "")}` : ""}` : "No account linked"}</CardDescription>
+                    <CardDescription>{a ? a.account_name : "No account linked"}</CardDescription>
                     </div>
                   </div>
                   {on
