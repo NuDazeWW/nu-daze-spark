@@ -2814,3 +2814,21 @@ body:not([data-sm-surface="reading"]) [role="dialog"]:not(.sm-light) :is(input, 
 @keyframes sm-section-flash { 0% { box-shadow: 0 0 0 0 hsl(186 100% 50% / .0); } 20% { box-shadow: 0 0 0 3px hsl(186 100% 50% / .85), 0 0 24px hsl(186 100% 50% / .45); } 100% { box-shadow: 0 0 0 0 hsl(186 100% 50% / 0); } }
 .sm-section-flash { animation: sm-section-flash 1.6s ease-out; border-radius: 14px; outline: none; }
 @media (prefers-reduced-motion: reduce) { .sm-section-flash { animation: none; box-shadow: 0 0 0 3px hsl(186 100% 50% / .85); } }
+
+/* Floating back-to-top arrow: matches the header back arrow, pinned to the bottom-left of the page area. */
+.sm-back-to-top {
+  position: fixed;
+  z-index: 40;
+  bottom: 1rem;
+  border: 1px solid hsl(var(--border) / .8);
+  background: hsl(var(--background) / .88);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-elevated);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: left .2s ease, opacity .18s ease, transform .18s ease;
+}
+.sm-back-to-top[data-visible="true"] { opacity: 1; transform: none; pointer-events: auto; }
+.sm-back-to-top:hover { background: hsl(var(--background)); }
+@media (prefers-reduced-motion: reduce) { .sm-back-to-top { transition: none; transform: none; } }
