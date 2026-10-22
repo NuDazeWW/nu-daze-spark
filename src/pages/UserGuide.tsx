@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Printer, BookOpen, ChevronDown, ChevronUp, ChevronRight, CheckCircle2, Info, Lightbulb, MessageSquare } from "lucide-react";
+import { ArrowRight, Printer, BookOpen, ChevronDown, ChevronUp, ChevronRight, CheckCircle2, Info, Lightbulb, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { useBilling, useCreditWeights, fmtUsd } from "@/hooks/useBilling";
