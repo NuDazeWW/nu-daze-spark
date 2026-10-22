@@ -65,5 +65,9 @@ describe("isNavItemActive", () => {
     expect(isNavItemActive(station, "/generator", "", "#generation-station")).toBe(true);
     expect(isNavItemActive(station, "/generator", "", "#post-connector")).toBe(false);
     expect(isNavItemActive(connector, "/generator", "", "#post-connector")).toBe(true);
+    // The Campaign Briefs entry points at another page, so it is never the selected one here.
+    const briefs = groupForPath("/generator")!.items[0];
+    expect(isNavItemActive(briefs, "/generator", "", "")).toBe(false);
+    expect(isNavItemActive(briefs, "/briefs", "", "")).toBe(true);
   });
 });
